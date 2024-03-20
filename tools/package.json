@@ -1,23 +1,34 @@
 {
 	"name": "vscode-languageserver-tools",
+	"version": "0.0.1",
+	"private": false,
 	"description": "Tooling for the language server protocol",
-	"version": "0.1.0",
-	"author": "Microsoft Corporation",
-	"license": "MIT",
-	"private": true,
+	"homepage": "https://github.com/CodeEditorLand/Foundation#readme",
+	"bugs": {
+		"url": "https://github.com/CodeEditorLand/Foundation/issues"
+	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/Microsoft/vscode-languageserver-node.git",
-		"directory": "tools"
+		"url": "git+https://github.com/CodeEditorLand/Foundation.git"
 	},
-	"bugs": {
-		"url": "https://github.com/Microsoft/vscode-languageserver-node/issues"
+	"license": "SEE LICENSE IN LICENSE",
+	"author": {
+		"name": "Playform",
+		"email": "Hello@Playform.Cloud",
+		"url": "https://playform.cloud"
 	},
+	"type": "module",
 	"main": "./lib/main.js",
 	"scripts": {
-		"compile": "node ../build/bin/tsc -b ./tsconfig.json",
-		"watch": "node ../build/bin/tsc -b ./tsconfig-watch.json -w",
 		"clean": "node ../node_modules/rimraf/dist/esm/bin.mjs lib && node ../node_modules/rimraf/dist/esm/bin.mjs dist",
-		"lint": "node ../node_modules/eslint/bin/eslint.js --ext ts src"
+		"compile": "node ../build/bin/tsc -b ./tsconfig.json",
+		"prepublishOnly": "TypeScriptESBuild 'Source/**/*.ts'",
+		"watch": "node ../build/bin/tsc -b ./tsconfig-watch.json -w"
+	},
+	"devDependencies": {
+		"typescript-esbuild": "latest"
+	},
+	"publishConfig": {
+		"access": "public"
 	}
 }

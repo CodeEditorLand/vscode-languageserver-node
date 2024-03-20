@@ -1,50 +1,55 @@
 {
 	"name": "vscode-languageclient",
+	"version": "0.0.1",
+	"private": false,
 	"description": "VSCode Language client implementation",
-	"version": "10.0.0-next.2",
-	"author": "Microsoft Corporation",
-	"license": "MIT",
-	"engines": {
-		"vscode": "^1.86.0"
+	"homepage": "https://github.com/CodeEditorLand/Foundation#readme",
+	"bugs": {
+		"url": "https://github.com/CodeEditorLand/Foundation/issues"
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/Microsoft/vscode-languageserver-node.git",
-		"directory": "client"
+		"url": "git+https://github.com/CodeEditorLand/Foundation.git"
 	},
-	"bugs": {
-		"url": "https://github.com/Microsoft/vscode-languageserver-node/issues"
+	"license": "SEE LICENSE IN LICENSE",
+	"author": {
+		"name": "Playform",
+		"email": "Hello@Playform.Cloud",
+		"url": "https://playform.cloud"
 	},
-	"enabledApiProposals": [],
+	"type": "module",
 	"main": "./lib/node/main.js",
 	"browser": {
 		"./lib/node/main.js": "./lib/browser/main.js"
 	},
 	"typings": "./lib/common/api.d.ts",
-	"devDependencies": {
-		"@types/minimatch": "^5.1.2",
-		"@types/semver": "^7.5.8",
-		"@types/vscode": "1.86.0",
-		"shx": "^0.3.4"
+	"scripts": {
+		"all": "npm run clean && npm run compile && npm run lint && npm test",
+		"all:publish": "git clean -xfd . && npm install && npm run updateVSCodeVersion && npm run compile:publish && npm run lint && cd ../client-node-tests && npm run all:publish && cd ..",
+		"clean": "node ../node_modules/rimraf/dist/esm/bin.mjs lib",
+		"compile": "node ../build/bin/tsc -b ./tsconfig.json && shx cp src/node/terminateProcess.sh lib/node/terminateProcess.sh",
+		"compile:clean": "git clean -xfd . && npm install && npm run clean && npm run compile",
+		"compile:publish": "node ../build/bin/tsc -b ./tsconfig.publish.json && shx cp src/node/terminateProcess.sh lib/node/terminateProcess.sh",
+		"prepack": "npm run all:publish",
+		"prepublishOnly": "TypeScriptESBuild 'Source/**/*.ts'",
+		"updateVSCodeVersion": "node ./bin/updateVSCode.js",
+		"preversion": "npm test",
+		"watch": "node ../build/bin/tsc -b ./tsconfig.watch.json -w"
 	},
 	"dependencies": {
 		"minimatch": "^9.0.3",
 		"semver": "^7.6.0",
 		"vscode-languageserver-protocol": "3.17.6-next.3"
 	},
-	"scripts": {
-		"prepublishOnly": "echo \"⛔ Can only publish from a secure pipeline ⛔\" && node ../build/npm/fail",
-		"prepack": "npm run all:publish",
-		"compile": "node ../build/bin/tsc -b ./tsconfig.json && shx cp src/node/terminateProcess.sh lib/node/terminateProcess.sh",
-		"compile:clean": "git clean -xfd . && npm install && npm run clean && npm run compile",
-		"watch": "node ../build/bin/tsc -b ./tsconfig.watch.json -w",
-		"lint": "node ../node_modules/eslint/bin/eslint.js --ext ts src",
-		"test": "cd ../client-node-tests && npm test && cd ../client",
-		"clean": "node ../node_modules/rimraf/dist/esm/bin.mjs lib",
-		"all": "npm run clean && npm run compile && npm run lint && npm test",
-		"compile:publish": "node ../build/bin/tsc -b ./tsconfig.publish.json && shx cp src/node/terminateProcess.sh lib/node/terminateProcess.sh",
-		"all:publish": "git clean -xfd . && npm install && npm run updateVSCodeVersion && npm run compile:publish && npm run lint && cd ../client-node-tests && npm run all:publish && cd ..",
-		"preversion": "npm test",
-		"updateVSCodeVersion": "node ./bin/updateVSCode.js"
-	}
+	"devDependencies": {
+		"@types/minimatch": "^5.1.2",
+		"@types/semver": "^7.5.8",
+		"@types/vscode": "1.86.0",
+		"shx": "^0.3.4",
+		"typescript-esbuild": "latest"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"enabledApiProposals": []
 }
