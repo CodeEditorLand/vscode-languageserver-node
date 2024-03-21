@@ -1,45 +1,14 @@
 {
-	"name": "test-extension",
-	"displayName": "test-extension",
-	"version": "0.0.1",
-	"private": false,
-	"description": "",
-	"homepage": "https://github.com/CodeEditorLand/Foundation#readme",
-	"bugs": {
-		"url": "https://github.com/CodeEditorLand/Foundation/issues"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/CodeEditorLand/Foundation.git"
-	},
-	"license": "SEE LICENSE IN LICENSE",
-	"author": {
-		"name": "Playform",
-		"email": "Hello@Playform.Cloud",
-		"url": "https://playform.cloud"
-	},
-	"type": "module",
-	"main": "./extension.js",
-	"scripts": {
-		"all": "npm run clean && npm run compile && npm run lint && npm run test",
-		"all:publish": "git clean -xfd . && npm install && npm run symlink:publish && npm run compile:publish && npm run test:publish",
-		"clean": "node ../node_modules/rimraf/dist/esm/bin.mjs lib",
-		"compile": "node ../build/bin/tsc -b ./tsconfig.json",
-		"compile:publish": "node ../build/bin/tsc -b ./tsconfig.publish.json",
-		"prepublishOnly": "TypeScriptESBuild 'Source/**/*.ts'",
-		"symlink:publish": "node ../build/bin/symlink-client-tests-publish.js",
-		"test:publish": "node lib/runTests.js",
-		"watch": "node ../build/bin/tsc -b ./tsconfig.watch.json -w"
-	},
-	"contributes": {},
 	"activationEvents": [
 		"*"
 	],
+	"contributes": {},
 	"dependencies": {
 		"minimatch": "^9.0.3",
 		"vscode-languageserver": "10.0.0-next.2",
 		"vscode-uri": "3.0.8"
 	},
+	"description": "",
 	"devDependencies": {
 		"@types/glob": "^8.1.0",
 		"@types/minimatch": "^5.1.2",
@@ -53,8 +22,20 @@
 		"typescript-esbuild": "0.4.5",
 		"uuid": "^9.0.1"
 	},
-	"publishConfig": {
-		"access": "public"
+	"displayName": "test-extension",
+	"enabledApiProposals": [],
+	"main": "./extension.js",
+	"name": "test-extension",
+	"scripts": {
+		"all": "npm run clean && npm run compile && npm run lint && npm run test",
+		"all:publish": "git clean -xfd . && npm install && npm run symlink:publish && npm run compile:publish && npm run test:publish",
+		"clean": "node ../node_modules/rimraf/dist/esm/bin.mjs lib",
+		"compile": "node ../build/bin/tsc -b ./tsconfig.json",
+		"compile:publish": "node ../build/bin/tsc -b ./tsconfig.publish.json",
+		"prepublishOnly": "TypeScriptESBuild 'Source/**/*.ts'",
+		"symlink:publish": "node ../build/bin/symlink-client-tests-publish.js",
+		"test:publish": "node lib/runTests.js",
+		"watch": "node ../build/bin/tsc -b ./tsconfig.watch.json -w"
 	},
-	"enabledApiProposals": []
+	"type": "module"
 }

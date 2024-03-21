@@ -1,23 +1,8 @@
 {
-	"name": "vscode-languageserver-types",
-	"version": "0.0.1",
-	"private": false,
 	"description": "Types used by the Language server for node",
-	"homepage": "https://github.com/CodeEditorLand/Foundation#readme",
-	"bugs": {
-		"url": "https://github.com/CodeEditorLand/Foundation/issues"
+	"devDependencies": {
+		"typescript-esbuild": "0.4.5"
 	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/CodeEditorLand/Foundation.git"
-	},
-	"license": "SEE LICENSE IN LICENSE",
-	"author": {
-		"name": "Playform",
-		"email": "Hello@Playform.Cloud",
-		"url": "https://playform.cloud"
-	},
-	"type": "module",
 	"exports": {
 		".": {
 			"browser": "./lib/esm/main.js",
@@ -27,7 +12,7 @@
 		}
 	},
 	"main": "./lib/umd/main.js",
-	"typings": "./lib/umd/main",
+	"name": "vscode-languageserver-types",
 	"scripts": {
 		"all": "npm run clean && npm run compile && npm run lint && npm run test",
 		"all:publish": "git clean -xfd . && npm install && npm run compile:esm && npm run compile:umd && npm run lint && npm run test",
@@ -40,10 +25,6 @@
 		"preversion": "npm test",
 		"watch": "node ../build/bin/tsc -b ./tsconfig.watch.json -w"
 	},
-	"devDependencies": {
-		"typescript-esbuild": "0.4.5"
-	},
-	"publishConfig": {
-		"access": "public"
-	}
+	"type": "module",
+	"typings": "./lib/umd/main"
 }

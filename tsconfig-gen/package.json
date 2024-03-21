@@ -1,28 +1,17 @@
 {
-	"name": "@vscode/tsconfig-gen",
-	"version": "0.0.1",
-	"private": false,
-	"description": "Tool to generate tsconfig files from a higher level description",
-	"homepage": "https://github.com/CodeEditorLand/Foundation#readme",
-	"bugs": {
-		"url": "https://github.com/CodeEditorLand/Foundation/issues"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/CodeEditorLand/Foundation.git"
-	},
-	"license": "SEE LICENSE IN LICENSE",
-	"author": {
-		"name": "Playform",
-		"email": "Hello@Playform.Cloud",
-		"url": "https://playform.cloud"
-	},
-	"type": "module",
-	"main": "./lib/main.js",
-	"typings": "./lib/main.d.ts",
 	"bin": {
 		"tsconfig-gen": "./bin/tsconfig-gen"
 	},
+	"dependencies": {
+		"yargs": "^17.7.2"
+	},
+	"description": "Tool to generate tsconfig files from a higher level description",
+	"devDependencies": {
+		"@types/yargs": "^17.0.29",
+		"typescript-esbuild": "0.4.5"
+	},
+	"main": "./lib/main.js",
+	"name": "@vscode/tsconfig-gen",
 	"scripts": {
 		"all": "npm run compile && npm run lint",
 		"all:publish": "git clean -xfd . && npm install && npm run compile:publish && npm run lint",
@@ -33,14 +22,6 @@
 		"prepublishOnly": "TypeScriptESBuild 'Source/**/*.ts'",
 		"watch": "node ../build/bin/tsc -b ./tsconfig.watch.json -w"
 	},
-	"dependencies": {
-		"yargs": "^17.7.2"
-	},
-	"devDependencies": {
-		"@types/yargs": "^17.0.29",
-		"typescript-esbuild": "0.4.5"
-	},
-	"publishConfig": {
-		"access": "public"
-	}
+	"type": "module",
+	"typings": "./lib/main.d.ts"
 }

@@ -1,31 +1,7 @@
 {
-	"name": "testbed",
-	"version": "0.0.1",
-	"private": false,
-	"description": "testbed",
-	"homepage": "https://github.com/CodeEditorLand/Foundation#readme",
-	"bugs": {
-		"url": "https://github.com/CodeEditorLand/Foundation/issues"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/CodeEditorLand/Foundation.git"
-	},
-	"license": "SEE LICENSE IN LICENSE",
-	"author": {
-		"name": "Playform",
-		"email": "Hello@Playform.Cloud",
-		"url": "https://playform.cloud"
-	},
-	"type": "module",
-	"main": "./client/out/extension.js",
-	"scripts": {
-		"clean": "tsc -b --clean",
-		"compile": "tsc -b",
-		"postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
-		"prepublishOnly": "TypeScriptESBuild 'Source/**/*.ts'",
-		"watch": "tsc -b -w"
-	},
+	"activationEvents": [
+		"*"
+	],
 	"contributes": {
 		"commands": [
 			{
@@ -50,14 +26,19 @@
 			"type": "object"
 		}
 	},
-	"activationEvents": [
-		"*"
-	],
+	"description": "testbed",
 	"devDependencies": {
 		"typescript-esbuild": "0.4.5"
 	},
-	"publishConfig": {
-		"access": "public"
+	"enabledApiProposals": [],
+	"main": "./client/out/extension.js",
+	"name": "testbed",
+	"scripts": {
+		"clean": "tsc -b --clean",
+		"compile": "tsc -b",
+		"postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
+		"prepublishOnly": "TypeScriptESBuild 'Source/**/*.ts'",
+		"watch": "tsc -b -w"
 	},
-	"enabledApiProposals": []
+	"type": "module"
 }

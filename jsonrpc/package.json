@@ -1,28 +1,15 @@
 {
-	"name": "vscode-jsonrpc",
-	"version": "0.0.1",
-	"private": false,
-	"description": "A json rpc implementation over streams",
-	"homepage": "https://github.com/CodeEditorLand/Foundation#readme",
-	"bugs": {
-		"url": "https://github.com/CodeEditorLand/Foundation/issues"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/CodeEditorLand/Foundation.git"
-	},
-	"license": "SEE LICENSE IN LICENSE",
-	"author": {
-		"name": "Playform",
-		"email": "Hello@Playform.Cloud",
-		"url": "https://playform.cloud"
-	},
-	"type": "module",
-	"main": "./lib/node/main.js",
 	"browser": {
 		"./lib/node/main.js": "./lib/browser/main.js"
 	},
-	"typings": "./lib/common/api.d.ts",
+	"description": "A json rpc implementation over streams",
+	"devDependencies": {
+		"@types/msgpack-lite": "^0.1.10",
+		"msgpack-lite": "^0.1.26",
+		"typescript-esbuild": "0.4.5"
+	},
+	"main": "./lib/node/main.js",
+	"name": "vscode-jsonrpc",
 	"scripts": {
 		"all": "npm run clean && npm run compile && npm run lint && npm run test",
 		"all:publish": "git clean -xfd . && npm install && npm run compile:publish && npm run lint && npm run test",
@@ -31,20 +18,14 @@
 		"compile:publish": "node ../build/bin/tsc -b ./tsconfig.publish.json",
 		"prepack": "npm run all:publish",
 		"prepublishOnly": "TypeScriptESBuild 'Source/**/*.ts'",
+		"preversion": "npm test",
 		"test:browser": "npm run webpack:test:silent && node ../build/bin/runBrowserTests.js  http://127.0.0.1:8080/jsonrpc/src/browser/test/",
 		"test:node": "node ../node_modules/mocha/bin/_mocha",
-		"preversion": "npm test",
 		"watch": "node ../build/bin/tsc -b ./tsconfig.watch.json -w",
 		"webpack": "node ../build/bin/webpack  --mode none --config ./webpack.config.js",
 		"webpack:test": "node ../build/bin/webpack --mode none --config ./src/browser/test/webpack.config.js",
 		"webpack:test:silent": "node ../build/bin/webpack --no-stats --mode none --config ./src/browser/test/webpack.config.js"
 	},
-	"devDependencies": {
-		"@types/msgpack-lite": "^0.1.10",
-		"msgpack-lite": "^0.1.26",
-		"typescript-esbuild": "0.4.5"
-	},
-	"publishConfig": {
-		"access": "public"
-	}
+	"type": "module",
+	"typings": "./lib/common/api.d.ts"
 }
