@@ -42,7 +42,7 @@
 	"devDependencies": {
 		"@types/msgpack-lite": "^0.1.10",
 		"msgpack-lite": "^0.1.26",
-		"typescript-esbuild": "latest"
+		"typescript-esbuild": "0.4.5"
 	},
 	"publishConfig": {
 		"access": "public"

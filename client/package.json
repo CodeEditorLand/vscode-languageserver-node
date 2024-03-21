@@ -46,7 +46,7 @@
 		"@types/semver": "^7.5.8",
 		"@types/vscode": "1.86.0",
 		"shx": "^0.3.4",
-		"typescript-esbuild": "latest"
+		"typescript-esbuild": "0.4.5"
 	},
 	"publishConfig": {
 		"access": "public"

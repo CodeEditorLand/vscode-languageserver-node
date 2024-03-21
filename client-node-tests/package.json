@@ -50,7 +50,7 @@
 		"find-process": "^1.4.7",
 		"glob": "^10.3.10",
 		"sinon": "^17.0.0",
-		"typescript-esbuild": "latest",
+		"typescript-esbuild": "0.4.5",
 		"uuid": "^9.0.1"
 	},
 	"publishConfig": {
