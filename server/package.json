@@ -1,20 +1,31 @@
 {
-	"bin": {
-		"installServerIntoExtension": "./bin/installServerIntoExtension"
+	"name": "vscode-languageserver",
+	"version": "0.0.1",
+	"private": false,
+	"description": "Language server implementation for node",
+	"homepage": "https://github.com/CodeEditorLand/Foundation#readme",
+	"bugs": {
+		"url": "https://github.com/CodeEditorLand/Foundation/issues"
 	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/CodeEditorLand/Foundation.git"
+	},
+	"license": "SEE LICENSE IN LICENSE",
+	"author": {
+		"name": "Playform",
+		"email": "Hello@Playform.Cloud",
+		"url": "https://playform.cloud"
+	},
+	"type": "module",
+	"main": "./lib/node/main.js",
 	"browser": {
 		"./lib/node/main.js": "./lib/browser/main.js"
 	},
-	"dependencies": {
-		"vscode-languageserver-protocol": "3.17.6-next.3"
+	"typings": "./lib/common/api.d.ts",
+	"bin": {
+		"installServerIntoExtension": "./bin/installServerIntoExtension"
 	},
-	"description": "Language server implementation for node",
-	"devDependencies": {
-		"typescript-esbuild": "0.4.5",
-		"vscode-languageserver-textdocument": "1.0.11"
-	},
-	"main": "./lib/node/main.js",
-	"name": "vscode-languageserver",
 	"scripts": {
 		"all": "npm run clean && npm run compile && npm run lint && npm test",
 		"all:publish": "git clean -xfd . && npm install && npm run compile:publish && npm run lint && npm test",
@@ -26,6 +37,14 @@
 		"preversion": "npm test",
 		"watch": "node ../build/bin/tsc -b ./tsconfig.watch.json -w"
 	},
-	"type": "module",
-	"typings": "./lib/common/api.d.ts"
+	"dependencies": {
+		"vscode-languageserver-protocol": "3.17.6-next.3"
+	},
+	"devDependencies": {
+		"typescript-esbuild": "0.4.5",
+		"vscode-languageserver-textdocument": "1.0.11"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
 }

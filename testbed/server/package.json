@@ -1,16 +1,35 @@
 {
-	"dependencies": {
-		"vscode-uri": "^3.0.1"
-	},
-	"description": "TestBed Server",
-	"devDependencies": {
-		"typescript-esbuild": "0.4.5"
-	},
 	"name": "testbed-server",
+	"version": "0.0.1",
+	"private": false,
+	"description": "TestBed Server",
+	"homepage": "https://github.com/CodeEditorLand/Foundation#readme",
+	"bugs": {
+		"url": "https://github.com/CodeEditorLand/Foundation/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/CodeEditorLand/Foundation.git"
+	},
+	"license": "SEE LICENSE IN LICENSE",
+	"author": {
+		"name": "Playform",
+		"email": "Hello@Playform.Cloud",
+		"url": "https://playform.cloud"
+	},
+	"type": "module",
 	"scripts": {
 		"compile": "tsc -b ./tsconfig.json",
 		"prepublishOnly": "TypeScriptESBuild 'Source/**/*.ts'",
 		"watch": "tsc --watch -b ./tsconfig.json"
 	},
-	"type": "module"
+	"dependencies": {
+		"vscode-uri": "^3.0.1"
+	},
+	"devDependencies": {
+		"typescript-esbuild": "0.4.5"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
 }
