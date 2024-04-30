@@ -1,39 +1,53 @@
 {
 	"name": "vscode-languageserver-types",
+	"version": "0.0.1",
+	"private": false,
 	"description": "Types used by the Language server for node",
-	"version": "3.17.6-next.3",
-	"author": "Microsoft Corporation",
-	"license": "MIT",
+	"keywords": [
+		"land"
+	],
+	"homepage": "HTTPS://GitHub.Com/CodeEditorLand/LandLanguageServerNode#readme",
+	"bugs": {
+		"url": "HTTPS://GitHub.Com/CodeEditorLand/LandLanguageServerNode/issues"
+	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/Microsoft/vscode-languageserver-node.git",
-		"directory": "types"
+		"url": "git+HTTPS://github.com/CodeEditorLand/LandLanguageServerNode.git"
 	},
-	"bugs": {
-		"url": "https://github.com/Microsoft/vscode-languageserver-node/issues"
+	"license": "SEE LICENSE IN LICENSE",
+	"author": {
+		"name": "🌆 — Land —",
+		"email": "Land@PlayForm.Cloud",
+		"url": "HTTPS://Land.PlayForm.Cloud"
 	},
-	"main": "./lib/umd/main.js",
-	"typings": "./lib/umd/main",
+	"type": "module",
 	"exports": {
 		".": {
 			"browser": "./lib/esm/main.js",
-			"module": "./lib/esm/main.js",
+			"default": "./lib/umd/main.js",
 			"import": "./lib/esm/main.js",
-			"default": "./lib/umd/main.js"
+			"module": "./lib/esm/main.js"
 		}
 	},
+	"main": "./lib/umd/main.js",
+	"typings": "./lib/umd/main",
 	"scripts": {
-		"prepublishOnly": "echo \"⛔ Can only publish from a secure pipeline ⛔\" && node ../build/npm/fail",
-		"prepack": "npm run all:publish",
-		"compile": "node ../build/bin/tsc -b ./tsconfig.json",
-		"clean": "node ../node_modules/rimraf/dist/esm/bin.mjs lib",
-		"watch": "node ../build/bin/tsc -b ./tsconfig.watch.json -w",
-		"lint": "node ../node_modules/eslint/bin/eslint.js --ext ts src",
-		"test": "node ../node_modules/mocha/bin/_mocha",
+		"Document": "Document 'Source/**/*.ts'",
 		"all": "npm run clean && npm run compile && npm run lint && npm run test",
+		"all:publish": "git clean -xfd . && npm install && npm run compile:esm && npm run compile:umd && npm run lint && npm run test",
+		"clean": "node ../node_modules/rimraf/dist/esm/bin.mjs lib",
+		"compile": "node ../build/bin/tsc -b ./tsconfig.json",
 		"compile:esm": "node ../build/bin/tsc -b ./tsconfig.esm.publish.json && node ../build/bin/fix-esm",
 		"compile:umd": "node ../build/bin/tsc -b ./tsconfig.umd.publish.json",
-		"all:publish": "git clean -xfd . && npm install && npm run compile:esm && npm run compile:umd && npm run lint && npm run test",
+		"prepack": "npm run all:publish",
+		"prepublishOnly": "Build 'Source/**/*.ts'",
 		"preversion": "npm test"
+	},
+	"devDependencies": {
+		"@playform/build": "0.0.7",
+		"@playform/document": "0.0.6"
+	},
+	"publishConfig": {
+		"access": "public"
 	}
 }

@@ -1,17 +1,33 @@
 {
 	"name": "testbed",
+	"version": "0.0.1",
+	"private": false,
 	"description": "testbed",
-	"version": "0.1.0",
-	"publisher": "vscode",
-	"engines": {
-		"vscode": "^1.33.0"
+	"keywords": [
+		"land"
+	],
+	"homepage": "HTTPS://GitHub.Com/CodeEditorLand/LandLanguageServerNode#readme",
+	"bugs": {
+		"url": "HTTPS://GitHub.Com/CodeEditorLand/LandLanguageServerNode/issues"
 	},
+	"repository": {
+		"type": "git",
+		"url": "git+HTTPS://github.com/CodeEditorLand/LandLanguageServerNode.git"
+	},
+	"license": "SEE LICENSE IN LICENSE",
+	"author": {
+		"name": "🌆 — Land —",
+		"email": "Land@PlayForm.Cloud",
+		"url": "HTTPS://Land.PlayForm.Cloud"
+	},
+	"type": "module",
 	"main": "./client/out/extension.js",
-	"activationEvents": [
-		"*"
-	],
-	"enabledApiProposals": [
-	],
+	"scripts": {
+		"Document": "Document 'Source/**/*.ts'",
+		"clean": "tsc -b --clean",
+		"compile": "tsc -b",
+		"prepublishOnly": "Build 'Source/**/*.ts'"
+	},
 	"contributes": {
 		"commands": [
 			{
@@ -20,26 +36,31 @@
 			}
 		],
 		"configuration": {
-			"type": "object",
-			"title": "TestBed configuration",
 			"properties": {
 				"testbed.enable": {
-					"type": "boolean",
 					"default": true,
-					"description": "Control whether eslint is enabled for JavaScript files or not."
+					"description": "Control whether eslint is enabled for JavaScript files or not.",
+					"type": "boolean"
 				},
 				"testbed.options": {
-					"type": "object",
 					"default": {},
-					"description": "The eslint options object to provide args to the eslint command."
+					"description": "The eslint options object to provide args to the eslint command.",
+					"type": "object"
 				}
-			}
+			},
+			"title": "TestBed configuration",
+			"type": "object"
 		}
 	},
-	"scripts": {
-		"postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
-		"compile": "tsc -b",
-		"clean": "tsc -b --clean",
-		"watch": "tsc -b -w"
-	}
+	"activationEvents": [
+		"*"
+	],
+	"devDependencies": {
+		"@playform/build": "0.0.7",
+		"@playform/document": "0.0.6"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"enabledApiProposals": []
 }

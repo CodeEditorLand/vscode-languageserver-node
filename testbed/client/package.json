@@ -1,15 +1,36 @@
 {
 	"name": "testbed-client",
+	"version": "0.0.1",
+	"private": false,
 	"description": "Testbed client",
-	"version": "0.1.0",
-	"private": true,
-	"publisher": "vscode",
-	"engines": {
-		"vscode": "^1.40.0"
+	"keywords": [
+		"land"
+	],
+	"homepage": "HTTPS://GitHub.Com/CodeEditorLand/LandLanguageServerNode#readme",
+	"bugs": {
+		"url": "HTTPS://GitHub.Com/CodeEditorLand/LandLanguageServerNode/issues"
 	},
+	"repository": {
+		"type": "git",
+		"url": "git+HTTPS://github.com/CodeEditorLand/LandLanguageServerNode.git"
+	},
+	"license": "SEE LICENSE IN LICENSE",
+	"author": {
+		"name": "🌆 — Land —",
+		"email": "Land@PlayForm.Cloud",
+		"url": "HTTPS://Land.PlayForm.Cloud"
+	},
+	"type": "module",
 	"scripts": {
-		"watch": "tsc -watch -b ./tsconfig.json",
-		"compile": "tsc -b ./tsconfig.json"
+		"Document": "Document 'Source/**/*.ts'",
+		"compile": "tsc -b ./tsconfig.json",
+		"prepublishOnly": "Build 'Source/**/*.ts'"
 	},
-	"devDependencies": {}
+	"devDependencies": {
+		"@playform/build": "0.0.7",
+		"@playform/document": "0.0.6"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
 }

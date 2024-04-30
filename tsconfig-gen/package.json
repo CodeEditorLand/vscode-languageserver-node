@@ -1,37 +1,50 @@
 {
 	"name": "@vscode/tsconfig-gen",
+	"version": "0.0.1",
+	"private": false,
 	"description": "Tool to generate tsconfig files from a higher level description",
-	"version": "0.1.0",
-	"author": "Microsoft Corporation",
-	"license": "MIT",
+	"keywords": [
+		"land"
+	],
+	"homepage": "HTTPS://GitHub.Com/CodeEditorLand/LandLanguageServerNode#readme",
+	"bugs": {
+		"url": "HTTPS://GitHub.Com/CodeEditorLand/LandLanguageServerNode/issues"
+	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/Microsoft/vscode-languageserver-node.git",
-		"directory": "tsconfig-gen"
+		"url": "git+HTTPS://github.com/CodeEditorLand/LandLanguageServerNode.git"
 	},
-	"bugs": {
-		"url": "https://github.com/Microsoft/vscode-languageserver-node/issues"
+	"license": "SEE LICENSE IN LICENSE",
+	"author": {
+		"name": "🌆 — Land —",
+		"email": "Land@PlayForm.Cloud",
+		"url": "HTTPS://Land.PlayForm.Cloud"
 	},
+	"type": "module",
 	"main": "./lib/main.js",
 	"typings": "./lib/main.d.ts",
 	"bin": {
 		"tsconfig-gen": "./bin/tsconfig-gen"
 	},
+	"scripts": {
+		"Document": "Document 'Source/**/*.ts'",
+		"all": "npm run compile && npm run lint",
+		"all:publish": "git clean -xfd . && npm install && npm run compile:publish && npm run lint",
+		"clean": "node ../node_modules/rimraf/dist/esm/bin.mjs lib",
+		"compile": "node ../build/bin/tsc -b ./tsconfig.json",
+		"compile:publish": "node ../build/bin/tsc -b ./tsconfig.publish.json",
+		"prepack": "git clean -xfd . && npm install && npm run all",
+		"prepublishOnly": "Build 'Source/**/*.ts'"
+	},
 	"dependencies": {
 		"yargs": "^17.7.2"
 	},
 	"devDependencies": {
+		"@playform/build": "0.0.7",
+		"@playform/document": "0.0.6",
 		"@types/yargs": "^17.0.29"
 	},
-	"scripts": {
-		"prepublishOnly": "echo \"⛔ Can only publish from a secure pipeline ⛔\" && node ../build/npm/fail",
-		"prepack": "git clean -xfd . && npm install && npm run all",
-		"compile": "node ../build/bin/tsc -b ./tsconfig.json",
-		"clean": "node ../node_modules/rimraf/dist/esm/bin.mjs lib",
-		"watch": "node ../build/bin/tsc -b ./tsconfig.watch.json -w",
-		"lint": "node ../node_modules/eslint/bin/eslint.js --ext ts src",
-		"all": "npm run compile && npm run lint",
-		"compile:publish": "node ../build/bin/tsc -b ./tsconfig.publish.json",
-		"all:publish": "git clean -xfd . && npm install && npm run compile:publish && npm run lint"
+	"publishConfig": {
+		"access": "public"
 	}
 }

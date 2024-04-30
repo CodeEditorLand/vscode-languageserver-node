@@ -1,17 +1,26 @@
 {
 	"name": "vscode-languageserver",
+	"version": "0.0.1",
+	"private": false,
 	"description": "Language server implementation for node",
-	"version": "10.0.0-next.3",
-	"author": "Microsoft Corporation",
-	"license": "MIT",
+	"keywords": [
+		"land"
+	],
+	"homepage": "HTTPS://GitHub.Com/CodeEditorLand/LandLanguageServerNode#readme",
+	"bugs": {
+		"url": "HTTPS://GitHub.Com/CodeEditorLand/LandLanguageServerNode/issues"
+	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/Microsoft/vscode-languageserver-node.git",
-		"directory": "server"
+		"url": "git+HTTPS://github.com/CodeEditorLand/LandLanguageServerNode.git"
 	},
-	"bugs": {
-		"url": "https://github.com/Microsoft/vscode-languageserver-node/issues"
+	"license": "SEE LICENSE IN LICENSE",
+	"author": {
+		"name": "🌆 — Land —",
+		"email": "Land@PlayForm.Cloud",
+		"url": "HTTPS://Land.PlayForm.Cloud"
 	},
+	"type": "module",
 	"main": "./lib/node/main.js",
 	"browser": {
 		"./lib/node/main.js": "./lib/browser/main.js"
@@ -20,23 +29,23 @@
 	"bin": {
 		"installServerIntoExtension": "./bin/installServerIntoExtension"
 	},
-	"devDependencies": {
-		"vscode-languageserver-textdocument": "1.0.11"
-	},
-	"dependencies": {
-		"vscode-languageserver-protocol": "3.17.6-next.4"
-	},
 	"scripts": {
-		"prepublishOnly": "echo \"⛔ Can only publish from a secure pipeline ⛔\" && node ../build/npm/fail",
-		"prepack": "npm run all:publish",
-		"compile": "node ../build/bin/tsc -b ./tsconfig.json",
-		"watch": "node ../build/bin/tsc -b ./tsconfig.watch.json -w",
-		"clean": "node ../node_modules/rimraf/dist/esm/bin.mjs lib",
-		"lint": "node ../node_modules/eslint/bin/eslint.js --ext ts src",
-		"test": "node ../node_modules/mocha/bin/_mocha",
+		"Document": "Document 'Source/**/*.ts'",
 		"all": "npm run clean && npm run compile && npm run lint && npm test",
-		"compile:publish": "node ../build/bin/tsc -b ./tsconfig.publish.json",
 		"all:publish": "git clean -xfd . && npm install && npm run compile:publish && npm run lint && npm test",
+		"clean": "node ../node_modules/rimraf/dist/esm/bin.mjs lib",
+		"compile": "node ../build/bin/tsc -b ./tsconfig.json",
+		"compile:publish": "node ../build/bin/tsc -b ./tsconfig.publish.json",
+		"prepack": "npm run all:publish",
+		"prepublishOnly": "Build 'Source/**/*.ts'",
 		"preversion": "npm test"
+	},
+	"dependencies": {},
+	"devDependencies": {
+		"@playform/build": "0.0.7",
+		"@playform/document": "0.0.6"
+	},
+	"publishConfig": {
+		"access": "public"
 	}
 }
