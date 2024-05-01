@@ -1,31 +1,36 @@
 {
-	"name": "vscode-languageserver-protocol",
-	"version": "0.0.1",
-	"private": false,
+	"author": {
+		"email": "Land@PlayForm.Cloud",
+		"name": "🌆 — Land —",
+		"url": "HTTPS://Land.PlayForm.Cloud"
+	},
+	"browser": {
+		"./lib/node/main.js": "./lib/browser/main.js"
+	},
+	"bugs": {
+		"url": "HTTPS://GitHub.Com/CodeEditorLand/LandLanguageServerNode/issues"
+	},
+	"dependencies": {},
 	"description": "VSCode Language Server Protocol implementation",
+	"devDependencies": {
+		"@playform/build": "0.0.7",
+		"@playform/document": "0.0.6"
+	},
+	"homepage": "HTTPS://GitHub.Com/CodeEditorLand/LandLanguageServerNode#readme",
 	"keywords": [
 		"land"
 	],
-	"homepage": "HTTPS://GitHub.Com/CodeEditorLand/LandLanguageServerNode#readme",
-	"bugs": {
-		"url": "HTTPS://GitHub.Com/CodeEditorLand/LandLanguageServerNode/issues"
+	"license": "SEE LICENSE IN LICENSE",
+	"main": "./lib/node/main.js",
+	"name": "vscode-languageserver-protocol",
+	"private": false,
+	"publishConfig": {
+		"access": "public"
 	},
 	"repository": {
 		"type": "git",
 		"url": "git+HTTPS://github.com/CodeEditorLand/LandLanguageServerNode.git"
 	},
-	"license": "SEE LICENSE IN LICENSE",
-	"author": {
-		"name": "🌆 — Land —",
-		"email": "Land@PlayForm.Cloud",
-		"url": "HTTPS://Land.PlayForm.Cloud"
-	},
-	"type": "module",
-	"main": "./lib/node/main.js",
-	"browser": {
-		"./lib/node/main.js": "./lib/browser/main.js"
-	},
-	"typings": "./lib/common/api.d.ts",
 	"scripts": {
 		"Document": "Document 'Source/**/*.ts'",
 		"all": "npm run clean && npm run compile && npm run lint && npm run test && npm run compile:metaModelTool && npm run generate:metaModel && npm run generate:metaModelSchema",
@@ -36,21 +41,16 @@
 		"compile:publish": "node ../build/bin/tsc -b ./tsconfig.publish.json",
 		"generate:metaModel": "node ../tools/lib/generator-main.js -p ./src/common/tsconfig.json > ./metaModel.json",
 		"generate:metaModelSchema": "ts-json-schema-generator --tsconfig ../tools/tsconfig.json --path ../tools/src/metaModel.ts > ./metaModel.schema.json",
+		"postpublish": "node ../build/npm/post-publish.js",
 		"prepack": "npm run all:publish",
 		"prepublishOnly": "Build 'Source/**/*.ts'",
-		"postpublish": "node ../build/npm/post-publish.js",
+		"preversion": "npm test",
 		"test:browser": "npm run webpack:test:silent && node ../build/bin/runBrowserTests.js  http://127.0.0.1:8080/protocol/src/browser/test/",
 		"test:node": "node ../node_modules/mocha/bin/_mocha",
-		"preversion": "npm test",
 		"webpack:test": "cd ../types && npm run compile:esm && cd ../protocol && node ../build/bin/webpack --mode none --config ./src/browser/test/webpack.config.js",
 		"webpack:test:silent": "cd ../types && npm run compile:esm && cd ../protocol && node ../build/bin/webpack --no-stats --mode none --config ./src/browser/test/webpack.config.js"
 	},
-	"dependencies": {},
-	"devDependencies": {
-		"@playform/build": "0.0.7",
-		"@playform/document": "0.0.6"
-	},
-	"publishConfig": {
-		"access": "public"
-	}
+	"type": "module",
+	"typings": "./lib/common/api.d.ts",
+	"version": "0.0.1"
 }

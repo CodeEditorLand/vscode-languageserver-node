@@ -1,30 +1,38 @@
 {
-	"name": "@vscode/tsconfig-gen",
-	"version": "0.0.1",
-	"private": false,
+	"author": {
+		"email": "Land@PlayForm.Cloud",
+		"name": "🌆 — Land —",
+		"url": "HTTPS://Land.PlayForm.Cloud"
+	},
+	"bin": {
+		"tsconfig-gen": "./bin/tsconfig-gen"
+	},
+	"bugs": {
+		"url": "HTTPS://GitHub.Com/CodeEditorLand/LandLanguageServerNode/issues"
+	},
+	"dependencies": {
+		"yargs": "17.7.2"
+	},
 	"description": "Tool to generate tsconfig files from a higher level description",
+	"devDependencies": {
+		"@playform/build": "0.0.7",
+		"@playform/document": "0.0.6",
+		"@types/yargs": "17.0.32"
+	},
+	"homepage": "HTTPS://GitHub.Com/CodeEditorLand/LandLanguageServerNode#readme",
 	"keywords": [
 		"land"
 	],
-	"homepage": "HTTPS://GitHub.Com/CodeEditorLand/LandLanguageServerNode#readme",
-	"bugs": {
-		"url": "HTTPS://GitHub.Com/CodeEditorLand/LandLanguageServerNode/issues"
+	"license": "SEE LICENSE IN LICENSE",
+	"main": "./lib/main.js",
+	"name": "@vscode/tsconfig-gen",
+	"private": false,
+	"publishConfig": {
+		"access": "public"
 	},
 	"repository": {
 		"type": "git",
 		"url": "git+HTTPS://github.com/CodeEditorLand/LandLanguageServerNode.git"
-	},
-	"license": "SEE LICENSE IN LICENSE",
-	"author": {
-		"name": "🌆 — Land —",
-		"email": "Land@PlayForm.Cloud",
-		"url": "HTTPS://Land.PlayForm.Cloud"
-	},
-	"type": "module",
-	"main": "./lib/main.js",
-	"typings": "./lib/main.d.ts",
-	"bin": {
-		"tsconfig-gen": "./bin/tsconfig-gen"
 	},
 	"scripts": {
 		"Document": "Document 'Source/**/*.ts'",
@@ -36,15 +44,7 @@
 		"prepack": "git clean -xfd . && npm install && npm run all",
 		"prepublishOnly": "Build 'Source/**/*.ts'"
 	},
-	"dependencies": {
-		"yargs": "17.7.2"
-	},
-	"devDependencies": {
-		"@playform/build": "0.0.7",
-		"@playform/document": "0.0.6",
-		"@types/yargs": "17.0.32"
-	},
-	"publishConfig": {
-		"access": "public"
-	}
+	"type": "module",
+	"typings": "./lib/main.d.ts",
+	"version": "0.0.1"
 }
