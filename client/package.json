@@ -1,43 +1,31 @@
 {
-	"author": {
-		"email": "Land@PlayForm.Cloud",
-		"name": "🌆 — Land —",
-		"url": "HTTPS://Land.PlayForm.Cloud"
-	},
-	"browser": {
-		"./lib/node/main.js": "./lib/browser/main.js"
-	},
-	"bugs": {
-		"url": "HTTPS://GitHub.Com/CodeEditorLand/LandLanguageServerNode/issues"
-	},
-	"dependencies": {
-		"minimatch": "9.0.4",
-		"semver": "7.6.0"
-	},
+	"name": "vscode-languageclient",
+	"version": "0.0.1",
+	"private": false,
 	"description": "VSCode Language client implementation",
-	"devDependencies": {
-		"@playform/build": "0.0.7",
-		"@playform/document": "0.0.6",
-		"@types/minimatch": "5.1.2",
-		"@types/semver": "7.5.8",
-		"shx": "0.3.4"
-	},
-	"enabledApiProposals": [],
-	"homepage": "HTTPS://GitHub.Com/CodeEditorLand/LandLanguageServerNode#readme",
 	"keywords": [
 		"land"
 	],
-	"license": "SEE LICENSE IN LICENSE",
-	"main": "./lib/node/main.js",
-	"name": "vscode-languageclient",
-	"private": false,
-	"publishConfig": {
-		"access": "public"
+	"homepage": "HTTPS://GitHub.Com/CodeEditorLand/LandLanguageServerNode#readme",
+	"bugs": {
+		"url": "HTTPS://GitHub.Com/CodeEditorLand/LandLanguageServerNode/issues"
 	},
 	"repository": {
 		"type": "git",
 		"url": "git+HTTPS://github.com/CodeEditorLand/LandLanguageServerNode.git"
 	},
+	"license": "SEE LICENSE IN LICENSE",
+	"author": {
+		"name": "🌆 — Land —",
+		"email": "Land@PlayForm.Cloud",
+		"url": "HTTPS://Land.PlayForm.Cloud"
+	},
+	"type": "module",
+	"main": "./lib/node/main.js",
+	"browser": {
+		"./lib/node/main.js": "./lib/browser/main.js"
+	},
+	"typings": "./lib/common/api.d.ts",
 	"scripts": {
 		"Document": "Document 'Source/**/*.ts'",
 		"all": "npm run clean && npm run compile && npm run lint && npm test",
@@ -48,10 +36,22 @@
 		"compile:publish": "node ../build/bin/tsc -b ./tsconfig.publish.json && shx cp src/node/terminateProcess.sh lib/node/terminateProcess.sh",
 		"prepack": "npm run all:publish",
 		"prepublishOnly": "Build 'Source/**/*.ts'",
-		"preversion": "npm test",
-		"updateVSCodeVersion": "node ./bin/updateVSCode.js"
+		"updateVSCodeVersion": "node ./bin/updateVSCode.js",
+		"preversion": "npm test"
 	},
-	"type": "module",
-	"typings": "./lib/common/api.d.ts",
-	"version": "0.0.1"
+	"dependencies": {
+		"minimatch": "9.0.4",
+		"semver": "7.6.0"
+	},
+	"devDependencies": {
+		"@playform/build": "0.0.7",
+		"@playform/document": "0.0.6",
+		"@types/minimatch": "5.1.2",
+		"@types/semver": "7.5.8",
+		"shx": "0.3.4"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"enabledApiProposals": []
 }

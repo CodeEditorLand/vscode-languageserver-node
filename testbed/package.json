@@ -1,14 +1,32 @@
 {
-	"activationEvents": [
-		"*"
+	"name": "testbed",
+	"version": "0.0.1",
+	"private": false,
+	"description": "testbed",
+	"keywords": [
+		"land"
 	],
-	"author": {
-		"email": "Land@PlayForm.Cloud",
-		"name": "🌆 — Land —",
-		"url": "HTTPS://Land.PlayForm.Cloud"
-	},
+	"homepage": "HTTPS://GitHub.Com/CodeEditorLand/LandLanguageServerNode#readme",
 	"bugs": {
 		"url": "HTTPS://GitHub.Com/CodeEditorLand/LandLanguageServerNode/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+HTTPS://github.com/CodeEditorLand/LandLanguageServerNode.git"
+	},
+	"license": "SEE LICENSE IN LICENSE",
+	"author": {
+		"name": "🌆 — Land —",
+		"email": "Land@PlayForm.Cloud",
+		"url": "HTTPS://Land.PlayForm.Cloud"
+	},
+	"type": "module",
+	"main": "./client/out/extension.js",
+	"scripts": {
+		"Document": "Document 'Source/**/*.ts'",
+		"clean": "tsc -b --clean",
+		"compile": "tsc -b",
+		"prepublishOnly": "Build 'Source/**/*.ts'"
 	},
 	"contributes": {
 		"commands": [
@@ -34,33 +52,15 @@
 			"type": "object"
 		}
 	},
-	"description": "testbed",
+	"activationEvents": [
+		"*"
+	],
 	"devDependencies": {
 		"@playform/build": "0.0.7",
 		"@playform/document": "0.0.6"
 	},
-	"enabledApiProposals": [],
-	"homepage": "HTTPS://GitHub.Com/CodeEditorLand/LandLanguageServerNode#readme",
-	"keywords": [
-		"land"
-	],
-	"license": "SEE LICENSE IN LICENSE",
-	"main": "./client/out/extension.js",
-	"name": "testbed",
-	"private": false,
 	"publishConfig": {
 		"access": "public"
 	},
-	"repository": {
-		"type": "git",
-		"url": "git+HTTPS://github.com/CodeEditorLand/LandLanguageServerNode.git"
-	},
-	"scripts": {
-		"Document": "Document 'Source/**/*.ts'",
-		"clean": "tsc -b --clean",
-		"compile": "tsc -b",
-		"prepublishOnly": "Build 'Source/**/*.ts'"
-	},
-	"type": "module",
-	"version": "0.0.1"
+	"enabledApiProposals": []
 }

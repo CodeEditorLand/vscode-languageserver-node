@@ -1,17 +1,26 @@
 {
-	"author": {
-		"email": "Land@PlayForm.Cloud",
-		"name": "🌆 — Land —",
-		"url": "HTTPS://Land.PlayForm.Cloud"
-	},
+	"name": "vscode-languageserver-textdocument",
+	"version": "0.0.1",
+	"private": false,
+	"description": "A simple text document implementation for Node LSP servers",
+	"keywords": [
+		"land"
+	],
+	"homepage": "HTTPS://GitHub.Com/CodeEditorLand/LandLanguageServerNode#readme",
 	"bugs": {
 		"url": "HTTPS://GitHub.Com/CodeEditorLand/LandLanguageServerNode/issues"
 	},
-	"description": "A simple text document implementation for Node LSP servers",
-	"devDependencies": {
-		"@playform/build": "0.0.7",
-		"@playform/document": "0.0.6"
+	"repository": {
+		"type": "git",
+		"url": "git+HTTPS://github.com/CodeEditorLand/LandLanguageServerNode.git"
 	},
+	"license": "SEE LICENSE IN LICENSE",
+	"author": {
+		"name": "🌆 — Land —",
+		"email": "Land@PlayForm.Cloud",
+		"url": "HTTPS://Land.PlayForm.Cloud"
+	},
+	"type": "module",
 	"exports": {
 		".": {
 			"browser": "./lib/esm/main.js",
@@ -20,21 +29,8 @@
 			"module": "./lib/esm/main.js"
 		}
 	},
-	"homepage": "HTTPS://GitHub.Com/CodeEditorLand/LandLanguageServerNode#readme",
-	"keywords": [
-		"land"
-	],
-	"license": "SEE LICENSE IN LICENSE",
 	"main": "./lib/umd/main.js",
-	"name": "vscode-languageserver-textdocument",
-	"private": false,
-	"publishConfig": {
-		"access": "public"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+HTTPS://github.com/CodeEditorLand/LandLanguageServerNode.git"
-	},
+	"typings": "./lib/umd/main",
 	"scripts": {
 		"Document": "Document 'Source/**/*.ts'",
 		"all": "npm run clean && npm run compile && npm run lint && npm run test",
@@ -47,7 +43,11 @@
 		"prepublishOnly": "Build 'Source/**/*.ts'",
 		"preversion": "npm test"
 	},
-	"type": "module",
-	"typings": "./lib/umd/main",
-	"version": "0.0.1"
+	"devDependencies": {
+		"@playform/build": "0.0.7",
+		"@playform/document": "0.0.6"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
 }

@@ -1,40 +1,26 @@
 {
-	"author": {
-		"email": "Land@PlayForm.Cloud",
-		"name": "🌆 — Land —",
-		"url": "HTTPS://Land.PlayForm.Cloud"
-	},
-	"bugs": {
-		"url": "HTTPS://GitHub.Com/CodeEditorLand/LandLanguageServerNode/issues"
-	},
+	"name": "vscode-lsp",
+	"version": "0.0.1",
+	"private": false,
 	"description": "VSCode Language Server Protocol Implementation",
-	"devDependencies": {
-		"@playform/build": "0.0.7",
-		"@playform/document": "0.0.6",
-		"@types/assert": "1.5.10",
-		"@types/node": "20.12.7",
-		"assert": "2.1.0",
-		"http-server": "14.1.1",
-		"rimraf": "5.0.5",
-		"shelljs": "0.8.5",
-		"shx": "0.3.4",
-		"source-map-support": "0.5.21",
-		"ts-json-schema-generator": "2.1.1"
-	},
-	"homepage": "HTTPS://GitHub.Com/CodeEditorLand/LandLanguageServerNode#readme",
 	"keywords": [
 		"land"
 	],
-	"license": "SEE LICENSE IN LICENSE",
-	"name": "vscode-lsp",
-	"private": false,
-	"publishConfig": {
-		"access": "public"
+	"homepage": "HTTPS://GitHub.Com/CodeEditorLand/LandLanguageServerNode#readme",
+	"bugs": {
+		"url": "HTTPS://GitHub.Com/CodeEditorLand/LandLanguageServerNode/issues"
 	},
 	"repository": {
 		"type": "git",
 		"url": "git+HTTPS://github.com/CodeEditorLand/LandLanguageServerNode.git"
 	},
+	"license": "SEE LICENSE IN LICENSE",
+	"author": {
+		"name": "🌆 — Land —",
+		"email": "Land@PlayForm.Cloud",
+		"url": "HTTPS://Land.PlayForm.Cloud"
+	},
+	"type": "module",
 	"scripts": {
 		"Document": "Document 'Source/**/*.ts'",
 		"all": "npm run symlink && npm run compile && npm run test",
@@ -64,6 +50,20 @@
 		"watch:testbed": "tsc -b ./testbed/tsconfig.json -w",
 		"watch:tsconfig-gen": "tsc -b ./tsconfig-gen/tsconfig.json -w"
 	},
-	"type": "module",
-	"version": "0.0.1"
+	"devDependencies": {
+		"@playform/build": "0.0.7",
+		"@playform/document": "0.0.6",
+		"@types/assert": "1.5.10",
+		"@types/node": "20.12.7",
+		"assert": "2.1.0",
+		"http-server": "14.1.1",
+		"rimraf": "5.0.5",
+		"shelljs": "0.8.5",
+		"shx": "0.3.4",
+		"source-map-support": "0.5.21",
+		"ts-json-schema-generator": "2.1.1"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
 }
