@@ -45,8 +45,8 @@
 	"devDependencies": {
 		"@playform/build": "0.0.7",
 		"@playform/document": "0.0.6",
-		"@types/msgpack-lite": "^0.1.10",
-		"msgpack-lite": "^0.1.26"
+		"@types/msgpack-lite": "0.1.11",
+		"msgpack-lite": "0.1.26"
 	},
 	"publishConfig": {
 		"access": "public"
