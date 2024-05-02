@@ -1,0 +1,151 @@
+name: NPM
+
+concurrency:
+    group: NPM-${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+permissions:
+    security-events: write
+    contents: write
+    pull-requests: write
+
+on:
+    workflow_dispatch:
+    release:
+        types: [created]
+    workflow_call:
+
+jobs:
+    Publish:
+        runs-on: ubuntu-latest
+
+        permissions:
+            contents: read
+            id-token: write
+
+        steps:
+            - uses: actions/checkout@v4.1.4
+
+            - uses: actions/setup-node@v4.0.2
+              with:
+                  node-version: "18"
+                  registry-url: "https://registry.npmjs.org"
+
+            - run: npm install -g npm
+
+            - name: Publish ./client-node-tests
+              continue-on-error: true
+              working-directory: ./client-node-tests
+              run: |
+                  npm install --include prod dev optional peer --legacy-peer-deps
+                  npm publish --legacy-peer-deps --provenance
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+            - name: Publish ./client
+              continue-on-error: true
+              working-directory: ./client
+              run: |
+                  npm install --include prod dev optional peer --legacy-peer-deps
+                  npm publish --legacy-peer-deps --provenance
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+            - name: Publish ./jsonrpc
+              continue-on-error: true
+              working-directory: ./jsonrpc
+              run: |
+                  npm install --include prod dev optional peer --legacy-peer-deps
+                  npm publish --legacy-peer-deps --provenance
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+            - name: Publish .
+              continue-on-error: true
+              working-directory: .
+              run: |
+                  npm install --include prod dev optional peer --legacy-peer-deps
+                  npm publish --legacy-peer-deps --provenance
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+            - name: Publish ./protocol
+              continue-on-error: true
+              working-directory: ./protocol
+              run: |
+                  npm install --include prod dev optional peer --legacy-peer-deps
+                  npm publish --legacy-peer-deps --provenance
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+            - name: Publish ./server
+              continue-on-error: true
+              working-directory: ./server
+              run: |
+                  npm install --include prod dev optional peer --legacy-peer-deps
+                  npm publish --legacy-peer-deps --provenance
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+            - name: Publish ./testbed/client
+              continue-on-error: true
+              working-directory: ./testbed/client
+              run: |
+                  npm install --include prod dev optional peer --legacy-peer-deps
+                  npm publish --legacy-peer-deps --provenance
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+            - name: Publish ./testbed
+              continue-on-error: true
+              working-directory: ./testbed
+              run: |
+                  npm install --include prod dev optional peer --legacy-peer-deps
+                  npm publish --legacy-peer-deps --provenance
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+            - name: Publish ./testbed/server
+              continue-on-error: true
+              working-directory: ./testbed/server
+              run: |
+                  npm install --include prod dev optional peer --legacy-peer-deps
+                  npm publish --legacy-peer-deps --provenance
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+            - name: Publish ./textDocument
+              continue-on-error: true
+              working-directory: ./textDocument
+              run: |
+                  npm install --include prod dev optional peer --legacy-peer-deps
+                  npm publish --legacy-peer-deps --provenance
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+            - name: Publish ./tools
+              continue-on-error: true
+              working-directory: ./tools
+              run: |
+                  npm install --include prod dev optional peer --legacy-peer-deps
+                  npm publish --legacy-peer-deps --provenance
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+            - name: Publish ./tsconfig-gen
+              continue-on-error: true
+              working-directory: ./tsconfig-gen
+              run: |
+                  npm install --include prod dev optional peer --legacy-peer-deps
+                  npm publish --legacy-peer-deps --provenance
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+            - name: Publish ./types
+              continue-on-error: true
+              working-directory: ./types
+              run: |
+                  npm install --include prod dev optional peer --legacy-peer-deps
+                  npm publish --legacy-peer-deps --provenance
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
