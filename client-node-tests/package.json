@@ -1,8 +1,9 @@
 {
-	"name": "@vscode/tsconfig-gen",
+	"name": "test-extension",
+	"displayName": "test-extension",
 	"version": "0.0.1",
 	"private": false,
-	"description": "Tool to generate tsconfig files from a higher level description",
+	"description": "",
 	"keywords": [
 		"land"
 	],
@@ -21,30 +22,39 @@
 		"url": "HTTPS://Land.PlayForm.Cloud"
 	},
 	"type": "module",
-	"main": "./lib/main.js",
-	"typings": "./lib/main.d.ts",
-	"bin": {
-		"tsconfig-gen": "./bin/tsconfig-gen"
-	},
+	"main": "./extension.js",
 	"scripts": {
 		"Document": "Document 'Source/**/*.ts'",
-		"all": "npm run compile && npm run lint",
-		"all:publish": "git clean -xfd . && npm install && npm run compile:publish && npm run lint",
+		"all": "npm run clean && npm run compile && npm run lint && npm run test",
+		"all:publish": "git clean -xfd . && npm install && npm run symlink:publish && npm run compile:publish && npm run test:publish",
 		"clean": "node ../node_modules/rimraf/dist/esm/bin.mjs lib",
 		"compile": "node ../build/bin/tsc -b ./tsconfig.json",
 		"compile:publish": "node ../build/bin/tsc -b ./tsconfig.publish.json",
-		"prepack": "git clean -xfd . && npm install && npm run all",
-		"prepublishOnly": "Build 'Source/**/*.ts'"
+		"prepublishOnly": "Build 'Source/**/*.ts'",
+		"symlink:publish": "node ../build/bin/symlink-client-tests-publish.js",
+		"test:publish": "node lib/runTests.js"
 	},
+	"contributes": {},
+	"activationEvents": [
+		"*"
+	],
 	"dependencies": {
-		"yargs": "17.7.2"
+		"minimatch": "9.0.4"
 	},
 	"devDependencies": {
 		"@playform/build": "0.0.7",
 		"@playform/document": "0.0.6",
-		"@types/yargs": "17.0.32"
+		"@types/glob": "8.1.0",
+		"@types/minimatch": "5.1.2",
+		"@types/sinon": "17.0.3",
+		"@types/uuid": "9.0.8",
+		"find-process": "1.4.7",
+		"glob": "10.3.12",
+		"sinon": "17.0.1",
+		"uuid": "9.0.1"
 	},
 	"publishConfig": {
 		"access": "public"
-	}
+	},
+	"enabledApiProposals": []
 }

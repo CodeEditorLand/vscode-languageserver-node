@@ -3,19 +3,22 @@
 	"version": "0.0.1",
 	"private": false,
 	"description": "Language server implementation for node",
-	"homepage": "https://github.com/CodeEditorLand/Foundation#readme",
+	"keywords": [
+		"land"
+	],
+	"homepage": "HTTPS://GitHub.Com/CodeEditorLand/LandLanguageServerNode#readme",
 	"bugs": {
-		"url": "https://github.com/CodeEditorLand/Foundation/issues"
+		"url": "HTTPS://GitHub.Com/CodeEditorLand/LandLanguageServerNode/issues"
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/CodeEditorLand/Foundation.git"
+		"url": "git+HTTPS://github.com/CodeEditorLand/LandLanguageServerNode.git"
 	},
 	"license": "SEE LICENSE IN LICENSE",
 	"author": {
-		"name": "Playform",
-		"email": "Hello@Playform.Cloud",
-		"url": "https://playform.cloud"
+		"name": "🌆 — Land —",
+		"email": "Land@PlayForm.Cloud",
+		"url": "HTTPS://Land.PlayForm.Cloud"
 	},
 	"type": "module",
 	"main": "./lib/node/main.js",
@@ -27,22 +30,20 @@
 		"installServerIntoExtension": "./bin/installServerIntoExtension"
 	},
 	"scripts": {
+		"Document": "Document 'Source/**/*.ts'",
 		"all": "npm run clean && npm run compile && npm run lint && npm test",
 		"all:publish": "git clean -xfd . && npm install && npm run compile:publish && npm run lint && npm test",
 		"clean": "node ../node_modules/rimraf/dist/esm/bin.mjs lib",
 		"compile": "node ../build/bin/tsc -b ./tsconfig.json",
 		"compile:publish": "node ../build/bin/tsc -b ./tsconfig.publish.json",
 		"prepack": "npm run all:publish",
-		"prepublishOnly": "TypeScriptESBuild 'Source/**/*.ts'",
-		"preversion": "npm test",
-		"watch": "node ../build/bin/tsc -b ./tsconfig.watch.json -w"
+		"prepublishOnly": "Build 'Source/**/*.ts'",
+		"preversion": "npm test"
 	},
-	"dependencies": {
-		"vscode-languageserver-protocol": "3.17.6-next.3"
-	},
+	"dependencies": {},
 	"devDependencies": {
-		"typescript-esbuild": "0.4.5",
-		"vscode-languageserver-textdocument": "1.0.11"
+		"@playform/build": "0.0.7",
+		"@playform/document": "0.0.6"
 	},
 	"publishConfig": {
 		"access": "public"
