@@ -54,7 +54,7 @@
 		"@playform/build": "0.0.7",
 		"@playform/document": "0.0.6",
 		"@types/assert": "1.5.10",
-		"@types/node": "20.12.7",
+		"@types/node": "20.12.10",
 		"assert": "2.1.0",
 		"http-server": "14.1.1",
 		"rimraf": "5.0.5",
