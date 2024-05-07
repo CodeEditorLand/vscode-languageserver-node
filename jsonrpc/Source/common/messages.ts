@@ -54,7 +54,7 @@ export namespace ErrorCodes {
 	 * @since 3.16.0
 	*/
 	export const jsonrpcReservedErrorRangeStart: -32099 = -32099;
-	/** @deprecated use  jsonrpcReservedErrorRangeStart */
+	
 	export const serverErrorStart: -32099 = /* jsonrpcReservedErrorRangeStart */ -32099;
 
 	/**
@@ -92,7 +92,7 @@ export namespace ErrorCodes {
 	 * @since 3.16.0
 	*/
 	export const jsonrpcReservedErrorRangeEnd: -32000 = -32000;
-	/** @deprecated use  jsonrpcReservedErrorRangeEnd */
+	
 	export const serverErrorEnd: -32000 = /* jsonrpcReservedErrorRangeEnd */ -32000;
 }
 type integer = number;
