@@ -20,7 +20,7 @@ if (args[0] === 'install' && process.env['npm_config_root_only'] === 'true') {
 	return;
 }
 
-/** @type { { folder: string; scripts: string[] }[] } */
+
 const folders = [
 	{ folder: 'tools', scripts: ['install', 'clean', 'lint'] },
 	{ folder: 'tsconfig-gen', scripts: ['install', 'clean', 'lint'] },
