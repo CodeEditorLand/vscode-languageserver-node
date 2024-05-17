@@ -1,26 +1,6 @@
 {
 	"name": "vscode-languageclient",
-	"version": "0.0.1",
-	"private": false,
 	"description": "VSCode Language client implementation",
-	"keywords": [
-		"land"
-	],
-	"homepage": "HTTPS://GitHub.Com/CodeEditorLand/LandLanguageServerNode#readme",
-	"bugs": {
-		"url": "HTTPS://GitHub.Com/CodeEditorLand/LandLanguageServerNode/issues"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+HTTPS://github.com/CodeEditorLand/LandLanguageServerNode.git"
-	},
-	"license": "SEE LICENSE IN LICENSE",
-	"author": {
-		"name": "🛬 Land —",
-		"email": "Land@PlayForm.Cloud",
-		"url": "HTTPS://Land.PlayForm.Cloud"
-	},
-	"type": "module",
 	"main": "./lib/node/main.js",
 	"browser": {
 		"./lib/node/main.js": "./lib/browser/main.js"
@@ -45,13 +25,9 @@
 	},
 	"devDependencies": {
 		"@playform/build": "0.0.7",
-		"@playform/document": "0.0.6",
 		"@types/minimatch": "5.1.2",
 		"@types/semver": "7.5.8",
 		"shx": "0.3.4"
-	},
-	"publishConfig": {
-		"access": "public"
 	},
 	"enabledApiProposals": []
 }

@@ -1,26 +1,6 @@
 {
 	"name": "vscode-lsp",
-	"version": "0.0.1",
-	"private": false,
 	"description": "VSCode Language Server Protocol Implementation",
-	"keywords": [
-		"land"
-	],
-	"homepage": "HTTPS://GitHub.Com/CodeEditorLand/LandLanguageServerNode#readme",
-	"bugs": {
-		"url": "HTTPS://GitHub.Com/CodeEditorLand/LandLanguageServerNode/issues"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+HTTPS://github.com/CodeEditorLand/LandLanguageServerNode.git"
-	},
-	"license": "SEE LICENSE IN LICENSE",
-	"author": {
-		"name": "🛬 Land —",
-		"email": "Land@PlayForm.Cloud",
-		"url": "HTTPS://Land.PlayForm.Cloud"
-	},
-	"type": "module",
 	"scripts": {
 		"Document": "Document 'Source/**/*.ts'",
 		"all": "npm run symlink && npm run compile && npm run test",
@@ -52,7 +32,6 @@
 	},
 	"devDependencies": {
 		"@playform/build": "0.0.7",
-		"@playform/document": "0.0.6",
 		"@types/assert": "1.5.10",
 		"@types/node": "20.12.10",
 		"assert": "2.1.0",
@@ -62,8 +41,5 @@
 		"shx": "0.3.4",
 		"source-map-support": "0.5.21",
 		"ts-json-schema-generator": "2.1.1"
-	},
-	"publishConfig": {
-		"access": "public"
 	}
 }
