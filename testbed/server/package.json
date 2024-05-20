@@ -1,13 +1,16 @@
 {
 	"name": "testbed-server",
+	"version": "0.1.0",
 	"description": "TestBed Server",
-	"scripts": {
-		"Document": "Document 'Source/**/*.ts'",
-		"compile": "tsc -b ./tsconfig.json",
-		"prepublishOnly": "Build 'Source/**/*.ts'"
+	"private": true,
+	"engines": {
+		"node": "*"
 	},
-	"dependencies": {},
-	"devDependencies": {
-		"@playform/build": "0.0.7"
+	"dependencies": {
+		"vscode-uri": "^3.0.1"
+	},
+	"scripts": {
+		"compile": "tsc -b ./tsconfig.json",
+		"watch": "tsc --watch -b ./tsconfig.json"
 	}
 }
