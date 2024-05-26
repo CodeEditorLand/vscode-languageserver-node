@@ -37,6 +37,6 @@
 		"shelljs": "0.8.5",
 		"shx": "0.3.4",
 		"source-map-support": "0.5.21",
-		"ts-json-schema-generator": "2.1.1"
+		"ts-json-schema-generator": "2.2.0"
 	}
 }
