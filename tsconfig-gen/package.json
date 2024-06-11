@@ -7,7 +7,7 @@
 	},
 	"description": "Tool to generate tsconfig files from a higher level description",
 	"devDependencies": {
-		"@types/yargs": "^17.0.29"
+		"@types/yargs": "^17.0.32"
 	},
 	"main": "./lib/main.js",
 	"name": "@vscode/tsconfig-gen",

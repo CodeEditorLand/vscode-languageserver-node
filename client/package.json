@@ -3,8 +3,8 @@
 		"./lib/node/main.js": "./lib/browser/main.js"
 	},
 	"dependencies": {
-		"minimatch": "^9.0.3",
-		"semver": "^7.6.0"
+		"minimatch": "^9.0.4",
+		"semver": "^7.6.2"
 	},
 	"description": "VSCode Language client implementation",
 	"devDependencies": {
