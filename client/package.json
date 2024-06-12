@@ -3,14 +3,14 @@
 		"./lib/node/main.js": "./lib/browser/main.js"
 	},
 	"dependencies": {
-		"minimatch": "^9.0.4",
-		"semver": "^7.6.2"
+		"minimatch": "9.0.4",
+		"semver": "7.6.2"
 	},
 	"description": "VSCode Language client implementation",
 	"devDependencies": {
-		"@types/minimatch": "^5.1.2",
-		"@types/semver": "^7.5.8",
-		"shx": "^0.3.4"
+		"@types/minimatch": "5.1.2",
+		"@types/semver": "7.5.8",
+		"shx": "0.3.4"
 	},
 	"enabledApiProposals": [],
 	"main": "./lib/node/main.js",
