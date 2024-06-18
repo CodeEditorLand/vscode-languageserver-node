@@ -21,8 +21,8 @@
 	},
 	"typings": "./lib/common/api.d.ts",
 	"devDependencies": {
-		"@types/msgpack-lite": "^0.1.10",
-		"msgpack-lite": "^0.1.26"
+		"@types/msgpack-lite": "0.1.11",
+		"msgpack-lite": "0.1.26"
 	},
 	"scripts": {
 		"prepublishOnly": "echo \"⛔ Can only publish from a secure pipeline ⛔\" && node ../build/npm/fail",
