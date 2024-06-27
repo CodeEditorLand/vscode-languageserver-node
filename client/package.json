@@ -19,7 +19,7 @@
 		"preversion": "npm test"
 	},
 	"dependencies": {
-		"minimatch": "9.0.4",
+		"minimatch": "9.0.5",
 		"semver": "7.6.2"
 	},
 	"devDependencies": {

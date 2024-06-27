@@ -30,7 +30,7 @@
 	},
 	"devDependencies": {
 		"@types/assert": "1.5.10",
-		"@types/node": "20.14.8",
+		"@types/node": "20.14.9",
 		"assert": "2.1.0",
 		"http-server": "14.1.1",
 		"rimraf": "5.0.7",

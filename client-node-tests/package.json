@@ -17,7 +17,7 @@
 		"*"
 	],
 	"dependencies": {
-		"minimatch": "9.0.4"
+		"minimatch": "9.0.5"
 	},
 	"devDependencies": {
 		"@types/glob": "8.1.0",
