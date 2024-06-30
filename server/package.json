@@ -1,14 +1,15 @@
 {
-	"name": "vscode-languageserver",
-	"description": "Language server implementation for node",
-	"main": "./lib/node/main.js",
-	"browser": {
-		"./lib/node/main.js": "./lib/browser/main.js"
-	},
-	"typings": "./lib/common/api.d.ts",
 	"bin": {
 		"installServerIntoExtension": "./bin/installServerIntoExtension"
 	},
+	"browser": {
+		"./lib/node/main.js": "./lib/browser/main.js"
+	},
+	"dependencies": {},
+	"description": "Language server implementation for node",
+	"devDependencies": {},
+	"main": "./lib/node/main.js",
+	"name": "vscode-languageserver",
 	"scripts": {
 		"all": "npm run clean && npm run compile && npm run lint && npm test",
 		"all:publish": "git clean -xfd . && npm install && npm run compile:publish && npm run lint && npm test",
@@ -19,6 +20,5 @@
 		"prepublishOnly": "echo \"⛔ Can only publish from a secure pipeline ⛔\" && node ../build/npm/fail",
 		"preversion": "npm test"
 	},
-	"dependencies": {},
-	"devDependencies": {}
+	"typings": "./lib/common/api.d.ts"
 }

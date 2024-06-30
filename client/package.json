@@ -1,11 +1,20 @@
 {
-	"name": "vscode-languageclient",
-	"description": "VSCode Language client implementation",
-	"main": "./lib/node/main.js",
 	"browser": {
 		"./lib/node/main.js": "./lib/browser/main.js"
 	},
-	"typings": "./lib/common/api.d.ts",
+	"dependencies": {
+		"minimatch": "^9.0.3",
+		"semver": "^7.6.0"
+	},
+	"description": "VSCode Language client implementation",
+	"devDependencies": {
+		"@types/minimatch": "^5.1.2",
+		"@types/semver": "^7.5.8",
+		"shx": "^0.3.4"
+	},
+	"enabledApiProposals": [],
+	"main": "./lib/node/main.js",
+	"name": "vscode-languageclient",
 	"scripts": {
 		"all": "npm run clean && npm run compile && npm run lint && npm test",
 		"all:publish": "git clean -xfd . && npm install && npm run updateVSCodeVersion && npm run compile:publish && npm run lint && cd ../client-node-tests && npm run all:publish && cd ..",
@@ -15,17 +24,8 @@
 		"compile:publish": "node ../build/bin/tsc -b ./tsconfig.publish.json && shx cp src/node/terminateProcess.sh lib/node/terminateProcess.sh",
 		"prepack": "npm run all:publish",
 		"prepublishOnly": "echo \"⛔ Can only publish from a secure pipeline ⛔\" && node ../build/npm/fail",
-		"updateVSCodeVersion": "node ./bin/updateVSCode.js",
-		"preversion": "npm test"
+		"preversion": "npm test",
+		"updateVSCodeVersion": "node ./bin/updateVSCode.js"
 	},
-	"dependencies": {
-		"minimatch": "^9.0.3",
-		"semver": "^7.6.0"
-	},
-	"devDependencies": {
-		"@types/minimatch": "^5.1.2",
-		"@types/semver": "^7.5.8",
-		"shx": "^0.3.4"
-	},
-	"enabledApiProposals": []
+	"typings": "./lib/common/api.d.ts"
 }
