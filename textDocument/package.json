@@ -1,4 +1,5 @@
 {
+	"name": "vscode-languageserver-textdocument",
 	"description": "A simple text document implementation for Node LSP servers",
 	"exports": {
 		".": {
@@ -9,7 +10,7 @@
 		}
 	},
 	"main": "./lib/umd/main.js",
-	"name": "vscode-languageserver-textdocument",
+	"typings": "./lib/umd/main",
 	"scripts": {
 		"all": "npm run clean && npm run compile && npm run lint && npm run test",
 		"all:publish": "git clean -xfd . && npm install && npm run compile:esm && npm run compile:umd && npm run lint && npm run test",
@@ -20,6 +21,5 @@
 		"prepack": "npm run all:publish",
 		"prepublishOnly": "echo \"⛔ Can only publish from a secure pipeline ⛔\" && node ../build/npm/fail",
 		"preversion": "npm test"
-	},
-	"typings": "./lib/umd/main"
+	}
 }

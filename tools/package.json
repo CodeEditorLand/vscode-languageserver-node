@@ -1,7 +1,7 @@
 {
+	"name": "vscode-languageserver-tools",
 	"description": "Tooling for the language server protocol",
 	"main": "./lib/main.js",
-	"name": "vscode-languageserver-tools",
 	"scripts": {
 		"clean": "node ../node_modules/rimraf/dist/esm/bin.mjs lib && node ../node_modules/rimraf/dist/esm/bin.mjs dist",
 		"compile": "node ../build/bin/tsc -b ./tsconfig.json"
