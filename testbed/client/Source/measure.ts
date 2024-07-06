@@ -2,7 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import * as proto from 'vscode-languageserver-protocol';
-import * as p2c from 'vscode-languageclient/lib/common/protocolConverter';
+import * as p2c from 'vscode-languageclient/$test/common/protocolConverter';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -19,7 +19,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 		const counter = 1000000;
 
-		const converter = p2c.createConverter(undefined, false, false);
+		const converter = p2c.createConverter(undefined, false, false, false);
 		// const diagnostics: proto.Diagnostic[] = new Array(counter);
 
 		// for (let i = 0; i < counter; i++) {
