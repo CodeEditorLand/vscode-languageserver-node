@@ -4,7 +4,7 @@
  * ------------------------------------------------------------------------------------------ */
 /// <reference path="../../typings/thenable.d.ts" preserve="true"/>
 
-import { inspect } from 'node:util';
+import { inspect } from 'util';
 
 import * as Is from '../common/utils/is';
 import { Connection, _, _Connection, Features, WatchDog, createConnection as createCommonConnection } from '../common/server';
