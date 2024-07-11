@@ -1,8 +1,0 @@
-{
-	"name": "vscode-languageserver-tools",
-	"description": "Tooling for the language server protocol",
-	"scripts": {
-		"clean": "rimraf lib && rimraf dist",
-		"compile": "tsc -b ./tsconfig.json"
-	}
-}

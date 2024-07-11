@@ -1,8 +1,0 @@
-{
-	"name": "testbed-server",
-	"description": "TestBed Server",
-	"scripts": {
-		"compile": "tsc -b ./tsconfig.json"
-	},
-	"dependencies": {}
-}
