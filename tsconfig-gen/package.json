@@ -1,21 +1,15 @@
 {
-	"bin": {
-		"tsconfig-gen": "./bin/tsconfig-gen"
-	},
-	"dependencies": {
-		"yargs": "^17.7.2"
-	},
+	"name": "@vscode/tsconfig-gen",
 	"description": "Tool to generate tsconfig files from a higher level description",
-	"devDependencies": {
-		"@types/yargs": "^17.0.29"
-	},
 	"exports": {
 		".": {
 			"default": "./lib/main.js",
 			"types": "./lib/main.d.ts"
 		}
 	},
-	"name": "@vscode/tsconfig-gen",
+	"bin": {
+		"tsconfig-gen": "./bin/tsconfig-gen"
+	},
 	"scripts": {
 		"all": "npm run compile && npm run lint",
 		"all:publish": "git clean -xfd . && npm install && npm run compile:publish && npm run lint",
@@ -24,5 +18,11 @@
 		"compile:publish": "tsc -b ./tsconfig.publish.json",
 		"prepack": "git clean -xfd . && npm install && npm run all",
 		"prepublishOnly": "echo \"⛔ Can only publish from a secure pipeline ⛔\" && node ../build/npm/fail"
+	},
+	"dependencies": {
+		"yargs": "^17.7.2"
+	},
+	"devDependencies": {
+		"@types/yargs": "^17.0.29"
 	}
 }
