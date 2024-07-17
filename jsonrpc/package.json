@@ -31,7 +31,7 @@
 		"webpack:test:silent": "node ../build/bin/webpack --no-stats --mode none --config ./src/browser/test/webpack.config.js"
 	},
 	"devDependencies": {
-		"@types/msgpack-lite": "^0.1.10",
-		"msgpack-lite": "^0.1.26"
+		"@types/msgpack-lite": "0.1.10",
+		"msgpack-lite": "0.1.26"
 	}
 }
