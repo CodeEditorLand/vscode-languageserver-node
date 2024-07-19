@@ -20,9 +20,9 @@
 		"prepublishOnly": "echo \"⛔ Can only publish from a secure pipeline ⛔\" && node ../build/npm/fail"
 	},
 	"dependencies": {
-		"yargs": "^17.7.2"
+		"yargs": "17.7.2"
 	},
 	"devDependencies": {
-		"@types/yargs": "^17.0.29"
+		"@types/yargs": "17.0.32"
 	}
 }
