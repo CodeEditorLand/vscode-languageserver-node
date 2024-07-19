@@ -29,14 +29,14 @@
 		"watch:tsconfig-gen": "tsc -b ./tsconfig-gen/tsconfig.json -w"
 	},
 	"devDependencies": {
-		"@types/assert": "1.5.10",
-		"@types/node": "20.14.11",
+		"@types/assert": "1.5.8",
+		"@types/node": "20.9.0",
 		"assert": "2.1.0",
 		"http-server": "14.1.1",
-		"rimraf": "6.0.1",
+		"rimraf": "5.0.5",
 		"shelljs": "0.8.5",
 		"shx": "0.3.4",
 		"source-map-support": "0.5.21",
-		"ts-json-schema-generator": "3.0.0-next.0"
+		"ts-json-schema-generator": "1.4.0"
 	}
 }
