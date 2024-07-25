@@ -1,46 +1,49 @@
 {
 	"name": "test-extension",
 	"displayName": "test-extension",
+	"publisher": "ms-vscode",
+	"private": true,
 	"description": "",
-	"main": "./extension.js",
-	"scripts": {
-		"all": "npm run clean && npm run compile && npm run lint && npm run test",
-		"all:publish": "git clean -xfd . && npm install && npm run symlink:publish && npm run compile:publish && npm run test:publish",
-		"clean": "rimraf lib",
-		"compile": "tsc -b ./tsconfig.json",
-		"compile:publish": "tsc -b ./tsconfig.publish.json",
-		"symlink:publish": "node ../build/bin/symlink-client-tests-publish.js",
-		"test:publish": "node lib/runTests.js"
+	"version": "0.0.1",
+	"engines": {
+		"vscode": "^1.91.0"
 	},
-	"contributes": {},
+	"categories": [
+		"Other"
+	],
 	"activationEvents": [
 		"*"
 	],
-	"dependencies": {
-		"minimatch": "10.0.1"
-	},
-	"description": "",
-	"devDependencies": {
-		"@types/glob": "8.1.0",
-		"@types/minimatch": "5.1.2",
-		"@types/sinon": "17.0.3",
-		"@types/uuid": "10.0.0",
-		"find-process": "1.4.7",
-		"glob": "11.0.0",
-		"sinon": "18.0.0",
-		"uuid": "10.0.0"
-	},
-	"displayName": "test-extension",
-	"enabledApiProposals": [],
 	"main": "./extension.js",
-	"name": "test-extension",
+	"contributes": {},
 	"scripts": {
-		"all": "npm run clean && npm run compile && npm run lint && npm run test",
-		"all:publish": "git clean -xfd . && npm install && npm run symlink:publish && npm run compile:publish && npm run test:publish",
 		"clean": "rimraf lib",
 		"compile": "tsc -b ./tsconfig.json",
-		"compile:publish": "tsc -b ./tsconfig.publish.json",
+		"watch": "tsc -b ./tsconfig.watch.json -w",
+		"lint": "eslint --ext ts src",
+		"test": "node ../build/bin/symlink-tests.js && node lib/runTests.js",
+		"all": "npm run clean && npm run compile && npm run lint && npm run test",
 		"symlink:publish": "node ../build/bin/symlink-client-tests-publish.js",
-		"test:publish": "node lib/runTests.js"
-	}
+		"compile:publish": "tsc -b ./tsconfig.publish.json",
+		"test:publish": "node lib/runTests.js",
+		"all:publish": "git clean -xfd . && npm install && npm run symlink:publish && npm run compile:publish && npm run test:publish"
+	},
+	"dependencies": {
+		"minimatch": "^9.0.3",
+		"vscode-languageserver": "10.0.0-next.7",
+		"vscode-uri": "3.0.8"
+	},
+	"devDependencies": {
+		"@types/glob": "^8.1.0",
+		"@types/minimatch": "^5.1.2",
+		"@types/sinon": "^10.0.20",
+		"@types/uuid": "^9.0.6",
+		"@types/vscode": "1.91.0",
+		"@vscode/test-electron": "^2.3.9",
+		"find-process": "^1.4.7",
+		"glob": "^10.3.10",
+		"sinon": "^17.0.0",
+		"uuid": "^9.0.1"
+	},
+	"enabledApiProposals": []
 }
