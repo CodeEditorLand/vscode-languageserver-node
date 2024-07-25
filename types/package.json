@@ -9,7 +9,7 @@
 		}
 	},
 	"main": "./lib/umd/main.js",
-	"name": "vscode-languageserver-types",
+	"typings": "./lib/umd/main",
 	"scripts": {
 		"all": "npm run clean && npm run compile && npm run lint && npm run test",
 		"all:publish": "git clean -xfd . && npm install && npm run compile:esm && npm run compile:umd && npm run lint && npm run test",
