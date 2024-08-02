@@ -1,17 +1,6 @@
 {
 	"dependencies": {},
 	"description": "VSCode Language Server Protocol implementation",
-	"version": "3.17.6-next.8",
-	"author": "Microsoft Corporation",
-	"license": "MIT",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/Microsoft/vscode-languageserver-node.git",
-		"directory": "protocol"
-	},
-	"bugs": {
-		"url": "https://github.com/Microsoft/vscode-languageserver-node/issues"
-	},
 	"exports": {
 		".": {
 			"default": "./lib/common/api.js",
@@ -25,10 +14,6 @@
 			"node": "./lib/node/main.js",
 			"types": "./lib/node/main.d.ts"
 		}
-	},
-	"dependencies": {
-		"vscode-jsonrpc": "9.0.0-next.5",
-		"vscode-languageserver-types": "3.17.6-next.5"
 	},
 	"scripts": {
 		"all": "npm run clean && npm run compile && npm run lint && npm run test && npm run compile:metaModelTool && npm run generate:metaModel && npm run generate:metaModelSchema",

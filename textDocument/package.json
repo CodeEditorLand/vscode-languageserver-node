@@ -1,18 +1,5 @@
 {
 	"description": "A simple text document implementation for Node LSP servers",
-	"version": "1.0.12",
-	"author": "Microsoft Corporation",
-	"license": "MIT",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/Microsoft/vscode-languageserver-node.git",
-		"directory": "textDocument"
-	},
-	"bugs": {
-		"url": "https://github.com/Microsoft/vscode-languageserver-node/issues"
-	},
-	"main": "./lib/umd/main.js",
-	"typings": "./lib/umd/main",
 	"exports": {
 		".": {
 			"browser": "./lib/esm/main.js",
