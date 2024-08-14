@@ -1,17 +1,6 @@
 {
 	"dependencies": {},
 	"description": "VSCode Language Server Protocol implementation",
-	"version": "3.17.6-next.10",
-	"author": "Microsoft Corporation",
-	"license": "MIT",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/Microsoft/vscode-languageserver-node.git",
-		"directory": "protocol"
-	},
-	"bugs": {
-		"url": "https://github.com/Microsoft/vscode-languageserver-node/issues"
-	},
 	"exports": {
 		".": {
 			"default": "./lib/common/api.js",
