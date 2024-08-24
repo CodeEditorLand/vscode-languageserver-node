@@ -15,7 +15,6 @@
 			"types": "./lib/node/main.d.ts"
 		}
 	},
-	"name": "vscode-languageserver-protocol",
 	"scripts": {
 		"all": "npm run clean && npm run compile && npm run lint && npm run test && npm run compile:metaModelTool && npm run generate:metaModel && npm run generate:metaModelSchema",
 		"all:publish": "git clean -xfd . && npm install && npm run compile:publish && npm run lint && npm run test && npm run compile:metaModelTool && npm run generate:metaModel && npm run generate:metaModelSchema",

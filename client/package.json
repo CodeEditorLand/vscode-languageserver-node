@@ -1,13 +1,13 @@
 {
 	"dependencies": {
-		"minimatch": "^9.0.3",
-		"semver": "^7.6.0"
+		"minimatch": "10.0.1",
+		"semver": "7.6.3"
 	},
 	"description": "VSCode Language client implementation",
 	"devDependencies": {
-		"@types/minimatch": "^5.1.2",
-		"@types/semver": "^7.5.8",
-		"shx": "^0.3.4"
+		"@types/minimatch": "5.1.2",
+		"@types/semver": "7.5.8",
+		"shx": "0.3.4"
 	},
 	"enabledApiProposals": [],
 	"exports": {
@@ -28,7 +28,6 @@
 			"types": "./lib/node/main.d.ts"
 		}
 	},
-	"name": "vscode-languageclient",
 	"scripts": {
 		"all": "npm run clean && npm run compile && npm run lint && npm test",
 		"all:publish": "git clean -xfd . && npm install && npm run updateVSCodeVersion && npm run compile:publish && npm run lint && cd ../client-node-tests && npm run all:publish && cd ..",
