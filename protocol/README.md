@@ -1,8 +1,8 @@
 # VSCode Language Server - Protocol Module
 
-[![NPM Version](https://img.shields.io/npm/v/vscode-languageserver-protocol.svg)](https://npmjs.org/package/vscode-languageclient)
-[![NPM Downloads](https://img.shields.io/npm/dm/vscode-languageserver-protocol.svg)](https://npmjs.org/package/vscode-languageclient)
-[![Build Status](https://dev.azure.com/ms/vscode-languageserver-node/_apis/build/status/microsoft.vscode-languageserver-node?branchName=main)](https://dev.azure.com/ms/vscode-languageserver-node/_build/latest?definitionId=439&branchName=main)
+[![NPM Version](https://img.shields.io/npm/v/vscode-languageserver-protocol.svg)](https://npmjs.org/package/vscode-languageserver-protocol)
+[![NPM Downloads](https://img.shields.io/npm/dm/vscode-languageserver-protocol.svg)](https://npmjs.org/package/vscode-languageserver-protocol)
+[![Build Status](https://dev.azure.com/vscode/vscode-languageserver-node/_apis/build/status%2Fvscode-languageserver-node?branchName=main)](https://dev.azure.com/vscode/vscode-languageserver-node/_build/latest?definitionId=52&branchName=main)
 
 This npm module is a tool independent implementation of the language server
 protocol and can be used in any type of node application. Please note that the
