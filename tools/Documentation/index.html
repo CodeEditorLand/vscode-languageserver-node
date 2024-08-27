@@ -1,0 +1,515 @@
+<!DOCTYPE html><html class="default" lang="en"><head><meta charset="utf-8"/><meta name="keywords" content="@playform/document"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>vscode-languageserver-tools</title><meta name="description" content="Documentation for vscode-languageserver-tools"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="assets/style.css"/><link rel="stylesheet" href="assets/highlight.css"/><link rel="stylesheet" href="assets/custom.css"/><script defer src="assets/main.js"></script><script async src="assets/icons.js" id="tsd-icons-script"></script><script async src="assets/search.js" id="tsd-search-script"></script><script async src="assets/navigation.js" id="tsd-nav-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os";document.body.style.display="none";setTimeout(() => app?app.showPage():document.body.style.removeProperty("display"),500)</script><header class="tsd-page-toolbar"><div class="tsd-toolbar-contents container"><div class="table-cell" id="tsd-search" data-base="."><div class="field"><label for="tsd-search-field" class="tsd-widget tsd-toolbar-icon search no-caption"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><use href="assets/icons.svg#icon-search"></use></svg></label><input type="text" id="tsd-search-field" aria-label="Search"/></div><div class="field"><div id="tsd-toolbar-links"></div></div><ul class="results"><li class="state loading">Preparing search index...</li><li class="state failure">The search index is not available</li></ul><a href="index.html" class="title">vscode-languageserver-tools</a></div><div class="table-cell" id="tsd-widgets"><a href="#" class="tsd-widget tsd-toolbar-icon menu no-caption" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><use href="assets/icons.svg#icon-menu"></use></svg></a></div></div></header><div class="container container-main"><div class="col-content"><div class="tsd-page-title"><h2>vscode-languageserver-tools</h2></div><div class="tsd-panel tsd-typography"><a id="md:vscode-language-server---node" class="tsd-anchor"></a><h1 class="tsd-anchor-link">VSCode Language Server - Node<a href="#md:vscode-language-server---node" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h1><p>This repository contains the code for the following npm modules:</p>
+<ul>
+<li><em>vscode-languageclient</em>: npm module to talk to a VSCode language server from
+a VSCode extension:<br>
+<a href="https://npmjs.org/package/vscode-languageclient"><img src="https://img.shields.io/npm/v/vscode-languageclient.svg" alt="NPM Version"></a>
+<a href="https://npmjs.org/package/vscode-languageclient"><img src="https://img.shields.io/npm/dm/vscode-languageclient.svg" alt="NPM Downloads"></a></li>
+<li><em>vscode-languageserver</em>: npm module to implement a VSCode language server
+using <a href="https://nodejs.org/">Node.js</a> as a runtime:<br>
+<a href="https://npmjs.org/package/vscode-languageserver"><img src="https://img.shields.io/npm/v/vscode-languageserver.svg" alt="NPM Version"></a>
+<a href="https://npmjs.org/package/vscode-languageserver"><img src="https://img.shields.io/npm/dm/vscode-languageserver.svg" alt="NPM Downloads"></a></li>
+<li><em>vscode-languageserver-textdocument</em>: npm module to implement text documents
+usable in a LSP server using <a href="https://nodejs.org/">Node.js</a> as a
+runtime:<br>
+<a href="https://npmjs.org/package/vscode-languageserver-textdocument"><img src="https://img.shields.io/npm/v/vscode-languageserver-textdocument.svg" alt="NPM Version"></a>
+<a href="https://npmjs.org/package/vscode-languageserver-textdocument"><img src="https://img.shields.io/npm/dm/vscode-languageserver-textdocument.svg" alt="NPM Downloads"></a></li>
+<li><em>vscode-languageserver-protocol</em>: the actual language server protocol
+definition in TypeScript:<br>
+<a href="https://npmjs.org/package/vscode-languageserver-protocol"><img src="https://img.shields.io/npm/v/vscode-languageserver-protocol.svg" alt="NPM Version"></a>
+<a href="https://npmjs.org/package/vscode-languageserver-protocol"><img src="https://img.shields.io/npm/dm/vscode-languageserver-protocol.svg" alt="NPM Downloads"></a></li>
+<li><em>vscode-languageserver-types</em>: data types used by the language server client
+and server:<br>
+<a href="https://npmjs.org/package/vscode-languageserver-types"><img src="https://img.shields.io/npm/v/vscode-languageserver-types.svg" alt="NPM Version"></a>
+<a href="https://npmjs.org/package/vscode-languageserver-types"><img src="https://img.shields.io/npm/dm/vscode-languageserver-types.svg" alt="NPM Downloads"></a></li>
+<li><em>vscode-jsonrpc</em>: the underlying message protocol to communicate between a
+client and a server:<br>
+<a href="https://npmjs.org/package/vscode-jsonrpc"><img src="https://img.shields.io/npm/v/vscode-jsonrpc.svg" alt="NPM Version"></a>
+<a href="https://npmjs.org/package/vscode-jsonrpc"><img src="https://img.shields.io/npm/dm/vscode-jsonrpc.svg" alt="NPM Downloads"></a></li>
+</ul>
+<p>All npm modules are built using one Azure Pipeline. Its status is:</p>
+<p><a href="https://dev.azure.com/vscode/vscode-languageserver-node/_build/latest?definitionId=52&amp;branchName=main"><img src="https://dev.azure.com/vscode/vscode-languageserver-node/_apis/build/status%2Fvscode-languageserver-node?branchName=main" alt="Build Status"></a></p>
+<p>Click
+<a href="https://code.visualstudio.com/docs/extensions/example-language-server">here</a>
+for a detailed document on how to use these npm modules to implement language
+servers for <a href="https://code.visualstudio.com/">VSCode</a>.</p>
+<a id="md:contributing" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Contributing<a href="#md:contributing" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><p>After cloning the repository, run <code>npm install</code> to install dependencies and
+<code>npm run symlink</code> to point packages in this repository to each other.</p>
+<a id="md:history" class="tsd-anchor"></a><h2 class="tsd-anchor-link">History<a href="#md:history" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><a id="md:next-1000-next_-client-and-1000-next_-server" class="tsd-anchor"></a><h2 class="tsd-anchor-link">Next (10.0.0-next._ Client and 10.0.0-next._ Server)<a href="#md:next-1000-next_-client-and-1000-next_-server" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><ul>
+<li>Upgraded to newer libraries, compilers and package.json exports rules:
+<ul>
+<li>Compiler upgraded to <code>5.5.x</code>.</li>
+<li>Libs now depend on NodeJS <code>20.9.0</code> and <code>es2022</code>. See also
+<a href="https://github.com/microsoft/TypeScript/wiki/Node-Target-Mapping">TypeScript's node target mapping</a>.</li>
+<li><code>vscode-jsonrpc</code>, <code>vscode-languageserver-protocol</code>,
+<code>vscode-languageclient</code> and <code>vscode-languageserver</code> now use the
+<code>exports</code> property instead of having a <code>main</code> and <code>typings</code> property.
+This might need adoption in tsconfig.json files around the <code>module</code> and
+<code>moduleResolution</code>. The LSP libraries currently use <code>node16</code> for both
+values.</li>
+</ul>
+</li>
+<li>added proposed CodeActionKind.RefactorMove</li>
+<li>snippet support in Workspace edits</li>
+<li>support to control the parallelism of the dispatch requests and
+notification. This is a breaking change since it allows notification
+handlers to return a promise to control this.</li>
+<li>make client browser implementation consistent with the node implementation
+in terms of arguments. This is a breaking change since it re-ordered
+parameter declarations.</li>
+<li>Added a <code>CancellationToken</code> to the show document middleware to make it
+consistent with the other middleware. This is a breaking change since it
+added a required parameter.</li>
+</ul>
+<a id="md:3175-protocol-901-client-and-901-server" class="tsd-anchor"></a><h2 class="tsd-anchor-link">3.17.5 Protocol, 9.0.1 Client and 9.0.1 Server<a href="#md:3175-protocol-901-client-and-901-server" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><ul>
+<li>fix ESM bundling</li>
+</ul>
+<a id="md:3174-protocol-820-json-rpc-900-client-and-900-server" class="tsd-anchor"></a><h2 class="tsd-anchor-link">3.17.4 Protocol, 8.2.0 JSON-RPC 9.0.0 Client and 9.0.0 Server<a href="#md:3174-protocol-820-json-rpc-900-client-and-900-server" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><ul>
+<li>added proposed inline completion request.</li>
+<li>added proposed formatting ranges request.</li>
+<li>added proposed refresh request for folding ranges. This changed the shape of
+the folding range feature since we need to expose the event emitter. The
+change is breaking. To get to the provider you now need to do<pre><code class="ts"><span class="hl-0">client</span><span class="hl-1">.</span><span class="hl-2">getFeature</span><span class="hl-1">(</span><span class="hl-0">lsclient</span><span class="hl-1">.</span><span class="hl-0">FoldingRangeRequest</span><span class="hl-1">.</span><span class="hl-0">method</span><span class="hl-1">).</span><span class="hl-2">getProvider</span><span class="hl-1">(</span><span class="hl-0">document</span><span class="hl-1">)</span><br/><span class="hl-1">	?.</span><span class="hl-0">provider</span><span class="hl-1">;</span>
+</code><button type="button">Copy</button></pre>
+
+</li>
+<li>various
+<a href="https://github.com/microsoft/vscode-languageserver-node/milestone/46?closed=1">bug fixes</a></li>
+</ul>
+<a id="md:3174-next0-protocol-820-next0-json-rpc-820-next0-client-and-820-next0-server" class="tsd-anchor"></a><h2 class="tsd-anchor-link">3.17.4-next.0 Protocol, 8.2.0-next.0 JSON-RPC, 8.2.0-next.0 Client and 8.2.0-next.0 Server.<a href="#md:3174-next0-protocol-820-next0-json-rpc-820-next0-client-and-820-next0-server" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><ul>
+<li>middleware support for general notifications and requests as well as for
+register and unregister capabilities.</li>
+<li>various
+<a href="https://github.com/microsoft/vscode-languageserver-node/milestone/46?closed=1">bug fixes</a>.</li>
+</ul>
+<a id="md:3173-protocol-810-json-rpc-810-client-and-810-server" class="tsd-anchor"></a><h2 class="tsd-anchor-link">3.17.3 Protocol, 8.1.0 JSON-RPC, 8.1.0 Client and 8.1.0 Server.<a href="#md:3173-protocol-810-json-rpc-810-client-and-810-server" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><ul>
+<li>support for custom message handlers</li>
+<li>various
+<a href="https://github.com/microsoft/vscode-languageserver-node/milestone/49?closed=1">bug fixes</a>.
+Noteworthy are fixes around request ordering problems with full document
+sync.</li>
+</ul>
+<a id="md:3172-protocol-802-json-rpc-802-client-and-802-server" class="tsd-anchor"></a><h2 class="tsd-anchor-link">3.17.2 Protocol, 8.0.2 JSON-RPC, 8.0.2 Client and 8.0.2 Server.<a href="#md:3172-protocol-802-json-rpc-802-client-and-802-server" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><ul>
+<li>make client more robust against unwanted restarts</li>
+<li>added a LanguageClient#dispose method to fully dispose a client</li>
+<li><a href="https://github.com/microsoft/vscode-languageserver-node/issues?q=is%3Aclosed+milestone%3A8.0.2">various bug fixes</a>.</li>
+</ul>
+<a id="md:3170-protocol-800-json-rpc-800-client-and-800-server" class="tsd-anchor"></a><h2 class="tsd-anchor-link">3.17.0 Protocol, 8.0.0 JSON-RPC, 8.0.0 Client and 8.0.0 Server.<a href="#md:3170-protocol-800-json-rpc-800-client-and-800-server" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><p>Library specific changes are:</p>
+<ul>
+<li>cleanup of client <code>start</code> and <code>stop</code> methods. Both methods now return a
+promise since these methods are async. This is a breaking change since start
+returned a disposable before. Extensions should now implement a deactivate
+function in their extension main file and correctly return the <code>stop</code>
+promise from the deactivate call. As a consequence the <code>onReady()</code> got
+removed since extensions can await the <code>start()</code> call now. Old code like
+this</li>
+</ul>
+<pre><code class="typescript"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">client</span><span class="hl-1">: </span><span class="hl-5">LanguageClient</span><span class="hl-1"> = ...;</span><br/><span class="hl-0">client</span><span class="hl-1">.</span><span class="hl-2">start</span><span class="hl-1">();</span><br/><span class="hl-6">await</span><span class="hl-1"> </span><span class="hl-0">client</span><span class="hl-1">.</span><span class="hl-2">onReady</span><span class="hl-1">();</span>
+</code><button type="button">Copy</button></pre>
+
+<p>should become:</p>
+<pre><code class="typescript"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">client</span><span class="hl-1">: </span><span class="hl-5">LanguageClient</span><span class="hl-1"> = ...;</span><br/><span class="hl-6">await</span><span class="hl-1"> </span><span class="hl-0">client</span><span class="hl-1">.</span><span class="hl-2">start</span><span class="hl-1">();</span>
+</code><button type="button">Copy</button></pre>
+
+<ul>
+<li>notification and request handler registration can now happen before the
+client is started. This ensures that no messages from the server are missed.</li>
+<li>if an extension sends a notification or request before the client got
+started the client will auto start.</li>
+<li>all <code>sendNotification</code> methods now return a promise. Returning a promise was
+necessary since the actual writing of the message to the underlying
+transport is async and a client for example could not determine if a
+notification was handed off to the transport. This is a breaking change in
+the sense that it might result in floating promise and might be flagged by a
+linter.</li>
+<li>all handler registrations now return a Disposable to allow unregistration of
+the handler.</li>
+<li>the behavior of <code>handleFailedRequest</code> has change. Instead of returning a
+default value when a exception is received from the server the method now
+rethrows the error. This ensures that VS Code's default behavior on errors
+is used. The method also handles the <code>RequestCancelled</code> and
+<code>ServerCancelled</code> in the following way:
+<ul>
+<li>if it receives <code>ServerCancelled</code> and the client didn't cancel the
+request as well throw CancellationError to ask the client to rerun the
+request.</li>
+<li>if it receives <code>RequestCancelled</code> then normally the client should have
+cancelled the request and the code will return the default value
+(according to the best interpretation of the 3.16 spec). If the client
+has not canceled interpret the <code>RequestCancelled</code> as <code>ServerCancelled</code>.</li>
+</ul>
+</li>
+<li>the next handler of a client middleware now drops server results if the
+request got already canceled on the client side by returning VS Code's
+default value for the corresponding provider (mostly <code>null</code>). This is a
+breaking change since in former releases of the library the middleware would
+see the result also not used by VS Code. The change was made to save CPU and
+memory by not converting unused response results.</li>
+<li>all converter functions which take an array are now async, yield and take a
+cancellation token. This is a breaking change and got introduced to avoid
+monopolizing the extension host during type conversions.</li>
+<li>the return type of ErrorHandler#error and ErrorHandler#closed changed in a
+breaking manner. It now supports return an optional message which will be
+displayed to the user.</li>
+<li>Added support for inline values.</li>
+<li>Added support for inlay hints.</li>
+<li>Added support for type hierarchies.</li>
+<li>Added support for notebook documents.</li>
+</ul>
+<a id="md:3160-protocol-600-json-rpc-700-client-and-700-server" class="tsd-anchor"></a><h2 class="tsd-anchor-link">3.16.0 Protocol, 6.0.0 JSON-RPC, 7.0.0 Client and 7.0.0 Server.<a href="#md:3160-protocol-600-json-rpc-700-client-and-700-server" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><p>For a detailed list of changes made in the 3.16.0 version of the protocol see
+the
+<a href="https://microsoft.github.io/language-server-protocol/specifications/specification-3-16/#version_3_16_0">change log</a>
+of the 3.16 specification.</p>
+<p>Library specific changes are:</p>
+<ul>
+<li>cleanup of Request and Notification types. Removed the unnecessary generic
+parameter RO. This is a breaking change. To adapt simply remove the type
+argument.</li>
+<li>added the new concept of a RegistrationType which decouple the registration
+method from the actual request or notification method. This is a breaking
+change for implementors of custom features. To adapt rename the <code>messages</code>
+property to <code>registrationType</code> and return a corresponding
+<code>RegistrationType</code>. Additional remove the first parameter from the
+<code>register</code> method.</li>
+<li>cleanup of <code>ErrorCodes</code>. LSP specific error codes got moved to a new
+namespace <code>LSPErrorCodes</code>. The namespace <code>ErrorCodes</code> in <code>jsonrpc</code> is not
+correctly reserved for JSON RPC specific error codes. This is a breaking
+change. To resolve it use <code>LSPErrorCodes</code> instead.</li>
+<li>split code into common, node and browser to allow using the LSP client and
+server npm modules in a Web browser via webpack. This is a <strong>breaking
+change</strong> and might lead to compile / runtime errors if not adopted. Every
+module has now three different exports which represent the split into
+common, node and browser. Lets look at <code>vscode-jsonrpc</code> for an example: (a)
+the import <code>vscode-jsonrpc</code> will only import the common code, (b) the import
+<code>vscode-jsonrpc\node</code> will import the common and the node code and (c) the
+import <code>vscode-jsonrpc\browser</code> will import the common and browser code.</li>
+<li>added support to control the
+<a href="https://www.jsonrpc.org/specification#parameter_structures">parameter structure</a>
+when sending requests and notifications in <code>vscode-jsonrpc</code>. The parameter
+structure can be controlled using the additional <code>parameterStructures</code>
+argument when creating a request or notification type or when sending an
+untyped request or notification using the <code>sendRequest</code> or
+<code>sendNotification</code> function. The default is <code>ParameterStructures.auto</code> which
+does the following:
+<ul>
+<li>use <code>byPosition</code> for messages with zero or greater than one parameter</li>
+<li>for one parameter it used <code>byName</code> for parameters which are object
+literals. Uses <code>byPosition</code> for all other parameters.</li>
+</ul>
+</li>
+</ul>
+<a id="md:3153-protocol-61x-client-and-61x-server" class="tsd-anchor"></a><h2 class="tsd-anchor-link">3.15.3 Protocol, 6.1.x client and 6.1.x server<a href="#md:3153-protocol-61x-client-and-61x-server" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><ul>
+<li>Small changes to the proposed support for semantic tokens.</li>
+</ul>
+<a id="md:3152-protocol-61x-client-and-61x-server" class="tsd-anchor"></a><h2 class="tsd-anchor-link">3.15.2 Protocol, 6.1.x client and 6.1.x server<a href="#md:3152-protocol-61x-client-and-61x-server" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><ul>
+<li>Proposed support for semantic tokens.</li>
+</ul>
+<a id="md:3150-protocol-600-client--600-server" class="tsd-anchor"></a><h2 class="tsd-anchor-link">3.15.0 Protocol, 6.0.0 Client &amp; 6.0.0 Server<a href="#md:3150-protocol-600-client--600-server" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><ul>
+<li>Progress support for work done and partial result progress.</li>
+<li>Proposed implementation for call hierarchies.</li>
+<li><code>SelectionRangeRequest</code> protocol added:
+<ul>
+<li>New APIs in Types: <code>SelectionRange</code></li>
+<li>New APIs in Protocol: <code>SelectionRangeRequest</code>, <code>SelectionRangeParams</code>,
+<code>SelectionRangeClientCapabilities</code>, <code>SelectionRangeServerCapabilities</code>,
+<code>SelectionRangeProviderOptions</code>,</li>
+</ul>
+</li>
+<li>Support for custom text document implementations:
+<ul>
+<li>new npm package <code>vscode-languageserver-textdocument</code> which ships a
+standard text document implementation with basic incremental update.
+Server now need to pre-requisite this npm package.</li>
+<li>deprecated text document implementation in types.</li>
+<li>this resulted in a small breakage on the server side. Instead of doing
+<code>new TextDocuments</code> you now have to pass in a text document
+configuration to provide callbacks to create and update a text document.
+Here are examples in TypeScript and JavaScript</li>
+</ul>
+</li>
+</ul>
+<pre><code class="ts"><span class="hl-6">import</span><span class="hl-1"> { </span><span class="hl-0">TextDocuments</span><span class="hl-1"> } </span><span class="hl-6">from</span><span class="hl-1"> </span><span class="hl-7">&quot;vscode-languageserver&quot;</span><span class="hl-1">;</span><br/><span class="hl-6">import</span><span class="hl-1"> { </span><span class="hl-0">TextDocument</span><span class="hl-1"> } </span><span class="hl-6">from</span><span class="hl-1"> </span><span class="hl-7">&quot;vscode-languageserver-textdocument&quot;</span><span class="hl-1">;</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">documents</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-2">TextDocuments</span><span class="hl-1">(</span><span class="hl-0">TextDocument</span><span class="hl-1">);</span>
+</code><button type="button">Copy</button></pre>
+
+<pre><code class="js"><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">server</span><span class="hl-1"> = </span><span class="hl-2">require</span><span class="hl-1">(</span><span class="hl-7">&quot;vscode-languageserver&quot;</span><span class="hl-1">);</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">textDocument</span><span class="hl-1"> = </span><span class="hl-2">require</span><span class="hl-1">(</span><span class="hl-7">&quot;vscode-languageserver-textdocument&quot;</span><span class="hl-1">);</span><br/><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">documents</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-0">server</span><span class="hl-1">.</span><span class="hl-2">TextDocuments</span><span class="hl-1">(</span><span class="hl-0">textDocument</span><span class="hl-1">.</span><span class="hl-0">TextDocument</span><span class="hl-1">);</span>
+</code><button type="button">Copy</button></pre>
+
+<a id="md:511-client" class="tsd-anchor"></a><h3 class="tsd-anchor-link">5.1.1 Client<a href="#md:511-client" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><ul>
+<li>Fixes
+<a href="https://github.com/Microsoft/vscode-languageserver-node/issues/416">[textDocument/rename] client doesn't obey <code>RenameOptions</code> while registering provider</a></li>
+</ul>
+<a id="md:510-client--510-server" class="tsd-anchor"></a><h3 class="tsd-anchor-link">5.1.0 Client &amp; 5.1.0 Server<a href="#md:510-client--510-server" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><ul>
+<li>Adopt protocol version 3.13.0</li>
+</ul>
+<a id="md:3130-protocol" class="tsd-anchor"></a><h3 class="tsd-anchor-link">3.13.0 Protocol<a href="#md:3130-protocol" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><ul>
+<li><code>FoldingRangeRequestParam</code> renamed to 'FoldingRangeParams'
+(<code>FoldingRangeRequestParam</code> still provided for backward compatibility)</li>
+<li>Added support for create, rename and delete file operations in workspace
+edits.</li>
+</ul>
+<a id="md:500-client--500-server" class="tsd-anchor"></a><h3 class="tsd-anchor-link">5.0.0 Client &amp; 5.0.0 Server<a href="#md:500-client--500-server" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><ul>
+<li>Make the client work with Electron 2.x. which is used since VS Code 1.26.x</li>
+<li>Check that the expected client version specified in <code>engines.vscode</code> in the
+<code>package.json</code> file matches the VS Code version the client is running on.</li>
+</ul>
+<a id="md:440-client--440-server--3100-protocol" class="tsd-anchor"></a><h3 class="tsd-anchor-link">4.4.0 Client &amp; 4.4.0 Server &amp; 3.10.0 Protocol<a href="#md:440-client--440-server--3100-protocol" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><ul>
+<li><a href="https://github.com/Microsoft/vscode-languageserver-node/issues/373">Implement hierarchical document outline</a></li>
+<li><code>Color</code>, <code>ColorInformation</code>, <code>ColorPresentation</code> moved to Types</li>
+<li><code>FoldingRangeRequest</code> protocol added:
+<ul>
+<li>New APIs in Types: <code>FoldingRange</code>, <code>FoldingRangeKind</code></li>
+<li>New APIs in Protocol: <code>FoldingRangeRequest</code>, <code>FoldingRangeRequestParam</code>,
+<code>FoldingRangeClientCapabilities</code>, <code>FoldingRangeServerCapabilities</code>,
+<code>FoldingRangeProviderOptions</code>,</li>
+</ul>
+</li>
+</ul>
+<a id="md:430-client--430-server--390-protocol" class="tsd-anchor"></a><h3 class="tsd-anchor-link">4.3.0 Client &amp; 4.3.0 Server &amp; 3.9.0 Protocol<a href="#md:430-client--430-server--390-protocol" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><ul>
+<li>Add support for <code>preselect</code> property on <code>CompletionItem</code></li>
+</ul>
+<a id="md:420-client--420-server--380-protocol" class="tsd-anchor"></a><h3 class="tsd-anchor-link">4.2.0 Client &amp; 4.2.0 Server &amp; 3.8.0 Protocol<a href="#md:420-client--420-server--380-protocol" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><ul>
+<li><a href="https://github.com/Microsoft/language-server-protocol/issues/389">Add CodeAction class</a></li>
+<li><a href="https://github.com/Microsoft/vscode-languageserver-node/pull/350">Add support for code action literal as a return value of the textDocument/codeAction request </a></li>
+</ul>
+<a id="md:414-client--413-server" class="tsd-anchor"></a><h3 class="tsd-anchor-link">4.1.4 Client &amp; 4.1.3 Server<a href="#md:414-client--413-server" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><ul>
+<li><a href="https://github.com/Microsoft/vscode-languageserver-node/issues/342">Client: duplicate messages sent after server restart</a></li>
+</ul>
+<a id="md:411-client" class="tsd-anchor"></a><h3 class="tsd-anchor-link">4.1.1 Client<a href="#md:411-client" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><ul>
+<li><a href="https://github.com/Microsoft/vscode-languageserver-node/issues/319">Information on server crash lost as output channel is closed</a></li>
+</ul>
+<a id="md:410-client--server" class="tsd-anchor"></a><h3 class="tsd-anchor-link">4.1.0 Client &amp; Server<a href="#md:410-client--server" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><ul>
+<li>
+<p>Add support for related information in diagnostics.</p>
+</li>
+<li>
+<p><a href="https://github.com/Microsoft/vscode-languageserver-node/issues/330">Initialization exceptions swallowed</a></p>
+</li>
+<li>
+<p><a href="https://github.com/Microsoft/vscode-languageserver-node/issues/329">Errors from rename still not shown in VSCode</a></p>
+</li>
+<li>
+<p><a href="https://github.com/Microsoft/vscode-languageserver-node/issues/331">terminateProcess.sh is not shipped in dist package</a></p>
+</li>
+<li>
+<p><a href="https://github.com/Microsoft/vscode-languageserver-node/pull/322">Add middleware to intercept textDocument/publishDiagnostics</a></p>
+</li>
+</ul>
+<a id="md:401-client" class="tsd-anchor"></a><h3 class="tsd-anchor-link">4.0.1 Client<a href="#md:401-client" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><ul>
+<li>removed unnecessary console log statement.</li>
+</ul>
+<a id="md:400-server-and-client" class="tsd-anchor"></a><h3 class="tsd-anchor-link">4.0.0 Server and Client<a href="#md:400-server-and-client" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><ul>
+<li>implemented the latest protocol additions. Noteworthy are completion
+context, extensible completion item and symbol kind as well as markdown
+support for completion item and signature help. Moved to 4.0.0 version since
+the introduction of the completion context required a breaking change in the
+client middleware. The old signature:</li>
+</ul>
+<pre><code class="ts"><span class="hl-0">provideCompletionItem</span><span class="hl-1">?: (</span><span class="hl-3">this</span><span class="hl-1">: </span><span class="hl-5">void</span><span class="hl-1">, </span><span class="hl-0">document</span><span class="hl-1">: </span><span class="hl-5">TextDocument</span><span class="hl-1">, </span><span class="hl-0">position</span><span class="hl-1">: </span><span class="hl-5">VPosition</span><span class="hl-1">, </span><span class="hl-0">token</span><span class="hl-1">: </span><span class="hl-5">CancellationToken</span><span class="hl-1">, </span><span class="hl-0">next</span><span class="hl-1">: </span><span class="hl-5">ProvideCompletionItemsSignature</span><span class="hl-1">) </span><span class="hl-3">=&gt;</span><span class="hl-1"> </span><span class="hl-0">ProviderResult</span><span class="hl-1">&lt;</span><span class="hl-0">VCompletionItem</span><span class="hl-1">[] | </span><span class="hl-0">VCompletionList</span><span class="hl-1">&gt;;</span>
+</code><button type="button">Copy</button></pre>
+
+<p>contains now an additional argument <code>context</code>:</p>
+<pre><code class="ts"><span class="hl-0">provideCompletionItem</span><span class="hl-1">?: (</span><span class="hl-3">this</span><span class="hl-1">: </span><span class="hl-5">void</span><span class="hl-1">, </span><span class="hl-0">document</span><span class="hl-1">: </span><span class="hl-5">TextDocument</span><span class="hl-1">, </span><span class="hl-0">position</span><span class="hl-1">: </span><span class="hl-5">VPosition</span><span class="hl-1">, </span><span class="hl-0">context</span><span class="hl-1">: </span><span class="hl-5">VCompletionContext</span><span class="hl-1">, </span><span class="hl-0">token</span><span class="hl-1">: </span><span class="hl-5">CancellationToken</span><span class="hl-1">, </span><span class="hl-0">next</span><span class="hl-1">: </span><span class="hl-5">ProvideCompletionItemsSignature</span><span class="hl-1">) </span><span class="hl-3">=&gt;</span><span class="hl-1"> </span><span class="hl-0">ProviderResult</span><span class="hl-1">&lt;</span><span class="hl-0">VCompletionItem</span><span class="hl-1">[] | </span><span class="hl-0">VCompletionList</span><span class="hl-1">&gt;;</span>
+</code><button type="button">Copy</button></pre>
+
+<ul>
+<li>Noteworthy fixes:
+<ul>
+<li><a href="https://github.com/Microsoft/language-server-protocol/issues/329">Getting value after executing command programmatically</a></li>
+<li><a href="https://github.com/Microsoft/language-server-protocol/issues/279">Experiencing infinite recursion in this code in VSCode 1.18.1</a></li>
+<li><a href="https://github.com/Microsoft/vscode-languageserver-node/issues/286">LanguageClient#handleConnectionClosed fails to restart if this._resolvedConnection.dispose() throws</a></li>
+</ul>
+</li>
+</ul>
+<a id="md:600-server-and-client" class="tsd-anchor"></a><h3 class="tsd-anchor-link">6.0.0 Server and Client<a href="#md:600-server-and-client" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><ul>
+<li>Move to Protocol 3.15.0</li>
+<li>move JS target to ES2017</li>
+</ul>
+<a id="md:3150-types-and-protocol" class="tsd-anchor"></a><h3 class="tsd-anchor-link">3.15.0 Types and Protocol<a href="#md:3150-types-and-protocol" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><ul>
+<li>Implement LSP 3.15.0</li>
+</ul>
+<a id="md:361-types" class="tsd-anchor"></a><h3 class="tsd-anchor-link">3.6.1 Types<a href="#md:361-types" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><ul>
+<li>ESM added as output format (for Webpack and other ESM consumers)</li>
+</ul>
+<a id="md:350-server-and-client" class="tsd-anchor"></a><h3 class="tsd-anchor-link">3.5.0 Server and Client<a href="#md:350-server-and-client" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><ul>
+<li>allow the client to start the server in detached mode. If the server is
+running detached the client will not monitor the server process and kill it
+on shutdown.</li>
+<li>bug fixing.</li>
+</ul>
+<a id="md:340-server-and-client" class="tsd-anchor"></a><h3 class="tsd-anchor-link">3.4.0 Server and Client<a href="#md:340-server-and-client" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><ul>
+<li>a new npm module <code>vscode-languageserver-protocol</code> has been added which
+contains the protocol definitions in TypeScript. This module is now shared
+between the client and the server.</li>
+<li>support for proposed protocol has been added to the <code>protocol</code>, <code>client</code> and
+<code>server</code> npm modules. Proposed protocol is subject to change even if it
+ships in a stable version of the npm modules.</li>
+<li>proposed protocol has been added for the following features:
+<ul>
+<li><em>configuration</em>: support to fetch configuration settings by sending a
+request from the server to the client</li>
+<li><em>workspaceFolders</em>: support to handle more than one root folder per
+workspace</li>
+<li><em>colorProvider</em>: support to compute color ranges for a document</li>
+</ul>
+</li>
+</ul>
+<a id="md:330-server-and-client" class="tsd-anchor"></a><h3 class="tsd-anchor-link">3.3.0 Server and Client<a href="#md:330-server-and-client" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><ul>
+<li>splitted the client into a base client and a main client to support reusing
+the client implementation in other environments.</li>
+<li>made the request processing more async. So instead of processing a request
+immediately when the code gets notified by a Node.js callback the request is
+now put into a queue and processed from the queue. This allows for better
+dropping or folding of events if necessary.</li>
+<li>bugs fixes see
+<a href="https://github.com/Microsoft/vscode-languageserver-node/issues?q=is%3Aissue+milestone%3A%22April+2017%22+is%3Aclosed">April</a>
+and
+<a href="https://github.com/Microsoft/vscode-languageserver-node/issues?q=is%3Aissue+is%3Aclosed+milestone%3A%22Mai+2017%22">May</a></li>
+</ul>
+<a id="md:321-server-and-client" class="tsd-anchor"></a><h3 class="tsd-anchor-link">3.2.1 Server and Client<a href="#md:321-server-and-client" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><ul>
+<li>Fixed
+<a href="https://github.com/Microsoft/vscode-languageserver-node/issues/199">Using wrong name for method <code>client/registerFeature</code>: should be <code>client/registerCapability</code></a></li>
+</ul>
+<a id="md:320-server-and-client" class="tsd-anchor"></a><h3 class="tsd-anchor-link">3.2.0 Server and Client<a href="#md:320-server-and-client" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><ul>
+<li>made <code>WorkspaceEdit</code> conform to the 3.x version of the spec and backwards
+compatible with 2.x version of the library.</li>
+<li>added <code>RequestCancelled</code> error code.</li>
+<li>Fixed
+<a href="https://github.com/Microsoft/vscode-languageserver-node/issues/179">nodePath not working (vscode-tslint)</a></li>
+<li>Fixed
+<a href="https://github.com/Microsoft/vscode-languageserver-node/issues/178">update from 3.0.4/3.0.5 to 3.1.0 breaks my extension</a></li>
+</ul>
+<a id="md:310-server-and-client" class="tsd-anchor"></a><h3 class="tsd-anchor-link">3.1.0 Server and Client<a href="#md:310-server-and-client" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><ul>
+<li>add support for named pipes and socket file transport</li>
+<li>fixed dead lock problem with node-ipc.</li>
+</ul>
+<a id="md:305-server-and-304-client" class="tsd-anchor"></a><h3 class="tsd-anchor-link">3.0.5 Server and 3.0.4 Client<a href="#md:305-server-and-304-client" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><ul>
+<li>deprecated <code>Files.uriToFilePath</code> in favour of the vscode-uri npm module
+which provides a more complete implementation of URI for VS Code.</li>
+<li>made <code>rootPath</code> optional since it is deprecated in 3.x.</li>
+</ul>
+<a id="md:303-client-server-and-json-rpc" class="tsd-anchor"></a><h3 class="tsd-anchor-link">3.0.3: Client, Server and JSON-RPC<a href="#md:303-client-server-and-json-rpc" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><a id="md:new-features" class="tsd-anchor"></a><h4 class="tsd-anchor-link">New Features<a href="#md:new-features" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h4><ul>
+<li>Moved all libraries to TypeScript 2.x.x</li>
+<li>Client and Server are compiled to ES6. JSON-RPC is still compiled to ES5.</li>
+<li>JSON-RPC supports n parameter request and notification invocation.</li>
+<li>Support for the 3.0 version of the
+<a href="https://github.com/Microsoft/language-server-protocol">Language Server protocol</a>.
+Some highlights are:
+<ul>
+<li>Support for feature flags.</li>
+<li>Support for dynamic registration. In the 2.x version of the library a
+server announced its capabilities statically. In 3.x the server can now
+dynamically register and un-register capability handlers using the new
+requests <code>client/registerCapability</code> and <code>client/unregisterCapability</code>.</li>
+<li>Support to delegate command execution via a new request
+<code>workspace/executeCommand</code> to the server.</li>
+</ul>
+</li>
+<li>Support for snippets in completion items:
+<ul>
+<li>New type <code>InsertTextFormat</code></li>
+<li>CompletionItem.insertTextFormat controls whether the inserted test is
+interpreted as a plain text or a snippet.</li>
+</ul>
+</li>
+</ul>
+<a id="md:breaking-changes" class="tsd-anchor"></a><h4 class="tsd-anchor-link">Breaking changes:<a href="#md:breaking-changes" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h4><ul>
+<li>to ensure ordered delivery of notifications and requests the language client
+now throws if sendRequest, onRequest, sendNotification or onNotification is
+called before the client is ready. Use the onReady() Promise to wait until
+the client is ready.</li>
+</ul>
+<pre><code class="ts"><span class="hl-3">let</span><span class="hl-1"> </span><span class="hl-0">client</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-2">LanguageClient</span><span class="hl-1">(...);</span><br/><span class="hl-0">client</span><span class="hl-1">.</span><span class="hl-2">onReady</span><span class="hl-1">().</span><span class="hl-2">then</span><span class="hl-1">(() </span><span class="hl-3">=&gt;</span><span class="hl-1"> {</span><br/><span class="hl-1">  </span><span class="hl-0">client</span><span class="hl-1">.</span><span class="hl-2">onNotification</span><span class="hl-1">(...);</span><br/><span class="hl-1">  </span><span class="hl-0">client</span><span class="hl-1">.</span><span class="hl-2">sendRequest</span><span class="hl-1">(...);</span><br/><span class="hl-1">);</span>
+</code><button type="button">Copy</button></pre>
+
+<ul>
+<li>removed the deprecated module functions on code2Protocol and protocol2Code
+converters. Use the corresponding properties on the LanguageClient instance
+instead to get access to the same converters used by the LanguageClient.</li>
+</ul>
+<pre><code class="ts"><span class="hl-8">// Old</span><br/><span class="hl-6">import</span><span class="hl-1"> { </span><span class="hl-0">Protocol2Code</span><span class="hl-1">, ... } </span><span class="hl-6">from</span><span class="hl-1"> </span><span class="hl-7">&#39;vscode-languageclient&#39;</span><span class="hl-1">;</span><br/><span class="hl-0">Protocol2Code</span><span class="hl-1">.</span><span class="hl-2">asTextEdits</span><span class="hl-1">(</span><span class="hl-0">edits</span><span class="hl-1">);</span><br/><span class="hl-8">// New</span><br/><span class="hl-3">let</span><span class="hl-1"> </span><span class="hl-0">client</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-2">LanguageClient</span><span class="hl-1">(...);</span><br/><span class="hl-0">client</span><span class="hl-1">.</span><span class="hl-0">protocol2CodeConverter</span><span class="hl-1">.</span><span class="hl-2">asTextEdits</span><span class="hl-1">(</span><span class="hl-0">edits</span><span class="hl-1">);</span>
+</code><button type="button">Copy</button></pre>
+
+<ul>
+<li>due to the use of TypeScript 2.x.x and differences in d.ts generation users
+of the new version need to move to TypeScript 2.x.x as well. Usually the
+<code>LanguageClient</code> is used in a VS Code extension. You can find detailed steps
+on how to upgrade a VS Code extension to TypeScript 2.x.x
+<a href="http://code.visualstudio.com/updates/v1_6#_authoring-in-typescript">here</a>.</li>
+<li><code>activeSignature</code> and <code>activeParameter</code> where incorrectly declared as
+optional in <code>SignatureHelp</code>. They are now mandatory.</li>
+<li>the <code>protocol.ts</code> file used enum types in 2.x. However the protocol itself
+is number based since no assumption can be made about the presence of an
+enum type in the implementing language. To make this more clear the enum got
+replace by number types with a or literal type definition. This might result
+in compile errors if a number was directly assigned to a previous enum type
+without a proper range check.</li>
+<li>Request and Notification types are now classes instead of interfaces. In
+addition they now take an additional type argument to type the registration
+options for dynamic registration. Adopting to that change is quite easy.
+Simply new the <code>RequestType</code> or <code>NotificationType</code> and add void as the
+registration option type. Please remember to update this on both the client
+and server side:</li>
+</ul>
+<pre><code class="ts"><span class="hl-8">// Old</span><br/><span class="hl-6">export</span><span class="hl-1"> </span><span class="hl-3">namespace</span><span class="hl-1"> </span><span class="hl-5">MyRequest</span><span class="hl-1"> {</span><br/><span class="hl-1">	</span><span class="hl-6">export</span><span class="hl-1"> </span><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">type</span><span class="hl-1">: </span><span class="hl-5">RequestType</span><span class="hl-1">&lt;</span><span class="hl-5">MyParams</span><span class="hl-1">, </span><span class="hl-5">MyResult</span><span class="hl-1">, </span><span class="hl-5">void</span><span class="hl-1">&gt; = {</span><br/><span class="hl-1">		</span><span class="hl-3">get</span><span class="hl-1"> </span><span class="hl-2">method</span><span class="hl-1">() {</span><br/><span class="hl-1">			</span><span class="hl-6">return</span><span class="hl-1"> </span><span class="hl-7">&quot;myRequest&quot;</span><span class="hl-1">;</span><br/><span class="hl-1">		},</span><br/><span class="hl-1">	};</span><br/><span class="hl-1">}</span><br/><span class="hl-6">export</span><span class="hl-1"> </span><span class="hl-3">namespace</span><span class="hl-1"> </span><span class="hl-5">MyNotification</span><span class="hl-1"> {</span><br/><span class="hl-1">	</span><span class="hl-6">export</span><span class="hl-1"> </span><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">type</span><span class="hl-1">: </span><span class="hl-5">NotificationType</span><span class="hl-1">&lt;</span><span class="hl-5">MyParams</span><span class="hl-1">&gt; = {</span><br/><span class="hl-1">		</span><span class="hl-3">get</span><span class="hl-1"> </span><span class="hl-2">method</span><span class="hl-1">() {</span><br/><span class="hl-1">			</span><span class="hl-6">return</span><span class="hl-1"> </span><span class="hl-7">&quot;myNotification&quot;</span><span class="hl-1">;</span><br/><span class="hl-1">		},</span><br/><span class="hl-1">	};</span><br/><span class="hl-1">}</span><br/><span class="hl-8">// New</span><br/><span class="hl-6">export</span><span class="hl-1"> </span><span class="hl-3">namespace</span><span class="hl-1"> </span><span class="hl-5">MyRequest</span><span class="hl-1"> {</span><br/><span class="hl-1">	</span><span class="hl-6">export</span><span class="hl-1"> </span><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">type</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-2">RequestType</span><span class="hl-1">&lt;</span><span class="hl-5">MyParams</span><span class="hl-1">, </span><span class="hl-5">MyResult</span><span class="hl-1">, </span><span class="hl-5">void</span><span class="hl-1">, </span><span class="hl-5">void</span><span class="hl-1">&gt;(</span><br/><span class="hl-1">		</span><span class="hl-7">&quot;myRequest&quot;</span><span class="hl-1">,</span><br/><span class="hl-1">	);</span><br/><span class="hl-1">}</span><br/><span class="hl-6">export</span><span class="hl-1"> </span><span class="hl-3">namespace</span><span class="hl-1"> </span><span class="hl-5">MyNotification</span><span class="hl-1"> {</span><br/><span class="hl-1">	</span><span class="hl-6">export</span><span class="hl-1"> </span><span class="hl-3">const</span><span class="hl-1"> </span><span class="hl-4">type</span><span class="hl-1"> = </span><span class="hl-3">new</span><span class="hl-1"> </span><span class="hl-2">NotificationType</span><span class="hl-1">&lt;</span><span class="hl-5">MyParams</span><span class="hl-1">, </span><span class="hl-5">void</span><span class="hl-1">&gt;(</span><span class="hl-7">&quot;myNotification&quot;</span><span class="hl-1">);</span><br/><span class="hl-1">}</span>
+</code><button type="button">Copy</button></pre>
+
+<a id="md:260-client-and-server" class="tsd-anchor"></a><h3 class="tsd-anchor-link">2.6.0: Client and server<a href="#md:260-client-and-server" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><ul>
+<li>Support for Document Link Providers</li>
+<li>Support for additional text edits and commands in completion items.</li>
+</ul>
+<a id="md:250-client-and-server" class="tsd-anchor"></a><h3 class="tsd-anchor-link">2.5.0: Client and Server<a href="#md:250-client-and-server" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><ul>
+<li>Better error handling on client side.</li>
+<li>Events for starting and stopping the server.</li>
+<li>Initialization options can be provided as a function.</li>
+<li>Support for stdio / stderr encoding.</li>
+<li>Support to convert URIs between the client and the server.</li>
+<li>Server connection.console logging now appears in the corresponding output
+channel instead of in the developer console.</li>
+<li>If a non stdio communication channel is used between client and server the
+server's stdio is redirected to the output channel.</li>
+<li>A client can now have an id and a name.</li>
+</ul>
+<a id="md:240-client-and-server" class="tsd-anchor"></a><h3 class="tsd-anchor-link">2.4.0 Client and Server<a href="#md:240-client-and-server" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><ul>
+<li>Data types such as Range, Position, TextDocument, Hover, CompletionItem...
+extracted to new node module <em>vscode-languageserver-types</em>. The new node
+module is shared between the server and client and can also be used by
+language service libraries that want to use the same data types.</li>
+</ul>
+<a id="md:230-client-only" class="tsd-anchor"></a><h3 class="tsd-anchor-link">2.3.0: Client only<a href="#md:230-client-only" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><ul>
+<li>the client now restarts the server if the server crashes without a prior
+exit notification sent. The strategy used to restart the server is plugable
+(see <code>LanguageClientOptions.errorHandler</code>). The default strategy restart the
+server unless it crashed 5 times or more in the last 3 minutes.</li>
+</ul>
+<a id="md:20-a-detailed-description-of-the-20-version-can-be-found-here-a-summary-of-the-changes" class="tsd-anchor"></a><h3 class="tsd-anchor-link">2.0: A detailed description of the 2.0 version can be found <a href="https://github.com/Microsoft/vscode-languageserver-protocol/blob/master/README.md">here</a>. A summary of the changes:<a href="#md:20-a-detailed-description-of-the-20-version-can-be-found-here-a-summary-of-the-changes" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><ul>
+<li>support for request cancellation. Cancellation is automatically hooked to
+VSCode's cancellation tokens</li>
+<li>document save notification.</li>
+<li>Synced text documents carry VSCode's text document version number</li>
+</ul>
+<a id="md:11x-provides-all-language-service-feature-available-in-the-extension-host-via-the-language-client--server-protocol-features-added" class="tsd-anchor"></a><h3 class="tsd-anchor-link">1.1.x: Provides all language service feature available in the extension host via the language client / server protocol. Features added:<a href="#md:11x-provides-all-language-service-feature-available-in-the-extension-host-via-the-language-client--server-protocol-features-added" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><ul>
+<li>Code Actions: provide actions to fix diagnostic problems.</li>
+<li>Code Lens: provide commands that are shown along with source text.</li>
+<li>Formatting: whole document, document ranges and formatting on type.</li>
+<li>Rename refactoring: provides renaming symbols.</li>
+</ul>
+<a id="md:10x-version-which-provides-support-for-the-following-features" class="tsd-anchor"></a><h3 class="tsd-anchor-link">1.0.x: Version which provides support for the following features:<a href="#md:10x-version-which-provides-support-for-the-following-features" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><ul>
+<li>Transports: stdio and node IPC can be used as a transport.</li>
+<li>Document synchronization: incremental and full text document
+synchronization.</li>
+<li>Configuration synchronization: synchronization of configuration settings to
+the server.</li>
+<li>File events: synchronization of file events to the server.</li>
+<li>Code Complete: provides code complete lists.</li>
+<li>Document Highlights: highlights all 'equal' symbols in a text document.</li>
+<li>Hover: provides hover information for a symbol selected in a text document.</li>
+<li>Signature Help: provides signature help for a symbol selected in a text
+document.</li>
+<li>Goto Definition: provides goto definition support for a symbol selected in a
+text document.</li>
+<li>Find References: finds all project-wide references for a symbol selected in
+a text document.</li>
+<li>List Document Symbols: lists all symbols defined in a text document.</li>
+<li>List Workspace Symbols: lists all project-wide symbols.</li>
+</ul>
+<a id="md:010x-initial-versions-to-build-a-good-api-for-the-client-and-server-side" class="tsd-anchor"></a><h3 class="tsd-anchor-link">0.10.x: Initial versions to build a good API for the client and server side<a href="#md:010x-initial-versions-to-build-a-good-api-for-the-client-and-server-side" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><a id="md:license" class="tsd-anchor"></a><h2 class="tsd-anchor-link">License<a href="#md:license" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><p><a href="https://github.com/Microsoft/vscode-languageserver-node/blob/master/License.txt">MIT</a></p>
+</div></div><div class="col-sidebar"><div class="page-menu"><div class="tsd-navigation settings"><details class="tsd-accordion"><summary class="tsd-accordion-summary"><h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="assets/icons.svg#icon-chevronDown"></use></svg>Settings</h3></summary><div class="tsd-accordion-details"><div class="tsd-filter-visibility"><span class="settings-label">Member Visibility</span><ul id="tsd-filter-options"><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-protected" name="protected"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Protected</span></label></li><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-external" name="external"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>External</span></label></li></ul></div><div class="tsd-theme-toggle"><label class="settings-label" for="tsd-theme">Theme</label><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div><details open class="tsd-accordion tsd-page-navigation"><summary class="tsd-accordion-summary"><h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><use href="assets/icons.svg#icon-chevronDown"></use></svg>On This Page</h3></summary><div class="tsd-accordion-details"><a href="#md:vscode-language-server---node"><span>VSCode <wbr/>Language <wbr/>Server -<wbr/> <wbr/>Node</span></a><ul><li><a href="#md:contributing"><span>Contributing</span></a></li><li><a href="#md:history"><span>History</span></a></li><li><a href="#md:next-1000-next_-client-and-1000-next_-server"><span>Next (10.0.0-<wbr/>next._<wbr/> <wbr/>Client and 10.0.0-<wbr/>next._<wbr/> <wbr/>Server)</span></a></li><li><a href="#md:3175-protocol-901-client-and-901-server"><span>3.17.5 <wbr/>Protocol, 9.0.1 <wbr/>Client and 9.0.1 <wbr/>Server</span></a></li><li><a href="#md:3174-protocol-820-json-rpc-900-client-and-900-server"><span>3.17.4 <wbr/>Protocol, 8.2.0 JSON-<wbr/>RPC 9.0.0 <wbr/>Client and 9.0.0 <wbr/>Server</span></a></li><li><a href="#md:3174-next0-protocol-820-next0-json-rpc-820-next0-client-and-820-next0-server"><span>3.17.4-<wbr/>next.0 <wbr/>Protocol, 8.2.0-<wbr/>next.0 JSON-<wbr/>RPC, 8.2.0-<wbr/>next.0 <wbr/>Client and 8.2.0-<wbr/>next.0 <wbr/>Server.</span></a></li><li><a href="#md:3173-protocol-810-json-rpc-810-client-and-810-server"><span>3.17.3 <wbr/>Protocol, 8.1.0 JSON-<wbr/>RPC, 8.1.0 <wbr/>Client and 8.1.0 <wbr/>Server.</span></a></li><li><a href="#md:3172-protocol-802-json-rpc-802-client-and-802-server"><span>3.17.2 <wbr/>Protocol, 8.0.2 JSON-<wbr/>RPC, 8.0.2 <wbr/>Client and 8.0.2 <wbr/>Server.</span></a></li><li><a href="#md:3170-protocol-800-json-rpc-800-client-and-800-server"><span>3.17.0 <wbr/>Protocol, 8.0.0 JSON-<wbr/>RPC, 8.0.0 <wbr/>Client and 8.0.0 <wbr/>Server.</span></a></li><li><a href="#md:3160-protocol-600-json-rpc-700-client-and-700-server"><span>3.16.0 <wbr/>Protocol, 6.0.0 JSON-<wbr/>RPC, 7.0.0 <wbr/>Client and 7.0.0 <wbr/>Server.</span></a></li><li><a href="#md:3153-protocol-61x-client-and-61x-server"><span>3.15.3 <wbr/>Protocol, 6.1.x client and 6.1.x server</span></a></li><li><a href="#md:3152-protocol-61x-client-and-61x-server"><span>3.15.2 <wbr/>Protocol, 6.1.x client and 6.1.x server</span></a></li><li><a href="#md:3150-protocol-600-client--600-server"><span>3.15.0 <wbr/>Protocol, 6.0.0 <wbr/>Client &amp; 6.0.0 <wbr/>Server</span></a></li><li><ul><li><a href="#md:511-client"><span>5.1.1 <wbr/>Client</span></a></li><li><a href="#md:510-client--510-server"><span>5.1.0 <wbr/>Client &amp; 5.1.0 <wbr/>Server</span></a></li><li><a href="#md:3130-protocol"><span>3.13.0 <wbr/>Protocol</span></a></li><li><a href="#md:500-client--500-server"><span>5.0.0 <wbr/>Client &amp; 5.0.0 <wbr/>Server</span></a></li><li><a href="#md:440-client--440-server--3100-protocol"><span>4.4.0 <wbr/>Client &amp; 4.4.0 <wbr/>Server &amp; 3.10.0 <wbr/>Protocol</span></a></li><li><a href="#md:430-client--430-server--390-protocol"><span>4.3.0 <wbr/>Client &amp; 4.3.0 <wbr/>Server &amp; 3.9.0 <wbr/>Protocol</span></a></li><li><a href="#md:420-client--420-server--380-protocol"><span>4.2.0 <wbr/>Client &amp; 4.2.0 <wbr/>Server &amp; 3.8.0 <wbr/>Protocol</span></a></li><li><a href="#md:414-client--413-server"><span>4.1.4 <wbr/>Client &amp; 4.1.3 <wbr/>Server</span></a></li><li><a href="#md:411-client"><span>4.1.1 <wbr/>Client</span></a></li><li><a href="#md:410-client--server"><span>4.1.0 <wbr/>Client &amp; <wbr/>Server</span></a></li><li><a href="#md:401-client"><span>4.0.1 <wbr/>Client</span></a></li><li><a href="#md:400-server-and-client"><span>4.0.0 <wbr/>Server and <wbr/>Client</span></a></li><li><a href="#md:600-server-and-client"><span>6.0.0 <wbr/>Server and <wbr/>Client</span></a></li><li><a href="#md:3150-types-and-protocol"><span>3.15.0 <wbr/>Types and <wbr/>Protocol</span></a></li><li><a href="#md:361-types"><span>3.6.1 <wbr/>Types</span></a></li><li><a href="#md:350-server-and-client"><span>3.5.0 <wbr/>Server and <wbr/>Client</span></a></li><li><a href="#md:340-server-and-client"><span>3.4.0 <wbr/>Server and <wbr/>Client</span></a></li><li><a href="#md:330-server-and-client"><span>3.3.0 <wbr/>Server and <wbr/>Client</span></a></li><li><a href="#md:321-server-and-client"><span>3.2.1 <wbr/>Server and <wbr/>Client</span></a></li><li><a href="#md:320-server-and-client"><span>3.2.0 <wbr/>Server and <wbr/>Client</span></a></li><li><a href="#md:310-server-and-client"><span>3.1.0 <wbr/>Server and <wbr/>Client</span></a></li><li><a href="#md:305-server-and-304-client"><span>3.0.5 <wbr/>Server and 3.0.4 <wbr/>Client</span></a></li><li><a href="#md:303-client-server-and-json-rpc"><span>3.0.3: <wbr/>Client, <wbr/>Server and JSON-<wbr/>RPC</span></a></li><li><ul><li><a href="#md:new-features"><span>New <wbr/>Features</span></a></li><li><a href="#md:breaking-changes"><span>Breaking changes:</span></a></li></ul></li><li><a href="#md:260-client-and-server"><span>2.6.0: <wbr/>Client and server</span></a></li><li><a href="#md:250-client-and-server"><span>2.5.0: <wbr/>Client and <wbr/>Server</span></a></li><li><a href="#md:240-client-and-server"><span>2.4.0 <wbr/>Client and <wbr/>Server</span></a></li><li><a href="#md:230-client-only"><span>2.3.0: <wbr/>Client only</span></a></li><li><a href="#md:20-a-detailed-description-of-the-20-version-can-be-found-here-a-summary-of-the-changes"><span>2.0: <wbr/>A detailed description of the 2.0 version can be found here. <wbr/>A summary of the changes:</span></a></li><li><a href="#md:11x-provides-all-language-service-feature-available-in-the-extension-host-via-the-language-client--server-protocol-features-added"><span>1.1.x: <wbr/>Provides all language service feature available in the extension host via the language client / server protocol. <wbr/>Features added:</span></a></li><li><a href="#md:10x-version-which-provides-support-for-the-following-features"><span>1.0.x: <wbr/>Version which provides support for the following features:</span></a></li><li><a href="#md:010x-initial-versions-to-build-a-good-api-for-the-client-and-server-side"><span>0.10.x: <wbr/>Initial versions to build a good API for the client and server side</span></a></li></ul></li><li><a href="#md:license"><span>License</span></a></li></ul></div></details></div><div class="site-menu"><nav class="tsd-navigation"><a href="index.html" class="current"><svg class="tsd-kind-icon" viewBox="0 0 24 24"><use href="assets/icons.svg#icon-1"></use></svg><span>vscode-languageserver-tools</span></a><ul class="tsd-small-nested-navigation" id="tsd-nav-container" data-base="."><li>Loading...</li></ul></nav></div></div></div><footer><p class="tsd-generator">Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></footer><div class="overlay"></div></body></html>
