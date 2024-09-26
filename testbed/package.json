@@ -1,11 +1,17 @@
 {
 	"name": "testbed",
 	"description": "testbed",
-	"main": "./client/out/extension.js",
-	"scripts": {
-		"clean": "tsc -b --clean",
-		"compile": "tsc -b"
+	"version": "0.1.0",
+	"publisher": "vscode",
+	"engines": {
+		"vscode": "^1.33.0"
 	},
+	"main": "./client/out/extension.js",
+	"activationEvents": [
+		"*"
+	],
+	"enabledApiProposals": [
+	],
 	"contributes": {
 		"commands": [
 			{
@@ -22,24 +28,26 @@
 			}
 		],
 		"configuration": {
+			"type": "object",
+			"title": "TestBed configuration",
 			"properties": {
 				"testbed.enable": {
+					"type": "boolean",
 					"default": true,
-					"description": "Control whether eslint is enabled for JavaScript files or not.",
-					"type": "boolean"
+					"description": "Control whether eslint is enabled for JavaScript files or not."
 				},
 				"testbed.options": {
+					"type": "object",
 					"default": {},
-					"description": "The eslint options object to provide args to the eslint command.",
-					"type": "object"
+					"description": "The eslint options object to provide args to the eslint command."
 				}
-			},
-			"title": "TestBed configuration",
-			"type": "object"
+			}
 		}
 	},
-	"activationEvents": [
-		"*"
-	],
-	"enabledApiProposals": []
+	"scripts": {
+		"postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
+		"compile": "tsc -b",
+		"clean": "tsc -b --clean",
+		"watch": "tsc -b -w"
+	}
 }
