@@ -1,17 +1,6 @@
 {
-	"description": "VSCode Language Server Protocol Implementation",
-	"devDependencies": {
-		"@types/assert": "1.5.10",
-		"@types/node": "22.7.3",
-		"assert": "2.1.0",
-		"http-server": "14.1.1",
-		"rimraf": "6.0.1",
-		"shelljs": "0.8.5",
-		"shx": "0.3.4",
-		"source-map-support": "0.5.21",
-		"ts-json-schema-generator": "2.3.0"
-	},
 	"name": "vscode-lsp",
+	"description": "VSCode Language Server Protocol Implementation",
 	"scripts": {
 		"all": "npm run symlink && npm run compile && npm run test",
 		"audit:all": "node ./build/bin/all.js audit",
@@ -38,5 +27,16 @@
 		"validate:version": "node ./tools/lib/validate-main.js",
 		"watch:testbed": "tsc -b ./testbed/tsconfig.json -w",
 		"watch:tsconfig-gen": "tsc -b ./tsconfig-gen/tsconfig.json -w"
+	},
+	"devDependencies": {
+		"@types/assert": "1.5.10",
+		"@types/node": "22.7.3",
+		"assert": "2.1.0",
+		"http-server": "14.1.1",
+		"rimraf": "6.0.1",
+		"shelljs": "0.8.5",
+		"shx": "0.3.4",
+		"source-map-support": "0.5.21",
+		"ts-json-schema-generator": "2.3.0"
 	}
 }
