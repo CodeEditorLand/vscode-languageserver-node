@@ -3,10 +3,15 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import * as url from 'url';
-import * as path from 'path';
-import * as fs from 'fs';
-import { spawnSync, fork, ChildProcess, SpawnSyncOptionsWithStringEncoding } from 'child_process';
+import {
+	ChildProcess,
+	fork,
+	spawnSync,
+	SpawnSyncOptionsWithStringEncoding,
+} from "child_process";
+import * as fs from "fs";
+import * as path from "path";
+import * as url from "url";
 
 /**
  * @deprecated Use the `vscode-uri` npm module which provides a more
@@ -14,31 +19,36 @@ import { spawnSync, fork, ChildProcess, SpawnSyncOptionsWithStringEncoding } fro
  */
 export function uriToFilePath(uri: string): string | undefined {
 	const parsed = url.parse(uri);
-	if (parsed.protocol !== 'file:' || !parsed.path) {
+	if (parsed.protocol !== "file:" || !parsed.path) {
 		return undefined;
 	}
-	const segments = parsed.path.split('/');
+	const segments = parsed.path.split("/");
 	for (let i = 0, len = segments.length; i < len; i++) {
 		segments[i] = decodeURIComponent(segments[i]);
 	}
-	if (process.platform === 'win32' && segments.length > 1) {
+	if (process.platform === "win32" && segments.length > 1) {
 		const first = segments[0];
 		const second = segments[1];
 		// Do we have a drive letter and we started with a / which is the
 		// case if the first segement is empty (see split above)
-		if (first.length === 0 && second.length > 1 && second[1] === ':') {
+		if (first.length === 0 && second.length > 1 && second[1] === ":") {
 			// Remove first slash
 			segments.shift();
 		}
 	}
-	return path.normalize(segments.join('/'));
+	return path.normalize(segments.join("/"));
 }
 
 function isWindows(): boolean {
-	return process.platform === 'win32';
+	return process.platform === "win32";
 }
 
-export function resolve(moduleName: string, nodePath: string | undefined, cwd: string | undefined, tracer: (message: string, verbose?: string) => void): Promise<string> {
+export function resolve(
+	moduleName: string,
+	nodePath: string | undefined,
+	cwd: string | undefined,
+	tracer: (message: string, verbose?: string) => void,
+): Promise<string> {
 	interface Message {
 		c: string;
 		s?: boolean;
@@ -46,34 +56,35 @@ export function resolve(moduleName: string, nodePath: string | undefined, cwd: s
 		r?: any;
 	}
 
-	const nodePathKey: string = 'NODE_PATH';
+	const nodePathKey: string = "NODE_PATH";
 
 	const app: string = [
-		'var p = process;',
-		'p.on(\'message\',function(m){',
-		'if(m.c===\'e\'){',
-		'p.exit(0);',
-		'}',
-		'else if(m.c===\'rs\'){',
-		'try{',
-		'var r=require.resolve(m.a);',
-		'p.send({c:\'r\',s:true,r:r});',
-		'}',
-		'catch(err){',
-		'p.send({c:\'r\',s:false});',
-		'}',
-		'}',
-		'});'
-	].join('');
+		"var p = process;",
+		"p.on('message',function(m){",
+		"if(m.c==='e'){",
+		"p.exit(0);",
+		"}",
+		"else if(m.c==='rs'){",
+		"try{",
+		"var r=require.resolve(m.a);",
+		"p.send({c:'r',s:true,r:r});",
+		"}",
+		"catch(err){",
+		"p.send({c:'r',s:false});",
+		"}",
+		"}",
+		"});",
+	].join("");
 
 	return new Promise<any>((resolve, reject) => {
 		const env = process.env;
 		const newEnv = Object.create(null);
-		Object.keys(env).forEach(key => newEnv[key] = env[key]);
+		Object.keys(env).forEach((key) => (newEnv[key] = env[key]));
 
 		if (nodePath && fs.existsSync(nodePath) /* see issue 545 */) {
 			if (newEnv[nodePathKey]) {
-				newEnv[nodePathKey] = nodePath + path.delimiter + newEnv[nodePathKey];
+				newEnv[nodePathKey] =
+					nodePath + path.delimiter + newEnv[nodePathKey];
 			} else {
 				newEnv[nodePathKey] = nodePath;
 			}
@@ -81,40 +92,47 @@ export function resolve(moduleName: string, nodePath: string | undefined, cwd: s
 				tracer(`NODE_PATH value is: ${newEnv[nodePathKey]}`);
 			}
 		}
-		newEnv['ELECTRON_RUN_AS_NODE'] = '1';
+		newEnv["ELECTRON_RUN_AS_NODE"] = "1";
 		try {
-			const cp: ChildProcess = fork('', [], <any>{
+			const cp: ChildProcess = fork("", [], <any>{
 				cwd: cwd,
 				env: newEnv,
-				execArgv: ['-e', app]
+				execArgv: ["-e", app],
 			});
 			if (cp.pid === void 0) {
-				reject(new Error(`Starting process to resolve node module  ${moduleName} failed`));
+				reject(
+					new Error(
+						`Starting process to resolve node module  ${moduleName} failed`,
+					),
+				);
 				return;
 			}
-			cp.on('error', (error: any) => {
+			cp.on("error", (error: any) => {
 				reject(error);
 			});
-			cp.on('message', (message: Message) => {
-				if (message.c === 'r') {
-					cp.send({ c: 'e' });
+			cp.on("message", (message: Message) => {
+				if (message.c === "r") {
+					cp.send({ c: "e" });
 					if (message.s) {
 						resolve(message.r);
 					} else {
-						reject(new Error(`Failed to resolve module: ${moduleName}`));
+						reject(
+							new Error(
+								`Failed to resolve module: ${moduleName}`,
+							),
+						);
 					}
 				}
 			});
 			const message: Message = {
-				c: 'rs',
-				a: moduleName
+				c: "rs",
+				a: moduleName,
 			};
 			cp.send(message);
 		} catch (error) {
 			reject(error);
 		}
 	});
-
 }
 
 /**
@@ -123,24 +141,30 @@ export function resolve(moduleName: string, nodePath: string | undefined, cwd: s
  * implement this themselves since they know best what kind of package managers to support.
  * @param tracer the tracer to use
  */
-export function resolveGlobalNodePath(tracer?: (message: string) => void): string | undefined {
-	let npmCommand = 'npm';
+export function resolveGlobalNodePath(
+	tracer?: (message: string) => void,
+): string | undefined {
+	let npmCommand = "npm";
 	const env: typeof process.env = Object.create(null);
-	Object.keys(process.env).forEach(key => env[key] = process.env[key]);
-	env['NO_UPDATE_NOTIFIER'] = 'true';
+	Object.keys(process.env).forEach((key) => (env[key] = process.env[key]));
+	env["NO_UPDATE_NOTIFIER"] = "true";
 	const options: SpawnSyncOptionsWithStringEncoding = {
-		encoding: 'utf8',
-		env
+		encoding: "utf8",
+		env,
 	};
 	if (isWindows()) {
-		npmCommand = 'npm.cmd';
+		npmCommand = "npm.cmd";
 		options.shell = true;
 	}
 
 	const handler = () => {};
 	try {
-		process.on('SIGPIPE', handler);
-		const stdout = spawnSync(npmCommand, ['config', 'get', 'prefix'], options).stdout;
+		process.on("SIGPIPE", handler);
+		const stdout = spawnSync(
+			npmCommand,
+			["config", "get", "prefix"],
+			options,
+		).stdout;
 
 		if (!stdout) {
 			if (tracer) {
@@ -155,16 +179,16 @@ export function resolveGlobalNodePath(tracer?: (message: string) => void): strin
 
 		if (prefix.length > 0) {
 			if (isWindows()) {
-				return path.join(prefix, 'node_modules');
+				return path.join(prefix, "node_modules");
 			} else {
-				return path.join(prefix, 'lib', 'node_modules');
+				return path.join(prefix, "lib", "node_modules");
 			}
 		}
 		return undefined;
 	} catch (err) {
 		return undefined;
 	} finally {
-		process.removeListener('SIGPIPE', handler);
+		process.removeListener("SIGPIPE", handler);
 	}
 }
 
@@ -179,21 +203,27 @@ interface YarnJsonFormat {
  * implement this themselves since they know best what kind of package managers to support.
  * @param tracer the tracer to use
  */
-export function resolveGlobalYarnPath(tracer?: (message: string) => void): string | undefined {
-	let yarnCommand = 'yarn';
+export function resolveGlobalYarnPath(
+	tracer?: (message: string) => void,
+): string | undefined {
+	let yarnCommand = "yarn";
 	const options: SpawnSyncOptionsWithStringEncoding = {
-		encoding: 'utf8'
+		encoding: "utf8",
 	};
 
 	if (isWindows()) {
-		yarnCommand = 'yarn.cmd';
+		yarnCommand = "yarn.cmd";
 		options.shell = true;
 	}
 
 	const handler = () => {};
 	try {
-		process.on('SIGPIPE', handler);
-		const results = spawnSync(yarnCommand, ['global', 'dir', '--json'], options);
+		process.on("SIGPIPE", handler);
+		const results = spawnSync(
+			yarnCommand,
+			["global", "dir", "--json"],
+			options,
+		);
 
 		const stdout = results.stdout;
 		if (!stdout) {
@@ -209,8 +239,8 @@ export function resolveGlobalYarnPath(tracer?: (message: string) => void): strin
 		for (const line of lines) {
 			try {
 				const yarn: YarnJsonFormat = JSON.parse(line);
-				if (yarn.type === 'log') {
-					return path.join(yarn.data, 'node_modules');
+				if (yarn.type === "log") {
+					return path.join(yarn.data, "node_modules");
 				}
 			} catch (e) {
 				// Do nothing. Ignore the line
@@ -220,23 +250,24 @@ export function resolveGlobalYarnPath(tracer?: (message: string) => void): strin
 	} catch (err) {
 		return undefined;
 	} finally {
-		process.removeListener('SIGPIPE', handler);
+		process.removeListener("SIGPIPE", handler);
 	}
 }
 
 export namespace FileSystem {
-
 	let _isCaseSensitive: boolean | undefined = undefined;
 	export function isCaseSensitive(): boolean {
 		if (_isCaseSensitive !== void 0) {
 			return _isCaseSensitive;
 		}
-		if (process.platform === 'win32') {
+		if (process.platform === "win32") {
 			_isCaseSensitive = false;
 		} else {
 			// convert current file name to upper case / lower case and check if file exists
 			// (guards against cases when name is already all uppercase or lowercase)
-			_isCaseSensitive = !fs.existsSync(__filename.toUpperCase()) || !fs.existsSync(__filename.toLowerCase());
+			_isCaseSensitive =
+				!fs.existsSync(__filename.toUpperCase()) ||
+				!fs.existsSync(__filename.toLowerCase());
 		}
 		return _isCaseSensitive;
 	}
@@ -245,27 +276,53 @@ export namespace FileSystem {
 		if (isCaseSensitive()) {
 			return path.normalize(child).indexOf(path.normalize(parent)) === 0;
 		} else {
-			return path.normalize(child).toLowerCase().indexOf(path.normalize(parent).toLowerCase()) === 0;
+			return (
+				path
+					.normalize(child)
+					.toLowerCase()
+					.indexOf(path.normalize(parent).toLowerCase()) === 0
+			);
 		}
 	}
 }
 
-export function resolveModulePath(workspaceRoot: string, moduleName: string, nodePath: string, tracer: (message: string, verbose?: string) => void): Promise<string> {
+export function resolveModulePath(
+	workspaceRoot: string,
+	moduleName: string,
+	nodePath: string,
+	tracer: (message: string, verbose?: string) => void,
+): Promise<string> {
 	if (nodePath) {
 		if (!path.isAbsolute(nodePath)) {
 			nodePath = path.join(workspaceRoot, nodePath);
 		}
 
-		return resolve(moduleName, nodePath, nodePath, tracer).then((value) => {
-			if (FileSystem.isParent(nodePath, value)) {
-				return value;
-			} else {
-				return Promise.reject<string>(new Error(`Failed to load ${moduleName} from node path location.`));
-			}
-		}).then<string, string>(undefined, (_error: any) => {
-			return resolve(moduleName, resolveGlobalNodePath(tracer), workspaceRoot, tracer);
-		});
+		return resolve(moduleName, nodePath, nodePath, tracer)
+			.then((value) => {
+				if (FileSystem.isParent(nodePath, value)) {
+					return value;
+				} else {
+					return Promise.reject<string>(
+						new Error(
+							`Failed to load ${moduleName} from node path location.`,
+						),
+					);
+				}
+			})
+			.then<string, string>(undefined, (_error: any) => {
+				return resolve(
+					moduleName,
+					resolveGlobalNodePath(tracer),
+					workspaceRoot,
+					tracer,
+				);
+			});
 	} else {
-		return resolve(moduleName, resolveGlobalNodePath(tracer), workspaceRoot, tracer);
+		return resolve(
+			moduleName,
+			resolveGlobalNodePath(tracer),
+			workspaceRoot,
+			tracer,
+		);
 	}
 }

@@ -2,22 +2,30 @@
  * Copyright (c) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
-'use strict';
+"use strict";
 
+import { TextDocument } from "vscode-languageserver-textdocument";
 import {
-	TextDocument
-} from 'vscode-languageserver-textdocument';
-
-import {
-	CompletionItem, createConnection, Diagnostic, Hover, InitializeError, InitializeResult, MarkupKind, Range, ResponseError,
-	TextDocuments, TextDocumentSyncKind, ProposedFeatures, DiagnosticSeverity
-} from 'vscode-languageserver/node';
+	CompletionItem,
+	createConnection,
+	Diagnostic,
+	DiagnosticSeverity,
+	Hover,
+	InitializeError,
+	InitializeResult,
+	MarkupKind,
+	ProposedFeatures,
+	Range,
+	ResponseError,
+	TextDocuments,
+	TextDocumentSyncKind,
+} from "vscode-languageserver/node";
 
 const patterns = [
 	/\b[A-Z]{2,}\b/g,
 	/\b[A-Z]{3,}\b/g,
 	/\b[A-Z]{4,}\b/g,
-	/\b[A-Z]{5,}\b/g
+	/\b[A-Z]{5,}\b/g,
 ];
 
 function computeDiagnostics(content: string): Diagnostic[] {
@@ -27,9 +35,18 @@ function computeDiagnostics(content: string): Diagnostic[] {
 	for (const line of lines) {
 		const pattern = patterns[Math.floor(Math.random() * 3)];
 		let match: RegExpExecArray | null;
-		while (match = pattern.exec(line)) {
+		while ((match = pattern.exec(line))) {
 			result.push(
-				Diagnostic.create(Range.create(lineNumber, match.index, lineNumber, match.index + match[0].length), `${match[0]} is all uppercase.`, DiagnosticSeverity.Error)
+				Diagnostic.create(
+					Range.create(
+						lineNumber,
+						match.index,
+						lineNumber,
+						match.index + match[0].length,
+					),
+					`${match[0]} is all uppercase.`,
+					DiagnosticSeverity.Error,
+				),
 			);
 		}
 		lineNumber++;
@@ -37,46 +54,63 @@ function computeDiagnostics(content: string): Diagnostic[] {
 	return result;
 }
 
-const connection: ProposedFeatures.Connection = createConnection(ProposedFeatures.all);
+const connection: ProposedFeatures.Connection = createConnection(
+	ProposedFeatures.all,
+);
 const documents = new TextDocuments(TextDocument);
 
-connection.onInitialize((params, cancel, progress): Thenable<InitializeResult> | ResponseError<InitializeError> | InitializeResult => {
-	const result: InitializeResult = {
-		capabilities: {
-			textDocumentSync: TextDocumentSyncKind.Incremental,
-			hoverProvider: true,
-			declarationProvider: true,
-			completionProvider: {}
-		}
-	};
-	return result;
-});
+connection.onInitialize(
+	(
+		params,
+		cancel,
+		progress,
+	):
+		| Thenable<InitializeResult>
+		| ResponseError<InitializeError>
+		| InitializeResult => {
+		const result: InitializeResult = {
+			capabilities: {
+				textDocumentSync: TextDocumentSyncKind.Incremental,
+				hoverProvider: true,
+				declarationProvider: true,
+				completionProvider: {},
+			},
+		};
+		return result;
+	},
+);
 
 documents.onDidChangeContent((event) => {
 	const document = event.document;
-	void connection.sendDiagnostics({ uri: document.uri, diagnostics: computeDiagnostics(document.getText()) });
+	void connection.sendDiagnostics({
+		uri: document.uri,
+		diagnostics: computeDiagnostics(document.getText()),
+	});
 });
 
 documents.onDidClose((event) => {
-	void connection.sendDiagnostics({ uri: event.document.uri, diagnostics: []});
+	void connection.sendDiagnostics({
+		uri: event.document.uri,
+		diagnostics: [],
+	});
 });
 
 connection.onHover((textPosition): Hover => {
 	return {
 		contents: {
 			kind: MarkupKind.PlainText,
-			value: 'foo\nbar'
-		}
+			value: "foo\nbar",
+		},
 	};
 });
 
 connection.onDeclaration((params, token) => {
-	return { uri: params.textDocument.uri, range: Range.create(0,0,0,0) };
+	return { uri: params.textDocument.uri, range: Range.create(0, 0, 0, 0) };
 });
 
 connection.onCompletion((params, token): CompletionItem[] => {
 	const result: CompletionItem[] = [];
-	const item = CompletionItem.create('foo');
+	const item = CompletionItem.create("foo");
 	result.push(item);
 	return result;
 });

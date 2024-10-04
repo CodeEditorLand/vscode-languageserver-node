@@ -3,10 +3,14 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import { ClientCapabilities, WorkDoneProgressCreateParams, WorkDoneProgressCreateRequest } from 'vscode-languageserver-protocol';
+import {
+	ClientCapabilities,
+	WorkDoneProgressCreateParams,
+	WorkDoneProgressCreateRequest,
+} from "vscode-languageserver-protocol";
 
-import { FeatureClient, FeatureState, StaticFeature } from './features';
-import { ProgressPart } from './progressPart';
+import { FeatureClient, FeatureState, StaticFeature } from "./features";
+import { ProgressPart } from "./progressPart";
 
 function ensure<T, K extends keyof T>(target: T, key: K): T[K] {
 	if (target[key] === void 0) {
@@ -16,7 +20,6 @@ function ensure<T, K extends keyof T>(target: T, key: K): T[K] {
 }
 
 export class ProgressFeature implements StaticFeature {
-
 	private readonly activeParts: Set<ProgressPart>;
 
 	constructor(private _client: FeatureClient<object>) {
@@ -24,11 +27,15 @@ export class ProgressFeature implements StaticFeature {
 	}
 
 	getState(): FeatureState {
-		return { kind: 'window', id: WorkDoneProgressCreateRequest.method, registrations: this.activeParts.size > 0 };
+		return {
+			kind: "window",
+			id: WorkDoneProgressCreateRequest.method,
+			registrations: this.activeParts.size > 0,
+		};
 	}
 
 	public fillClientCapabilities(capabilities: ClientCapabilities): void {
-		ensure(capabilities, 'window')!.workDoneProgress = true;
+		ensure(capabilities, "window")!.workDoneProgress = true;
 	}
 
 	public initialize(): void {
@@ -39,7 +46,9 @@ export class ProgressFeature implements StaticFeature {
 		};
 
 		const createHandler = (params: WorkDoneProgressCreateParams) => {
-			this.activeParts.add(new ProgressPart(this._client, params.token, deleteHandler));
+			this.activeParts.add(
+				new ProgressPart(this._client, params.token, deleteHandler),
+			);
 		};
 
 		client.onRequest(WorkDoneProgressCreateRequest.type, createHandler);

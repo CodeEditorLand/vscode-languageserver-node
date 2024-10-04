@@ -3,15 +3,15 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import RAL from './ral';
-import * as Is from './is';
-import { Semaphore } from './semaphore';
-import { Message } from './messages';
-import { Event, Emitter } from './events';
-import { ContentEncoder, ContentTypeEncoder } from './encoding';
+import { ContentEncoder, ContentTypeEncoder } from "./encoding";
+import { Emitter, Event } from "./events";
+import * as Is from "./is";
+import { Message } from "./messages";
+import RAL from "./ral";
+import { Semaphore } from "./semaphore";
 
-const ContentLength: string = 'Content-Length: ';
-const CRLF = '\r\n';
+const ContentLength: string = "Content-Length: ";
+const CRLF = "\r\n";
 
 /**
  * Writes JSON-RPC messages to an underlying transport.
@@ -47,14 +47,20 @@ export interface MessageWriter {
 export namespace MessageWriter {
 	export function is(value: any): value is MessageWriter {
 		const candidate: MessageWriter = value;
-		return candidate && Is.func(candidate.dispose) && Is.func(candidate.onClose) &&
-			Is.func(candidate.onError) && Is.func(candidate.write);
+		return (
+			candidate &&
+			Is.func(candidate.dispose) &&
+			Is.func(candidate.onClose) &&
+			Is.func(candidate.onError) &&
+			Is.func(candidate.write)
+		);
 	}
 }
 
 export abstract class AbstractMessageWriter {
-
-	private errorEmitter: Emitter<[Error, Message | undefined, number | undefined]>;
+	private errorEmitter: Emitter<
+		[Error, Message | undefined, number | undefined]
+	>;
 	private closeEmitter: Emitter<void>;
 
 	constructor() {
@@ -67,7 +73,9 @@ export abstract class AbstractMessageWriter {
 		this.closeEmitter.dispose();
 	}
 
-	public get onError(): Event<[Error, Message | undefined, number | undefined]> {
+	public get onError(): Event<
+		[Error, Message | undefined, number | undefined]
+	> {
 		return this.errorEmitter.event;
 	}
 
@@ -87,7 +95,9 @@ export abstract class AbstractMessageWriter {
 		if (error instanceof Error) {
 			return error;
 		} else {
-			return new Error(`Writer received error. Reason: ${Is.string(error.message) ? error.message : 'unknown'}`);
+			return new Error(
+				`Writer received error. Reason: ${Is.string(error.message) ? error.message : "unknown"}`,
+			);
 		}
 	}
 }
@@ -105,23 +115,38 @@ interface ResolvedMessageWriterOptions {
 }
 
 namespace ResolvedMessageWriterOptions {
-	export function fromOptions(options: RAL.MessageBufferEncoding | MessageWriterOptions | undefined): ResolvedMessageWriterOptions {
-		if (options === undefined || typeof options === 'string') {
-			return { charset: options ?? 'utf-8', contentTypeEncoder: RAL().applicationJson.encoder };
+	export function fromOptions(
+		options: RAL.MessageBufferEncoding | MessageWriterOptions | undefined,
+	): ResolvedMessageWriterOptions {
+		if (options === undefined || typeof options === "string") {
+			return {
+				charset: options ?? "utf-8",
+				contentTypeEncoder: RAL().applicationJson.encoder,
+			};
 		} else {
-			return { charset : options.charset ?? 'utf-8', contentEncoder : options.contentEncoder, contentTypeEncoder : options.contentTypeEncoder ?? RAL().applicationJson.encoder };
+			return {
+				charset: options.charset ?? "utf-8",
+				contentEncoder: options.contentEncoder,
+				contentTypeEncoder:
+					options.contentTypeEncoder ?? RAL().applicationJson.encoder,
+			};
 		}
 	}
 }
 
-export class WriteableStreamMessageWriter extends AbstractMessageWriter implements MessageWriter {
-
+export class WriteableStreamMessageWriter
+	extends AbstractMessageWriter
+	implements MessageWriter
+{
 	private writable: RAL.WritableStream;
 	private options: ResolvedMessageWriterOptions;
 	private errorCount: number;
 	private writeSemaphore: Semaphore<void>;
 
-	public constructor(writable: RAL.WritableStream, options?: RAL.MessageBufferEncoding | MessageWriterOptions) {
+	public constructor(
+		writable: RAL.WritableStream,
+		options?: RAL.MessageBufferEncoding | MessageWriterOptions,
+	) {
 		super();
 		this.writable = writable;
 		this.options = ResolvedMessageWriterOptions.fromOptions(options);
@@ -133,28 +158,41 @@ export class WriteableStreamMessageWriter extends AbstractMessageWriter implemen
 
 	public async write(msg: Message): Promise<void> {
 		return this.writeSemaphore.lock(async () => {
-			const payload = this.options.contentTypeEncoder.encode(msg, this.options).then((buffer) => {
-				if (this.options.contentEncoder !== undefined) {
-					return this.options.contentEncoder.encode(buffer);
-				} else {
-					return buffer;
-				}
-			});
-			return payload.then((buffer) => {
-				const headers: string[] = [];
-				headers.push(ContentLength, buffer.byteLength.toString(), CRLF);
-				headers.push(CRLF);
-				return this.doWrite(msg, headers, buffer);
-			}, (error) => {
-				this.fireError(error);
-				throw error;
-			});
+			const payload = this.options.contentTypeEncoder
+				.encode(msg, this.options)
+				.then((buffer) => {
+					if (this.options.contentEncoder !== undefined) {
+						return this.options.contentEncoder.encode(buffer);
+					} else {
+						return buffer;
+					}
+				});
+			return payload.then(
+				(buffer) => {
+					const headers: string[] = [];
+					headers.push(
+						ContentLength,
+						buffer.byteLength.toString(),
+						CRLF,
+					);
+					headers.push(CRLF);
+					return this.doWrite(msg, headers, buffer);
+				},
+				(error) => {
+					this.fireError(error);
+					throw error;
+				},
+			);
 		});
 	}
 
-	private async doWrite(msg: Message, headers: string[], data: Uint8Array): Promise<void> {
+	private async doWrite(
+		msg: Message,
+		headers: string[],
+		data: Uint8Array,
+	): Promise<void> {
 		try {
-			await this.writable.write(headers.join(''), 'ascii');
+			await this.writable.write(headers.join(""), "ascii");
 			return this.writable.write(data);
 		} catch (error) {
 			this.handleError(error, msg);

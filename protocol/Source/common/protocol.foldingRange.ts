@@ -3,13 +3,26 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { RequestHandler, RequestHandler0 } from 'vscode-jsonrpc';
-import { TextDocumentIdentifier, uinteger, FoldingRange, FoldingRangeKind } from 'vscode-languageserver-types';
+import { RequestHandler, RequestHandler0 } from "vscode-jsonrpc";
+import {
+	FoldingRange,
+	FoldingRangeKind,
+	TextDocumentIdentifier,
+	uinteger,
+} from "vscode-languageserver-types";
 
-import { MessageDirection, ProtocolRequestType, ProtocolRequestType0 } from './messages';
+import {
+	MessageDirection,
+	ProtocolRequestType,
+	ProtocolRequestType0,
+} from "./messages";
 import type {
-	TextDocumentRegistrationOptions, StaticRegistrationOptions, PartialResultParams, WorkDoneProgressParams, WorkDoneProgressOptions
-} from './protocol';
+	PartialResultParams,
+	StaticRegistrationOptions,
+	TextDocumentRegistrationOptions,
+	WorkDoneProgressOptions,
+	WorkDoneProgressParams,
+} from "./protocol";
 
 // ---- capabilities
 
@@ -31,16 +44,15 @@ export type ClientFoldingRangeKindOptions = {
  */
 export type ClientFoldingRangeOptions = {
 	/**
-	* If set, the client signals that it supports setting collapsedText on
-	* folding ranges to display custom labels instead of the default text.
-	*
-	* @since 3.17.0
-	*/
+	 * If set, the client signals that it supports setting collapsedText on
+	 * folding ranges to display custom labels instead of the default text.
+	 *
+	 * @since 3.17.0
+	 */
 	collapsedText?: boolean;
 };
 
 export interface FoldingRangeClientCapabilities {
-
 	/**
 	 * Whether implementation supports dynamic registration for folding range
 	 * providers. If this is set to `true` the client supports the new
@@ -85,7 +97,6 @@ export interface FoldingRangeClientCapabilities {
  * @proposed
  */
 export type FoldingRangeWorkspaceClientCapabilities = {
-
 	/**
 	 * Whether the client implementation supports a refresh request sent from the
 	 * server to the client.
@@ -101,16 +112,19 @@ export type FoldingRangeWorkspaceClientCapabilities = {
 	refreshSupport?: boolean;
 };
 
-export interface FoldingRangeOptions extends WorkDoneProgressOptions {
-}
+export interface FoldingRangeOptions extends WorkDoneProgressOptions {}
 
-export interface FoldingRangeRegistrationOptions extends TextDocumentRegistrationOptions, FoldingRangeOptions, StaticRegistrationOptions {
-}
+export interface FoldingRangeRegistrationOptions
+	extends TextDocumentRegistrationOptions,
+		FoldingRangeOptions,
+		StaticRegistrationOptions {}
 
 /**
  * Parameters for a {@link FoldingRangeRequest}.
  */
-export interface FoldingRangeParams extends WorkDoneProgressParams, PartialResultParams {
+export interface FoldingRangeParams
+	extends WorkDoneProgressParams,
+		PartialResultParams {
 	/**
 	 * The text document.
 	 */
@@ -124,10 +138,22 @@ export interface FoldingRangeParams extends WorkDoneProgressParams, PartialResul
  * that resolves to such.
  */
 export namespace FoldingRangeRequest {
-	export const method: 'textDocument/foldingRange' = 'textDocument/foldingRange';
-	export const messageDirection: MessageDirection = MessageDirection.clientToServer;
-	export const type = new ProtocolRequestType<FoldingRangeParams, FoldingRange[] | null, FoldingRange[], void, FoldingRangeRegistrationOptions>(method);
-	export type HandlerSignature = RequestHandler<FoldingRangeParams, FoldingRange[] | null, void>;
+	export const method: "textDocument/foldingRange" =
+		"textDocument/foldingRange";
+	export const messageDirection: MessageDirection =
+		MessageDirection.clientToServer;
+	export const type = new ProtocolRequestType<
+		FoldingRangeParams,
+		FoldingRange[] | null,
+		FoldingRange[],
+		void,
+		FoldingRangeRegistrationOptions
+	>(method);
+	export type HandlerSignature = RequestHandler<
+		FoldingRangeParams,
+		FoldingRange[] | null,
+		void
+	>;
 }
 
 /**
@@ -136,7 +162,10 @@ export namespace FoldingRangeRequest {
  */
 export namespace FoldingRangeRefreshRequest {
 	export const method: `workspace/foldingRange/refresh` = `workspace/foldingRange/refresh`;
-	export const messageDirection: MessageDirection = MessageDirection.serverToClient;
-	export const type = new ProtocolRequestType0<void, void, void, void>(method);
+	export const messageDirection: MessageDirection =
+		MessageDirection.serverToClient;
+	export const type = new ProtocolRequestType0<void, void, void, void>(
+		method,
+	);
 	export type HandlerSignature = RequestHandler0<void, void>;
 }

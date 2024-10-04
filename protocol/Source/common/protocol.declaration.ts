@@ -3,17 +3,31 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import { RequestHandler } from 'vscode-jsonrpc';
-import { Declaration, DeclarationLink, Location, LocationLink } from 'vscode-languageserver-types';
+import { RequestHandler } from "vscode-jsonrpc";
+import {
+	Declaration,
+	DeclarationLink,
+	Location,
+	LocationLink,
+} from "vscode-languageserver-types";
 
-import { MessageDirection, ProtocolRequestType } from './messages';
+import { MessageDirection, ProtocolRequestType } from "./messages";
 import type {
-	TextDocumentRegistrationOptions, StaticRegistrationOptions, TextDocumentPositionParams, PartialResultParams, WorkDoneProgressParams,
-	WorkDoneProgressOptions
-} from './protocol';
+	PartialResultParams,
+	StaticRegistrationOptions,
+	TextDocumentPositionParams,
+	TextDocumentRegistrationOptions,
+	WorkDoneProgressOptions,
+	WorkDoneProgressParams,
+} from "./protocol";
 
 // @ts-ignore: to avoid inlining LocationLink as dynamic import
-let __noDynamicImport: LocationLink | Declaration | DeclarationLink | Location | undefined;
+let __noDynamicImport:
+	| LocationLink
+	| Declaration
+	| DeclarationLink
+	| Location
+	| undefined;
 
 /**
  * @since 3.14.0
@@ -32,14 +46,17 @@ export interface DeclarationClientCapabilities {
 	linkSupport?: boolean;
 }
 
-export interface DeclarationOptions extends WorkDoneProgressOptions {
-}
+export interface DeclarationOptions extends WorkDoneProgressOptions {}
 
-export interface DeclarationRegistrationOptions extends DeclarationOptions, TextDocumentRegistrationOptions, StaticRegistrationOptions  {
-}
+export interface DeclarationRegistrationOptions
+	extends DeclarationOptions,
+		TextDocumentRegistrationOptions,
+		StaticRegistrationOptions {}
 
-export interface DeclarationParams extends TextDocumentPositionParams, WorkDoneProgressParams, PartialResultParams {
-}
+export interface DeclarationParams
+	extends TextDocumentPositionParams,
+		WorkDoneProgressParams,
+		PartialResultParams {}
 
 /**
  * A request to resolve the type definition locations of a symbol at a given text
@@ -48,8 +65,20 @@ export interface DeclarationParams extends TextDocumentPositionParams, WorkDoneP
  * or a Thenable that resolves to such.
  */
 export namespace DeclarationRequest {
-	export const method: 'textDocument/declaration' = 'textDocument/declaration';
-	export const messageDirection: MessageDirection = MessageDirection.clientToServer;
-	export const type = new ProtocolRequestType<DeclarationParams, Declaration | DeclarationLink[] | null, Location[] | DeclarationLink[], void, DeclarationRegistrationOptions>(method);
-	export type HandlerSignature = RequestHandler<DeclarationParams, Declaration | DeclarationLink[] | null, void>;
+	export const method: "textDocument/declaration" =
+		"textDocument/declaration";
+	export const messageDirection: MessageDirection =
+		MessageDirection.clientToServer;
+	export const type = new ProtocolRequestType<
+		DeclarationParams,
+		Declaration | DeclarationLink[] | null,
+		Location[] | DeclarationLink[],
+		void,
+		DeclarationRegistrationOptions
+	>(method);
+	export type HandlerSignature = RequestHandler<
+		DeclarationParams,
+		Declaration | DeclarationLink[] | null,
+		void
+	>;
 }

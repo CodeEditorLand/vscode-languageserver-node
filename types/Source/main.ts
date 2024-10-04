@@ -2,7 +2,7 @@
  * Copyright (c) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
-'use strict';
+"use strict";
 
 /**
  * A tagging type for string properties that are actually document URIs.
@@ -11,7 +11,7 @@ export type DocumentUri = string;
 
 export namespace DocumentUri {
 	export function is(value: any): value is DocumentUri {
-		return typeof value === 'string';
+		return typeof value === "string";
 	}
 }
 
@@ -24,7 +24,7 @@ export type URI = string;
 
 export namespace URI {
 	export function is(value: any): value is URI {
-		return typeof value === 'string';
+		return typeof value === "string";
 	}
 }
 
@@ -37,7 +37,11 @@ export namespace integer {
 	export const MIN_VALUE = -2147483648;
 	export const MAX_VALUE = 2147483647;
 	export function is(value: any): value is integer {
-		return typeof value === 'number' && MIN_VALUE <= value && value <= MAX_VALUE;
+		return (
+			typeof value === "number" &&
+			MIN_VALUE <= value &&
+			value <= MAX_VALUE
+		);
 	}
 }
 
@@ -50,7 +54,11 @@ export namespace uinteger {
 	export const MIN_VALUE = 0;
 	export const MAX_VALUE = 2147483647;
 	export function is(value: any): value is uinteger {
-		return typeof value === 'number' && MIN_VALUE <= value && value <= MAX_VALUE;
+		return (
+			typeof value === "number" &&
+			MIN_VALUE <= value &&
+			value <= MAX_VALUE
+		);
 	}
 }
 
@@ -62,7 +70,6 @@ export namespace uinteger {
  * 0 <= d <= 1.
  */
 export type decimal = number;
-
 
 /**
  * The LSP any type.
@@ -146,8 +153,12 @@ export namespace Position {
 	 * @param character The position's character.
 	 */
 	export function create(line: uinteger, character: uinteger): Position {
-		if (line === Number.MAX_VALUE) { line = uinteger.MAX_VALUE; }
-		if (character === Number.MAX_VALUE) { character = uinteger.MAX_VALUE; }
+		if (line === Number.MAX_VALUE) {
+			line = uinteger.MAX_VALUE;
+		}
+		if (character === Number.MAX_VALUE) {
+			character = uinteger.MAX_VALUE;
+		}
 		return { line, character };
 	}
 	/**
@@ -155,7 +166,11 @@ export namespace Position {
 	 */
 	export function is(value: any): value is Position {
 		const candidate = value as Position;
-		return Is.objectLiteral(candidate) && Is.uinteger(candidate.line) && Is.uinteger(candidate.character);
+		return (
+			Is.objectLiteral(candidate) &&
+			Is.uinteger(candidate.line) &&
+			Is.uinteger(candidate.character)
+		);
 	}
 }
 
@@ -202,14 +217,34 @@ export namespace Range {
 	 * @param endLine The end line number.
 	 * @param endCharacter The end character.
 	 */
-	export function create(startLine: uinteger, startCharacter: uinteger, endLine: uinteger, endCharacter: uinteger): Range;
-	export function create(one: Position | uinteger, two: Position | uinteger, three?: uinteger, four?: uinteger): Range {
-		if (Is.uinteger(one) && Is.uinteger(two) && Is.uinteger(three) && Is.uinteger(four)) {
-			return { start: Position.create(one, two), end: Position.create(three, four) };
+	export function create(
+		startLine: uinteger,
+		startCharacter: uinteger,
+		endLine: uinteger,
+		endCharacter: uinteger,
+	): Range;
+	export function create(
+		one: Position | uinteger,
+		two: Position | uinteger,
+		three?: uinteger,
+		four?: uinteger,
+	): Range {
+		if (
+			Is.uinteger(one) &&
+			Is.uinteger(two) &&
+			Is.uinteger(three) &&
+			Is.uinteger(four)
+		) {
+			return {
+				start: Position.create(one, two),
+				end: Position.create(three, four),
+			};
 		} else if (Position.is(one) && Position.is(two)) {
 			return { start: one, end: two };
 		} else {
-			throw new Error(`Range#create called with invalid arguments[${one}, ${two}, ${three}, ${four}]`);
+			throw new Error(
+				`Range#create called with invalid arguments[${one}, ${two}, ${three}, ${four}]`,
+			);
 		}
 	}
 	/**
@@ -217,7 +252,11 @@ export namespace Range {
 	 */
 	export function is(value: any): value is Range {
 		const candidate = value as Range;
-		return Is.objectLiteral(candidate) && Position.is(candidate.start) && Position.is(candidate.end);
+		return (
+			Is.objectLiteral(candidate) &&
+			Position.is(candidate.start) &&
+			Position.is(candidate.end)
+		);
 	}
 }
 
@@ -248,13 +287,17 @@ export namespace Location {
 	 */
 	export function is(value: any): value is Location {
 		const candidate = value as Location;
-		return Is.objectLiteral(candidate) && Range.is(candidate.range) && (Is.string(candidate.uri) || Is.undefined(candidate.uri));
+		return (
+			Is.objectLiteral(candidate) &&
+			Range.is(candidate.range) &&
+			(Is.string(candidate.uri) || Is.undefined(candidate.uri))
+		);
 	}
 }
 
 /**
-	 * Represents the connection of two locations. Provides additional metadata over normal {@link Location locations},
-	 * including an origin range.
+ * Represents the connection of two locations. Provides additional metadata over normal {@link Location locations},
+ * including an origin range.
  */
 export interface LocationLink {
 	/**
@@ -289,7 +332,6 @@ export interface LocationLink {
  * {@link LocationLink} literals.
  */
 export namespace LocationLink {
-
 	/**
 	 * Creates a LocationLink literal.
 	 * @param targetUri The definition's uri.
@@ -297,8 +339,18 @@ export namespace LocationLink {
 	 * @param targetSelectionRange The span of the symbol definition at the target.
 	 * @param originSelectionRange The span of the symbol being defined in the originating source file.
 	 */
-	export function create(targetUri: DocumentUri, targetRange: Range, targetSelectionRange: Range, originSelectionRange?: Range): LocationLink {
-		return { targetUri, targetRange, targetSelectionRange, originSelectionRange };
+	export function create(
+		targetUri: DocumentUri,
+		targetRange: Range,
+		targetSelectionRange: Range,
+		originSelectionRange?: Range,
+	): LocationLink {
+		return {
+			targetUri,
+			targetRange,
+			targetSelectionRange,
+			originSelectionRange,
+		};
 	}
 
 	/**
@@ -306,9 +358,14 @@ export namespace LocationLink {
 	 */
 	export function is(value: any): value is LocationLink {
 		const candidate = value as LocationLink;
-		return Is.objectLiteral(candidate) && Range.is(candidate.targetRange) && Is.string(candidate.targetUri)
-			&& Range.is(candidate.targetSelectionRange)
-			&& (Range.is(candidate.originSelectionRange) || Is.undefined(candidate.originSelectionRange));
+		return (
+			Is.objectLiteral(candidate) &&
+			Range.is(candidate.targetRange) &&
+			Is.string(candidate.targetUri) &&
+			Range.is(candidate.targetSelectionRange) &&
+			(Range.is(candidate.originSelectionRange) ||
+				Is.undefined(candidate.originSelectionRange))
+		);
 	}
 }
 
@@ -316,7 +373,6 @@ export namespace LocationLink {
  * Represents a color in RGBA space.
  */
 export interface Color {
-
 	/**
 	 * The red component of this color in the range [0-1].
 	 */
@@ -346,7 +402,12 @@ export namespace Color {
 	/**
 	 * Creates a new Color literal.
 	 */
-	export function create(red: decimal, green: decimal, blue: decimal, alpha: decimal): Color {
+	export function create(
+		red: decimal,
+		green: decimal,
+		blue: decimal,
+		alpha: decimal,
+	): Color {
 		return {
 			red,
 			green,
@@ -360,10 +421,13 @@ export namespace Color {
 	 */
 	export function is(value: any): value is Color {
 		const candidate = value as Color;
-		return Is.objectLiteral(candidate) && Is.numberRange(candidate.red, 0, 1)
-			&& Is.numberRange(candidate.green, 0, 1)
-			&& Is.numberRange(candidate.blue, 0, 1)
-			&& Is.numberRange(candidate.alpha, 0, 1);
+		return (
+			Is.objectLiteral(candidate) &&
+			Is.numberRange(candidate.red, 0, 1) &&
+			Is.numberRange(candidate.green, 0, 1) &&
+			Is.numberRange(candidate.blue, 0, 1) &&
+			Is.numberRange(candidate.alpha, 0, 1)
+		);
 	}
 }
 
@@ -371,7 +435,6 @@ export namespace Color {
  * Represents a color range from a document.
  */
 export interface ColorInformation {
-
 	/**
 	 * The range in the document where this color appears.
 	 */
@@ -403,7 +466,11 @@ export namespace ColorInformation {
 	 */
 	export function is(value: any): value is ColorInformation {
 		const candidate = value as ColorInformation;
-		return Is.objectLiteral(candidate) && Range.is(candidate.range) && Color.is(candidate.color);
+		return (
+			Is.objectLiteral(candidate) &&
+			Range.is(candidate.range) &&
+			Color.is(candidate.color)
+		);
 	}
 }
 
@@ -435,7 +502,11 @@ export namespace ColorPresentation {
 	/**
 	 * Creates a new ColorInformation literal.
 	 */
-	export function create(label: string, textEdit?: TextEdit, additionalTextEdits?: TextEdit[]): ColorPresentation {
+	export function create(
+		label: string,
+		textEdit?: TextEdit,
+		additionalTextEdits?: TextEdit[],
+	): ColorPresentation {
 		return {
 			label,
 			textEdit,
@@ -448,9 +519,13 @@ export namespace ColorPresentation {
 	 */
 	export function is(value: any): value is ColorPresentation {
 		const candidate = value as ColorPresentation;
-		return Is.objectLiteral(candidate) && Is.string(candidate.label)
-			&& (Is.undefined(candidate.textEdit) || TextEdit.is(candidate))
-			&& (Is.undefined(candidate.additionalTextEdits) || Is.typedArray(candidate.additionalTextEdits, TextEdit.is));
+		return (
+			Is.objectLiteral(candidate) &&
+			Is.string(candidate.label) &&
+			(Is.undefined(candidate.textEdit) || TextEdit.is(candidate)) &&
+			(Is.undefined(candidate.additionalTextEdits) ||
+				Is.typedArray(candidate.additionalTextEdits, TextEdit.is))
+		);
 	}
 }
 
@@ -461,17 +536,17 @@ export namespace FoldingRangeKind {
 	/**
 	 * Folding range for a comment
 	 */
-	export const Comment = 'comment';
+	export const Comment = "comment";
 
 	/**
 	 * Folding range for an import or include
 	 */
-	export const Imports = 'imports';
+	export const Imports = "imports";
 
 	/**
 	 * Folding range for a region (e.g. `#region`)
 	 */
-	export const Region = 'region';
+	export const Region = "region";
 }
 
 /**
@@ -486,7 +561,6 @@ export type FoldingRangeKind = string;
  * than the number of lines in the document. Clients are free to ignore invalid ranges.
  */
 export interface FoldingRange {
-
 	/**
 	 * The zero-based start line of the range to fold. The folded area starts after the line's last character.
 	 * To be valid, the end must be zero or larger and smaller than the number of lines in the document.
@@ -534,10 +608,17 @@ export namespace FoldingRange {
 	/**
 	 * Creates a new FoldingRange literal.
 	 */
-	export function create(startLine: uinteger, endLine: uinteger, startCharacter?: uinteger, endCharacter?: uinteger, kind?: FoldingRangeKind, collapsedText?: string): FoldingRange {
+	export function create(
+		startLine: uinteger,
+		endLine: uinteger,
+		startCharacter?: uinteger,
+		endCharacter?: uinteger,
+		kind?: FoldingRangeKind,
+		collapsedText?: string,
+	): FoldingRange {
 		const result: FoldingRange = {
 			startLine,
-			endLine
+			endLine,
 		};
 		if (Is.defined(startCharacter)) {
 			result.startCharacter = startCharacter;
@@ -559,10 +640,16 @@ export namespace FoldingRange {
 	 */
 	export function is(value: any): value is FoldingRange {
 		const candidate = value as FoldingRange;
-		return Is.objectLiteral(candidate) && Is.uinteger(candidate.startLine) && Is.uinteger(candidate.startLine)
-			&& (Is.undefined(candidate.startCharacter) || Is.uinteger(candidate.startCharacter))
-			&& (Is.undefined(candidate.endCharacter) || Is.uinteger(candidate.endCharacter))
-			&& (Is.undefined(candidate.kind) || Is.string(candidate.kind));
+		return (
+			Is.objectLiteral(candidate) &&
+			Is.uinteger(candidate.startLine) &&
+			Is.uinteger(candidate.startLine) &&
+			(Is.undefined(candidate.startCharacter) ||
+				Is.uinteger(candidate.startCharacter)) &&
+			(Is.undefined(candidate.endCharacter) ||
+				Is.uinteger(candidate.endCharacter)) &&
+			(Is.undefined(candidate.kind) || Is.string(candidate.kind))
+		);
 	}
 }
 
@@ -588,14 +675,16 @@ export interface DiagnosticRelatedInformation {
  * {@link DiagnosticRelatedInformation} literals.
  */
 export namespace DiagnosticRelatedInformation {
-
 	/**
 	 * Creates a new DiagnosticRelatedInformation literal.
 	 */
-	export function create(location: Location, message: string): DiagnosticRelatedInformation {
+	export function create(
+		location: Location,
+		message: string,
+	): DiagnosticRelatedInformation {
 		return {
 			location,
-			message
+			message,
 		};
 	}
 
@@ -603,8 +692,13 @@ export namespace DiagnosticRelatedInformation {
 	 * Checks whether the given literal conforms to the {@link DiagnosticRelatedInformation} interface.
 	 */
 	export function is(value: any): value is DiagnosticRelatedInformation {
-		const candidate: DiagnosticRelatedInformation = value as DiagnosticRelatedInformation;
-		return Is.defined(candidate) && Location.is(candidate.location) && Is.string(candidate.message);
+		const candidate: DiagnosticRelatedInformation =
+			value as DiagnosticRelatedInformation;
+		return (
+			Is.defined(candidate) &&
+			Location.is(candidate.location) &&
+			Is.string(candidate.message)
+		);
 	}
 }
 
@@ -638,7 +732,6 @@ export type DiagnosticSeverity = 1 | 2 | 3 | 4;
  * @since 3.15.0
  */
 export namespace DiagnosticTag {
-
 	/**
 	 * Unused or unnecessary code.
 	 *
@@ -753,7 +846,14 @@ export namespace Diagnostic {
 	/**
 	 * Creates a new Diagnostic literal.
 	 */
-	export function create(range: Range, message: string, severity?: DiagnosticSeverity, code?: integer | string, source?: string, relatedInformation?: DiagnosticRelatedInformation[]): Diagnostic {
+	export function create(
+		range: Range,
+		message: string,
+		severity?: DiagnosticSeverity,
+		code?: integer | string,
+		source?: string,
+		relatedInformation?: DiagnosticRelatedInformation[],
+	): Diagnostic {
 		const result: Diagnostic = { range, message };
 		if (Is.defined(severity)) {
 			result.severity = severity;
@@ -775,14 +875,24 @@ export namespace Diagnostic {
 	 */
 	export function is(value: any): value is Diagnostic {
 		const candidate = value as Diagnostic;
-		return Is.defined(candidate)
-			&& Range.is(candidate.range)
-			&& Is.string(candidate.message)
-			&& (Is.number(candidate.severity) || Is.undefined(candidate.severity))
-			&& (Is.integer(candidate.code) || Is.string(candidate.code) || Is.undefined(candidate.code))
-			&& (Is.undefined(candidate.codeDescription) || (Is.string(candidate.codeDescription?.href)))
-			&& (Is.string(candidate.source) || Is.undefined(candidate.source))
-			&& (Is.undefined(candidate.relatedInformation) || Is.typedArray<DiagnosticRelatedInformation>(candidate.relatedInformation, DiagnosticRelatedInformation.is));
+		return (
+			Is.defined(candidate) &&
+			Range.is(candidate.range) &&
+			Is.string(candidate.message) &&
+			(Is.number(candidate.severity) ||
+				Is.undefined(candidate.severity)) &&
+			(Is.integer(candidate.code) ||
+				Is.string(candidate.code) ||
+				Is.undefined(candidate.code)) &&
+			(Is.undefined(candidate.codeDescription) ||
+				Is.string(candidate.codeDescription?.href)) &&
+			(Is.string(candidate.source) || Is.undefined(candidate.source)) &&
+			(Is.undefined(candidate.relatedInformation) ||
+				Is.typedArray<DiagnosticRelatedInformation>(
+					candidate.relatedInformation,
+					DiagnosticRelatedInformation.is,
+				))
+		);
 	}
 }
 
@@ -818,7 +928,6 @@ export interface Command {
 	arguments?: LSPAny[];
 }
 
-
 /**
  * The Command namespace provides helper functions to work with
  * {@link Command} literals.
@@ -827,7 +936,11 @@ export namespace Command {
 	/**
 	 * Creates a new Command literal.
 	 */
-	export function create(title: string, command: string, ...args: any[]): Command {
+	export function create(
+		title: string,
+		command: string,
+		...args: any[]
+	): Command {
 		const result: Command = { title, command };
 		if (Is.defined(args) && args.length > 0) {
 			result.arguments = args;
@@ -839,7 +952,12 @@ export namespace Command {
 	 */
 	export function is(value: any): value is Command {
 		const candidate = value as Command;
-		return Is.defined(candidate) && Is.string(candidate.title) && (candidate.tooltip === undefined || Is.string(candidate.tooltip)) && Is.string(candidate.command);
+		return (
+			Is.defined(candidate) &&
+			Is.string(candidate.title) &&
+			(candidate.tooltip === undefined || Is.string(candidate.tooltip)) &&
+			Is.string(candidate.command)
+		);
 	}
 }
 
@@ -886,14 +1004,16 @@ export namespace TextEdit {
 	 * @param range The range of text to be deleted.
 	 */
 	export function del(range: Range): TextEdit {
-		return { range, newText: '' };
+		return { range, newText: "" };
 	}
 
 	export function is(value: any): value is TextEdit {
 		const candidate = value as TextEdit;
-		return Is.objectLiteral(candidate)
-			&& Is.string(candidate.newText)
-			&& Range.is(candidate.range);
+		return (
+			Is.objectLiteral(candidate) &&
+			Is.string(candidate.newText) &&
+			Range.is(candidate.range)
+		);
 	}
 }
 
@@ -923,7 +1043,11 @@ export interface ChangeAnnotation {
 }
 
 export namespace ChangeAnnotation {
-	export function create(label: string, needsConfirmation?: boolean, description?: string): ChangeAnnotation {
+	export function create(
+		label: string,
+		needsConfirmation?: boolean,
+		description?: string,
+	): ChangeAnnotation {
 		const result: ChangeAnnotation = { label };
 		if (needsConfirmation !== undefined) {
 			result.needsConfirmation = needsConfirmation;
@@ -935,9 +1059,14 @@ export namespace ChangeAnnotation {
 	}
 	export function is(value: any): value is ChangeAnnotation {
 		const candidate = value as ChangeAnnotation;
-		return Is.objectLiteral(candidate) && Is.string(candidate.label) &&
-			(Is.boolean(candidate.needsConfirmation) || candidate.needsConfirmation === undefined) &&
-			(Is.string(candidate.description) || candidate.description === undefined);
+		return (
+			Is.objectLiteral(candidate) &&
+			Is.string(candidate.label) &&
+			(Is.boolean(candidate.needsConfirmation) ||
+				candidate.needsConfirmation === undefined) &&
+			(Is.string(candidate.description) ||
+				candidate.description === undefined)
+		);
 	}
 }
 
@@ -966,7 +1095,6 @@ export interface AnnotatedTextEdit extends TextEdit {
 }
 
 export namespace AnnotatedTextEdit {
-
 	/**
 	 * Creates an annotated replace text edit.
 	 *
@@ -974,7 +1102,11 @@ export namespace AnnotatedTextEdit {
 	 * @param newText The new text.
 	 * @param annotation The annotation.
 	 */
-	export function replace(range: Range, newText: string, annotation: ChangeAnnotationIdentifier): AnnotatedTextEdit {
+	export function replace(
+		range: Range,
+		newText: string,
+		annotation: ChangeAnnotationIdentifier,
+	): AnnotatedTextEdit {
 		return { range, newText, annotationId: annotation };
 	}
 	/**
@@ -984,8 +1116,16 @@ export namespace AnnotatedTextEdit {
 	 * @param newText The text to be inserted.
 	 * @param annotation The annotation.
 	 */
-	export function insert(position: Position, newText: string, annotation: ChangeAnnotationIdentifier): AnnotatedTextEdit {
-		return { range: { start: position, end: position }, newText, annotationId: annotation };
+	export function insert(
+		position: Position,
+		newText: string,
+		annotation: ChangeAnnotationIdentifier,
+	): AnnotatedTextEdit {
+		return {
+			range: { start: position, end: position },
+			newText,
+			annotationId: annotation,
+		};
 	}
 	/**
 	 * Creates an annotated delete text edit.
@@ -993,16 +1133,22 @@ export namespace AnnotatedTextEdit {
 	 * @param range The range of text to be deleted.
 	 * @param annotation The annotation.
 	 */
-	export function del(range: Range, annotation: ChangeAnnotationIdentifier): AnnotatedTextEdit {
-		return { range, newText: '', annotationId: annotation };
+	export function del(
+		range: Range,
+		annotation: ChangeAnnotationIdentifier,
+	): AnnotatedTextEdit {
+		return { range, newText: "", annotationId: annotation };
 	}
 
 	export function is(value: any): value is AnnotatedTextEdit {
 		const candidate: AnnotatedTextEdit = value as AnnotatedTextEdit;
-		return TextEdit.is(candidate) && (ChangeAnnotation.is(candidate.annotationId) || ChangeAnnotationIdentifier.is(candidate.annotationId));
+		return (
+			TextEdit.is(candidate) &&
+			(ChangeAnnotation.is(candidate.annotationId) ||
+				ChangeAnnotationIdentifier.is(candidate.annotationId))
+		);
 	}
 }
-
 
 /**
  * Describes textual changes on a text document. A TextDocumentEdit describes all changes
@@ -1036,15 +1182,22 @@ export namespace TextDocumentEdit {
 	/**
 	 * Creates a new `TextDocumentEdit`
 	 */
-	export function create(textDocument: OptionalVersionedTextDocumentIdentifier, edits: (TextEdit | AnnotatedTextEdit | SnippetTextEdit)[]): TextDocumentEdit {
+	export function create(
+		textDocument: OptionalVersionedTextDocumentIdentifier,
+		edits: (TextEdit | AnnotatedTextEdit | SnippetTextEdit)[],
+	): TextDocumentEdit {
 		return { textDocument, edits };
 	}
 
 	export function is(value: any): value is TextDocumentEdit {
 		const candidate = value as TextDocumentEdit;
-		return Is.defined(candidate)
-			&& OptionalVersionedTextDocumentIdentifier.is(candidate.textDocument)
-			&& Array.isArray(candidate.edits);
+		return (
+			Is.defined(candidate) &&
+			OptionalVersionedTextDocumentIdentifier.is(
+				candidate.textDocument,
+			) &&
+			Array.isArray(candidate.edits)
+		);
 	}
 }
 
@@ -1087,7 +1240,7 @@ export interface CreateFile extends ResourceOperation {
 	/**
 	 * A create
 	 */
-	kind: 'create';
+	kind: "create";
 
 	/**
 	 * The resource to create.
@@ -1101,12 +1254,20 @@ export interface CreateFile extends ResourceOperation {
 }
 
 export namespace CreateFile {
-	export function create(uri: DocumentUri, options?: CreateFileOptions, annotation?: ChangeAnnotationIdentifier): CreateFile {
+	export function create(
+		uri: DocumentUri,
+		options?: CreateFileOptions,
+		annotation?: ChangeAnnotationIdentifier,
+	): CreateFile {
 		const result: CreateFile = {
-			kind: 'create',
-			uri
+			kind: "create",
+			uri,
 		};
-		if (options !== undefined && (options.overwrite !== undefined || options.ignoreIfExists !== undefined)) {
+		if (
+			options !== undefined &&
+			(options.overwrite !== undefined ||
+				options.ignoreIfExists !== undefined)
+		) {
 			result.options = options;
 		}
 		if (annotation !== undefined) {
@@ -1117,11 +1278,17 @@ export namespace CreateFile {
 
 	export function is(value: any): value is CreateFile {
 		const candidate: CreateFile = value;
-		return candidate && candidate.kind === 'create' && Is.string(candidate.uri) && (
-			candidate.options === undefined ||
-			((candidate.options.overwrite === undefined || Is.boolean(candidate.options.overwrite)) && (candidate.options.ignoreIfExists === undefined || Is.boolean(candidate.options.ignoreIfExists)))
-		) && (
-			candidate.annotationId === undefined || ChangeAnnotationIdentifier.is(candidate.annotationId)
+		return (
+			candidate &&
+			candidate.kind === "create" &&
+			Is.string(candidate.uri) &&
+			(candidate.options === undefined ||
+				((candidate.options.overwrite === undefined ||
+					Is.boolean(candidate.options.overwrite)) &&
+					(candidate.options.ignoreIfExists === undefined ||
+						Is.boolean(candidate.options.ignoreIfExists)))) &&
+			(candidate.annotationId === undefined ||
+				ChangeAnnotationIdentifier.is(candidate.annotationId))
 		);
 	}
 }
@@ -1148,7 +1315,7 @@ export interface RenameFile extends ResourceOperation {
 	/**
 	 * A rename
 	 */
-	kind: 'rename';
+	kind: "rename";
 
 	/**
 	 * The old (existing) location.
@@ -1167,13 +1334,22 @@ export interface RenameFile extends ResourceOperation {
 }
 
 export namespace RenameFile {
-	export function create(oldUri: DocumentUri, newUri: DocumentUri, options?: RenameFileOptions, annotation?: ChangeAnnotationIdentifier): RenameFile {
+	export function create(
+		oldUri: DocumentUri,
+		newUri: DocumentUri,
+		options?: RenameFileOptions,
+		annotation?: ChangeAnnotationIdentifier,
+	): RenameFile {
 		const result: RenameFile = {
-			kind: 'rename',
+			kind: "rename",
 			oldUri,
-			newUri
+			newUri,
 		};
-		if (options !== undefined && (options.overwrite !== undefined || options.ignoreIfExists !== undefined)) {
+		if (
+			options !== undefined &&
+			(options.overwrite !== undefined ||
+				options.ignoreIfExists !== undefined)
+		) {
 			result.options = options;
 		}
 		if (annotation !== undefined) {
@@ -1184,11 +1360,18 @@ export namespace RenameFile {
 
 	export function is(value: any): value is RenameFile {
 		const candidate: RenameFile = value;
-		return candidate && candidate.kind === 'rename' && Is.string(candidate.oldUri) && Is.string(candidate.newUri) && (
-			candidate.options === undefined ||
-			((candidate.options.overwrite === undefined || Is.boolean(candidate.options.overwrite)) && (candidate.options.ignoreIfExists === undefined || Is.boolean(candidate.options.ignoreIfExists)))
-		) && (
-			candidate.annotationId === undefined || ChangeAnnotationIdentifier.is(candidate.annotationId)
+		return (
+			candidate &&
+			candidate.kind === "rename" &&
+			Is.string(candidate.oldUri) &&
+			Is.string(candidate.newUri) &&
+			(candidate.options === undefined ||
+				((candidate.options.overwrite === undefined ||
+					Is.boolean(candidate.options.overwrite)) &&
+					(candidate.options.ignoreIfExists === undefined ||
+						Is.boolean(candidate.options.ignoreIfExists)))) &&
+			(candidate.annotationId === undefined ||
+				ChangeAnnotationIdentifier.is(candidate.annotationId))
 		);
 	}
 }
@@ -1215,7 +1398,7 @@ export interface DeleteFile extends ResourceOperation {
 	/**
 	 * A delete
 	 */
-	kind: 'delete';
+	kind: "delete";
 
 	/**
 	 * The file to delete.
@@ -1229,12 +1412,20 @@ export interface DeleteFile extends ResourceOperation {
 }
 
 export namespace DeleteFile {
-	export function create(uri: DocumentUri, options?: DeleteFileOptions, annotation?: ChangeAnnotationIdentifier): DeleteFile {
+	export function create(
+		uri: DocumentUri,
+		options?: DeleteFileOptions,
+		annotation?: ChangeAnnotationIdentifier,
+	): DeleteFile {
 		const result: DeleteFile = {
-			kind: 'delete',
-			uri
+			kind: "delete",
+			uri,
 		};
-		if (options !== undefined && (options.recursive !== undefined || options.ignoreIfNotExists !== undefined)) {
+		if (
+			options !== undefined &&
+			(options.recursive !== undefined ||
+				options.ignoreIfNotExists !== undefined)
+		) {
 			result.options = options;
 		}
 		if (annotation !== undefined) {
@@ -1245,11 +1436,17 @@ export namespace DeleteFile {
 
 	export function is(value: any): value is DeleteFile {
 		const candidate: DeleteFile = value;
-		return candidate && candidate.kind === 'delete' && Is.string(candidate.uri) && (
-			candidate.options === undefined ||
-			((candidate.options.recursive === undefined || Is.boolean(candidate.options.recursive)) && (candidate.options.ignoreIfNotExists === undefined || Is.boolean(candidate.options.ignoreIfNotExists)))
-		) && (
-			candidate.annotationId === undefined || ChangeAnnotationIdentifier.is(candidate.annotationId)
+		return (
+			candidate &&
+			candidate.kind === "delete" &&
+			Is.string(candidate.uri) &&
+			(candidate.options === undefined ||
+				((candidate.options.recursive === undefined ||
+					Is.boolean(candidate.options.recursive)) &&
+					(candidate.options.ignoreIfNotExists === undefined ||
+						Is.boolean(candidate.options.ignoreIfNotExists)))) &&
+			(candidate.annotationId === undefined ||
+				ChangeAnnotationIdentifier.is(candidate.annotationId))
 		);
 	}
 }
@@ -1286,8 +1483,12 @@ export interface WorkspaceEdit {
 	 * If a client neither supports `documentChanges` nor `workspace.workspaceEdit.resourceOperations` then
 	 * only plain `TextEdit`s using the `changes` property are supported.
 	 */
-	documentChanges?: (TextDocumentEdit | CreateFile | RenameFile | DeleteFile)[];
-
+	documentChanges?: (
+		| TextDocumentEdit
+		| CreateFile
+		| RenameFile
+		| DeleteFile
+	)[];
 
 	/**
 	 * A map of change annotations that can be referenced in `AnnotatedTextEdit`s or create, rename and
@@ -1305,15 +1506,23 @@ export interface WorkspaceEdit {
 export namespace WorkspaceEdit {
 	export function is(value: any): value is WorkspaceEdit {
 		const candidate: WorkspaceEdit = value;
-		return candidate &&
-			(candidate.changes !== undefined || candidate.documentChanges !== undefined) &&
-			(candidate.documentChanges === undefined || candidate.documentChanges.every((change) => {
-				if (Is.string((change as ResourceOperation).kind)) {
-					return CreateFile.is(change) || RenameFile.is(change) || DeleteFile.is(change);
-				} else {
-					return TextDocumentEdit.is(change);
-				}
-			}));
+		return (
+			candidate &&
+			(candidate.changes !== undefined ||
+				candidate.documentChanges !== undefined) &&
+			(candidate.documentChanges === undefined ||
+				candidate.documentChanges.every((change) => {
+					if (Is.string((change as ResourceOperation).kind)) {
+						return (
+							CreateFile.is(change) ||
+							RenameFile.is(change) ||
+							DeleteFile.is(change)
+						);
+					} else {
+						return TextDocumentEdit.is(change);
+					}
+				}))
+		);
 	}
 }
 
@@ -1373,7 +1582,11 @@ export interface TextEditChange {
 	 * @param annotation An optional annotation.
 	 */
 	insert(position: Position, newText: string): void;
-	insert(position: Position, newText: string, annotation: ChangeAnnotation | ChangeAnnotationIdentifier): ChangeAnnotationIdentifier;
+	insert(
+		position: Position,
+		newText: string,
+		annotation: ChangeAnnotation | ChangeAnnotationIdentifier,
+	): ChangeAnnotationIdentifier;
 
 	/**
 	 * Replace the given range with given text for the given resource.
@@ -1383,7 +1596,11 @@ export interface TextEditChange {
 	 * @param annotation An optional annotation.
 	 */
 	replace(range: Range, newText: string): void;
-	replace(range: Range, newText: string, annotation?: ChangeAnnotation | ChangeAnnotationIdentifier): ChangeAnnotationIdentifier;
+	replace(
+		range: Range,
+		newText: string,
+		annotation?: ChangeAnnotation | ChangeAnnotationIdentifier,
+	): ChangeAnnotationIdentifier;
 
 	/**
 	 * Delete the text at the given range.
@@ -1392,22 +1609,35 @@ export interface TextEditChange {
 	 * @param annotation An optional annotation.
 	 */
 	delete(range: Range): void;
-	delete(range: Range, annotation?: ChangeAnnotation | ChangeAnnotationIdentifier): ChangeAnnotationIdentifier;
+	delete(
+		range: Range,
+		annotation?: ChangeAnnotation | ChangeAnnotationIdentifier,
+	): ChangeAnnotationIdentifier;
 }
 
 class TextEditChangeImpl implements TextEditChange {
-
 	private edits: (TextEdit | AnnotatedTextEdit | SnippetTextEdit)[];
 	private changeAnnotations: ChangeAnnotations | undefined;
 
-	public constructor(edits: (TextEdit | AnnotatedTextEdit | SnippetTextEdit)[], changeAnnotations?: ChangeAnnotations) {
+	public constructor(
+		edits: (TextEdit | AnnotatedTextEdit | SnippetTextEdit)[],
+		changeAnnotations?: ChangeAnnotations,
+	) {
 		this.edits = edits;
 		this.changeAnnotations = changeAnnotations;
 	}
 
 	public insert(position: Position, newText: string): void;
-	public insert(position: Position, newText: string, annotation: ChangeAnnotation | ChangeAnnotationIdentifier): ChangeAnnotationIdentifier;
-	public insert(position: Position, newText: string, annotation?: ChangeAnnotation | ChangeAnnotationIdentifier): ChangeAnnotationIdentifier | void {
+	public insert(
+		position: Position,
+		newText: string,
+		annotation: ChangeAnnotation | ChangeAnnotationIdentifier,
+	): ChangeAnnotationIdentifier;
+	public insert(
+		position: Position,
+		newText: string,
+		annotation?: ChangeAnnotation | ChangeAnnotationIdentifier,
+	): ChangeAnnotationIdentifier | void {
 		let edit: TextEdit;
 		let id: ChangeAnnotationIdentifier | undefined;
 		if (annotation === undefined) {
@@ -1427,8 +1657,16 @@ class TextEditChangeImpl implements TextEditChange {
 	}
 
 	public replace(range: Range, newText: string): void;
-	public replace(range: Range, newText: string, annotation: ChangeAnnotation | ChangeAnnotationIdentifier): ChangeAnnotationIdentifier;
-	public replace(range: Range, newText: string, annotation?: ChangeAnnotation | ChangeAnnotationIdentifier): ChangeAnnotationIdentifier | void {
+	public replace(
+		range: Range,
+		newText: string,
+		annotation: ChangeAnnotation | ChangeAnnotationIdentifier,
+	): ChangeAnnotationIdentifier;
+	public replace(
+		range: Range,
+		newText: string,
+		annotation?: ChangeAnnotation | ChangeAnnotationIdentifier,
+	): ChangeAnnotationIdentifier | void {
 		let edit: TextEdit;
 		let id: ChangeAnnotationIdentifier | undefined;
 		if (annotation === undefined) {
@@ -1448,8 +1686,14 @@ class TextEditChangeImpl implements TextEditChange {
 	}
 
 	public delete(range: Range): void;
-	public delete(range: Range, annotation: ChangeAnnotation | ChangeAnnotationIdentifier): ChangeAnnotationIdentifier;
-	public delete(range: Range, annotation?: ChangeAnnotation | ChangeAnnotationIdentifier): ChangeAnnotationIdentifier | void {
+	public delete(
+		range: Range,
+		annotation: ChangeAnnotation | ChangeAnnotationIdentifier,
+	): ChangeAnnotationIdentifier;
+	public delete(
+		range: Range,
+		annotation?: ChangeAnnotation | ChangeAnnotationIdentifier,
+	): ChangeAnnotationIdentifier | void {
 		let edit: TextEdit;
 		let id: ChangeAnnotationIdentifier | undefined;
 		if (annotation === undefined) {
@@ -1480,9 +1724,13 @@ class TextEditChangeImpl implements TextEditChange {
 		this.edits.splice(0, this.edits.length);
 	}
 
-	private assertChangeAnnotations(value: ChangeAnnotations | undefined): asserts value is ChangeAnnotations {
+	private assertChangeAnnotations(
+		value: ChangeAnnotations | undefined,
+	): asserts value is ChangeAnnotations {
 		if (value === undefined) {
-			throw new Error(`Text edit change is not configured to manage change annotations.`);
+			throw new Error(
+				`Text edit change is not configured to manage change annotations.`,
+			);
 		}
 	}
 }
@@ -1513,11 +1761,14 @@ export interface SnippetTextEdit {
 export namespace SnippetTextEdit {
 	export function is(value: any): value is SnippetTextEdit {
 		const candidate = value as SnippetTextEdit;
-		return Is.objectLiteral(candidate)
-			&& Range.is(candidate.range)
-			&& StringValue.isSnippet(candidate.snippet)
-			&& (candidate.annotationId === undefined ||
-				(ChangeAnnotation.is(candidate.annotationId) || ChangeAnnotationIdentifier.is(candidate.annotationId)));
+		return (
+			Is.objectLiteral(candidate) &&
+			Range.is(candidate.range) &&
+			StringValue.isSnippet(candidate.snippet) &&
+			(candidate.annotationId === undefined ||
+				ChangeAnnotation.is(candidate.annotationId) ||
+				ChangeAnnotationIdentifier.is(candidate.annotationId))
+		);
 	}
 }
 
@@ -1525,13 +1776,15 @@ export namespace SnippetTextEdit {
  * A helper class
  */
 class ChangeAnnotations {
-
-	private _annotations: { [id: ChangeAnnotationIdentifier]: ChangeAnnotation };
+	private _annotations: {
+		[id: ChangeAnnotationIdentifier]: ChangeAnnotation;
+	};
 	private _counter: number;
 	private _size: number;
 
 	public constructor(annotations?: { [id: string]: ChangeAnnotation }) {
-		this._annotations = annotations === undefined ? Object.create(null) : annotations;
+		this._annotations =
+			annotations === undefined ? Object.create(null) : annotations;
 		this._counter = 0;
 		this._size = 0;
 	}
@@ -1545,8 +1798,14 @@ class ChangeAnnotations {
 	}
 
 	public manage(annotation: ChangeAnnotation): ChangeAnnotationIdentifier;
-	public manage(id: ChangeAnnotationIdentifier, annotation: ChangeAnnotation): ChangeAnnotationIdentifier;
-	public manage(idOrAnnotation: ChangeAnnotationIdentifier | ChangeAnnotation, annotation?: ChangeAnnotation): ChangeAnnotationIdentifier {
+	public manage(
+		id: ChangeAnnotationIdentifier,
+		annotation: ChangeAnnotation,
+	): ChangeAnnotationIdentifier;
+	public manage(
+		idOrAnnotation: ChangeAnnotationIdentifier | ChangeAnnotation,
+		annotation?: ChangeAnnotation,
+	): ChangeAnnotationIdentifier {
 		let id: ChangeAnnotationIdentifier;
 		if (ChangeAnnotationIdentifier.is(idOrAnnotation)) {
 			id = idOrAnnotation;
@@ -1584,23 +1843,30 @@ export class WorkspaceChange {
 		if (workspaceEdit !== undefined) {
 			this._workspaceEdit = workspaceEdit;
 			if (workspaceEdit.documentChanges) {
-				this._changeAnnotations = new ChangeAnnotations(workspaceEdit.changeAnnotations);
+				this._changeAnnotations = new ChangeAnnotations(
+					workspaceEdit.changeAnnotations,
+				);
 				workspaceEdit.changeAnnotations = this._changeAnnotations.all();
 				workspaceEdit.documentChanges.forEach((change) => {
 					if (TextDocumentEdit.is(change)) {
-						const textEditChange = new TextEditChangeImpl(change.edits, this._changeAnnotations!);
-						this._textEditChanges[change.textDocument.uri] = textEditChange;
+						const textEditChange = new TextEditChangeImpl(
+							change.edits,
+							this._changeAnnotations!,
+						);
+						this._textEditChanges[change.textDocument.uri] =
+							textEditChange;
 					}
 				});
 			} else if (workspaceEdit.changes) {
 				Object.keys(workspaceEdit.changes).forEach((key) => {
-					const textEditChange = new TextEditChangeImpl(workspaceEdit.changes![key]);
+					const textEditChange = new TextEditChangeImpl(
+						workspaceEdit.changes![key],
+					);
 					this._textEditChanges[key] = textEditChange;
 				});
 			}
 		} else {
-			this._workspaceEdit = {
-			};
+			this._workspaceEdit = {};
 		}
 	}
 
@@ -1614,7 +1880,8 @@ export class WorkspaceChange {
 			if (this._changeAnnotations.size === 0) {
 				this._workspaceEdit.changeAnnotations = undefined;
 			} else {
-				this._workspaceEdit.changeAnnotations = this._changeAnnotations.all();
+				this._workspaceEdit.changeAnnotations =
+					this._changeAnnotations.all();
 			}
 		}
 		return this._workspaceEdit;
@@ -1624,21 +1891,31 @@ export class WorkspaceChange {
 	 * Returns the {@link TextEditChange} to manage text edits
 	 * for resources.
 	 */
-	public getTextEditChange(textDocument: OptionalVersionedTextDocumentIdentifier): TextEditChange;
+	public getTextEditChange(
+		textDocument: OptionalVersionedTextDocumentIdentifier,
+	): TextEditChange;
 	public getTextEditChange(uri: DocumentUri): TextEditChange;
-	public getTextEditChange(key: DocumentUri | OptionalVersionedTextDocumentIdentifier): TextEditChange {
+	public getTextEditChange(
+		key: DocumentUri | OptionalVersionedTextDocumentIdentifier,
+	): TextEditChange {
 		if (OptionalVersionedTextDocumentIdentifier.is(key)) {
 			this.initDocumentChanges();
 			if (this._workspaceEdit.documentChanges === undefined) {
-				throw new Error('Workspace edit is not configured for document changes.');
+				throw new Error(
+					"Workspace edit is not configured for document changes.",
+				);
 			}
-			const textDocument: OptionalVersionedTextDocumentIdentifier = { uri: key.uri, version: key.version };
-			let result: TextEditChange = this._textEditChanges[textDocument.uri];
+			const textDocument: OptionalVersionedTextDocumentIdentifier = {
+				uri: key.uri,
+				version: key.version,
+			};
+			let result: TextEditChange =
+				this._textEditChanges[textDocument.uri];
 			if (!result) {
 				const edits: (TextEdit | AnnotatedTextEdit)[] = [];
 				const textDocumentEdit: TextDocumentEdit = {
 					textDocument,
-					edits
+					edits,
 				};
 				this._workspaceEdit.documentChanges.push(textDocumentEdit);
 				result = new TextEditChangeImpl(edits, this._changeAnnotations);
@@ -1648,7 +1925,9 @@ export class WorkspaceChange {
 		} else {
 			this.initChanges();
 			if (this._workspaceEdit.changes === undefined) {
-				throw new Error('Workspace edit is not configured for normal text edit changes.');
+				throw new Error(
+					"Workspace edit is not configured for normal text edit changes.",
+				);
 			}
 			let result: TextEditChange = this._textEditChanges[key];
 			if (!result) {
@@ -1662,28 +1941,54 @@ export class WorkspaceChange {
 	}
 
 	private initDocumentChanges(): void {
-		if (this._workspaceEdit.documentChanges === undefined && this._workspaceEdit.changes === undefined) {
+		if (
+			this._workspaceEdit.documentChanges === undefined &&
+			this._workspaceEdit.changes === undefined
+		) {
 			this._changeAnnotations = new ChangeAnnotations();
 			this._workspaceEdit.documentChanges = [];
-			this._workspaceEdit.changeAnnotations = this._changeAnnotations.all();
+			this._workspaceEdit.changeAnnotations =
+				this._changeAnnotations.all();
 		}
 	}
 
 	private initChanges(): void {
-		if (this._workspaceEdit.documentChanges === undefined && this._workspaceEdit.changes === undefined) {
+		if (
+			this._workspaceEdit.documentChanges === undefined &&
+			this._workspaceEdit.changes === undefined
+		) {
 			this._workspaceEdit.changes = Object.create(null);
 		}
 	}
 
 	public createFile(uri: DocumentUri, options?: CreateFileOptions): void;
-	public createFile(uri: DocumentUri, annotation: ChangeAnnotation | ChangeAnnotationIdentifier, options?: CreateFileOptions): ChangeAnnotationIdentifier;
-	public createFile(uri: DocumentUri, optionsOrAnnotation?: CreateFileOptions | ChangeAnnotation | ChangeAnnotationIdentifier, options?: CreateFileOptions): ChangeAnnotationIdentifier | void {
+	public createFile(
+		uri: DocumentUri,
+		annotation: ChangeAnnotation | ChangeAnnotationIdentifier,
+		options?: CreateFileOptions,
+	): ChangeAnnotationIdentifier;
+	public createFile(
+		uri: DocumentUri,
+		optionsOrAnnotation?:
+			| CreateFileOptions
+			| ChangeAnnotation
+			| ChangeAnnotationIdentifier,
+		options?: CreateFileOptions,
+	): ChangeAnnotationIdentifier | void {
 		this.initDocumentChanges();
 		if (this._workspaceEdit.documentChanges === undefined) {
-			throw new Error('Workspace edit is not configured for document changes.');
+			throw new Error(
+				"Workspace edit is not configured for document changes.",
+			);
 		}
-		let annotation: ChangeAnnotation | ChangeAnnotationIdentifier | undefined;
-		if (ChangeAnnotation.is(optionsOrAnnotation) || ChangeAnnotationIdentifier.is(optionsOrAnnotation)) {
+		let annotation:
+			| ChangeAnnotation
+			| ChangeAnnotationIdentifier
+			| undefined;
+		if (
+			ChangeAnnotation.is(optionsOrAnnotation) ||
+			ChangeAnnotationIdentifier.is(optionsOrAnnotation)
+		) {
 			annotation = optionsOrAnnotation;
 		} else {
 			options = optionsOrAnnotation;
@@ -1694,7 +1999,9 @@ export class WorkspaceChange {
 		if (annotation === undefined) {
 			operation = CreateFile.create(uri, options);
 		} else {
-			id = ChangeAnnotationIdentifier.is(annotation) ? annotation : this._changeAnnotations!.manage(annotation);
+			id = ChangeAnnotationIdentifier.is(annotation)
+				? annotation
+				: this._changeAnnotations!.manage(annotation);
 			operation = CreateFile.create(uri, options, id);
 		}
 		this._workspaceEdit.documentChanges.push(operation);
@@ -1703,15 +2010,40 @@ export class WorkspaceChange {
 		}
 	}
 
-	public renameFile(oldUri: DocumentUri, newUri: DocumentUri, options?: RenameFileOptions): void;
-	public renameFile(oldUri: DocumentUri, newUri: DocumentUri, annotation?: ChangeAnnotation | ChangeAnnotationIdentifier, options?: RenameFileOptions): ChangeAnnotationIdentifier;
-	public renameFile(oldUri: DocumentUri, newUri: DocumentUri, optionsOrAnnotation?: RenameFileOptions | ChangeAnnotation | ChangeAnnotationIdentifier, options?: RenameFileOptions): ChangeAnnotationIdentifier | void {
+	public renameFile(
+		oldUri: DocumentUri,
+		newUri: DocumentUri,
+		options?: RenameFileOptions,
+	): void;
+	public renameFile(
+		oldUri: DocumentUri,
+		newUri: DocumentUri,
+		annotation?: ChangeAnnotation | ChangeAnnotationIdentifier,
+		options?: RenameFileOptions,
+	): ChangeAnnotationIdentifier;
+	public renameFile(
+		oldUri: DocumentUri,
+		newUri: DocumentUri,
+		optionsOrAnnotation?:
+			| RenameFileOptions
+			| ChangeAnnotation
+			| ChangeAnnotationIdentifier,
+		options?: RenameFileOptions,
+	): ChangeAnnotationIdentifier | void {
 		this.initDocumentChanges();
 		if (this._workspaceEdit.documentChanges === undefined) {
-			throw new Error('Workspace edit is not configured for document changes.');
+			throw new Error(
+				"Workspace edit is not configured for document changes.",
+			);
 		}
-		let annotation: ChangeAnnotation | ChangeAnnotationIdentifier | undefined;
-		if (ChangeAnnotation.is(optionsOrAnnotation) || ChangeAnnotationIdentifier.is(optionsOrAnnotation)) {
+		let annotation:
+			| ChangeAnnotation
+			| ChangeAnnotationIdentifier
+			| undefined;
+		if (
+			ChangeAnnotation.is(optionsOrAnnotation) ||
+			ChangeAnnotationIdentifier.is(optionsOrAnnotation)
+		) {
 			annotation = optionsOrAnnotation;
 		} else {
 			options = optionsOrAnnotation;
@@ -1722,7 +2054,9 @@ export class WorkspaceChange {
 		if (annotation === undefined) {
 			operation = RenameFile.create(oldUri, newUri, options);
 		} else {
-			id = ChangeAnnotationIdentifier.is(annotation) ? annotation : this._changeAnnotations!.manage(annotation);
+			id = ChangeAnnotationIdentifier.is(annotation)
+				? annotation
+				: this._changeAnnotations!.manage(annotation);
 			operation = RenameFile.create(oldUri, newUri, options, id);
 		}
 		this._workspaceEdit.documentChanges.push(operation);
@@ -1732,14 +2066,33 @@ export class WorkspaceChange {
 	}
 
 	public deleteFile(uri: DocumentUri, options?: DeleteFileOptions): void;
-	public deleteFile(uri: DocumentUri, annotation: ChangeAnnotation | ChangeAnnotationIdentifier, options?: DeleteFileOptions): ChangeAnnotationIdentifier;
-	public deleteFile(uri: DocumentUri, optionsOrAnnotation?: DeleteFileOptions | ChangeAnnotation | ChangeAnnotationIdentifier, options?: DeleteFileOptions): ChangeAnnotationIdentifier | void {
+	public deleteFile(
+		uri: DocumentUri,
+		annotation: ChangeAnnotation | ChangeAnnotationIdentifier,
+		options?: DeleteFileOptions,
+	): ChangeAnnotationIdentifier;
+	public deleteFile(
+		uri: DocumentUri,
+		optionsOrAnnotation?:
+			| DeleteFileOptions
+			| ChangeAnnotation
+			| ChangeAnnotationIdentifier,
+		options?: DeleteFileOptions,
+	): ChangeAnnotationIdentifier | void {
 		this.initDocumentChanges();
 		if (this._workspaceEdit.documentChanges === undefined) {
-			throw new Error('Workspace edit is not configured for document changes.');
+			throw new Error(
+				"Workspace edit is not configured for document changes.",
+			);
 		}
-		let annotation: ChangeAnnotation | ChangeAnnotationIdentifier | undefined;
-		if (ChangeAnnotation.is(optionsOrAnnotation) || ChangeAnnotationIdentifier.is(optionsOrAnnotation)) {
+		let annotation:
+			| ChangeAnnotation
+			| ChangeAnnotationIdentifier
+			| undefined;
+		if (
+			ChangeAnnotation.is(optionsOrAnnotation) ||
+			ChangeAnnotationIdentifier.is(optionsOrAnnotation)
+		) {
 			annotation = optionsOrAnnotation;
 		} else {
 			options = optionsOrAnnotation;
@@ -1750,7 +2103,9 @@ export class WorkspaceChange {
 		if (annotation === undefined) {
 			operation = DeleteFile.create(uri, options);
 		} else {
-			id = ChangeAnnotationIdentifier.is(annotation) ? annotation : this._changeAnnotations!.manage(annotation);
+			id = ChangeAnnotationIdentifier.is(annotation)
+				? annotation
+				: this._changeAnnotations!.manage(annotation);
 			operation = DeleteFile.create(uri, options, id);
 		}
 		this._workspaceEdit.documentChanges.push(operation);
@@ -1794,7 +2149,8 @@ export namespace TextDocumentIdentifier {
 /**
  * A text document identifier to denote a specific version of a text document.
  */
-export interface VersionedTextDocumentIdentifier extends TextDocumentIdentifier {
+export interface VersionedTextDocumentIdentifier
+	extends TextDocumentIdentifier {
 	/**
 	 * The version number of this document.
 	 */
@@ -1811,7 +2167,10 @@ export namespace VersionedTextDocumentIdentifier {
 	 * @param uri The document's uri.
 	 * @param version The document's version.
 	 */
-	export function create(uri: DocumentUri, version: integer): VersionedTextDocumentIdentifier {
+	export function create(
+		uri: DocumentUri,
+		version: integer,
+	): VersionedTextDocumentIdentifier {
 		return { uri, version };
 	}
 
@@ -1820,14 +2179,19 @@ export namespace VersionedTextDocumentIdentifier {
 	 */
 	export function is(value: any): value is VersionedTextDocumentIdentifier {
 		const candidate = value as VersionedTextDocumentIdentifier;
-		return Is.defined(candidate) && Is.string(candidate.uri) && Is.integer(candidate.version);
+		return (
+			Is.defined(candidate) &&
+			Is.string(candidate.uri) &&
+			Is.integer(candidate.version)
+		);
 	}
 }
 
 /**
  * A text document identifier to optionally denote a specific version of a text document.
  */
-export interface OptionalVersionedTextDocumentIdentifier extends TextDocumentIdentifier {
+export interface OptionalVersionedTextDocumentIdentifier
+	extends TextDocumentIdentifier {
 	/**
 	 * The version number of this document. If a versioned text document identifier
 	 * is sent from the server to the client and the file is not open in the editor
@@ -1848,16 +2212,25 @@ export namespace OptionalVersionedTextDocumentIdentifier {
 	 * @param uri The document's uri.
 	 * @param version The document's version.
 	 */
-	export function create(uri: DocumentUri, version: integer | null): OptionalVersionedTextDocumentIdentifier {
+	export function create(
+		uri: DocumentUri,
+		version: integer | null,
+	): OptionalVersionedTextDocumentIdentifier {
 		return { uri, version };
 	}
 
 	/**
 	 * Checks whether the given literal conforms to the {@link OptionalVersionedTextDocumentIdentifier} interface.
 	 */
-	export function is(value: any): value is OptionalVersionedTextDocumentIdentifier {
+	export function is(
+		value: any,
+	): value is OptionalVersionedTextDocumentIdentifier {
 		const candidate = value as OptionalVersionedTextDocumentIdentifier;
-		return Is.defined(candidate) && Is.string(candidate.uri) && (candidate.version === null || Is.integer(candidate.version));
+		return (
+			Is.defined(candidate) &&
+			Is.string(candidate.uri) &&
+			(candidate.version === null || Is.integer(candidate.version))
+		);
 	}
 }
 
@@ -1894,82 +2267,81 @@ export interface TextDocumentItem {
  * @proposed
  */
 export namespace LanguageKind {
-	export const ABAP = 'abap' as const;
-	export const WindowsBat	= 'bat' as const;
-	export const BibTeX	= 'bibtex' as const;
-	export const Clojure = 'clojure' as const;
-	export const Coffeescript = 'coffeescript' as const;
-	export const C = 'c' as const;
-	export const CPP = 'cpp' as const;
-	export const CSharp	= 'csharp' as const;
-	export const CSS = 'css' as const;
+	export const ABAP = "abap" as const;
+	export const WindowsBat = "bat" as const;
+	export const BibTeX = "bibtex" as const;
+	export const Clojure = "clojure" as const;
+	export const Coffeescript = "coffeescript" as const;
+	export const C = "c" as const;
+	export const CPP = "cpp" as const;
+	export const CSharp = "csharp" as const;
+	export const CSS = "css" as const;
 	/**
 	 * @since 3.18.0
 	 * @proposed
 	 */
-	export const D = 'd' as const;
+	export const D = "d" as const;
 	/**
 	 * @since 3.18.0
 	 * @proposed
 	 */
-	export const Delphi = 'pascal' as const;
-	export const Diff = 'diff' as const;
-	export const Dart = 'dart' as const;
-	export const Dockerfile	= 'dockerfile' as const;
-	export const Elixir	= 'elixir' as const;
-	export const Erlang	= 'erlang' as const;
-	export const FSharp	= 'fsharp' as const;
-	export const GitCommit = 'git-commit' as const;
-	export const GitRebase = 'rebase' as const;
-	export const Go	= 'go' as const;
-	export const Groovy	= 'groovy' as const;
-	export const Handlebars	= 'handlebars' as const;
-	export const Haskell	= 'haskell' as const;
-	export const HTML = 'html' as const;
-	export const Ini = 'ini' as const;
-	export const Java = 'java' as const;
-	export const JavaScript	= 'javascript' as const;
-	export const JavaScriptReact = 'javascriptreact' as const;
-	export const JSON = 'json' as const;
-	export const LaTeX = 'latex' as const;
-	export const Less = 'less' as const;
-	export const Lua = 'lua' as const;
-	export const Makefile = 'makefile' as const;
-	export const Markdown = 'markdown' as const;
-	export const ObjectiveC	= 'objective-c' as const;
-	export const ObjectiveCPP = 'objective-cpp' as const;
+	export const Delphi = "pascal" as const;
+	export const Diff = "diff" as const;
+	export const Dart = "dart" as const;
+	export const Dockerfile = "dockerfile" as const;
+	export const Elixir = "elixir" as const;
+	export const Erlang = "erlang" as const;
+	export const FSharp = "fsharp" as const;
+	export const GitCommit = "git-commit" as const;
+	export const GitRebase = "rebase" as const;
+	export const Go = "go" as const;
+	export const Groovy = "groovy" as const;
+	export const Handlebars = "handlebars" as const;
+	export const Haskell = "haskell" as const;
+	export const HTML = "html" as const;
+	export const Ini = "ini" as const;
+	export const Java = "java" as const;
+	export const JavaScript = "javascript" as const;
+	export const JavaScriptReact = "javascriptreact" as const;
+	export const JSON = "json" as const;
+	export const LaTeX = "latex" as const;
+	export const Less = "less" as const;
+	export const Lua = "lua" as const;
+	export const Makefile = "makefile" as const;
+	export const Markdown = "markdown" as const;
+	export const ObjectiveC = "objective-c" as const;
+	export const ObjectiveCPP = "objective-cpp" as const;
 	/**
 	 * @since 3.18.0
 	 * @proposed
 	 */
-	export const Pascal = 'pascal' as const;
-	export const Perl = 'perl' as const;
-	export const Perl6 = 'perl6' as const;
-	export const PHP = 'php' as const;
-	export const Powershell	= 'powershell' as const;
-	export const Pug = 'jade' as const;
-	export const Python	= 'python' as const;
-	export const R	= 'r' as const;
-	export const Razor = 'razor' as const;
-	export const Ruby = 'ruby' as const;
-	export const Rust = 'rust' as const;
-	export const SCSS = 'scss' as const;
-	export const SASS = 'sass' as const;
-	export const Scala = 'scala' as const;
-	export const ShaderLab = 'shaderlab' as const;
-	export const ShellScript = 'shellscript' as const;
-	export const SQL = 'sql' as const;
-	export const Swift = 'swift' as const;
-	export const TypeScript	= 'typescript' as const;
-	export const TypeScriptReact = 'typescriptreact' as const;
-	export const TeX = 'tex' as const;
-	export const VisualBasic = 'vb' as const;
-	export const XML = 'xml' as const;
-	export const XSL = 'xsl' as const;
-	export const YAML = 'yaml' as const;
+	export const Pascal = "pascal" as const;
+	export const Perl = "perl" as const;
+	export const Perl6 = "perl6" as const;
+	export const PHP = "php" as const;
+	export const Powershell = "powershell" as const;
+	export const Pug = "jade" as const;
+	export const Python = "python" as const;
+	export const R = "r" as const;
+	export const Razor = "razor" as const;
+	export const Ruby = "ruby" as const;
+	export const Rust = "rust" as const;
+	export const SCSS = "scss" as const;
+	export const SASS = "sass" as const;
+	export const Scala = "scala" as const;
+	export const ShaderLab = "shaderlab" as const;
+	export const ShellScript = "shellscript" as const;
+	export const SQL = "sql" as const;
+	export const Swift = "swift" as const;
+	export const TypeScript = "typescript" as const;
+	export const TypeScriptReact = "typescriptreact" as const;
+	export const TeX = "tex" as const;
+	export const VisualBasic = "vb" as const;
+	export const XML = "xml" as const;
+	export const XSL = "xsl" as const;
+	export const YAML = "yaml" as const;
 }
 export type LanguageKind = string;
-
 
 /**
  * The TextDocumentItem namespace provides helper functions to work with
@@ -1983,7 +2355,12 @@ export namespace TextDocumentItem {
 	 * @param version The document's version number.
 	 * @param text The document's text.
 	 */
-	export function create(uri: DocumentUri, languageId: LanguageKind, version: integer, text: string): TextDocumentItem {
+	export function create(
+		uri: DocumentUri,
+		languageId: LanguageKind,
+		version: integer,
+		text: string,
+	): TextDocumentItem {
 		return { uri, languageId, version, text };
 	}
 
@@ -1992,7 +2369,13 @@ export namespace TextDocumentItem {
 	 */
 	export function is(value: any): value is TextDocumentItem {
 		const candidate = value as TextDocumentItem;
-		return Is.defined(candidate) && Is.string(candidate.uri) && Is.string(candidate.languageId) && Is.integer(candidate.version) && Is.string(candidate.text);
+		return (
+			Is.defined(candidate) &&
+			Is.string(candidate.uri) &&
+			Is.string(candidate.languageId) &&
+			Is.integer(candidate.version) &&
+			Is.string(candidate.text)
+		);
 	}
 }
 
@@ -2007,22 +2390,25 @@ export namespace MarkupKind {
 	/**
 	 * Plain text is supported as a content format
 	 */
-	export const PlainText: 'plaintext' = 'plaintext';
+	export const PlainText: "plaintext" = "plaintext";
 
 	/**
 	 * Markdown is supported as a content format
 	 */
-	export const Markdown: 'markdown' = 'markdown';
+	export const Markdown: "markdown" = "markdown";
 
 	/**
 	 * Checks whether the given value is a value of the {@link MarkupKind} type.
 	 */
 	export function is(value: any): value is MarkupKind {
 		const candidate = value as MarkupKind;
-		return candidate === MarkupKind.PlainText || candidate === MarkupKind.Markdown;
+		return (
+			candidate === MarkupKind.PlainText ||
+			candidate === MarkupKind.Markdown
+		);
 	}
 }
-export type MarkupKind = 'plaintext' | 'markdown';
+export type MarkupKind = "plaintext" | "markdown";
 
 /**
  * A `MarkupContent` literal represents a string value which content is interpreted base on its
@@ -2066,7 +2452,11 @@ export namespace MarkupContent {
 	 */
 	export function is(value: any): value is MarkupContent {
 		const candidate = value as MarkupContent;
-		return Is.objectLiteral(value) && MarkupKind.is(candidate.kind) && Is.string(candidate.value);
+		return (
+			Is.objectLiteral(value) &&
+			MarkupKind.is(candidate.kind) &&
+			Is.string(candidate.value)
+		);
 	}
 }
 
@@ -2101,8 +2491,32 @@ export namespace CompletionItemKind {
 	export const TypeParameter: 25 = 25;
 }
 
-export type CompletionItemKind = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25;
-
+export type CompletionItemKind =
+	| 1
+	| 2
+	| 3
+	| 4
+	| 5
+	| 6
+	| 7
+	| 8
+	| 9
+	| 10
+	| 11
+	| 12
+	| 13
+	| 14
+	| 15
+	| 16
+	| 17
+	| 18
+	| 19
+	| 20
+	| 21
+	| 22
+	| 23
+	| 24
+	| 25;
 
 /**
  * Defines whether the insert text in a completion item should be interpreted as
@@ -2128,7 +2542,6 @@ export namespace InsertTextFormat {
 }
 
 export type InsertTextFormat = 1 | 2;
-
 
 /**
  * Completion item tags are extra annotations that tweak the rendering of a completion
@@ -2173,20 +2586,30 @@ export interface InsertReplaceEdit {
  * @since 3.16.0
  */
 export namespace InsertReplaceEdit {
-
 	/**
 	 * Creates a new insert / replace edit
 	 */
-	export function create(newText: string, insert: Range, replace: Range): InsertReplaceEdit {
+	export function create(
+		newText: string,
+		insert: Range,
+		replace: Range,
+	): InsertReplaceEdit {
 		return { newText, insert, replace };
 	}
 
 	/**
 	 * Checks whether the given literal conforms to the {@link InsertReplaceEdit} interface.
 	 */
-	export function is(value: TextEdit | InsertReplaceEdit): value is InsertReplaceEdit {
+	export function is(
+		value: TextEdit | InsertReplaceEdit,
+	): value is InsertReplaceEdit {
 		const candidate: InsertReplaceEdit = value as InsertReplaceEdit;
-		return candidate && Is.string(candidate.newText) && Range.is(candidate.insert) && Range.is(candidate.replace);
+		return (
+			candidate &&
+			Is.string(candidate.newText) &&
+			Range.is(candidate.insert) &&
+			Range.is(candidate.replace)
+		);
 	}
 }
 
@@ -2242,8 +2665,12 @@ export interface CompletionItemLabelDetails {
 export namespace CompletionItemLabelDetails {
 	export function is(value: any): value is CompletionItemLabelDetails {
 		const candidate = value as CompletionItemLabelDetails;
-		return candidate && (Is.string(candidate.detail) || candidate.detail === undefined) &&
-			(Is.string(candidate.description) || candidate.description === undefined);
+		return (
+			candidate &&
+			(Is.string(candidate.detail) || candidate.detail === undefined) &&
+			(Is.string(candidate.description) ||
+				candidate.description === undefined)
+		);
 	}
 }
 
@@ -2252,7 +2679,6 @@ export namespace CompletionItemLabelDetails {
  * proposed to complete text that is being typed.
  */
 export interface CompletionItem {
-
 	/**
 	 * The label of this completion item.
 	 *
@@ -2551,7 +2977,10 @@ export namespace CompletionList {
 	 * @param items The completion items.
 	 * @param isIncomplete The list is not complete.
 	 */
-	export function create(items?: CompletionItem[], isIncomplete?: boolean): CompletionList {
+	export function create(
+		items?: CompletionItem[],
+		isIncomplete?: boolean,
+	): CompletionList {
 		return { items: items ? items : [], isIncomplete: !!isIncomplete };
 	}
 }
@@ -2588,7 +3017,7 @@ export namespace MarkedString {
 	 * @param plainText The plain text.
 	 */
 	export function fromPlainText(plainText: string): string {
-		return plainText.replace(/[\\`*_{}[\]()#+\-.!]/g, '\\$&'); // escape markdown syntax tokens: http://daringfireball.net/projects/markdown/syntax#backslash
+		return plainText.replace(/[\\`*_{}[\]()#+\-.!]/g, "\\$&"); // escape markdown syntax tokens: http://daringfireball.net/projects/markdown/syntax#backslash
 	}
 
 	/**
@@ -2596,7 +3025,12 @@ export namespace MarkedString {
 	 */
 	export function is(value: any): value is MarkedString {
 		const candidate = value as MarkedString;
-		return Is.string(candidate) || (Is.objectLiteral(candidate) && Is.string(candidate.language) && Is.string(candidate.value));
+		return (
+			Is.string(candidate) ||
+			(Is.objectLiteral(candidate) &&
+				Is.string(candidate.language) &&
+				Is.string(candidate.value))
+		);
 	}
 }
 
@@ -2622,12 +3056,13 @@ export namespace Hover {
 	 */
 	export function is(value: any): value is Hover {
 		const candidate = value as Hover;
-		return !!candidate && Is.objectLiteral(candidate) && (
-			MarkupContent.is(candidate.contents) ||
-			MarkedString.is(candidate.contents) ||
-			Is.typedArray(candidate.contents, MarkedString.is)
-		) && (
-			value.range === undefined || Range.is(value.range)
+		return (
+			!!candidate &&
+			Is.objectLiteral(candidate) &&
+			(MarkupContent.is(candidate.contents) ||
+				MarkedString.is(candidate.contents) ||
+				Is.typedArray(candidate.contents, MarkedString.is)) &&
+			(value.range === undefined || Range.is(value.range))
 		);
 	}
 }
@@ -2637,7 +3072,6 @@ export namespace Hover {
  * have a label and a doc-comment.
  */
 export interface ParameterInformation {
-
 	/**
 	 * The label of this parameter information.
 	 *
@@ -2672,7 +3106,10 @@ export namespace ParameterInformation {
 	 * @param label A label string.
 	 * @param documentation A doc string.
 	 */
-	export function create(label: string | [uinteger, uinteger], documentation?: string): ParameterInformation {
+	export function create(
+		label: string | [uinteger, uinteger],
+		documentation?: string,
+	): ParameterInformation {
 		return documentation ? { label, documentation } : { label };
 	}
 }
@@ -2721,7 +3158,11 @@ export interface SignatureInformation {
  * {@link SignatureInformation} literals.
  */
 export namespace SignatureInformation {
-	export function create(label: string, documentation?: string, ...parameters: ParameterInformation[]): SignatureInformation {
+	export function create(
+		label: string,
+		documentation?: string,
+		...parameters: ParameterInformation[]
+	): SignatureInformation {
 		const result: SignatureInformation = { label };
 		if (Is.defined(documentation)) {
 			result.documentation = documentation;
@@ -2874,7 +3315,10 @@ export namespace DocumentHighlight {
 	 * @param range The range the highlight applies to.
 	 * @param kind The highlight kind
 	 */
-	export function create(range: Range, kind?: DocumentHighlightKind): DocumentHighlight {
+	export function create(
+		range: Range,
+		kind?: DocumentHighlightKind,
+	): DocumentHighlight {
 		const result: DocumentHighlight = { range };
 		if (Is.number(kind)) {
 			result.kind = kind;
@@ -2915,7 +3359,33 @@ export namespace SymbolKind {
 	export const TypeParameter: 26 = 26;
 }
 
-export type SymbolKind = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26;
+export type SymbolKind =
+	| 1
+	| 2
+	| 3
+	| 4
+	| 5
+	| 6
+	| 7
+	| 8
+	| 9
+	| 10
+	| 11
+	| 12
+	| 13
+	| 14
+	| 15
+	| 16
+	| 17
+	| 18
+	| 19
+	| 20
+	| 21
+	| 22
+	| 23
+	| 24
+	| 25
+	| 26;
 
 /**
  * Symbol tags are extra annotations that tweak the rendering of a symbol.
@@ -2923,7 +3393,6 @@ export type SymbolKind = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 |
  * @since 3.16
  */
 export namespace SymbolTag {
-
 	/**
 	 * Render a symbol as obsolete, usually using a strike-out.
 	 */
@@ -2931,7 +3400,6 @@ export namespace SymbolTag {
 }
 
 export type SymbolTag = 1;
-
 
 /**
  * A base for all symbol information.
@@ -2999,11 +3467,17 @@ export namespace SymbolInformation {
 	 * @param uri The resource of the location of symbol.
 	 * @param containerName The name of the symbol containing the symbol.
 	 */
-	export function create(name: string, kind: SymbolKind, range: Range, uri: DocumentUri, containerName?: string): SymbolInformation {
+	export function create(
+		name: string,
+		kind: SymbolKind,
+		range: Range,
+		uri: DocumentUri,
+		containerName?: string,
+	): SymbolInformation {
 		const result: SymbolInformation = {
 			name,
 			kind,
-			location: { uri, range }
+			location: { uri, range },
 		};
 		if (containerName) {
 			result.containerName = containerName;
@@ -3046,7 +3520,6 @@ export interface WorkspaceSymbol extends BaseSymbolInformation {
 }
 
 export namespace WorkspaceSymbol {
-
 	/**
 	 * Create a new workspace symbol.
 	 *
@@ -3056,7 +3529,12 @@ export namespace WorkspaceSymbol {
 	 * @param range An options range of the location.
 	 * @returns A WorkspaceSymbol.
 	 */
-	export function create(name: string, kind: SymbolKind, uri: DocumentUri, range?: Range): WorkspaceSymbol {
+	export function create(
+		name: string,
+		kind: SymbolKind,
+		uri: DocumentUri,
+		range?: Range,
+	): WorkspaceSymbol {
 		return range !== undefined
 			? { name, kind, location: { uri, range } }
 			: { name, kind, location: { uri } };
@@ -3070,7 +3548,6 @@ export namespace WorkspaceSymbol {
  * its most interesting range, e.g. the range of an identifier.
  */
 export interface DocumentSymbol {
-
 	/**
 	 * The name of this symbol. Will be displayed in the user interface and therefore must not be
 	 * an empty string or a string only consisting of white spaces.
@@ -3131,13 +3608,20 @@ export namespace DocumentSymbol {
 	 * @param selectionRange The selectionRange of the symbol.
 	 * @param children Children of the symbol.
 	 */
-	export function create(name: string, detail: string | undefined, kind: SymbolKind, range: Range, selectionRange: Range, children?: DocumentSymbol[]): DocumentSymbol {
+	export function create(
+		name: string,
+		detail: string | undefined,
+		kind: SymbolKind,
+		range: Range,
+		selectionRange: Range,
+		children?: DocumentSymbol[],
+	): DocumentSymbol {
 		const result: DocumentSymbol = {
 			name,
 			detail,
 			kind,
 			range,
-			selectionRange
+			selectionRange,
 		};
 		if (children !== undefined) {
 			result.children = children;
@@ -3149,13 +3633,19 @@ export namespace DocumentSymbol {
 	 */
 	export function is(value: any): value is DocumentSymbol {
 		const candidate: DocumentSymbol = value;
-		return candidate &&
-			Is.string(candidate.name) && Is.number(candidate.kind) &&
-			Range.is(candidate.range) && Range.is(candidate.selectionRange) &&
+		return (
+			candidate &&
+			Is.string(candidate.name) &&
+			Is.number(candidate.kind) &&
+			Range.is(candidate.range) &&
+			Range.is(candidate.selectionRange) &&
 			(candidate.detail === undefined || Is.string(candidate.detail)) &&
-			(candidate.deprecated === undefined || Is.boolean(candidate.deprecated)) &&
-			(candidate.children === undefined || Array.isArray(candidate.children)) &&
-			(candidate.tags === undefined || Array.isArray(candidate.tags));
+			(candidate.deprecated === undefined ||
+				Is.boolean(candidate.deprecated)) &&
+			(candidate.children === undefined ||
+				Array.isArray(candidate.children)) &&
+			(candidate.tags === undefined || Array.isArray(candidate.tags))
+		);
 	}
 }
 
@@ -3173,21 +3663,20 @@ export type CodeActionKind = string;
  * A set of predefined code action kinds
  */
 export namespace CodeActionKind {
-
 	/**
 	 * Empty kind.
 	 */
-	export const Empty: '' = '';
+	export const Empty: "" = "";
 
 	/**
 	 * Base kind for quickfix actions: 'quickfix'
 	 */
-	export const QuickFix: 'quickfix' = 'quickfix';
+	export const QuickFix: "quickfix" = "quickfix";
 
 	/**
 	 * Base kind for refactoring actions: 'refactor'
 	 */
-	export const Refactor: 'refactor' = 'refactor';
+	export const Refactor: "refactor" = "refactor";
 
 	/**
 	 * Base kind for refactoring extraction actions: 'refactor.extract'
@@ -3200,7 +3689,7 @@ export namespace CodeActionKind {
 	 * - Extract interface from class
 	 * - ...
 	 */
-	export const RefactorExtract: 'refactor.extract' = 'refactor.extract';
+	export const RefactorExtract: "refactor.extract" = "refactor.extract";
 
 	/**
 	 * Base kind for refactoring inline actions: 'refactor.inline'
@@ -3212,7 +3701,7 @@ export namespace CodeActionKind {
 	 * - Inline constant
 	 * - ...
 	 */
-	export const RefactorInline: 'refactor.inline' = 'refactor.inline';
+	export const RefactorInline: "refactor.inline" = "refactor.inline";
 
 	/**
 	 * Base kind for refactoring move actions: `refactor.move`
@@ -3227,7 +3716,7 @@ export namespace CodeActionKind {
 	 * @since 3.18.0
 	 * @proposed
 	 */
-	export const RefactorMove: 'refactor.move' = 'refactor.move';
+	export const RefactorMove: "refactor.move" = "refactor.move";
 
 	/**
 	 * Base kind for refactoring rewrite actions: 'refactor.rewrite'
@@ -3241,19 +3730,20 @@ export namespace CodeActionKind {
 	 * - Move method to base class
 	 * - ...
 	 */
-	export const RefactorRewrite: 'refactor.rewrite' = 'refactor.rewrite';
+	export const RefactorRewrite: "refactor.rewrite" = "refactor.rewrite";
 
 	/**
 	 * Base kind for source actions: `source`
 	 *
 	 * Source code actions apply to the entire file.
 	 */
-	export const Source: 'source' = 'source';
+	export const Source: "source" = "source";
 
 	/**
 	 * Base kind for an organize imports source action: `source.organizeImports`
 	 */
-	export const SourceOrganizeImports: 'source.organizeImports' = 'source.organizeImports';
+	export const SourceOrganizeImports: "source.organizeImports" =
+		"source.organizeImports";
 
 	/**
 	 * Base kind for auto-fix source actions: `source.fixAll`.
@@ -3263,7 +3753,7 @@ export namespace CodeActionKind {
 	 *
 	 * @since 3.15.0
 	 */
-	export const SourceFixAll: 'source.fixAll' = 'source.fixAll';
+	export const SourceFixAll: "source.fixAll" = "source.fixAll";
 
 	/**
 	 * Base kind for all code actions applying to the entire notebook's scope. CodeActionKinds using
@@ -3271,7 +3761,7 @@ export namespace CodeActionKind {
 	 *
 	 * @since 3.18.0
 	 */
-	export const Notebook: 'notebook' = 'notebook';
+	export const Notebook: "notebook" = "notebook";
 }
 
 /**
@@ -3295,7 +3785,6 @@ export namespace CodeActionTriggerKind {
 }
 
 export type CodeActionTriggerKind = 1 | 2;
-
 
 /**
  * Contains additional diagnostic information about the context in which
@@ -3335,7 +3824,11 @@ export namespace CodeActionContext {
 	/**
 	 * Creates a new CodeActionContext literal.
 	 */
-	export function create(diagnostics: Diagnostic[], only?: CodeActionKind[], triggerKind?: CodeActionTriggerKind): CodeActionContext {
+	export function create(
+		diagnostics: Diagnostic[],
+		only?: CodeActionKind[],
+		triggerKind?: CodeActionTriggerKind,
+	): CodeActionContext {
 		const result: CodeActionContext = { diagnostics };
 		if (only !== undefined && only !== null) {
 			result.only = only;
@@ -3350,12 +3843,17 @@ export namespace CodeActionContext {
 	 */
 	export function is(value: any): value is CodeActionContext {
 		const candidate = value as CodeActionContext;
-		return Is.defined(candidate) && Is.typedArray<Diagnostic[]>(candidate.diagnostics, Diagnostic.is)
-			&& (candidate.only === undefined || Is.typedArray(candidate.only, Is.string))
-			&& (candidate.triggerKind === undefined || candidate.triggerKind === CodeActionTriggerKind.Invoked || candidate.triggerKind === CodeActionTriggerKind.Automatic);
+		return (
+			Is.defined(candidate) &&
+			Is.typedArray<Diagnostic[]>(candidate.diagnostics, Diagnostic.is) &&
+			(candidate.only === undefined ||
+				Is.typedArray(candidate.only, Is.string)) &&
+			(candidate.triggerKind === undefined ||
+				candidate.triggerKind === CodeActionTriggerKind.Invoked ||
+				candidate.triggerKind === CodeActionTriggerKind.Automatic)
+		);
 	}
 }
-
 
 /**
  * Captures why the code action is currently disabled.
@@ -3363,7 +3861,6 @@ export namespace CodeActionContext {
  * @since 3.18.0
  */
 export type CodeActionDisabled = {
-
 	/**
 	 * Human readable description of why the code action is currently disabled.
 	 *
@@ -3399,7 +3896,6 @@ export type CodeActionTag = 1;
  * A CodeAction must set either `edit` and/or a `command`. If both are supplied, the `edit` is applied first, then the `command` is executed.
  */
 export interface CodeAction {
-
 	/**
 	 * A short, human-readable, title for this code action.
 	 */
@@ -3468,7 +3964,7 @@ export interface CodeAction {
 	data?: LSPAny;
 
 	/**
- 	 * Tags for this code action.
+	 * Tags for this code action.
 	 *
 	 * @since 3.18.0 - proposed
 	 */
@@ -3491,7 +3987,11 @@ export namespace CodeAction {
 	 * @param command The command to execute.
 	 * @param kind The kind of the code action.
 	 */
-	export function create(title: string, command: Command, kind?: CodeActionKind): CodeAction;
+	export function create(
+		title: string,
+		command: Command,
+		kind?: CodeActionKind,
+	): CodeAction;
 
 	/**
 	 * Creates a new code action.
@@ -3500,12 +4000,20 @@ export namespace CodeAction {
 	 * @param edit The edit to perform.
 	 * @param kind The kind of the code action.
 	 */
-	export function create(title: string, edit: WorkspaceEdit, kind?: CodeActionKind): CodeAction;
+	export function create(
+		title: string,
+		edit: WorkspaceEdit,
+		kind?: CodeActionKind,
+	): CodeAction;
 
-	export function create(title: string, kindOrCommandOrEdit?: CodeActionKind | Command | WorkspaceEdit, kind?: CodeActionKind): CodeAction {
+	export function create(
+		title: string,
+		kindOrCommandOrEdit?: CodeActionKind | Command | WorkspaceEdit,
+		kind?: CodeActionKind,
+	): CodeAction {
 		const result: CodeAction = { title };
 		let checkKind: boolean = true;
-		if (typeof kindOrCommandOrEdit === 'string') {
+		if (typeof kindOrCommandOrEdit === "string") {
 			checkKind = false;
 			result.kind = kindOrCommandOrEdit;
 		} else if (Command.is(kindOrCommandOrEdit)) {
@@ -3520,14 +4028,22 @@ export namespace CodeAction {
 	}
 	export function is(value: any): value is CodeAction {
 		const candidate: CodeAction = value;
-		return candidate && Is.string(candidate.title) &&
-			(candidate.diagnostics === undefined || Is.typedArray(candidate.diagnostics, Diagnostic.is)) &&
+		return (
+			candidate &&
+			Is.string(candidate.title) &&
+			(candidate.diagnostics === undefined ||
+				Is.typedArray(candidate.diagnostics, Diagnostic.is)) &&
 			(candidate.kind === undefined || Is.string(candidate.kind)) &&
 			(candidate.edit !== undefined || candidate.command !== undefined) &&
-			(candidate.command === undefined || Command.is(candidate.command)) &&
-			(candidate.isPreferred === undefined || Is.boolean(candidate.isPreferred)) &&
-			(candidate.edit === undefined || WorkspaceEdit.is(candidate.edit)) &&
-			(candidate.tags === undefined || Is.typedArray(candidate.tags, CodeActionTag.is));
+			(candidate.command === undefined ||
+				Command.is(candidate.command)) &&
+			(candidate.isPreferred === undefined ||
+				Is.boolean(candidate.isPreferred)) &&
+			(candidate.edit === undefined ||
+				WorkspaceEdit.is(candidate.edit)) &&
+			(candidate.tags === undefined ||
+				Is.typedArray(candidate.tags, CodeActionTag.is))
+		);
 	}
 }
 
@@ -3566,7 +4082,9 @@ export namespace CodeLens {
 	 */
 	export function create(range: Range, data?: LSPAny): CodeLens {
 		const result: CodeLens = { range };
-		if (Is.defined(data)) { result.data = data; }
+		if (Is.defined(data)) {
+			result.data = data;
+		}
 		return result;
 	}
 	/**
@@ -3574,7 +4092,11 @@ export namespace CodeLens {
 	 */
 	export function is(value: any): value is CodeLens {
 		const candidate = value as CodeLens;
-		return Is.defined(candidate) && Range.is(candidate.range) && (Is.undefined(candidate.command) || Command.is(candidate.command));
+		return (
+			Is.defined(candidate) &&
+			Range.is(candidate.range) &&
+			(Is.undefined(candidate.command) || Command.is(candidate.command))
+		);
 	}
 }
 
@@ -3627,7 +4149,10 @@ export namespace FormattingOptions {
 	/**
 	 * Creates a new FormattingOptions literal.
 	 */
-	export function create(tabSize: uinteger, insertSpaces: boolean): FormattingOptions {
+	export function create(
+		tabSize: uinteger,
+		insertSpaces: boolean,
+	): FormattingOptions {
 		return { tabSize, insertSpaces };
 	}
 	/**
@@ -3635,7 +4160,11 @@ export namespace FormattingOptions {
 	 */
 	export function is(value: any): value is FormattingOptions {
 		const candidate = value as FormattingOptions;
-		return Is.defined(candidate) && Is.uinteger(candidate.tabSize) && Is.boolean(candidate.insertSpaces);
+		return (
+			Is.defined(candidate) &&
+			Is.uinteger(candidate.tabSize) &&
+			Is.boolean(candidate.insertSpaces)
+		);
 	}
 }
 
@@ -3644,7 +4173,6 @@ export namespace FormattingOptions {
  * text document or a web site.
  */
 export interface DocumentLink {
-
 	/**
 	 * The range this link applies to.
 	 */
@@ -3681,7 +4209,11 @@ export namespace DocumentLink {
 	/**
 	 * Creates a new DocumentLink literal.
 	 */
-	export function create(range: Range, target?: string, data?: LSPAny): DocumentLink {
+	export function create(
+		range: Range,
+		target?: string,
+		data?: LSPAny,
+	): DocumentLink {
 		return { range, target, data };
 	}
 
@@ -3690,7 +4222,11 @@ export namespace DocumentLink {
 	 */
 	export function is(value: any): value is DocumentLink {
 		const candidate = value as DocumentLink;
-		return Is.defined(candidate) && Range.is(candidate.range) && (Is.undefined(candidate.target) || Is.string(candidate.target));
+		return (
+			Is.defined(candidate) &&
+			Range.is(candidate.range) &&
+			(Is.undefined(candidate.target) || Is.string(candidate.target))
+		);
 	}
 }
 
@@ -3699,7 +4235,6 @@ export namespace DocumentLink {
  * may have a parent selection range that contains it.
  */
 export interface SelectionRange {
-
 	/**
 	 * The {@link Range range} of this selection range.
 	 */
@@ -3709,7 +4244,6 @@ export interface SelectionRange {
 	 * The parent selection range containing this range. Therefore `parent.range` must contain `this.range`.
 	 */
 	parent?: SelectionRange;
-
 }
 
 /**
@@ -3722,13 +4256,21 @@ export namespace SelectionRange {
 	 * @param range the range.
 	 * @param parent an optional parent.
 	 */
-	export function create(range: Range, parent?: SelectionRange): SelectionRange {
+	export function create(
+		range: Range,
+		parent?: SelectionRange,
+	): SelectionRange {
 		return { range, parent };
 	}
 
 	export function is(value: any): value is SelectionRange {
 		const candidate = value as SelectionRange;
-		return Is.objectLiteral(candidate) && Range.is(candidate.range) && (candidate.parent === undefined || SelectionRange.is(candidate.parent));
+		return (
+			Is.objectLiteral(candidate) &&
+			Range.is(candidate.range) &&
+			(candidate.parent === undefined ||
+				SelectionRange.is(candidate.parent))
+		);
 	}
 }
 
@@ -3788,7 +4330,6 @@ export interface CallHierarchyItem {
  * @since 3.16.0
  */
 export interface CallHierarchyIncomingCall {
-
 	/**
 	 * The item that makes the call.
 	 */
@@ -3807,7 +4348,6 @@ export interface CallHierarchyIncomingCall {
  * @since 3.16.0
  */
 export interface CallHierarchyOutgoingCall {
-
 	/**
 	 * The item that is called.
 	 */
@@ -3829,40 +4369,40 @@ export interface CallHierarchyOutgoingCall {
  * @since 3.16.0
  */
 export enum SemanticTokenTypes {
-	namespace = 'namespace',
+	namespace = "namespace",
 	/**
 	 * Represents a generic type. Acts as a fallback for types which can't be mapped to
 	 * a specific type like class or enum.
 	 */
-	type = 'type',
-	class = 'class',
-	enum = 'enum',
-	interface = 'interface',
-	struct = 'struct',
-	typeParameter = 'typeParameter',
-	parameter = 'parameter',
-	variable = 'variable',
-	property = 'property',
-	enumMember = 'enumMember',
-	event = 'event',
-	function = 'function',
-	method = 'method',
-	macro = 'macro',
-	keyword = 'keyword',
-	modifier = 'modifier',
-	comment = 'comment',
-	string = 'string',
-	number = 'number',
-	regexp = 'regexp',
-	operator = 'operator',
+	type = "type",
+	class = "class",
+	enum = "enum",
+	interface = "interface",
+	struct = "struct",
+	typeParameter = "typeParameter",
+	parameter = "parameter",
+	variable = "variable",
+	property = "property",
+	enumMember = "enumMember",
+	event = "event",
+	function = "function",
+	method = "method",
+	macro = "macro",
+	keyword = "keyword",
+	modifier = "modifier",
+	comment = "comment",
+	string = "string",
+	number = "number",
+	regexp = "regexp",
+	operator = "operator",
 	/**
 	 * @since 3.17.0
 	 */
-	decorator = 'decorator',
+	decorator = "decorator",
 	/**
 	 * @since 3.18.0
 	 */
-	label = 'label'
+	label = "label",
 }
 
 /**
@@ -3873,16 +4413,16 @@ export enum SemanticTokenTypes {
  * @since 3.16.0
  */
 export enum SemanticTokenModifiers {
-	declaration = 'declaration',
-	definition = 'definition',
-	readonly = 'readonly',
-	static = 'static',
-	deprecated = 'deprecated',
-	abstract = 'abstract',
-	async = 'async',
-	modification = 'modification',
-	documentation = 'documentation',
-	defaultLibrary = 'defaultLibrary'
+	declaration = "declaration",
+	definition = "definition",
+	readonly = "readonly",
+	static = "static",
+	deprecated = "deprecated",
+	abstract = "abstract",
+	async = "async",
+	modification = "modification",
+	documentation = "documentation",
+	defaultLibrary = "defaultLibrary",
 }
 
 /**
@@ -3924,8 +4464,14 @@ export interface SemanticTokens {
 export namespace SemanticTokens {
 	export function is(value: any): value is SemanticTokens {
 		const candidate = value as SemanticTokens;
-		return Is.objectLiteral(candidate) && (candidate.resultId === undefined || typeof candidate.resultId === 'string') &&
-			Array.isArray(candidate.data) && (candidate.data.length === 0 || typeof candidate.data[0] === 'number');
+		return (
+			Is.objectLiteral(candidate) &&
+			(candidate.resultId === undefined ||
+				typeof candidate.resultId === "string") &&
+			Array.isArray(candidate.data) &&
+			(candidate.data.length === 0 ||
+				typeof candidate.data[0] === "number")
+		);
 	}
 }
 
@@ -4041,9 +4587,16 @@ export namespace InlineValueText {
 		return { range, text };
 	}
 
-	export function is(value: InlineValue | undefined | null): value is InlineValueText {
+	export function is(
+		value: InlineValue | undefined | null,
+	): value is InlineValueText {
 		const candidate = value as InlineValueText;
-		return candidate !== undefined && candidate !== null && Range.is(candidate.range) && Is.string(candidate.text);
+		return (
+			candidate !== undefined &&
+			candidate !== null &&
+			Range.is(candidate.range) &&
+			Is.string(candidate.text)
+		);
 	}
 }
 
@@ -4081,14 +4634,26 @@ export namespace InlineValueVariableLookup {
 	/**
 	 * Creates a new InlineValueText literal.
 	 */
-	export function create(range: Range, variableName: string | undefined, caseSensitiveLookup: boolean): InlineValueVariableLookup {
+	export function create(
+		range: Range,
+		variableName: string | undefined,
+		caseSensitiveLookup: boolean,
+	): InlineValueVariableLookup {
 		return { range, variableName, caseSensitiveLookup };
 	}
 
-	export function is(value: InlineValue | undefined | null): value is InlineValueVariableLookup {
+	export function is(
+		value: InlineValue | undefined | null,
+	): value is InlineValueVariableLookup {
 		const candidate = value as InlineValueVariableLookup;
-		return candidate !== undefined && candidate !== null && Range.is(candidate.range) && Is.boolean(candidate.caseSensitiveLookup)
-			&& (Is.string(candidate.variableName) || candidate.variableName === undefined);
+		return (
+			candidate !== undefined &&
+			candidate !== null &&
+			Range.is(candidate.range) &&
+			Is.boolean(candidate.caseSensitiveLookup) &&
+			(Is.string(candidate.variableName) ||
+				candidate.variableName === undefined)
+		);
 	}
 }
 
@@ -4121,14 +4686,24 @@ export namespace InlineValueEvaluatableExpression {
 	/**
 	 * Creates a new InlineValueEvaluatableExpression literal.
 	 */
-	export function create(range: Range, expression: string | undefined): InlineValueEvaluatableExpression {
+	export function create(
+		range: Range,
+		expression: string | undefined,
+	): InlineValueEvaluatableExpression {
 		return { range, expression };
 	}
 
-	export function is(value: InlineValue | undefined | null): value is InlineValueEvaluatableExpression {
+	export function is(
+		value: InlineValue | undefined | null,
+	): value is InlineValueEvaluatableExpression {
 		const candidate = value as InlineValueEvaluatableExpression;
-		return candidate !== undefined && candidate !== null && Range.is(candidate.range)
-			&& (Is.string(candidate.expression) || candidate.expression === undefined);
+		return (
+			candidate !== undefined &&
+			candidate !== null &&
+			Range.is(candidate.range) &&
+			(Is.string(candidate.expression) ||
+				candidate.expression === undefined)
+		);
 	}
 }
 
@@ -4141,13 +4716,15 @@ export namespace InlineValueEvaluatableExpression {
  *
  * @since 3.17.0
  */
-export type InlineValue = InlineValueText | InlineValueVariableLookup | InlineValueEvaluatableExpression;
+export type InlineValue =
+	| InlineValueText
+	| InlineValueVariableLookup
+	| InlineValueEvaluatableExpression;
 
 /**
  * @since 3.17.0
  */
 export type InlineValueContext = {
-
 	/**
 	 * The stack frame (as a DAP Id) where the execution has stopped.
 	 */
@@ -4170,7 +4747,10 @@ export namespace InlineValueContext {
 	/**
 	 * Creates a new InlineValueContext literal.
 	 */
-	export function create(frameId: integer, stoppedLocation: Range): InlineValueContext {
+	export function create(
+		frameId: integer,
+		stoppedLocation: Range,
+	): InlineValueContext {
 		return { frameId, stoppedLocation };
 	}
 
@@ -4189,7 +4769,6 @@ export namespace InlineValueContext {
  * @since 3.17.0
  */
 export namespace InlayHintKind {
-
 	/**
 	 * An inlay hint that for a type annotation.
 	 */
@@ -4214,7 +4793,6 @@ export type InlayHintKind = 1 | 2;
  * @since 3.17.0
  */
 export type InlayHintLabelPart = {
-
 	/**
 	 * The value of this label part.
 	 */
@@ -4252,17 +4830,21 @@ export type InlayHintLabelPart = {
 };
 
 export namespace InlayHintLabelPart {
-
 	export function create(value: string): InlayHintLabelPart {
 		return { value };
 	}
 
 	export function is(value: any): value is InlayHintLabelPart {
 		const candidate: InlayHintLabelPart = value;
-		return Is.objectLiteral(candidate)
-			&& (candidate.tooltip === undefined || Is.string(candidate.tooltip) || MarkupContent.is(candidate.tooltip))
-			&& (candidate.location === undefined || Location.is(candidate.location))
-			&& (candidate.command === undefined || Command.is(candidate.command));
+		return (
+			Is.objectLiteral(candidate) &&
+			(candidate.tooltip === undefined ||
+				Is.string(candidate.tooltip) ||
+				MarkupContent.is(candidate.tooltip)) &&
+			(candidate.location === undefined ||
+				Location.is(candidate.location)) &&
+			(candidate.command === undefined || Command.is(candidate.command))
+		);
 	}
 }
 
@@ -4272,7 +4854,6 @@ export namespace InlayHintLabelPart {
  * @since 3.17.0
  */
 export type InlayHint = {
-
 	/**
 	 * The position of this hint.
 	 *
@@ -4335,8 +4916,11 @@ export type InlayHint = {
 };
 
 export namespace InlayHint {
-
-	export function create(position: Position, label: string | InlayHintLabelPart[], kind?: InlayHintKind): InlayHint {
+	export function create(
+		position: Position,
+		label: string | InlayHintLabelPart[],
+		kind?: InlayHintKind,
+	): InlayHint {
 		const result: InlayHint = { position, label };
 		if (kind !== undefined) {
 			result.kind = kind;
@@ -4346,13 +4930,23 @@ export namespace InlayHint {
 
 	export function is(value: any): value is InlayHint {
 		const candidate: InlayHint = value;
-		return Is.objectLiteral(candidate) && Position.is(candidate.position)
-			&& (Is.string(candidate.label) || Is.typedArray(candidate.label, InlayHintLabelPart.is))
-			&& (candidate.kind === undefined || InlayHintKind.is(candidate.kind))
-			&& (candidate.textEdits === undefined) || Is.typedArray(candidate.textEdits, TextEdit.is)
-			&& (candidate.tooltip === undefined || Is.string(candidate.tooltip) || MarkupContent.is(candidate.tooltip))
-			&& (candidate.paddingLeft === undefined || Is.boolean(candidate.paddingLeft))
-			&& (candidate.paddingRight === undefined || Is.boolean(candidate.paddingRight));
+		return (
+			(Is.objectLiteral(candidate) &&
+				Position.is(candidate.position) &&
+				(Is.string(candidate.label) ||
+					Is.typedArray(candidate.label, InlayHintLabelPart.is)) &&
+				(candidate.kind === undefined ||
+					InlayHintKind.is(candidate.kind)) &&
+				candidate.textEdits === undefined) ||
+			(Is.typedArray(candidate.textEdits, TextEdit.is) &&
+				(candidate.tooltip === undefined ||
+					Is.string(candidate.tooltip) ||
+					MarkupContent.is(candidate.tooltip)) &&
+				(candidate.paddingLeft === undefined ||
+					Is.boolean(candidate.paddingLeft)) &&
+				(candidate.paddingRight === undefined ||
+					Is.boolean(candidate.paddingRight)))
+		);
 	}
 }
 
@@ -4372,7 +4966,7 @@ export type StringValue = {
 	/**
 	 * The kind of string value.
 	 */
-	kind: 'snippet';
+	kind: "snippet";
 
 	/**
 	 * The snippet string.
@@ -4382,14 +4976,16 @@ export type StringValue = {
 
 export namespace StringValue {
 	export function createSnippet(value: string): StringValue {
-		return { kind: 'snippet', value };
+		return { kind: "snippet", value };
 	}
 
 	export function isSnippet(value: any): value is StringValue {
 		const candidate = value as StringValue;
-		return Is.objectLiteral(candidate)
-			&& candidate.kind === 'snippet'
-			&& Is.string(candidate.value);
+		return (
+			Is.objectLiteral(candidate) &&
+			candidate.kind === "snippet" &&
+			Is.string(candidate.value)
+		);
 	}
 }
 
@@ -4422,7 +5018,12 @@ export interface InlineCompletionItem {
 }
 
 export namespace InlineCompletionItem {
-	export function create(insertText: string | StringValue, filterText?: string, range?: Range, command?: Command): InlineCompletionItem {
+	export function create(
+		insertText: string | StringValue,
+		filterText?: string,
+		range?: Range,
+		command?: Command,
+	): InlineCompletionItem {
 		return { insertText, filterText, range, command };
 	}
 }
@@ -4441,7 +5042,9 @@ export interface InlineCompletionList {
 }
 
 export namespace InlineCompletionList {
-	export function create(items: InlineCompletionItem[]): InlineCompletionList {
+	export function create(
+		items: InlineCompletionItem[],
+	): InlineCompletionList {
 		return { items };
 	}
 }
@@ -4508,8 +5111,11 @@ export type InlineCompletionContext = {
 	selectedCompletionInfo?: SelectedCompletionInfo;
 };
 
-export namespace InlineCompletionContext{
-	export function create(triggerKind: InlineCompletionTriggerKind, selectedCompletionInfo?: SelectedCompletionInfo): InlineCompletionContext {
+export namespace InlineCompletionContext {
+	export function create(
+		triggerKind: InlineCompletionTriggerKind,
+		selectedCompletionInfo?: SelectedCompletionInfo,
+	): InlineCompletionContext {
 		return { triggerKind, selectedCompletionInfo };
 	}
 }
@@ -4533,11 +5139,15 @@ export interface WorkspaceFolder {
 export namespace WorkspaceFolder {
 	export function is(value: any): value is WorkspaceFolder {
 		const candidate: WorkspaceFolder = value;
-		return Is.objectLiteral(candidate) && URI.is(candidate.uri) && Is.string(candidate.name);
+		return (
+			Is.objectLiteral(candidate) &&
+			URI.is(candidate.uri) &&
+			Is.string(candidate.name)
+		);
 	}
 }
 
-export const EOL: string[] = ['\n', '\r\n', '\r'];
+export const EOL: string[] = ["\n", "\r\n", "\r"];
 
 /**
  * A simple text document. Not to be implemented. The document keeps the content
@@ -4546,7 +5156,6 @@ export const EOL: string[] = ['\n', '\r\n', '\r'];
  * @deprecated Use the text document from the new vscode-languageserver-textdocument package.
  */
 export interface TextDocument {
-
 	/**
 	 * The associated URI for this document. Most documents have the __file__-scheme, indicating that they
 	 * represent files on disk. However, some documents may have other schemes indicating that they are not
@@ -4624,7 +5233,12 @@ export namespace TextDocument {
 	 * @param version The document's version.
 	 * @param content The document's content.
 	 */
-	export function create(uri: DocumentUri, languageId: LanguageKind, version: integer, content: string): TextDocument {
+	export function create(
+		uri: DocumentUri,
+		languageId: LanguageKind,
+		version: integer,
+		content: string,
+	): TextDocument {
 		return new FullTextDocument(uri, languageId, version, content);
 	}
 	/**
@@ -4632,11 +5246,22 @@ export namespace TextDocument {
 	 */
 	export function is(value: any): value is TextDocument {
 		const candidate = value as TextDocument;
-		return Is.defined(candidate) && Is.string(candidate.uri) && (Is.undefined(candidate.languageId) || Is.string(candidate.languageId)) && Is.uinteger(candidate.lineCount)
-			&& Is.func(candidate.getText) && Is.func(candidate.positionAt) && Is.func(candidate.offsetAt) ? true : false;
+		return Is.defined(candidate) &&
+			Is.string(candidate.uri) &&
+			(Is.undefined(candidate.languageId) ||
+				Is.string(candidate.languageId)) &&
+			Is.uinteger(candidate.lineCount) &&
+			Is.func(candidate.getText) &&
+			Is.func(candidate.positionAt) &&
+			Is.func(candidate.offsetAt)
+			? true
+			: false;
 	}
 
-	export function applyEdits(document: TextDocument, edits: TextEdit[]): string {
+	export function applyEdits(
+		document: TextDocument,
+		edits: TextEdit[],
+	): string {
 		let text = document.getText();
 		const sortedEdits = mergeSort(edits, (a, b) => {
 			const diff = a.range.start.line - b.range.start.line;
@@ -4651,9 +5276,12 @@ export namespace TextDocument {
 			const startOffset = document.offsetAt(e.range.start);
 			const endOffset = document.offsetAt(e.range.end);
 			if (endOffset <= lastModifiedOffset) {
-				text = text.substring(0, startOffset) + e.newText + text.substring(endOffset, text.length);
+				text =
+					text.substring(0, startOffset) +
+					e.newText +
+					text.substring(endOffset, text.length);
 			} else {
-				throw new Error('Overlapping edit');
+				throw new Error("Overlapping edit");
 			}
 			lastModifiedOffset = startOffset;
 		}
@@ -4701,42 +5329,48 @@ export namespace TextDocument {
  *
  * @deprecated Use the text document from the new vscode-languageserver-textdocument package.
  */
-type TextDocumentContentChangeEvent = {
-	/**
-	 * The range of the document that changed.
-	 */
-	range: Range;
+type TextDocumentContentChangeEvent =
+	| {
+			/**
+			 * The range of the document that changed.
+			 */
+			range: Range;
 
-	/**
-	 * The optional length of the range that got replaced.
-	 *
-	 * @deprecated use range instead.
-	 */
-	rangeLength?: uinteger;
+			/**
+			 * The optional length of the range that got replaced.
+			 *
+			 * @deprecated use range instead.
+			 */
+			rangeLength?: uinteger;
 
-	/**
-	 * The new text for the provided range.
-	 */
-	text: string;
-} | {
-	/**
-	 * The new text of the whole document.
-	 */
-	text: string;
-};
+			/**
+			 * The new text for the provided range.
+			 */
+			text: string;
+	  }
+	| {
+			/**
+			 * The new text of the whole document.
+			 */
+			text: string;
+	  };
 
 /**
  * @deprecated Use the text document from the new vscode-languageserver-textdocument package.
  */
 class FullTextDocument implements TextDocument {
-
 	private _uri: DocumentUri;
 	private _languageId: LanguageKind;
 	private _version: integer;
 	private _content: string;
 	private _lineOffsets: uinteger[] | undefined;
 
-	public constructor(uri: DocumentUri, languageId: LanguageKind, version: integer, content: string) {
+	public constructor(
+		uri: DocumentUri,
+		languageId: LanguageKind,
+		version: integer,
+		content: string,
+	) {
 		this._uri = uri;
 		this._languageId = languageId;
 		this._version = version;
@@ -4765,7 +5399,10 @@ class FullTextDocument implements TextDocument {
 		return this._content;
 	}
 
-	public update(event: TextDocumentContentChangeEvent, version: integer): void {
+	public update(
+		event: TextDocumentContentChangeEvent,
+		version: integer,
+	): void {
 		this._content = event.text;
 		this._version = version;
 		this._lineOffsets = undefined;
@@ -4782,8 +5419,12 @@ class FullTextDocument implements TextDocument {
 					isLineStart = false;
 				}
 				const ch = text.charAt(i);
-				isLineStart = (ch === '\r' || ch === '\n');
-				if (ch === '\r' && i + 1 < text.length && text.charAt(i + 1) === '\n') {
+				isLineStart = ch === "\r" || ch === "\n";
+				if (
+					ch === "\r" &&
+					i + 1 < text.length &&
+					text.charAt(i + 1) === "\n"
+				) {
 					i++;
 				}
 			}
@@ -4799,7 +5440,8 @@ class FullTextDocument implements TextDocument {
 		offset = Math.max(Math.min(offset, this._content.length), 0);
 
 		const lineOffsets = this.getLineOffsets();
-		let low = 0, high = lineOffsets.length;
+		let low = 0,
+			high = lineOffsets.length;
 		if (high === 0) {
 			return Position.create(0, offset);
 		}
@@ -4825,8 +5467,14 @@ class FullTextDocument implements TextDocument {
 			return 0;
 		}
 		const lineOffset = lineOffsets[position.line];
-		const nextLineOffset = (position.line + 1 < lineOffsets.length) ? lineOffsets[position.line + 1] : this._content.length;
-		return Math.max(Math.min(lineOffset + position.character, nextLineOffset), lineOffset);
+		const nextLineOffset =
+			position.line + 1 < lineOffsets.length
+				? lineOffsets[position.line + 1]
+				: this._content.length;
+		return Math.max(
+			Math.min(lineOffset + position.character, nextLineOffset),
+			lineOffset,
+		);
 	}
 
 	public get lineCount() {
@@ -4835,15 +5483,14 @@ class FullTextDocument implements TextDocument {
 }
 
 namespace Is {
-
 	const toString = Object.prototype.toString;
 
 	export function defined(value: any): boolean {
-		return typeof value !== 'undefined';
+		return typeof value !== "undefined";
 	}
 
 	export function undefined(value: any): boolean {
-		return typeof value === 'undefined';
+		return typeof value === "undefined";
 	}
 
 	export function boolean(value: any): value is boolean {
@@ -4851,37 +5498,56 @@ namespace Is {
 	}
 
 	export function string(value: any): value is string {
-		return toString.call(value) === '[object String]';
+		return toString.call(value) === "[object String]";
 	}
 
 	export function number(value: any): value is number {
-		return toString.call(value) === '[object Number]';
+		return toString.call(value) === "[object Number]";
 	}
 
-	export function numberRange(value: any, min: number, max: number): value is number {
-		return toString.call(value) === '[object Number]' && min <= value && value <= max;
+	export function numberRange(
+		value: any,
+		min: number,
+		max: number,
+	): value is number {
+		return (
+			toString.call(value) === "[object Number]" &&
+			min <= value &&
+			value <= max
+		);
 	}
 
 	export function integer(value: any): value is integer {
-		return toString.call(value) === '[object Number]' && -2147483648 <= value && value <= 2147483647;
+		return (
+			toString.call(value) === "[object Number]" &&
+			-2147483648 <= value &&
+			value <= 2147483647
+		);
 	}
 
 	export function uinteger(value: any): value is uinteger {
-		return toString.call(value) === '[object Number]' && 0 <= value && value <= 2147483647;
+		return (
+			toString.call(value) === "[object Number]" &&
+			0 <= value &&
+			value <= 2147483647
+		);
 	}
 
 	export function func(value: any): value is Function {
-		return toString.call(value) === '[object Function]';
+		return toString.call(value) === "[object Function]";
 	}
 
 	export function objectLiteral(value: any): value is object {
 		// Strictly speaking class instances pass this check as well. Since the LSP
 		// doesn't use classes we ignore this for now. If we do we need to add something
 		// like this: `Object.getPrototypeOf(Object.getPrototypeOf(x)) === null`
-		return value !== null && typeof value === 'object';
+		return value !== null && typeof value === "object";
 	}
 
-	export function typedArray<T>(value: any, check: (value: any) => boolean): value is T[] {
+	export function typedArray<T>(
+		value: any,
+		check: (value: any) => boolean,
+	): value is T[] {
 		return Array.isArray(value) && (<any[]>value).every(check);
 	}
 }

@@ -3,13 +3,21 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { RequestHandler } from 'vscode-jsonrpc';
-import { TextDocumentIdentifier, Position, SelectionRange } from 'vscode-languageserver-types';
+import { RequestHandler } from "vscode-jsonrpc";
+import {
+	Position,
+	SelectionRange,
+	TextDocumentIdentifier,
+} from "vscode-languageserver-types";
 
-import { MessageDirection, ProtocolRequestType } from './messages';
+import { MessageDirection, ProtocolRequestType } from "./messages";
 import type {
-	TextDocumentRegistrationOptions, WorkDoneProgressOptions, StaticRegistrationOptions, WorkDoneProgressParams, PartialResultParams
-} from './protocol';
+	PartialResultParams,
+	StaticRegistrationOptions,
+	TextDocumentRegistrationOptions,
+	WorkDoneProgressOptions,
+	WorkDoneProgressParams,
+} from "./protocol";
 
 // ---- capabilities
 
@@ -22,16 +30,19 @@ export interface SelectionRangeClientCapabilities {
 	dynamicRegistration?: boolean;
 }
 
-export interface SelectionRangeOptions extends WorkDoneProgressOptions {
-}
+export interface SelectionRangeOptions extends WorkDoneProgressOptions {}
 
-export interface SelectionRangeRegistrationOptions extends SelectionRangeOptions, TextDocumentRegistrationOptions, StaticRegistrationOptions {
-}
+export interface SelectionRangeRegistrationOptions
+	extends SelectionRangeOptions,
+		TextDocumentRegistrationOptions,
+		StaticRegistrationOptions {}
 
 /**
  * A parameter literal used in selection range requests.
  */
-export interface SelectionRangeParams extends WorkDoneProgressParams, PartialResultParams {
+export interface SelectionRangeParams
+	extends WorkDoneProgressParams,
+		PartialResultParams {
 	/**
 	 * The text document.
 	 */
@@ -50,8 +61,20 @@ export interface SelectionRangeParams extends WorkDoneProgressParams, PartialRes
  * that resolves to such.
  */
 export namespace SelectionRangeRequest {
-	export const method: 'textDocument/selectionRange' = 'textDocument/selectionRange';
-	export const messageDirection: MessageDirection = MessageDirection.clientToServer;
-	export const type = new ProtocolRequestType<SelectionRangeParams, SelectionRange[] | null, SelectionRange[], void, SelectionRangeRegistrationOptions>(method);
-	export type HandlerSignature = RequestHandler<SelectionRangeParams, SelectionRange[] | null, void>;
+	export const method: "textDocument/selectionRange" =
+		"textDocument/selectionRange";
+	export const messageDirection: MessageDirection =
+		MessageDirection.clientToServer;
+	export const type = new ProtocolRequestType<
+		SelectionRangeParams,
+		SelectionRange[] | null,
+		SelectionRange[],
+		void,
+		SelectionRangeRegistrationOptions
+	>(method);
+	export type HandlerSignature = RequestHandler<
+		SelectionRangeParams,
+		SelectionRange[] | null,
+		void
+	>;
 }

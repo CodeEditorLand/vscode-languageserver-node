@@ -3,7 +3,7 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import * as is from './is';
+import * as is from "./is";
 
 /**
  * A language server message
@@ -16,7 +16,6 @@ export interface Message {
  * Request message
  */
 export interface RequestMessage extends Message {
-
 	/**
 	 * The request id.
 	 */
@@ -52,10 +51,11 @@ export namespace ErrorCodes {
 	 * are left in the range.
 	 *
 	 * @since 3.16.0
-	*/
+	 */
 	export const jsonrpcReservedErrorRangeStart: -32099 = -32099;
 	/** @deprecated use  jsonrpcReservedErrorRangeStart */
-	export const serverErrorStart: -32099 = /* jsonrpcReservedErrorRangeStart */ -32099;
+	export const serverErrorStart: -32099 =
+		/* jsonrpcReservedErrorRangeStart */ -32099;
 
 	/**
 	 * An error occurred when write a message to the transport layer.
@@ -90,13 +90,14 @@ export namespace ErrorCodes {
 	 * It doesn't denote a real error code.
 	 *
 	 * @since 3.16.0
-	*/
+	 */
 	export const jsonrpcReservedErrorRangeEnd: -32000 = -32000;
 	/** @deprecated use  jsonrpcReservedErrorRangeEnd */
-	export const serverErrorEnd: -32000 = /* jsonrpcReservedErrorRangeEnd */ -32000;
+	export const serverErrorEnd: -32000 =
+		/* jsonrpcReservedErrorRangeEnd */ -32000;
 }
 type integer = number;
-export type ErrorCodes= integer;
+export type ErrorCodes = integer;
 
 export interface ResponseErrorLiteral<D = void> {
 	/**
@@ -121,7 +122,6 @@ export interface ResponseErrorLiteral<D = void> {
  * has failed.
  */
 export class ResponseError<D = void> extends Error {
-
 	public readonly code: number;
 	public readonly data: D | undefined;
 
@@ -135,7 +135,7 @@ export class ResponseError<D = void> extends Error {
 	public toJson(): ResponseErrorLiteral<D> {
 		const result: ResponseErrorLiteral<D> = {
 			code: this.code,
-			message: this.message
+			message: this.message,
 		};
 		if (this.data !== undefined) {
 			result.data = this.data;
@@ -169,12 +169,12 @@ export interface ResponseMessage extends Message {
  * A LSP Log Entry.
  */
 export type LSPMessageType =
-	| 'send-request'
-	| 'receive-request'
-	| 'send-response'
-	| 'receive-response'
-	| 'send-notification'
-	| 'receive-notification';
+	| "send-request"
+	| "receive-request"
+	| "send-response"
+	| "receive-response"
+	| "send-notification"
+	| "receive-notification";
 
 export interface LSPLogMessage {
 	type: LSPMessageType;
@@ -187,26 +187,29 @@ export class ParameterStructures {
 	 * The parameter structure is automatically inferred on the number of parameters
 	 * and the parameter type in case of a single param.
 	 */
-	public static readonly auto = new ParameterStructures('auto');
+	public static readonly auto = new ParameterStructures("auto");
 
 	/**
 	 * Forces `byPosition` parameter structure. This is useful if you have a single
 	 * parameter which has a literal type.
 	 */
-	public static readonly byPosition = new ParameterStructures('byPosition');
+	public static readonly byPosition = new ParameterStructures("byPosition");
 
 	/**
 	 * Forces `byName` parameter structure. This is only useful when having a single
 	 * parameter. The library will report errors if used with a different number of
 	 * parameters.
 	 */
-	public static readonly byName = new ParameterStructures('byName');
+	public static readonly byName = new ParameterStructures("byName");
 
-	private constructor(private readonly kind: string) {
-	}
+	private constructor(private readonly kind: string) {}
 
 	public static is(value: any): value is ParameterStructures {
-		return value === ParameterStructures.auto || value === ParameterStructures.byName || value === ParameterStructures.byPosition;
+		return (
+			value === ParameterStructures.auto ||
+			value === ParameterStructures.byName ||
+			value === ParameterStructures.byPosition
+		);
 	}
 
 	public toString(): string {
@@ -227,7 +230,6 @@ export interface MessageSignature {
  * An abstract implementation of a MessageType.
  */
 export abstract class AbstractMessageSignature implements MessageSignature {
-
 	public readonly method: string;
 	public readonly numberOfParams: number;
 
@@ -266,7 +268,10 @@ export class RequestType<P, R, E> extends AbstractMessageSignature {
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */
 	public readonly _: [P, R, E, _EM] | undefined;
-	constructor(method: string, private _parameterStructures: ParameterStructures = ParameterStructures.auto) {
+	constructor(
+		method: string,
+		private _parameterStructures: ParameterStructures = ParameterStructures.auto,
+	) {
 		super(method, 1);
 	}
 
@@ -280,7 +285,10 @@ export class RequestType1<P1, R, E> extends AbstractMessageSignature {
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */
 	public readonly _: [P1, R, E, _EM] | undefined;
-	constructor(method: string, private _parameterStructures: ParameterStructures = ParameterStructures.auto) {
+	constructor(
+		method: string,
+		private _parameterStructures: ParameterStructures = ParameterStructures.auto,
+	) {
 		super(method, 1);
 	}
 
@@ -309,7 +317,14 @@ export class RequestType3<P1, P2, P3, R, E> extends AbstractMessageSignature {
 	}
 }
 
-export class RequestType4<P1, P2, P3, P4, R, E> extends AbstractMessageSignature {
+export class RequestType4<
+	P1,
+	P2,
+	P3,
+	P4,
+	R,
+	E,
+> extends AbstractMessageSignature {
 	/**
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */
@@ -319,7 +334,15 @@ export class RequestType4<P1, P2, P3, P4, R, E> extends AbstractMessageSignature
 	}
 }
 
-export class RequestType5<P1, P2, P3, P4, P5, R, E> extends AbstractMessageSignature {
+export class RequestType5<
+	P1,
+	P2,
+	P3,
+	P4,
+	P5,
+	R,
+	E,
+> extends AbstractMessageSignature {
 	/**
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */
@@ -329,7 +352,16 @@ export class RequestType5<P1, P2, P3, P4, P5, R, E> extends AbstractMessageSigna
 	}
 }
 
-export class RequestType6<P1, P2, P3, P4, P5, P6, R, E> extends AbstractMessageSignature {
+export class RequestType6<
+	P1,
+	P2,
+	P3,
+	P4,
+	P5,
+	P6,
+	R,
+	E,
+> extends AbstractMessageSignature {
 	/**
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */
@@ -339,7 +371,17 @@ export class RequestType6<P1, P2, P3, P4, P5, P6, R, E> extends AbstractMessageS
 	}
 }
 
-export class RequestType7<P1, P2, P3, P4, P5, P6, P7, R, E> extends AbstractMessageSignature {
+export class RequestType7<
+	P1,
+	P2,
+	P3,
+	P4,
+	P5,
+	P6,
+	P7,
+	R,
+	E,
+> extends AbstractMessageSignature {
 	/**
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */
@@ -349,7 +391,18 @@ export class RequestType7<P1, P2, P3, P4, P5, P6, P7, R, E> extends AbstractMess
 	}
 }
 
-export class RequestType8<P1, P2, P3, P4, P5, P6, P7, P8, R, E> extends AbstractMessageSignature {
+export class RequestType8<
+	P1,
+	P2,
+	P3,
+	P4,
+	P5,
+	P6,
+	P7,
+	P8,
+	R,
+	E,
+> extends AbstractMessageSignature {
 	/**
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */
@@ -359,11 +412,25 @@ export class RequestType8<P1, P2, P3, P4, P5, P6, P7, P8, R, E> extends Abstract
 	}
 }
 
-export class RequestType9<P1, P2, P3, P4, P5, P6, P7, P8, P9, R, E> extends AbstractMessageSignature {
+export class RequestType9<
+	P1,
+	P2,
+	P3,
+	P4,
+	P5,
+	P6,
+	P7,
+	P8,
+	P9,
+	R,
+	E,
+> extends AbstractMessageSignature {
 	/**
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */
-	public readonly _: [P1, P2, P3, P4, P5, P6, P7, P8, P9, R, E, _EM] | undefined;
+	public readonly _:
+		| [P1, P2, P3, P4, P5, P6, P7, P8, P9, R, E, _EM]
+		| undefined;
 	constructor(method: string) {
 		super(method, 9);
 	}
@@ -389,7 +456,10 @@ export class NotificationType<P> extends AbstractMessageSignature {
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */
 	public readonly _: [P, _EM] | undefined;
-	constructor(method: string, private _parameterStructures: ParameterStructures = ParameterStructures.auto) {
+	constructor(
+		method: string,
+		private _parameterStructures: ParameterStructures = ParameterStructures.auto,
+	) {
 		super(method, 1);
 	}
 
@@ -413,7 +483,10 @@ export class NotificationType1<P1> extends AbstractMessageSignature {
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */
 	public readonly _: [P1, _EM] | undefined;
-	constructor(method: string, private _parameterStructures: ParameterStructures = ParameterStructures.auto) {
+	constructor(
+		method: string,
+		private _parameterStructures: ParameterStructures = ParameterStructures.auto,
+	) {
 		super(method, 1);
 	}
 
@@ -442,7 +515,12 @@ export class NotificationType3<P1, P2, P3> extends AbstractMessageSignature {
 	}
 }
 
-export class NotificationType4<P1, P2, P3, P4> extends AbstractMessageSignature {
+export class NotificationType4<
+	P1,
+	P2,
+	P3,
+	P4,
+> extends AbstractMessageSignature {
 	/**
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */
@@ -452,7 +530,13 @@ export class NotificationType4<P1, P2, P3, P4> extends AbstractMessageSignature 
 	}
 }
 
-export class NotificationType5<P1, P2, P3, P4, P5> extends AbstractMessageSignature {
+export class NotificationType5<
+	P1,
+	P2,
+	P3,
+	P4,
+	P5,
+> extends AbstractMessageSignature {
 	/**
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */
@@ -462,7 +546,14 @@ export class NotificationType5<P1, P2, P3, P4, P5> extends AbstractMessageSignat
 	}
 }
 
-export class NotificationType6<P1, P2, P3, P4, P5, P6> extends AbstractMessageSignature {
+export class NotificationType6<
+	P1,
+	P2,
+	P3,
+	P4,
+	P5,
+	P6,
+> extends AbstractMessageSignature {
 	/**
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */
@@ -472,7 +563,15 @@ export class NotificationType6<P1, P2, P3, P4, P5, P6> extends AbstractMessageSi
 	}
 }
 
-export class NotificationType7<P1, P2, P3, P4, P5, P6, P7> extends AbstractMessageSignature {
+export class NotificationType7<
+	P1,
+	P2,
+	P3,
+	P4,
+	P5,
+	P6,
+	P7,
+> extends AbstractMessageSignature {
 	/**
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */
@@ -482,7 +581,16 @@ export class NotificationType7<P1, P2, P3, P4, P5, P6, P7> extends AbstractMessa
 	}
 }
 
-export class NotificationType8<P1, P2, P3, P4, P5, P6, P7, P8> extends AbstractMessageSignature {
+export class NotificationType8<
+	P1,
+	P2,
+	P3,
+	P4,
+	P5,
+	P6,
+	P7,
+	P8,
+> extends AbstractMessageSignature {
 	/**
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */
@@ -492,7 +600,17 @@ export class NotificationType8<P1, P2, P3, P4, P5, P6, P7, P8> extends AbstractM
 	}
 }
 
-export class NotificationType9<P1, P2, P3, P4, P5, P6, P7, P8, P9> extends AbstractMessageSignature {
+export class NotificationType9<
+	P1,
+	P2,
+	P3,
+	P4,
+	P5,
+	P6,
+	P7,
+	P8,
+	P9,
+> extends AbstractMessageSignature {
 	/**
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */
@@ -504,26 +622,46 @@ export class NotificationType9<P1, P2, P3, P4, P5, P6, P7, P8, P9> extends Abstr
 
 export namespace Message {
 	/**
- 	 * Tests if the given message is a request message
- 	 */
-	export function isRequest(message: Message | undefined): message is RequestMessage {
+	 * Tests if the given message is a request message
+	 */
+	export function isRequest(
+		message: Message | undefined,
+	): message is RequestMessage {
 		const candidate = <RequestMessage>message;
-		return candidate && is.string(candidate.method) && (is.string(candidate.id) || is.number(candidate.id));
+		return (
+			candidate &&
+			is.string(candidate.method) &&
+			(is.string(candidate.id) || is.number(candidate.id))
+		);
 	}
 
 	/**
- 	 * Tests if the given message is a notification message
- 	 */
-	export function isNotification(message: Message | undefined): message is NotificationMessage {
+	 * Tests if the given message is a notification message
+	 */
+	export function isNotification(
+		message: Message | undefined,
+	): message is NotificationMessage {
 		const candidate = <NotificationMessage>message;
-		return candidate && is.string(candidate.method) && (<any>message).id === void 0;
+		return (
+			candidate &&
+			is.string(candidate.method) &&
+			(<any>message).id === void 0
+		);
 	}
 
 	/**
- 	 * Tests if the given message is a response message
- 	 */
-	export function isResponse(message: Message | undefined): message is ResponseMessage {
+	 * Tests if the given message is a response message
+	 */
+	export function isResponse(
+		message: Message | undefined,
+	): message is ResponseMessage {
 		const candidate = <ResponseMessage>message;
-		return candidate && (candidate.result !== void 0 || !!candidate.error) && (is.string(candidate.id) || is.number(candidate.id) || candidate.id === null);
+		return (
+			candidate &&
+			(candidate.result !== void 0 || !!candidate.error) &&
+			(is.string(candidate.id) ||
+				is.number(candidate.id) ||
+				candidate.id === null)
+		);
 	}
 }

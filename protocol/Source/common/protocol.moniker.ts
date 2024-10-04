@@ -3,10 +3,14 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import { MessageDirection, ProtocolRequestType } from './messages';
+import { MessageDirection, ProtocolRequestType } from "./messages";
 import type {
-	WorkDoneProgressOptions, WorkDoneProgressParams, PartialResultParams, TextDocumentRegistrationOptions, TextDocumentPositionParams
-} from './protocol';
+	PartialResultParams,
+	TextDocumentPositionParams,
+	TextDocumentRegistrationOptions,
+	WorkDoneProgressOptions,
+	WorkDoneProgressParams,
+} from "./protocol";
 
 /**
  * Moniker uniqueness level to define scope of the moniker.
@@ -17,30 +21,35 @@ export namespace UniquenessLevel {
 	/**
 	 * The moniker is only unique inside a document
 	 */
-	export const document = 'document';
+	export const document = "document";
 
 	/**
 	 * The moniker is unique inside a project for which a dump got created
 	 */
-	export const project = 'project';
+	export const project = "project";
 
 	/**
 	 * The moniker is unique inside the group to which a project belongs
 	 */
-	export const group = 'group';
+	export const group = "group";
 
 	/**
 	 * The moniker is unique inside the moniker scheme.
 	 */
-	export const scheme = 'scheme';
+	export const scheme = "scheme";
 
 	/**
 	 * The moniker is globally unique
 	 */
-	export const global = 'global';
+	export const global = "global";
 }
 
-export type UniquenessLevel = 'document' | 'project' | 'group' | 'scheme' | 'global';
+export type UniquenessLevel =
+	| "document"
+	| "project"
+	| "group"
+	| "scheme"
+	| "global";
 
 /**
  * The moniker kind.
@@ -51,21 +60,21 @@ export namespace MonikerKind {
 	/**
 	 * The moniker represent a symbol that is imported into a project
 	 */
-	export const $import = 'import';
+	export const $import = "import";
 
 	/**
 	 * The moniker represents a symbol that is exported from a project
 	 */
-	export const $export = 'export';
+	export const $export = "export";
 
 	/**
 	 * The moniker represents a symbol that is local to a project (e.g. a local
 	 * variable of a function, a class not visible outside the project, ...)
 	 */
-	export const local = 'local';
+	export const local = "local";
 }
 
-export type MonikerKind = 'import' | 'export' | 'local';
+export type MonikerKind = "import" | "export" | "local";
 
 /**
  * Moniker definition to match LSIF 0.5 moniker definition.
@@ -109,17 +118,18 @@ export interface MonikerClientCapabilities {
 	dynamicRegistration?: boolean;
 }
 
-export interface MonikerServerCapabilities {
-}
+export interface MonikerServerCapabilities {}
 
-export interface MonikerOptions extends WorkDoneProgressOptions {
-}
+export interface MonikerOptions extends WorkDoneProgressOptions {}
 
-export interface MonikerRegistrationOptions extends TextDocumentRegistrationOptions, MonikerOptions {
-}
+export interface MonikerRegistrationOptions
+	extends TextDocumentRegistrationOptions,
+		MonikerOptions {}
 
-export interface MonikerParams extends TextDocumentPositionParams, WorkDoneProgressParams, PartialResultParams {
-}
+export interface MonikerParams
+	extends TextDocumentPositionParams,
+		WorkDoneProgressParams,
+		PartialResultParams {}
 
 /**
  * A request to get the moniker of a symbol at a given text document position.
@@ -127,7 +137,14 @@ export interface MonikerParams extends TextDocumentPositionParams, WorkDoneProgr
  * The response is of type {@link Moniker Moniker[]} or `null`.
  */
 export namespace MonikerRequest {
-	export const method: 'textDocument/moniker' = 'textDocument/moniker';
-	export const messageDirection: MessageDirection = MessageDirection.clientToServer;
-	export const type = new ProtocolRequestType<MonikerParams, Moniker[] | null, Moniker[], void, MonikerRegistrationOptions>(method);
+	export const method: "textDocument/moniker" = "textDocument/moniker";
+	export const messageDirection: MessageDirection =
+		MessageDirection.clientToServer;
+	export const type = new ProtocolRequestType<
+		MonikerParams,
+		Moniker[] | null,
+		Moniker[],
+		void,
+		MonikerRegistrationOptions
+	>(method);
 }

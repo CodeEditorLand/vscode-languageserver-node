@@ -3,30 +3,45 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import { workspace, Uri, Disposable, ConfigurationChangeEvent, FileSystemWatcher as VFileSystemWatcher, WorkspaceFolder as VWorkspaceFolder } from 'vscode';
+import {
+	ConfigurationChangeEvent,
+	Disposable,
+	Uri,
+	FileSystemWatcher as VFileSystemWatcher,
+	WorkspaceFolder as VWorkspaceFolder,
+	workspace,
+} from "vscode";
+import {
+	ClientCapabilities,
+	ConfigurationRequest,
+	DidChangeConfigurationNotification,
+	DidChangeConfigurationRegistrationOptions,
+	RegistrationType,
+} from "vscode-languageserver-protocol";
 
 import {
-	ClientCapabilities, ConfigurationRequest, DidChangeConfigurationNotification, DidChangeConfigurationRegistrationOptions, RegistrationType
-} from 'vscode-languageserver-protocol';
-
-import * as Is from './utils/is';
-import * as UUID from './utils/uuid';
-
-import { StaticFeature, FeatureClient, FeatureState, DynamicFeature, ensure, RegistrationData } from './features';
+	DynamicFeature,
+	ensure,
+	FeatureClient,
+	FeatureState,
+	RegistrationData,
+	StaticFeature,
+} from "./features";
+import * as Is from "./utils/is";
+import * as UUID from "./utils/uuid";
 
 export interface ConfigurationMiddleware {
 	configuration?: ConfigurationRequest.MiddlewareSignature;
 }
 
 interface ConfigurationWorkspaceMiddleware {
-	workspace? : ConfigurationMiddleware;
+	workspace?: ConfigurationMiddleware;
 }
 
 /**
  * Configuration pull model. From server to client.
  */
 export class ConfigurationFeature implements StaticFeature {
-
 	private readonly _client: FeatureClient<ConfigurationWorkspaceMiddleware>;
 
 	constructor(client: FeatureClient<ConfigurationWorkspaceMiddleware>) {
@@ -34,7 +49,7 @@ export class ConfigurationFeature implements StaticFeature {
 	}
 
 	getState(): FeatureState {
-		return { kind: 'static' };
+		return { kind: "static" };
 	}
 
 	public fillClientCapabilities(capabilities: ClientCapabilities): void {
@@ -45,11 +60,23 @@ export class ConfigurationFeature implements StaticFeature {
 	public initialize(): void {
 		const client = this._client;
 		client.onRequest(ConfigurationRequest.type, (params, token) => {
-			const configuration: ConfigurationRequest.HandlerSignature = (params) => {
+			const configuration: ConfigurationRequest.HandlerSignature = (
+				params,
+			) => {
 				const result: any[] = [];
 				for (const item of params.items) {
-					const resource = item.scopeUri !== void 0 && item.scopeUri !== null ? this._client.protocol2CodeConverter.asUri(item.scopeUri) : undefined;
-					result.push(this.getConfiguration(resource, item.section !== null ? item.section : undefined));
+					const resource =
+						item.scopeUri !== void 0 && item.scopeUri !== null
+							? this._client.protocol2CodeConverter.asUri(
+									item.scopeUri,
+								)
+							: undefined;
+					result.push(
+						this.getConfiguration(
+							resource,
+							item.section !== null ? item.section : undefined,
+						),
+					);
 				}
 				return result;
 			};
@@ -60,16 +87,28 @@ export class ConfigurationFeature implements StaticFeature {
 		});
 	}
 
-	private getConfiguration(resource: Uri | undefined, section: string | undefined): any {
+	private getConfiguration(
+		resource: Uri | undefined,
+		section: string | undefined,
+	): any {
 		let result: any = null;
 		if (section) {
-			const index = section.lastIndexOf('.');
+			const index = section.lastIndexOf(".");
 			if (index === -1) {
-				result = toJSONObject(workspace.getConfiguration(undefined, resource).get(section));
+				result = toJSONObject(
+					workspace
+						.getConfiguration(undefined, resource)
+						.get(section),
+				);
 			} else {
-				const config = workspace.getConfiguration(section.substr(0, index), resource);
+				const config = workspace.getConfiguration(
+					section.substr(0, index),
+					resource,
+				);
 				if (config) {
-					result = toJSONObject(config.get(section.substr(index + 1)));
+					result = toJSONObject(
+						config.get(section.substr(index + 1)),
+					);
 				}
 			}
 		} else {
@@ -87,15 +126,14 @@ export class ConfigurationFeature implements StaticFeature {
 		return result;
 	}
 
-	public clear(): void {
-	}
+	public clear(): void {}
 }
 
 export function toJSONObject(obj: any): any {
 	if (obj) {
 		if (Array.isArray(obj)) {
 			return obj.map(toJSONObject);
-		} else if (typeof obj === 'object') {
+		} else if (typeof obj === "object") {
 			const res = Object.create(null);
 			for (const key in obj) {
 				if (Object.prototype.hasOwnProperty.call(obj, key)) {
@@ -106,7 +144,6 @@ export function toJSONObject(obj: any): any {
 		}
 	}
 	return obj;
-
 }
 
 export interface DidChangeConfigurationSignature {
@@ -114,7 +151,11 @@ export interface DidChangeConfigurationSignature {
 }
 
 export interface DidChangeConfigurationMiddleware {
-	didChangeConfiguration?: (this: void, sections: string[] | undefined, next: DidChangeConfigurationSignature) => Promise<void>;
+	didChangeConfiguration?: (
+		this: void,
+		sections: string[] | undefined,
+		next: DidChangeConfigurationSignature,
+	) => Promise<void>;
 }
 
 interface DidChangeConfigurationWorkspaceMiddleware {
@@ -141,24 +182,33 @@ export type SynchronizeOptions = {
 	fileEvents?: VFileSystemWatcher | VFileSystemWatcher[];
 };
 
-
 export type $ConfigurationOptions = {
 	synchronize?: SynchronizeOptions;
 	workspaceFolder?: VWorkspaceFolder;
 };
 
-export class SyncConfigurationFeature implements DynamicFeature<DidChangeConfigurationRegistrationOptions> {
-
+export class SyncConfigurationFeature
+	implements DynamicFeature<DidChangeConfigurationRegistrationOptions>
+{
 	private isCleared: boolean;
 	private readonly _listeners: Map<string, Disposable>;
 
-	constructor(private _client: FeatureClient<DidChangeConfigurationWorkspaceMiddleware, $ConfigurationOptions>) {
+	constructor(
+		private _client: FeatureClient<
+			DidChangeConfigurationWorkspaceMiddleware,
+			$ConfigurationOptions
+		>,
+	) {
 		this.isCleared = false;
 		this._listeners = new Map();
 	}
 
 	public getState(): FeatureState {
-		return { kind: 'workspace', id: this.registrationType.method, registrations: this._listeners.size > 0 };
+		return {
+			kind: "workspace",
+			id: this.registrationType.method,
+			registrations: this._listeners.size > 0,
+		};
 	}
 
 	public get registrationType(): RegistrationType<DidChangeConfigurationRegistrationOptions> {
@@ -166,29 +216,38 @@ export class SyncConfigurationFeature implements DynamicFeature<DidChangeConfigu
 	}
 
 	public fillClientCapabilities(capabilities: ClientCapabilities): void {
-		ensure(ensure(capabilities, 'workspace')!, 'didChangeConfiguration')!.dynamicRegistration = true;
+		ensure(
+			ensure(capabilities, "workspace")!,
+			"didChangeConfiguration",
+		)!.dynamicRegistration = true;
 	}
 
 	public initialize(): void {
 		this.isCleared = false;
-		const section = this._client.clientOptions.synchronize?.configurationSection;
+		const section =
+			this._client.clientOptions.synchronize?.configurationSection;
 		if (section !== undefined) {
 			this.register({
 				id: UUID.generateUuid(),
 				registerOptions: {
-					section: section
-				}
+					section: section,
+				},
 			});
 		}
 	}
 
-	public register(data: RegistrationData<DidChangeConfigurationRegistrationOptions>): void {
+	public register(
+		data: RegistrationData<DidChangeConfigurationRegistrationOptions>,
+	): void {
 		const disposable = workspace.onDidChangeConfiguration((event) => {
 			this.onDidChangeConfiguration(data.registerOptions.section, event);
 		});
 		this._listeners.set(data.id, disposable);
 		if (data.registerOptions.section !== undefined) {
-			this.onDidChangeConfiguration(data.registerOptions.section, undefined);
+			this.onDidChangeConfiguration(
+				data.registerOptions.section,
+				undefined,
+			);
 		}
 	}
 
@@ -208,7 +267,10 @@ export class SyncConfigurationFeature implements DynamicFeature<DidChangeConfigu
 		this.isCleared = true;
 	}
 
-	private onDidChangeConfiguration(configurationSection: string | string[] | undefined, event: ConfigurationChangeEvent | undefined): void {
+	private onDidChangeConfiguration(
+		configurationSection: string | string[] | undefined,
+		event: ConfigurationChangeEvent | undefined,
+	): void {
 		if (this.isCleared) {
 			return;
 		}
@@ -219,21 +281,38 @@ export class SyncConfigurationFeature implements DynamicFeature<DidChangeConfigu
 			sections = configurationSection;
 		}
 		if (sections !== undefined && event !== undefined) {
-			const affected = sections.some((section) => event.affectsConfiguration(section));
+			const affected = sections.some((section) =>
+				event.affectsConfiguration(section),
+			);
 			if (!affected) {
 				return;
 			}
 		}
-		const didChangeConfiguration = async (sections: string[] | undefined): Promise<void> => {
+		const didChangeConfiguration = async (
+			sections: string[] | undefined,
+		): Promise<void> => {
 			if (sections === undefined) {
-				return this._client.sendNotification(DidChangeConfigurationNotification.type, { settings: null });
+				return this._client.sendNotification(
+					DidChangeConfigurationNotification.type,
+					{ settings: null },
+				);
 			} else {
-				return this._client.sendNotification(DidChangeConfigurationNotification.type, { settings: this.extractSettingsInformation(sections) });
+				return this._client.sendNotification(
+					DidChangeConfigurationNotification.type,
+					{ settings: this.extractSettingsInformation(sections) },
+				);
 			}
 		};
-		const middleware = this._client.middleware.workspace?.didChangeConfiguration;
-		(middleware ? middleware(sections, didChangeConfiguration) : didChangeConfiguration(sections)).catch((error) => {
-			this._client.error(`Sending notification ${DidChangeConfigurationNotification.type.method} failed`, error);
+		const middleware =
+			this._client.middleware.workspace?.didChangeConfiguration;
+		(middleware
+			? middleware(sections, didChangeConfiguration)
+			: didChangeConfiguration(sections)
+		).catch((error) => {
+			this._client.error(
+				`Sending notification ${DidChangeConfigurationNotification.type.method} failed`,
+				error,
+			);
 		});
 	}
 
@@ -250,22 +329,28 @@ export class SyncConfigurationFeature implements DynamicFeature<DidChangeConfigu
 			}
 			return current;
 		}
-		const resource: Uri | undefined = this._client.clientOptions.workspaceFolder
+		const resource: Uri | undefined = this._client.clientOptions
+			.workspaceFolder
 			? this._client.clientOptions.workspaceFolder.uri
 			: undefined;
 		const result = Object.create(null);
 		for (let i = 0; i < keys.length; i++) {
 			const key = keys[i];
-			const index: number = key.indexOf('.');
+			const index: number = key.indexOf(".");
 			let config: any = null;
 			if (index >= 0) {
-				config = workspace.getConfiguration(key.substr(0, index), resource).get(key.substr(index + 1));
+				config = workspace
+					.getConfiguration(key.substr(0, index), resource)
+					.get(key.substr(index + 1));
 			} else {
-				config = workspace.getConfiguration(undefined, resource).get(key);
+				config = workspace
+					.getConfiguration(undefined, resource)
+					.get(key);
 			}
 			if (config) {
-				const path = keys[i].split('.');
-				ensurePath(result, path)[path[path.length - 1]] = toJSONObject(config);
+				const path = keys[i].split(".");
+				ensurePath(result, path)[path[path.length - 1]] =
+					toJSONObject(config);
 			}
 		}
 		return result;

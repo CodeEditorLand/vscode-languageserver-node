@@ -3,11 +3,25 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { TextDocumentIdentifier, Range, InlineValue, InlineValueContext } from 'vscode-languageserver-types';
-import { RequestHandler, RequestHandler0 } from 'vscode-jsonrpc';
+import { RequestHandler, RequestHandler0 } from "vscode-jsonrpc";
+import {
+	InlineValue,
+	InlineValueContext,
+	Range,
+	TextDocumentIdentifier,
+} from "vscode-languageserver-types";
 
-import { MessageDirection, ProtocolRequestType, ProtocolRequestType0 } from './messages';
-import type { TextDocumentRegistrationOptions, WorkDoneProgressOptions, StaticRegistrationOptions, WorkDoneProgressParams } from './protocol';
+import {
+	MessageDirection,
+	ProtocolRequestType,
+	ProtocolRequestType0,
+} from "./messages";
+import type {
+	StaticRegistrationOptions,
+	TextDocumentRegistrationOptions,
+	WorkDoneProgressOptions,
+	WorkDoneProgressParams,
+} from "./protocol";
 
 // ---- capabilities
 
@@ -53,7 +67,9 @@ export type InlineValueOptions = WorkDoneProgressOptions;
  *
  * @since 3.17.0
  */
-export type InlineValueRegistrationOptions = InlineValueOptions & TextDocumentRegistrationOptions & StaticRegistrationOptions;
+export type InlineValueRegistrationOptions = InlineValueOptions &
+	TextDocumentRegistrationOptions &
+	StaticRegistrationOptions;
 
 /**
  * A parameter literal used in inline value requests.
@@ -86,10 +102,22 @@ export type InlineValueParams = WorkDoneProgressParams & {
  * @since 3.17.0
  */
 export namespace InlineValueRequest {
-	export const method: 'textDocument/inlineValue' = 'textDocument/inlineValue';
-	export const messageDirection: MessageDirection = MessageDirection.clientToServer;
-	export const type = new ProtocolRequestType<InlineValueParams, InlineValue[] | null, InlineValue[], void, InlineValueRegistrationOptions>(method);
-	export type HandlerSignature = RequestHandler<InlineValueParams, InlineValue[] | null, void>;
+	export const method: "textDocument/inlineValue" =
+		"textDocument/inlineValue";
+	export const messageDirection: MessageDirection =
+		MessageDirection.clientToServer;
+	export const type = new ProtocolRequestType<
+		InlineValueParams,
+		InlineValue[] | null,
+		InlineValue[],
+		void,
+		InlineValueRegistrationOptions
+	>(method);
+	export type HandlerSignature = RequestHandler<
+		InlineValueParams,
+		InlineValue[] | null,
+		void
+	>;
 }
 
 /**
@@ -97,7 +125,10 @@ export namespace InlineValueRequest {
  */
 export namespace InlineValueRefreshRequest {
 	export const method: `workspace/inlineValue/refresh` = `workspace/inlineValue/refresh`;
-	export const messageDirection: MessageDirection = MessageDirection.serverToClient;
-	export const type = new ProtocolRequestType0<void, void, void, void>(method);
+	export const messageDirection: MessageDirection =
+		MessageDirection.serverToClient;
+	export const type = new ProtocolRequestType0<void, void, void, void>(
+		method,
+	);
 	export type HandlerSignature = RequestHandler0<void, void>;
 }
