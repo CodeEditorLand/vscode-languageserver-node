@@ -3,22 +3,14 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import {
-	NotificationHandler,
-	ProgressToken,
-	ProgressType,
-	RequestHandler,
-} from "vscode-jsonrpc";
-import { uinteger } from "vscode-languageserver-types";
+import { NotificationHandler, RequestHandler, ProgressType, ProgressToken } from 'vscode-jsonrpc';
+import { uinteger } from 'vscode-languageserver-types';
 
-import {
-	MessageDirection,
-	ProtocolNotificationType,
-	ProtocolRequestType,
-} from "./messages";
+import { MessageDirection, ProtocolRequestType, ProtocolNotificationType } from './messages';
 
 export interface WorkDoneProgressBegin {
-	kind: "begin";
+
+	kind: 'begin';
 
 	/**
 	 * Mandatory title of the progress operation. Used to briefly inform about
@@ -56,7 +48,8 @@ export interface WorkDoneProgressBegin {
 }
 
 export interface WorkDoneProgressReport {
-	kind: "report";
+
+	kind: 'report';
 
 	/**
 	 * Controls enablement state of a cancel button.
@@ -87,7 +80,8 @@ export interface WorkDoneProgressReport {
 }
 
 export interface WorkDoneProgressEnd {
-	kind: "end";
+
+	kind: 'end';
 
 	/**
 	 * Optional, a final message indicating to for example indicate the outcome
@@ -97,16 +91,14 @@ export interface WorkDoneProgressEnd {
 }
 
 export namespace WorkDoneProgress {
-	export const type = new ProgressType<
-		WorkDoneProgressBegin | WorkDoneProgressReport | WorkDoneProgressEnd
-	>();
+	export const type = new ProgressType<WorkDoneProgressBegin | WorkDoneProgressReport | WorkDoneProgressEnd>();
 
 	export function is(value: ProgressType<any>): value is typeof type {
 		return value === type;
 	}
 }
 
-export interface WorkDoneProgressCreateParams {
+export interface WorkDoneProgressCreateParams  {
 	/**
 	 * The token to be used to report progress.
 	 */
@@ -118,22 +110,10 @@ export interface WorkDoneProgressCreateParams {
  * reporting from the server.
  */
 export namespace WorkDoneProgressCreateRequest {
-	export const method: "window/workDoneProgress/create" =
-		"window/workDoneProgress/create";
-	export const messageDirection: MessageDirection =
-		MessageDirection.serverToClient;
-	export const type = new ProtocolRequestType<
-		WorkDoneProgressCreateParams,
-		void,
-		never,
-		void,
-		void
-	>(method);
-	export type HandlerSignature = RequestHandler<
-		WorkDoneProgressCreateParams,
-		void,
-		void
-	>;
+	export const method: 'window/workDoneProgress/create' = 'window/workDoneProgress/create';
+	export const messageDirection: MessageDirection = MessageDirection.serverToClient;
+	export const type = new ProtocolRequestType<WorkDoneProgressCreateParams, void, never, void, void>(method);
+	export type HandlerSignature = RequestHandler<WorkDoneProgressCreateParams, void, void>;
 }
 
 export interface WorkDoneProgressCancelParams {
@@ -148,14 +128,8 @@ export interface WorkDoneProgressCancelParams {
  * initiated on the server side.
  */
 export namespace WorkDoneProgressCancelNotification {
-	export const method: "window/workDoneProgress/cancel" =
-		"window/workDoneProgress/cancel";
-	export const messageDirection: MessageDirection =
-		MessageDirection.clientToServer;
-	export const type = new ProtocolNotificationType<
-		WorkDoneProgressCancelParams,
-		void
-	>(method);
-	export type HandlerSignature =
-		NotificationHandler<WorkDoneProgressCancelParams>;
+	export const method: 'window/workDoneProgress/cancel' = 'window/workDoneProgress/cancel';
+	export const messageDirection: MessageDirection = MessageDirection.clientToServer;
+	export const type = new ProtocolNotificationType<WorkDoneProgressCancelParams, void>(method);
+	export type HandlerSignature = NotificationHandler<WorkDoneProgressCancelParams>;
 }

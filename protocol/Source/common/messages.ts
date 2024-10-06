@@ -3,20 +3,12 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import {
-	_EM,
-	NotificationType,
-	NotificationType0,
-	ParameterStructures,
-	ProgressType,
-	RequestType,
-	RequestType0,
-} from "vscode-jsonrpc";
+import { RequestType, RequestType0, NotificationType, NotificationType0, ProgressType, _EM, ParameterStructures } from 'vscode-jsonrpc';
 
 export enum MessageDirection {
-	clientToServer = "clientToServer",
-	serverToClient = "serverToClient",
-	both = "both",
+	clientToServer = 'clientToServer',
+	serverToClient = 'serverToClient',
+	both = 'both'
 }
 
 export class RegistrationType<RO> {
@@ -31,10 +23,7 @@ export class RegistrationType<RO> {
 	}
 }
 
-export class ProtocolRequestType0<R, PR, E, RO>
-	extends RequestType0<R, E>
-	implements ProgressType<PR>, RegistrationType<RO>
-{
+export class ProtocolRequestType0<R, PR, E, RO> extends RequestType0<R, E> implements ProgressType<PR>, RegistrationType<RO> {
 	/**
 	 * Clients must not use these properties. They are here to ensure correct typing.
 	 * in TypeScript
@@ -49,10 +38,7 @@ export class ProtocolRequestType0<R, PR, E, RO>
 	}
 }
 
-export class ProtocolRequestType<P, R, PR, E, RO>
-	extends RequestType<P, R, E>
-	implements ProgressType<PR>, RegistrationType<RO>
-{
+export class ProtocolRequestType<P, R, PR, E, RO> extends RequestType<P, R, E> implements ProgressType<PR>, RegistrationType<RO> {
 	/**
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */
@@ -66,10 +52,8 @@ export class ProtocolRequestType<P, R, PR, E, RO>
 	}
 }
 
-export class ProtocolNotificationType0<RO>
-	extends NotificationType0
-	implements RegistrationType<RO>
-{
+
+export class ProtocolNotificationType0<RO> extends NotificationType0 implements RegistrationType<RO> {
 	/**
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */
@@ -81,10 +65,7 @@ export class ProtocolNotificationType0<RO>
 	}
 }
 
-export class ProtocolNotificationType<P, RO>
-	extends NotificationType<P>
-	implements RegistrationType<RO>
-{
+export class ProtocolNotificationType<P, RO> extends NotificationType<P> implements RegistrationType<RO> {
 	/**
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */

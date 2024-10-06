@@ -3,10 +3,9 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import * as vscode from "vscode";
-import { LSPAny } from "vscode-languageserver-protocol";
-
-import * as Is from "./utils/is";
+import * as vscode from 'vscode';
+import { LSPAny } from 'vscode-languageserver-protocol';
+import * as Is from './utils/is';
 
 /**
  * We keep this for a while to not break servers which adopted
@@ -20,25 +19,16 @@ export interface DiagnosticCode {
 export namespace DiagnosticCode {
 	export function is(value: any): value is DiagnosticCode {
 		const candidate: DiagnosticCode = value as DiagnosticCode;
-		return (
-			candidate !== undefined &&
-			candidate !== null &&
-			(Is.number(candidate.value) || Is.string(candidate.value)) &&
-			Is.string(candidate.target)
-		);
+		return candidate !== undefined && candidate !== null && (Is.number(candidate.value) || Is.string(candidate.value)) && Is.string(candidate.target);
 	}
 }
 
 export class ProtocolDiagnostic extends vscode.Diagnostic {
+
 	public readonly data: LSPAny | undefined;
 	public hasDiagnosticCode: boolean;
 
-	constructor(
-		range: vscode.Range,
-		message: string,
-		severity: vscode.DiagnosticSeverity,
-		data: LSPAny | undefined,
-	) {
+	constructor(range: vscode.Range, message: string, severity: vscode.DiagnosticSeverity, data: LSPAny | undefined) {
 		super(range, message, severity);
 		this.data = data;
 		this.hasDiagnosticCode = false;

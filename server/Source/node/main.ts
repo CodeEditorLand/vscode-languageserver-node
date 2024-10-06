@@ -4,35 +4,19 @@
  * ------------------------------------------------------------------------------------------ */
 /// <reference path="../../typings/thenable.d.ts" preserve="true"/>
 
-import { inspect } from "node:util";
-import {
-	ConnectionOptions,
-	ConnectionStrategy,
-	createProtocolConnection,
-	createServerPipeTransport,
-	createServerSocketTransport,
-	InitializeParams,
-	IPCMessageReader,
-	IPCMessageWriter,
-	Logger,
-	MessageReader,
-	MessageWriter,
-	ProtocolConnection,
-} from "vscode-languageserver-protocol/node";
+import { inspect } from 'node:util';
 
-import {
-	_,
-	_Connection,
-	Connection,
-	createConnection as createCommonConnection,
-	Features,
-	WatchDog,
-} from "../common/server";
-import * as Is from "../common/utils/is";
-import * as fm from "./files";
+import * as Is from '../common/utils/is';
+import { Connection, _, _Connection, Features, WatchDog, createConnection as createCommonConnection } from '../common/server';
 
-export * from "vscode-languageserver-protocol/node";
-export * from "../common/api";
+import * as fm from './files';
+import {
+	ConnectionStrategy, ConnectionOptions, MessageReader, MessageWriter, IPCMessageReader, IPCMessageWriter, createServerPipeTransport,
+	createServerSocketTransport, InitializeParams, createProtocolConnection, Logger, ProtocolConnection
+} from 'vscode-languageserver-protocol/node';
+
+export * from 'vscode-languageserver-protocol/node';
+export * from '../common/api';
 
 export namespace Files {
 	export const uriToFilePath = fm.uriToFilePath;
@@ -58,7 +42,7 @@ let _shutdownReceived: boolean = false;
 let exitTimer: NodeJS.Timer | undefined = undefined;
 
 function setupExitTimer(): void {
-	const argName = "--clientProcessId";
+	const argName = '--clientProcessId';
 	function runTimer(value: string): void {
 		try {
 			const processId = parseInt(value);
@@ -84,7 +68,7 @@ function setupExitTimer(): void {
 			runTimer(process.argv[i + 1]);
 			return;
 		} else {
-			const args = arg.split("=");
+			const args = arg.split('=');
 			if (args[0] === argName) {
 				runTimer(args[1]);
 			}
@@ -118,17 +102,16 @@ const watchDog: WatchDog = {
 	exit: (code: number): void => {
 		endProtocolConnection();
 		process.exit(code);
-	},
+	}
 };
+
 
 /**
  * Creates a new connection based on the processes command line arguments:
  *
  * @param options An optional connection strategy or connection options to control additional settings
  */
-export function createConnection(
-	options?: ConnectionStrategy | ConnectionOptions,
-): Connection;
+export function createConnection(options?: ConnectionStrategy | ConnectionOptions): Connection;
 
 /**
  * Creates a new connection using a the given streams.
@@ -138,11 +121,7 @@ export function createConnection(
  * @param options An optional connection strategy or connection options to control additional settings
  * @return A {@link Connection connection}
  */
-export function createConnection(
-	inputStream: NodeJS.ReadableStream,
-	outputStream: NodeJS.WritableStream,
-	options?: ConnectionStrategy | ConnectionOptions,
-): Connection;
+export function createConnection(inputStream: NodeJS.ReadableStream, outputStream: NodeJS.WritableStream, options?: ConnectionStrategy | ConnectionOptions): Connection;
 
 /**
  * Creates a new connection.
@@ -151,11 +130,7 @@ export function createConnection(
  * @param writer The message writer to write message to.
  * @param options An optional connection strategy or connection options to control additional settings
  */
-export function createConnection(
-	reader: MessageReader,
-	writer: MessageWriter,
-	options?: ConnectionStrategy | ConnectionOptions,
-): Connection;
+export function createConnection(reader: MessageReader, writer: MessageWriter, options?: ConnectionStrategy | ConnectionOptions): Connection;
 
 /**
  * Creates a new connection based on the processes command line arguments. The new connection surfaces proposed API
@@ -163,37 +138,10 @@ export function createConnection(
  * @param factories: the factories to use to implement the proposed API
  * @param options An optional connection strategy or connection options to control additional settings
  */
-export function createConnection<
-	PConsole = _,
-	PTracer = _,
-	PTelemetry = _,
-	PClient = _,
-	PWindow = _,
-	PWorkspace = _,
-	PLanguages = _,
-	PNotebooks = _,
->(
-	factories: Features<
-		PConsole,
-		PTracer,
-		PTelemetry,
-		PClient,
-		PWindow,
-		PWorkspace,
-		PLanguages,
-		PNotebooks
-	>,
-	options?: ConnectionStrategy | ConnectionOptions,
-): _Connection<
-	PConsole,
-	PTracer,
-	PTelemetry,
-	PClient,
-	PWindow,
-	PWorkspace,
-	PLanguages,
-	PNotebooks
->;
+export function createConnection<PConsole = _, PTracer = _, PTelemetry = _, PClient = _, PWindow = _, PWorkspace = _, PLanguages = _, PNotebooks = _>(
+	factories: Features<PConsole, PTracer, PTelemetry, PClient, PWindow, PWorkspace, PLanguages, PNotebooks>,
+	options?: ConnectionStrategy | ConnectionOptions
+): _Connection<PConsole, PTracer, PTelemetry, PClient, PWindow, PWorkspace, PLanguages, PNotebooks>;
 
 /**
  * Creates a new connection using a the given streams.
@@ -203,39 +151,10 @@ export function createConnection<
  * @param options An optional connection strategy or connection options to control additional settings
  * @return A {@link Connection connection}
  */
-export function createConnection<
-	PConsole = _,
-	PTracer = _,
-	PTelemetry = _,
-	PClient = _,
-	PWindow = _,
-	PWorkspace = _,
-	PLanguages = _,
-	PNotebooks = _,
->(
-	factories: Features<
-		PConsole,
-		PTracer,
-		PTelemetry,
-		PClient,
-		PWindow,
-		PWorkspace,
-		PLanguages,
-		PNotebooks
-	>,
-	inputStream: NodeJS.ReadableStream,
-	outputStream: NodeJS.WritableStream,
-	options?: ConnectionStrategy | ConnectionOptions,
-): _Connection<
-	PConsole,
-	PTracer,
-	PTelemetry,
-	PClient,
-	PWindow,
-	PWorkspace,
-	PLanguages,
-	PNotebooks
->;
+export function createConnection<PConsole = _, PTracer = _, PTelemetry = _, PClient = _, PWindow = _, PWorkspace = _, PLanguages = _, PNotebooks = _>(
+	factories: Features<PConsole, PTracer, PTelemetry, PClient, PWindow, PWorkspace, PLanguages, PNotebooks>,
+	inputStream: NodeJS.ReadableStream, outputStream: NodeJS.WritableStream, options?: ConnectionStrategy | ConnectionOptions
+): _Connection<PConsole, PTracer, PTelemetry, PClient, PWindow, PWorkspace, PLanguages, PNotebooks>;
 
 /**
  * Creates a new connection.
@@ -244,55 +163,19 @@ export function createConnection<
  * @param writer The message writer to write message to.
  * @param options An optional connection strategy or connection options to control additional settings
  */
-export function createConnection<
-	PConsole = _,
-	PTracer = _,
-	PTelemetry = _,
-	PClient = _,
-	PWindow = _,
-	PWorkspace = _,
-	PLanguages = _,
-	PNotebooks = _,
->(
-	factories: Features<
-		PConsole,
-		PTracer,
-		PTelemetry,
-		PClient,
-		PWindow,
-		PWorkspace,
-		PLanguages,
-		PNotebooks
-	>,
-	reader: MessageReader,
-	writer: MessageWriter,
-	options?: ConnectionStrategy | ConnectionOptions,
-): _Connection<
-	PConsole,
-	PTracer,
-	PTelemetry,
-	PClient,
-	PWindow,
-	PWorkspace,
-	PLanguages,
-	PNotebooks
->;
+export function createConnection<PConsole = _, PTracer = _, PTelemetry = _, PClient = _, PWindow = _, PWorkspace = _, PLanguages = _, PNotebooks = _>(
+	factories: Features<PConsole, PTracer, PTelemetry, PClient, PWindow, PWorkspace, PLanguages, PNotebooks>,
+	reader: MessageReader, writer: MessageWriter, options?: ConnectionStrategy | ConnectionOptions
+): _Connection<PConsole, PTracer, PTelemetry, PClient, PWindow, PWorkspace, PLanguages, PNotebooks>;
 
-export function createConnection(
-	arg1?: any,
-	arg2?: any,
-	arg3?: any,
-	arg4?: any,
-): Connection {
+export function createConnection(arg1?: any, arg2?: any, arg3?: any, arg4?: any): Connection {
 	let factories: Features | undefined;
 	let input: NodeJS.ReadableStream | MessageReader | undefined;
 	let output: NodeJS.WritableStream | MessageWriter | undefined;
 	let options: ConnectionStrategy | ConnectionOptions | undefined;
-	if (arg1 !== undefined && (arg1 as Features).__brand === "features") {
+	if (arg1 !== undefined && (arg1 as Features).__brand === 'features') {
 		factories = arg1;
-		arg1 = arg2;
-		arg2 = arg3;
-		arg3 = arg4;
+		arg1 = arg2; arg2 = arg3; arg3 = arg4;
 	}
 	if (ConnectionStrategy.is(arg1) || ConnectionOptions.is(arg1)) {
 		options = arg1;
@@ -304,39 +187,11 @@ export function createConnection(
 	return _createConnection(input, output, options, factories);
 }
 
-function _createConnection<
-	PConsole = _,
-	PTracer = _,
-	PTelemetry = _,
-	PClient = _,
-	PWindow = _,
-	PWorkspace = _,
-	PLanguages = _,
-	PNotebooks = _,
->(
-	input?: NodeJS.ReadableStream | MessageReader,
-	output?: NodeJS.WritableStream | MessageWriter,
+function _createConnection<PConsole = _, PTracer = _, PTelemetry = _, PClient = _, PWindow = _, PWorkspace = _, PLanguages = _, PNotebooks = _>(
+	input?: NodeJS.ReadableStream | MessageReader, output?: NodeJS.WritableStream | MessageWriter,
 	options?: ConnectionStrategy | ConnectionOptions,
-	factories?: Features<
-		PConsole,
-		PTracer,
-		PTelemetry,
-		PClient,
-		PWindow,
-		PWorkspace,
-		PLanguages,
-		PNotebooks
-	>,
-): _Connection<
-	PConsole,
-	PTracer,
-	PTelemetry,
-	PClient,
-	PWindow,
-	PWorkspace,
-	PLanguages,
-	PNotebooks
-> {
+	factories?: Features<PConsole, PTracer, PTelemetry, PClient, PWindow, PWorkspace, PLanguages, PNotebooks>,
+): _Connection<PConsole, PTracer, PTelemetry, PClient, PWindow, PWorkspace, PLanguages, PNotebooks> {
 	let stdio = false;
 	if (!input && !output && process.argv.length > 2) {
 		let port: number | undefined = undefined;
@@ -344,27 +199,28 @@ function _createConnection<
 		const argv = process.argv.slice(2);
 		for (let i = 0; i < argv.length; i++) {
 			const arg = argv[i];
-			if (arg === "--node-ipc") {
+			if (arg === '--node-ipc') {
 				input = new IPCMessageReader(process);
 				output = new IPCMessageWriter(process);
 				break;
-			} else if (arg === "--stdio") {
+			} else if (arg === '--stdio') {
 				stdio = true;
 				input = process.stdin;
 				output = process.stdout;
 				break;
-			} else if (arg === "--socket") {
+			} else if (arg === '--socket') {
 				port = parseInt(argv[i + 1]);
 				break;
-			} else if (arg === "--pipe") {
+			} else if (arg === '--pipe') {
 				pipeName = argv[i + 1];
 				break;
-			} else {
-				const args = arg.split("=");
-				if (args[0] === "--socket") {
+			}
+			else {
+				const args = arg.split('=');
+				if (args[0] === '--socket') {
 					port = parseInt(args[1]);
 					break;
-				} else if (args[0] === "--pipe") {
+				} else if (args[0] === '--pipe') {
 					pipeName = args[1];
 					break;
 				}
@@ -380,42 +236,29 @@ function _createConnection<
 			output = transport[1];
 		}
 	}
-	const commandLineMessage =
-		"Use arguments of createConnection or set command line parameters: '--node-ipc', '--stdio' or '--socket={number}'";
+	const commandLineMessage = 'Use arguments of createConnection or set command line parameters: \'--node-ipc\', \'--stdio\' or \'--socket={number}\'';
 	if (!input) {
-		throw new Error(
-			"Connection input stream is not set. " + commandLineMessage,
-		);
+		throw new Error('Connection input stream is not set. ' + commandLineMessage);
 	}
 	if (!output) {
-		throw new Error(
-			"Connection output stream is not set. " + commandLineMessage,
-		);
+		throw new Error('Connection output stream is not set. ' + commandLineMessage);
 	}
 
 	// Backwards compatibility
-	if (
-		Is.func((input as NodeJS.ReadableStream).read) &&
-		Is.func((input as NodeJS.ReadableStream).on)
-	) {
+	if (Is.func((input as NodeJS.ReadableStream).read) && Is.func((input as NodeJS.ReadableStream).on)) {
 		const inputStream = <NodeJS.ReadableStream>input;
-		inputStream.on("end", () => {
+		inputStream.on('end', () => {
 			endProtocolConnection();
 			process.exit(_shutdownReceived ? 0 : 1);
 		});
-		inputStream.on("close", () => {
+		inputStream.on('close', () => {
 			endProtocolConnection();
 			process.exit(_shutdownReceived ? 0 : 1);
 		});
 	}
 
 	const connectionFactory = (logger: Logger): ProtocolConnection => {
-		const result = createProtocolConnection(
-			input as any,
-			output as any,
-			logger,
-			options,
-		);
+		const result = createProtocolConnection(input as any, output as any, logger, options);
 		if (stdio) {
 			patchConsole(logger);
 		}
@@ -426,9 +269,7 @@ function _createConnection<
 
 function patchConsole(logger: Logger): undefined {
 	function serialize(args: unknown[]) {
-		return args
-			.map((arg) => (typeof arg === "string" ? arg : inspect(arg)))
-			.join(" ");
+		return args.map(arg => typeof arg === 'string' ? arg : inspect(arg)).join(' ');
 	}
 
 	const counters = new Map<string, number>();
@@ -438,14 +279,14 @@ function patchConsole(logger: Logger): undefined {
 			return;
 		}
 		if (args.length === 0) {
-			logger.error("Assertion failed");
+			logger.error('Assertion failed');
 		} else {
 			const [message, ...rest] = args;
 			logger.error(`Assertion failed: ${message} ${serialize(rest)}`);
 		}
 	};
 
-	console.count = function count(label = "default") {
+	console.count = function count(label = 'default') {
 		const message = String(label);
 		let counter = counters.get(message) ?? 0;
 		counter += 1;
@@ -465,7 +306,7 @@ function patchConsole(logger: Logger): undefined {
 		logger.log(serialize(args));
 	};
 
-	console.dir = function dir(arg, options) {
+	console.dir = function dir(arg, options){
 		logger.log(inspect(arg, options));
 	};
 
@@ -473,13 +314,13 @@ function patchConsole(logger: Logger): undefined {
 		logger.log(serialize(args));
 	};
 
-	console.error = function error(...args) {
+	console.error = function error(...args){
 		logger.error(serialize(args));
 	};
 
 	console.trace = function trace(...args) {
-		const stack = new Error().stack!.replace(/(.+\n){2}/, "");
-		let message = "Trace";
+		const stack = new Error().stack!.replace(/(.+\n){2}/, '');
+		let message = 'Trace';
 		if (args.length !== 0) {
 			message += `: ${serialize(args)}`;
 		}

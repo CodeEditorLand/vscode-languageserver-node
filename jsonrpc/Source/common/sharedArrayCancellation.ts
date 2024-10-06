@@ -3,19 +3,10 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import {
-	AbstractCancellationTokenSource,
-	CancellationToken,
-	CancellationTokenSource,
-} from "./cancellation";
-import {
-	CancellationId,
-	CancellationSenderStrategy,
-	MessageConnection,
-	RequestCancellationReceiverStrategy,
-} from "./connection";
-import { Event } from "./events";
-import { RequestMessage } from "./messages";
+import { Event } from './events';
+import { RequestMessage } from './messages';
+import { AbstractCancellationTokenSource, CancellationToken, CancellationTokenSource } from './cancellation';
+import { CancellationId,RequestCancellationReceiverStrategy, CancellationSenderStrategy, MessageConnection } from './connection';
 
 interface RequestMessageWithCancellationData extends RequestMessage {
 	$cancellationData: SharedArrayBuffer;
@@ -27,6 +18,7 @@ namespace CancellationState {
 }
 
 export class SharedArraySenderStrategy implements CancellationSenderStrategy {
+
 	private readonly buffers: Map<CancellationId, SharedArrayBuffer>;
 
 	constructor() {
@@ -41,14 +33,10 @@ export class SharedArraySenderStrategy implements CancellationSenderStrategy {
 		const data = new Int32Array(buffer, 0, 1);
 		data[0] = CancellationState.Continue;
 		this.buffers.set(request.id, buffer);
-		(request as RequestMessageWithCancellationData).$cancellationData =
-			buffer;
+		(request as RequestMessageWithCancellationData).$cancellationData = buffer;
 	}
 
-	async sendCancellation(
-		_conn: MessageConnection,
-		id: CancellationId,
-	): Promise<void> {
+	async sendCancellation(_conn: MessageConnection, id: CancellationId): Promise<void> {
 		const buffer = this.buffers.get(id);
 		if (buffer === undefined) {
 			return;
@@ -67,6 +55,7 @@ export class SharedArraySenderStrategy implements CancellationSenderStrategy {
 }
 
 class SharedArrayBufferCancellationToken implements CancellationToken {
+
 	private readonly data: Int32Array;
 
 	constructor(buffer: SharedArrayBuffer) {
@@ -78,36 +67,30 @@ class SharedArrayBufferCancellationToken implements CancellationToken {
 	}
 
 	public get onCancellationRequested(): Event<void> {
-		throw new Error(
-			`Cancellation over SharedArrayBuffer doesn't support cancellation events`,
-		);
+		throw new Error(`Cancellation over SharedArrayBuffer doesn't support cancellation events`);
 	}
 }
 
-class SharedArrayBufferCancellationTokenSource
-	implements AbstractCancellationTokenSource
-{
+class SharedArrayBufferCancellationTokenSource implements AbstractCancellationTokenSource {
+
 	public readonly token: SharedArrayBufferCancellationToken;
 
 	constructor(buffer: SharedArrayBuffer) {
 		this.token = new SharedArrayBufferCancellationToken(buffer);
 	}
 
-	cancel(): void {}
+	cancel(): void {
+	}
 
-	dispose(): void {}
+	dispose(): void {
+	}
 }
 
-export class SharedArrayReceiverStrategy
-	implements RequestCancellationReceiverStrategy
-{
-	public readonly kind = "request" as const;
+export class SharedArrayReceiverStrategy implements RequestCancellationReceiverStrategy {
+	public readonly kind = 'request' as const;
 
-	createCancellationTokenSource(
-		request: RequestMessage,
-	): AbstractCancellationTokenSource {
-		const buffer = (request as RequestMessageWithCancellationData)
-			.$cancellationData;
+	createCancellationTokenSource(request: RequestMessage): AbstractCancellationTokenSource {
+		const buffer = (request as RequestMessageWithCancellationData).$cancellationData;
 		if (buffer === undefined) {
 			return new CancellationTokenSource();
 		}

@@ -3,14 +3,9 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import {
-	CancellationToken,
-	HandlerResult,
-	RequestHandler,
-} from "vscode-jsonrpc";
-import { Range, URI } from "vscode-languageserver-types";
-
-import { MessageDirection, ProtocolRequestType } from "./messages";
+import { CancellationToken, HandlerResult, RequestHandler } from 'vscode-jsonrpc';
+import { Range, URI } from 'vscode-languageserver-types';
+import { MessageDirection, ProtocolRequestType } from './messages';
 
 /**
  * Client capabilities for the showDocument request.
@@ -79,26 +74,11 @@ export interface ShowDocumentResult {
  * will very likely open the URI in a WEB browser.
  *
  * @since 3.16.0
- */
+*/
 export namespace ShowDocumentRequest {
-	export const method: "window/showDocument" = "window/showDocument";
-	export const messageDirection: MessageDirection =
-		MessageDirection.serverToClient;
-	export const type = new ProtocolRequestType<
-		ShowDocumentParams,
-		ShowDocumentResult,
-		void,
-		void,
-		void
-	>(method);
-	export type HandlerSignature = RequestHandler<
-		ShowDocumentParams,
-		ShowDocumentResult,
-		void
-	>;
-	export type MiddlewareSignature = (
-		params: ShowDocumentParams,
-		token: CancellationToken,
-		next: HandlerSignature,
-	) => HandlerResult<ShowDocumentResult, void>;
+	export const method: 'window/showDocument' = 'window/showDocument';
+	export const messageDirection: MessageDirection = MessageDirection.serverToClient;
+	export const type = new ProtocolRequestType<ShowDocumentParams, ShowDocumentResult, void, void, void>(method);
+	export type HandlerSignature = RequestHandler<ShowDocumentParams, ShowDocumentResult, void>;
+	export type MiddlewareSignature = (params: ShowDocumentParams, token: CancellationToken, next: HandlerSignature) => HandlerResult<ShowDocumentResult, void>;
 }

@@ -4,38 +4,20 @@
  * ------------------------------------------------------------------------------------------ */
 
 import {
-	CancellationToken,
-	CancellationTokenSource,
-	ClientCapabilities,
-	PartialResultParams,
-	ProgressToken,
-	ProgressType,
-	WorkDoneProgress,
-	WorkDoneProgressBegin,
-	WorkDoneProgressCancelNotification,
-	WorkDoneProgressCreateRequest,
-	WorkDoneProgressParams,
-	WorkDoneProgressReport,
-} from "vscode-languageserver-protocol";
+	ClientCapabilities, CancellationToken, CancellationTokenSource, ProgressToken, ProgressType, WorkDoneProgressParams, PartialResultParams,
+	WorkDoneProgressBegin, WorkDoneProgress, WorkDoneProgressReport, WorkDoneProgressCancelNotification, WorkDoneProgressCreateRequest
+} from 'vscode-languageserver-protocol';
 
-import type { _RemoteWindow, Feature } from "./server";
-import { generateUuid } from "./utils/uuid";
+import { generateUuid } from './utils/uuid';
+import type { Feature, _RemoteWindow } from './server';
 
 export interface ProgressContext {
-	sendProgress<P>(
-		type: ProgressType<P>,
-		token: ProgressToken,
-		value: P,
-	): void;
+	sendProgress<P>(type: ProgressType<P>, token: ProgressToken, value: P): void;
 }
 
 export interface WorkDoneProgressReporter {
-	begin(
-		title: string,
-		percentage?: number,
-		message?: string,
-		cancellable?: boolean,
-	): void;
+
+	begin(title: string, percentage?: number, message?: string, cancellable?: boolean): void;
 
 	report(percentage: number): void;
 	report(message: string): void;
@@ -44,60 +26,43 @@ export interface WorkDoneProgressReporter {
 	done(): void;
 }
 
-export interface WorkDoneProgressServerReporter
-	extends WorkDoneProgressReporter {
+export interface WorkDoneProgressServerReporter extends WorkDoneProgressReporter {
 	readonly token: CancellationToken;
 }
 
 export interface WindowProgress {
-	attachWorkDoneProgress(
-		token: ProgressToken | undefined,
-	): WorkDoneProgressReporter;
+	attachWorkDoneProgress(token: ProgressToken | undefined): WorkDoneProgressReporter;
 	createWorkDoneProgress(): Promise<WorkDoneProgressServerReporter>;
 }
 
 class WorkDoneProgressReporterImpl implements WorkDoneProgressReporter {
-	public static Instances: Map<
-		string | number,
-		WorkDoneProgressReporterImpl
-	> = new Map();
 
-	constructor(
-		private _connection: ProgressContext,
-		private _token: ProgressToken,
-	) {
+	public static Instances: Map<string | number, WorkDoneProgressReporterImpl> = new Map();
+
+	constructor(private _connection: ProgressContext, private _token: ProgressToken) {
 		WorkDoneProgressReporterImpl.Instances.set(this._token, this);
 	}
 
-	public begin(
-		title: string,
-		percentage?: number,
-		message?: string,
-		cancellable?: boolean,
-	): void {
+	public begin(title: string, percentage?: number, message?: string, cancellable?: boolean): void {
 		const param: WorkDoneProgressBegin = {
-			kind: "begin",
+			kind: 'begin',
 			title,
 			message,
-			cancellable,
+			cancellable
 		};
-		if (typeof percentage === "number") {
+		if (typeof percentage === 'number') {
 			// Round to the nearest integer, because the percentage
 			// is a uinteger according to the specification
 			param.percentage = Math.round(percentage);
 		}
-		this._connection.sendProgress(
-			WorkDoneProgress.type,
-			this._token,
-			param,
-		);
+		this._connection.sendProgress(WorkDoneProgress.type, this._token, param);
 	}
 
 	report(arg0: number | string, arg1?: string): void {
 		const param: WorkDoneProgressReport = {
-			kind: "report",
+			kind: 'report'
 		};
-		if (typeof arg0 === "number") {
+		if (typeof arg0 === 'number') {
 			// Round to the nearest integer, because the percentage
 			// is a uinteger according to the specification
 			param.percentage = Math.round(arg0);
@@ -107,25 +72,18 @@ class WorkDoneProgressReporterImpl implements WorkDoneProgressReporter {
 		} else {
 			param.message = arg0;
 		}
-		this._connection.sendProgress(
-			WorkDoneProgress.type,
-			this._token,
-			param,
-		);
+		this._connection.sendProgress(WorkDoneProgress.type, this._token, param);
 	}
 
 	done(): void {
 		WorkDoneProgressReporterImpl.Instances.delete(this._token);
-		this._connection.sendProgress(WorkDoneProgress.type, this._token, {
-			kind: "end",
-		});
+		this._connection.sendProgress(WorkDoneProgress.type, this._token, { kind: 'end' } );
 	}
+
 }
 
-class WorkDoneProgressServerReporterImpl
-	extends WorkDoneProgressReporterImpl
-	implements WorkDoneProgressServerReporter
-{
+class WorkDoneProgressServerReporterImpl extends WorkDoneProgressReporterImpl implements WorkDoneProgressServerReporter {
+
 	private _source: CancellationTokenSource;
 
 	constructor(connection: ProgressContext, token: ProgressToken) {
@@ -148,19 +106,22 @@ class WorkDoneProgressServerReporterImpl
 }
 
 class NullProgressReporter implements WorkDoneProgressReporter {
-	constructor() {}
 
-	begin(): void {}
+	constructor() {
+	}
 
-	report(): void {}
+	begin(): void {
+	}
 
-	done(): void {}
+	report(): void {
+	}
+
+	done(): void {
+	}
 }
 
-class NullProgressServerReporter
-	extends NullProgressReporter
-	implements WorkDoneProgressServerReporter
-{
+class NullProgressServerReporter extends NullProgressReporter implements WorkDoneProgressServerReporter {
+
 	private _source: CancellationTokenSource;
 
 	constructor() {
@@ -181,10 +142,7 @@ class NullProgressServerReporter
 	}
 }
 
-export function attachWorkDone(
-	connection: ProgressContext,
-	params: WorkDoneProgressParams | undefined,
-): WorkDoneProgressReporter {
+export function attachWorkDone(connection: ProgressContext, params: WorkDoneProgressParams | undefined): WorkDoneProgressReporter {
 	if (params === undefined || params.workDoneToken === undefined) {
 		return new NullProgressReporter();
 	}
@@ -194,9 +152,7 @@ export function attachWorkDone(
 	return new WorkDoneProgressReporterImpl(connection, token);
 }
 
-export const ProgressFeature: Feature<_RemoteWindow, WindowProgress> = (
-	Base,
-) => {
+export const ProgressFeature: Feature<_RemoteWindow, WindowProgress> = (Base) => {
 	return class extends Base {
 		private _progressSupported: boolean;
 		public constructor() {
@@ -207,27 +163,15 @@ export const ProgressFeature: Feature<_RemoteWindow, WindowProgress> = (
 			super.initialize(capabilities);
 			if (capabilities?.window?.workDoneProgress === true) {
 				this._progressSupported = true;
-				this.connection.onNotification(
-					WorkDoneProgressCancelNotification.type,
-					(params) => {
-						const progress =
-							WorkDoneProgressReporterImpl.Instances.get(
-								params.token,
-							);
-						if (
-							progress instanceof
-								WorkDoneProgressServerReporterImpl ||
-							progress instanceof NullProgressServerReporter
-						) {
-							progress.cancel();
-						}
-					},
-				);
+				this.connection.onNotification(WorkDoneProgressCancelNotification.type, (params) => {
+					const progress = WorkDoneProgressReporterImpl.Instances.get(params.token);
+					if (progress instanceof WorkDoneProgressServerReporterImpl || progress instanceof NullProgressServerReporter) {
+						progress.cancel();
+					}
+				});
 			}
 		}
-		public attachWorkDoneProgress(
-			token: ProgressToken | undefined,
-		): WorkDoneProgressReporter {
+		public attachWorkDoneProgress(token: ProgressToken | undefined): WorkDoneProgressReporter {
 			if (token === undefined) {
 				return new NullProgressReporter();
 			} else {
@@ -237,16 +181,10 @@ export const ProgressFeature: Feature<_RemoteWindow, WindowProgress> = (
 		public createWorkDoneProgress(): Promise<WorkDoneProgressServerReporter> {
 			if (this._progressSupported) {
 				const token: string = generateUuid();
-				return this.connection
-					.sendRequest(WorkDoneProgressCreateRequest.type, { token })
-					.then(() => {
-						const result: WorkDoneProgressServerReporterImpl =
-							new WorkDoneProgressServerReporterImpl(
-								this.connection,
-								token,
-							);
-						return result;
-					});
+				return this.connection.sendRequest(WorkDoneProgressCreateRequest.type, { token }).then(() => {
+					const result: WorkDoneProgressServerReporterImpl = new WorkDoneProgressServerReporterImpl(this.connection, token);
+					return result;
+				});
 			} else {
 				return Promise.resolve(new NullProgressServerReporter());
 			}
@@ -263,20 +201,15 @@ namespace ResultProgress {
 }
 
 class ResultProgressReporterImpl<R> implements ResultProgressReporter<R> {
-	constructor(
-		private _connection: ProgressContext,
-		private _token: ProgressToken,
-	) {}
+	constructor(private _connection: ProgressContext, private _token: ProgressToken) {
+	}
 
 	public report(data: R): void {
 		this._connection.sendProgress(ResultProgress.type, this._token, data);
 	}
 }
 
-export function attachPartialResult<R>(
-	connection: ProgressContext,
-	params: PartialResultParams,
-): ResultProgressReporter<R> | undefined {
+export function attachPartialResult<R>(connection: ProgressContext, params: PartialResultParams): ResultProgressReporter<R> | undefined {
 	if (params === undefined || params.partialResultToken === undefined) {
 		return undefined;
 	}

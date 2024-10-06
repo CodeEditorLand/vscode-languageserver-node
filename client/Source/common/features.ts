@@ -4,147 +4,33 @@
  * ------------------------------------------------------------------------------------------ */
 
 import {
-	CallHierarchyProvider,
-	CancellationError,
-	CancellationToken,
-	CodeActionProvider,
-	CompletionItemProvider,
-	DeclarationProvider,
-	DefinitionProvider,
-	Disposable,
-	DocumentColorProvider,
-	DocumentFormattingEditProvider,
-	DocumentHighlightProvider,
-	DocumentLinkProvider,
-	DocumentRangeFormattingEditProvider,
-	DocumentSymbolProvider,
-	Event,
-	EventEmitter,
-	FileCreateEvent,
-	FileDeleteEvent,
-	FileRenameEvent,
-	FileWillCreateEvent,
-	FileWillDeleteEvent,
-	FileWillRenameEvent,
-	HoverProvider,
-	ImplementationProvider,
-	InlineCompletionItemProvider,
-	languages as Languages,
-	LinkedEditingRangeProvider,
-	OnTypeFormattingEditProvider,
-	ProviderResult,
-	ReferenceProvider,
-	RenameProvider,
-	SelectionRangeProvider,
-	SignatureHelpProvider,
-	TextDocument,
-	TypeDefinitionProvider,
-	TypeHierarchyProvider,
-	DocumentSelector as VDocumentSelector,
-	Event as VEvent,
-	TextEdit as VTextEdit,
-	workspace as Workspace,
-	WorkspaceSymbolProvider,
-	type Uri,
-} from "vscode";
-import {
-	CallHierarchyPrepareRequest,
-	ClientCapabilities,
-	CodeActionRequest,
-	CodeLensRequest,
-	CompletionRequest,
-	DeclarationRequest,
-	DefinitionRequest,
-	DidChangeTextDocumentNotification,
-	DidCloseTextDocumentNotification,
-	DidCreateFilesNotification,
-	DidDeleteFilesNotification,
-	DidOpenTextDocumentNotification,
-	DidRenameFilesNotification,
-	DidSaveTextDocumentNotification,
-	DocumentColorRequest,
-	DocumentDiagnosticRequest,
-	DocumentFormattingRequest,
-	DocumentHighlightRequest,
-	DocumentLinkRequest,
-	DocumentOnTypeFormattingRequest,
-	DocumentRangeFormattingRequest,
-	DocumentSelector,
-	DocumentSymbolRequest,
-	ExecuteCommandOptions,
-	ExecuteCommandRequest,
-	FileOperationRegistrationOptions,
-	FoldingRangeRequest,
-	GenericNotificationHandler,
-	GenericRequestHandler,
-	HoverRequest,
-	ImplementationRequest,
-	InitializeParams,
-	InlayHintRequest,
-	InlineCompletionRegistrationOptions,
-	InlineCompletionRequest,
-	InlineValueRequest,
-	LinkedEditingRangeRequest,
-	MessageSignature,
-	NotebookDocumentSyncRegistrationOptions,
-	NotebookDocumentSyncRegistrationType,
-	NotificationHandler,
-	NotificationHandler0,
-	NotificationType,
-	NotificationType0,
-	ProgressType,
-	ProtocolNotificationType,
-	ProtocolNotificationType0,
-	ProtocolRequestType,
-	ProtocolRequestType0,
-	ReferencesRequest,
-	RegistrationType,
-	RenameRequest,
-	RequestHandler,
-	RequestHandler0,
-	RequestType,
-	RequestType0,
-	SelectionRangeRequest,
-	SemanticTokensRegistrationType,
-	ServerCapabilities,
-	SignatureHelpRequest,
-	StaticRegistrationOptions,
-	TextDocumentIdentifier,
-	TextDocumentRegistrationOptions,
-	TypeDefinitionRequest,
-	TypeHierarchyPrepareRequest,
-	WillCreateFilesRequest,
-	WillDeleteFilesRequest,
-	WillRenameFilesRequest,
-	WillSaveTextDocumentNotification,
-	WillSaveTextDocumentWaitUntilRequest,
-	WorkDoneProgressOptions,
-	WorkspaceSymbolRequest,
-} from "vscode-languageserver-protocol";
+	languages as Languages, workspace as Workspace, TextDocument, Event as VEvent, DocumentSelector as VDocumentSelector, EventEmitter, Event,
+	Disposable, CancellationToken, ProviderResult, TextEdit as VTextEdit, ReferenceProvider, DefinitionProvider, SignatureHelpProvider,
+	HoverProvider, CompletionItemProvider, WorkspaceSymbolProvider, DocumentHighlightProvider, CodeActionProvider, DocumentFormattingEditProvider,
+	DocumentRangeFormattingEditProvider, OnTypeFormattingEditProvider, RenameProvider, DocumentSymbolProvider, DocumentLinkProvider, DocumentColorProvider,
+	DeclarationProvider, ImplementationProvider, SelectionRangeProvider, TypeDefinitionProvider, CallHierarchyProvider,
+	LinkedEditingRangeProvider, TypeHierarchyProvider, FileCreateEvent, FileRenameEvent, FileDeleteEvent, FileWillCreateEvent, FileWillRenameEvent,
+	FileWillDeleteEvent, CancellationError, InlineCompletionItemProvider, type Uri
+} from 'vscode';
 
-import type * as c2p from "./codeConverter";
-import type { CodeLensProviderShape } from "./codeLens";
-import type {
-	DiagnosticFeatureShape,
-	DiagnosticProviderShape,
-} from "./diagnostic";
-import { FoldingRangeProviderShape } from "./foldingRange";
-import type { InlayHintsProviderShape } from "./inlayHint";
-import type { InlineValueProviderShape } from "./inlineValue";
-import type { NotebookDocumentProviderShape } from "./notebook";
-import type * as p2c from "./protocolConverter";
-// Features can refer to other feature when implementing themselves.
-// Hence the feature client needs to provide access to them. To
-// avoid cyclic dependencies these import MUST ALL be type imports.
-import type { SemanticTokensProviderShape } from "./semanticTokens";
-import type {
-	DidChangeTextDocumentFeatureShape,
-	DidCloseTextDocumentFeatureShape,
-	DidOpenTextDocumentFeatureShape,
-	DidSaveTextDocumentFeatureShape,
-} from "./textSynchronization";
-import * as Is from "./utils/is";
-import * as UUID from "./utils/uuid";
+import {
+	CallHierarchyPrepareRequest, ClientCapabilities, CodeActionRequest, CodeLensRequest, CompletionRequest, DeclarationRequest, DefinitionRequest,
+	DidChangeTextDocumentNotification, DidCloseTextDocumentNotification, DidCreateFilesNotification, DidDeleteFilesNotification, DidOpenTextDocumentNotification,
+	DidRenameFilesNotification, DidSaveTextDocumentNotification, DocumentColorRequest, DocumentDiagnosticRequest, DocumentFormattingRequest, DocumentHighlightRequest,
+	DocumentLinkRequest, DocumentOnTypeFormattingRequest, DocumentRangeFormattingRequest, DocumentSelector, DocumentSymbolRequest, ExecuteCommandOptions, ExecuteCommandRequest, FileOperationRegistrationOptions,
+	FoldingRangeRequest, GenericNotificationHandler, GenericRequestHandler, HoverRequest, ImplementationRequest, InitializeParams, InlayHintRequest, InlineCompletionRegistrationOptions, InlineCompletionRequest, InlineValueRequest,
+	LinkedEditingRangeRequest, MessageSignature, NotebookDocumentSyncRegistrationOptions, NotebookDocumentSyncRegistrationType, NotificationHandler, NotificationHandler0,
+	NotificationType, NotificationType0, ProgressType,  ProtocolNotificationType, ProtocolNotificationType0, ProtocolRequestType, ProtocolRequestType0, ReferencesRequest,
+	RegistrationType, RenameRequest, RequestHandler, RequestHandler0, RequestType, RequestType0, SelectionRangeRequest, SemanticTokensRegistrationType, ServerCapabilities,
+	SignatureHelpRequest, StaticRegistrationOptions, TextDocumentIdentifier, TextDocumentRegistrationOptions, TypeDefinitionRequest, TypeHierarchyPrepareRequest, WillCreateFilesRequest,
+	WillDeleteFilesRequest, WillRenameFilesRequest, WillSaveTextDocumentNotification, WillSaveTextDocumentWaitUntilRequest, WorkDoneProgressOptions, WorkspaceSymbolRequest
+} from 'vscode-languageserver-protocol';
+
+import * as Is from './utils/is';
+import * as UUID from './utils/uuid';
+
+import type * as c2p from './codeConverter';
+import type * as p2c from './protocolConverter';
 
 export class LSPCancellationError extends CancellationError {
 	public readonly data: object | Object;
@@ -170,59 +56,56 @@ export interface RegistrationData<T> {
 	registerOptions: T;
 }
 
-export type FeatureStateKind = "document" | "workspace" | "static" | "window";
+export type FeatureStateKind = 'document' | 'workspace' | 'static' | 'window';
 
-export type FeatureState =
-	| {
-			kind: "document";
+export type FeatureState = {
+	kind: 'document';
 
-			/**
-			 * The features's id. This is usually the method names used during
-			 * registration.
-			 */
-			id: string;
+	/**
+	 * The features's id. This is usually the method names used during
+	 * registration.
+	 */
+	id: string;
 
-			/**
-			 * Has active registrations.
-			 */
-			registrations: boolean;
+	/**
+	 * Has active registrations.
+	 */
+	registrations: boolean;
 
-			/**
-			 * A registration matches an open document.
-			 */
-			matches: boolean;
-	  }
-	| {
-			kind: "workspace";
+	/**
+	 * A registration matches an open document.
+	 */
+	matches: boolean;
 
-			/**
-			 * The features's id. This is usually the method names used during
-			 * registration.
-			 */
-			id: string;
+} | {
+	kind: 'workspace';
 
-			/**
-			 * Has active registrations.
-			 */
-			registrations: boolean;
-	  }
-	| {
-			kind: "window";
+	/**
+	 * The features's id. This is usually the method names used during
+	 * registration.
+	 */
+	id: string;
 
-			/**
-			 * The features's id. This is usually the method names used during
-			 * registration.
-			 */
-			id: string;
+	/**
+	 * Has active registrations.
+	 */
+	registrations: boolean;
+} | {
+	kind: 'window';
 
-			/**
-			 * Has active registrations.
-			 */
-			registrations: boolean;
-	  }
-	| {
-			kind: "static";
-	  };
+	/**
+	 * The features's id. This is usually the method names used during
+	 * registration.
+	 */
+	id: string;
+
+	/**
+	 * Has active registrations.
+	 */
+	registrations: boolean;
+} | {
+	kind: 'static';
+};
 
 /**
  * A static feature. A static feature can't be dynamically activated via the
@@ -252,10 +135,7 @@ export interface StaticFeature {
 	 * @param documentSelector the document selector pass to the client's constructor.
 	 *  May be `undefined` if the client was created without a selector.
 	 */
-	preInitialize?: (
-		capabilities: ServerCapabilities,
-		documentSelector: DocumentSelector | undefined,
-	) => void;
+	preInitialize?: (capabilities: ServerCapabilities, documentSelector: DocumentSelector | undefined) => void;
 
 	/**
 	 * Initialize the feature. This method is called on a feature instance
@@ -267,10 +147,7 @@ export interface StaticFeature {
 	 * @param documentSelector the document selector pass to the client's constructor.
 	 *  May be `undefined` if the client was created without a selector.
 	 */
-	initialize(
-		capabilities: ServerCapabilities,
-		documentSelector: DocumentSelector | undefined,
-	): void;
+	initialize(capabilities: ServerCapabilities, documentSelector: DocumentSelector | undefined): void;
 
 	/**
 	 * Returns the state the feature is in.
@@ -286,18 +163,11 @@ export interface StaticFeature {
 }
 
 export namespace StaticFeature {
-	export function is(value: any): value is StaticFeature {
+	export function is (value: any): value is StaticFeature {
 		const candidate: StaticFeature = value;
-		return (
-			candidate !== undefined &&
-			candidate !== null &&
-			Is.func(candidate.fillClientCapabilities) &&
-			Is.func(candidate.initialize) &&
-			Is.func(candidate.getState) &&
-			Is.func(candidate.clear) &&
-			(candidate.fillInitializeParams === undefined ||
-				Is.func(candidate.fillInitializeParams))
-		);
+		return candidate !== undefined && candidate !== null &&
+			Is.func(candidate.fillClientCapabilities) && Is.func(candidate.initialize) && Is.func(candidate.getState) && Is.func(candidate.clear) &&
+			(candidate.fillInitializeParams === undefined || Is.func(candidate.fillInitializeParams));
 	}
 }
 
@@ -305,6 +175,7 @@ export namespace StaticFeature {
  * A dynamic feature can be activated via the server.
  */
 export interface DynamicFeature<RO> {
+
 	/**
 	 * Called to fill the initialize params.
 	 *
@@ -328,10 +199,7 @@ export interface DynamicFeature<RO> {
 	 * @param documentSelector the document selector pass to the client's constructor.
 	 *  May be `undefined` if the client was created without a selector.
 	 */
-	preInitialize?: (
-		capabilities: ServerCapabilities,
-		documentSelector: DocumentSelector | undefined,
-	) => void;
+	preInitialize?: (capabilities: ServerCapabilities, documentSelector: DocumentSelector | undefined) => void;
 
 	/**
 	 * Initialize the feature. This method is called on a feature instance
@@ -343,10 +211,7 @@ export interface DynamicFeature<RO> {
 	 * @param documentSelector the document selector pass to the client's constructor.
 	 *  May be `undefined` if the client was created without a selector.
 	 */
-	initialize(
-		capabilities: ServerCapabilities,
-		documentSelector: DocumentSelector | undefined,
-	): void;
+	initialize(capabilities: ServerCapabilities, documentSelector: DocumentSelector | undefined): void;
 
 	/**
 	 * Returns the state the feature is in.
@@ -383,19 +248,10 @@ export interface DynamicFeature<RO> {
 export namespace DynamicFeature {
 	export function is<T>(value: any): value is DynamicFeature<T> {
 		const candidate: DynamicFeature<T> = value;
-		return (
-			candidate !== undefined &&
-			candidate !== null &&
-			Is.func(candidate.fillClientCapabilities) &&
-			Is.func(candidate.initialize) &&
-			Is.func(candidate.getState) &&
-			Is.func(candidate.clear) &&
-			(candidate.fillInitializeParams === undefined ||
-				Is.func(candidate.fillInitializeParams)) &&
-			Is.func(candidate.register) &&
-			Is.func(candidate.unregister) &&
-			candidate.registrationType !== undefined
-		);
+		return candidate !== undefined && candidate !== null &&
+			Is.func(candidate.fillClientCapabilities) && Is.func(candidate.initialize) && Is.func(candidate.getState) && Is.func(candidate.clear) &&
+			(candidate.fillInitializeParams === undefined || Is.func(candidate.fillInitializeParams)) && Is.func(candidate.register) &&
+			Is.func(candidate.unregister) && candidate.registrationType !== undefined;
 	}
 }
 
@@ -403,17 +259,13 @@ interface CreateParamsSignature<E, P> {
 	(data: E): P;
 }
 
-export interface NotificationSendEvent<
-	P extends { textDocument: TextDocumentIdentifier },
-> {
+export interface NotificationSendEvent<P extends { textDocument: TextDocumentIdentifier }> {
 	textDocument: TextDocument;
 	type: ProtocolNotificationType<P, TextDocumentRegistrationOptions>;
 	params: P;
 }
 
-export interface NotifyingFeature<
-	P extends { textDocument: TextDocumentIdentifier },
-> {
+export interface NotifyingFeature<P extends { textDocument: TextDocumentIdentifier }> {
 	onNotificationSent: VEvent<NotificationSendEvent<P>>;
 }
 
@@ -421,9 +273,8 @@ export interface NotifyingFeature<
  * An abstract dynamic feature implementation that operates on documents (e.g. text
  * documents or notebooks).
  */
-export abstract class DynamicDocumentFeature<RO, MW, CO = object>
-	implements DynamicFeature<RO>
-{
+export abstract class DynamicDocumentFeature<RO, MW, CO = object> implements DynamicFeature<RO> {
+
 	protected readonly _client: FeatureClient<MW, CO>;
 
 	constructor(client: FeatureClient<MW, CO>) {
@@ -431,13 +282,8 @@ export abstract class DynamicDocumentFeature<RO, MW, CO = object>
 	}
 
 	// Repeat from interface.
-	public abstract fillClientCapabilities(
-		capabilities: ClientCapabilities,
-	): void;
-	public abstract initialize(
-		capabilities: ServerCapabilities,
-		documentSelector: DocumentSelector | undefined,
-	): void;
+	public abstract fillClientCapabilities(capabilities: ClientCapabilities): void;
+	public abstract initialize(capabilities: ServerCapabilities, documentSelector: DocumentSelector | undefined): void;
 	public abstract registrationType: RegistrationType<RO>;
 	public abstract register(data: RegistrationData<RO>): void;
 	public abstract unregister(id: string): void;
@@ -454,22 +300,13 @@ export abstract class DynamicDocumentFeature<RO, MW, CO = object>
 			count++;
 			for (const document of Workspace.textDocuments) {
 				if (Languages.match(selector, document) > 0) {
-					return {
-						kind: "document",
-						id: this.registrationType.method,
-						registrations: true,
-						matches: true,
-					};
+					return { kind: 'document', id: this.registrationType.method, registrations: true, matches: true };
 				}
 			}
 		}
 		const registrations = count > 0;
-		return {
-			kind: "document",
-			id: this.registrationType.method,
-			registrations,
-			matches: false,
-		};
+		return { kind: 'document', id: this.registrationType.method, registrations, matches: false };
+
 	}
 
 	protected abstract getDocumentSelectors(): IterableIterator<VDocumentSelector>;
@@ -486,43 +323,25 @@ export interface TextDocumentSendFeature<T extends Function> {
 	getProvider(document: TextDocument): { send: T } | undefined;
 }
 
+
 /**
  * An abstract base class to implement features that react to events
  * emitted from text documents.
  */
-export abstract class TextDocumentEventFeature<
-		P extends { textDocument: TextDocumentIdentifier },
-		E,
-		M,
-	>
-	extends DynamicDocumentFeature<TextDocumentRegistrationOptions, M>
-	implements
-		TextDocumentSendFeature<(data: E) => Promise<void>>,
-		NotifyingFeature<P>
-{
+export abstract class TextDocumentEventFeature<P extends { textDocument: TextDocumentIdentifier }, E, M> extends DynamicDocumentFeature<TextDocumentRegistrationOptions, M> implements TextDocumentSendFeature<(data: E) => Promise<void>>, NotifyingFeature<P> {
+
 	private readonly _event: Event<E>;
-	protected readonly _type: ProtocolNotificationType<
-		P,
-		TextDocumentRegistrationOptions
-	>;
-	protected readonly _middleware: () =>
-		| NextSignature<E, Promise<void>>
-		| undefined;
+	protected readonly _type: ProtocolNotificationType<P, TextDocumentRegistrationOptions>;
+	protected readonly _middleware: () => NextSignature<E, Promise<void>> | undefined;
 	protected readonly _createParams: CreateParamsSignature<E, P>;
 	protected readonly _textDocument: (data: E) => TextDocument;
-	protected readonly _selectorFilter?: (
-		selectors: IterableIterator<VDocumentSelector>,
-		data: E,
-	) => boolean;
+	protected readonly _selectorFilter?: (selectors: IterableIterator<VDocumentSelector>, data: E) => boolean;
 
 	private _listener: Disposable | undefined;
 	protected readonly _selectors: Map<string, VDocumentSelector>;
 	private _onNotificationSent: EventEmitter<NotificationSendEvent<P>>;
 
-	public static textDocumentFilter(
-		selectors: IterableIterator<VDocumentSelector>,
-		textDocument: TextDocument,
-	): boolean {
+	public static textDocumentFilter(selectors: IterableIterator<VDocumentSelector>, textDocument: TextDocument): boolean {
 		for (const selector of selectors) {
 			if (Languages.match(selector, textDocument) > 0) {
 				return true;
@@ -531,17 +350,10 @@ export abstract class TextDocumentEventFeature<
 		return false;
 	}
 
-	constructor(
-		client: FeatureClient<M>,
-		event: Event<E>,
-		type: ProtocolNotificationType<P, TextDocumentRegistrationOptions>,
-		middleware: () => NextSignature<E, Promise<void>> | undefined,
-		createParams: CreateParamsSignature<E, P>,
+	constructor(client: FeatureClient<M>, event: Event<E>, type: ProtocolNotificationType<P, TextDocumentRegistrationOptions>,
+		middleware: () => NextSignature<E, Promise<void>> | undefined, createParams: CreateParamsSignature<E, P>,
 		textDocument: (data: E) => TextDocument,
-		selectorFilter?: (
-			selectors: IterableIterator<VDocumentSelector>,
-			data: E,
-		) => boolean,
+		selectorFilter?: (selectors: IterableIterator<VDocumentSelector>, data: E) => boolean
 	) {
 		super(client);
 		this._event = event;
@@ -562,71 +374,45 @@ export abstract class TextDocumentEventFeature<
 		return this._selectors.values();
 	}
 
-	public register(
-		data: RegistrationData<TextDocumentRegistrationOptions>,
-	): void {
+	public register(data: RegistrationData<TextDocumentRegistrationOptions>): void {
+
 		if (!data.registerOptions.documentSelector) {
 			return;
 		}
 		if (!this._listener) {
 			this._listener = this._event((data) => {
 				this.callback(data).catch((error) => {
-					this._client.error(
-						`Sending document notification ${this._type.method} failed.`,
-						error,
-					);
+					this._client.error(`Sending document notification ${this._type.method} failed.`, error);
 				});
 			});
 		}
-		this._selectors.set(
-			data.id,
-			this._client.protocol2CodeConverter.asDocumentSelector(
-				data.registerOptions.documentSelector,
-			),
-		);
+		this._selectors.set(data.id, this._client.protocol2CodeConverter.asDocumentSelector(data.registerOptions.documentSelector));
 	}
 
 	protected async callback(data: E): Promise<void> {
 		const doSend = async (data: E): Promise<void> => {
 			const params = this._createParams(data);
 			await this._client.sendNotification(this._type, params);
-			this.notificationSent(
-				this.getTextDocument(data),
-				this._type,
-				params,
-			);
+			this.notificationSent(this.getTextDocument(data), this._type, params);
 		};
 		if (this.matches(data)) {
 			const middleware = this._middleware();
-			return middleware
-				? middleware(data, (data) => doSend(data))
-				: doSend(data);
+			return middleware ? middleware(data, (data) => doSend(data)) : doSend(data);
 		}
 	}
 
 	protected matches(data: E): boolean {
-		if (
-			this._client.hasDedicatedTextSynchronizationFeature(
-				this._textDocument(data),
-			)
-		) {
+		if (this._client.hasDedicatedTextSynchronizationFeature(this._textDocument(data))) {
 			return false;
 		}
-		return (
-			!this._selectorFilter ||
-			this._selectorFilter(this._selectors.values(), data)
-		);
+		return !this._selectorFilter || this._selectorFilter(this._selectors.values(), data);
 	}
 
 	public get onNotificationSent(): VEvent<NotificationSendEvent<P>> {
 		return this._onNotificationSent.event;
 	}
 
-	protected notificationSent(
-		textDocument: TextDocument,
-		type: ProtocolNotificationType<P, TextDocumentRegistrationOptions>,
-		params: P,
-	): void {
+	protected notificationSent(textDocument: TextDocument, type: ProtocolNotificationType<P, TextDocumentRegistrationOptions>, params: P): void {
 		this._onNotificationSent.fire({ textDocument, type, params });
 	}
 
@@ -650,15 +436,13 @@ export abstract class TextDocumentEventFeature<
 		}
 	}
 
-	public getProvider(
-		document: TextDocument,
-	): { send: (data: E) => Promise<void> } | undefined {
+	public getProvider(document: TextDocument):  { send: (data: E) => Promise<void> } | undefined {
 		for (const selector of this._selectors.values()) {
 			if (Languages.match(selector, document) > 0) {
 				return {
 					send: (data: E) => {
 						return this.callback(data);
-					},
+					}
 				};
 			}
 		}
@@ -691,26 +475,15 @@ export type DocumentSelectorOptions = {
  * A abstract feature implementation that registers language providers
  * for text documents using a given document selector.
  */
-export abstract class TextDocumentLanguageFeature<
-	PO,
-	RO extends TextDocumentRegistrationOptions & PO,
-	PR,
-	MW,
-	CO = object,
-> extends DynamicDocumentFeature<RO, MW, CO> {
-	private readonly _registrationType: RegistrationType<RO>;
-	private readonly _registrations: Map<
-		string,
-		TextDocumentFeatureRegistration<RO, PR>
-	>;
+export abstract class TextDocumentLanguageFeature<PO, RO extends TextDocumentRegistrationOptions & PO, PR, MW, CO = object> extends DynamicDocumentFeature<RO, MW, CO> {
 
-	constructor(
-		client: FeatureClient<MW, CO>,
-		registrationType: RegistrationType<RO>,
-	) {
+	private readonly _registrationType: RegistrationType<RO>;
+	private readonly _registrations: Map<string, TextDocumentFeatureRegistration<RO, PR>>;
+
+	constructor(client: FeatureClient<MW, CO>, registrationType: RegistrationType<RO>) {
 		super(client);
 		this._registrationType = registrationType;
-		this._registrations = new Map();
+		this._registrations =  new Map();
 	}
 
 	protected *getDocumentSelectors(): IterableIterator<VDocumentSelector> {
@@ -719,9 +492,7 @@ export abstract class TextDocumentLanguageFeature<
 			if (selector === null) {
 				continue;
 			}
-			yield this._client.protocol2CodeConverter.asDocumentSelector(
-				selector,
-			);
+			yield this._client.protocol2CodeConverter.asDocumentSelector(selector);
 		}
 	}
 
@@ -729,34 +500,19 @@ export abstract class TextDocumentLanguageFeature<
 		return this._registrationType;
 	}
 
-	public abstract fillClientCapabilities(
-		capabilities: ClientCapabilities,
-	): void;
+	public abstract fillClientCapabilities(capabilities: ClientCapabilities): void;
 
-	public abstract initialize(
-		capabilities: ServerCapabilities,
-		documentSelector: DocumentSelector,
-	): void;
+	public abstract initialize(capabilities: ServerCapabilities, documentSelector: DocumentSelector): void;
 
 	public register(data: RegistrationData<RO>): void {
 		if (!data.registerOptions.documentSelector) {
 			return;
 		}
-		const registration = this.registerLanguageProvider(
-			data.registerOptions,
-			data.id,
-		);
-		this._registrations.set(data.id, {
-			disposable: registration[0],
-			data,
-			provider: registration[1],
-		});
+		const registration = this.registerLanguageProvider(data.registerOptions, data.id);
+		this._registrations.set(data.id, { disposable: registration[0], data, provider: registration[1] });
 	}
 
-	protected abstract registerLanguageProvider(
-		options: RO,
-		id: string,
-	): [Disposable, PR];
+	protected abstract registerLanguageProvider(options: RO, id: string): [Disposable, PR];
 
 	public unregister(id: string): void {
 		const registration = this._registrations.get(id);
@@ -773,71 +529,36 @@ export abstract class TextDocumentLanguageFeature<
 		this._registrations.clear();
 	}
 
-	protected getRegistration(
-		documentSelector: DocumentSelector | undefined,
-		capability: undefined | PO | (RO & StaticRegistrationOptions),
-	): [
-		string | undefined,
-		(RO & { documentSelector: DocumentSelector }) | undefined,
-	] {
+	protected getRegistration(documentSelector: DocumentSelector | undefined, capability: undefined | PO | (RO & StaticRegistrationOptions)): [string | undefined, (RO & { documentSelector: DocumentSelector }) | undefined] {
 		if (!capability) {
 			return [undefined, undefined];
 		} else if (TextDocumentRegistrationOptions.is(capability)) {
-			const id = StaticRegistrationOptions.hasId(capability)
-				? capability.id
-				: UUID.generateUuid();
+			const id = StaticRegistrationOptions.hasId(capability) ? capability.id : UUID.generateUuid();
 			const selector = capability.documentSelector ?? documentSelector;
 			if (selector) {
-				return [
-					id,
-					Object.assign({}, capability, {
-						documentSelector: selector,
-					}),
-				];
+				return [id, Object.assign({}, capability, { documentSelector: selector })];
 			}
-		} else if (
-			(Is.boolean(capability) && capability === true) ||
-			WorkDoneProgressOptions.is(capability)
-		) {
+		} else if (Is.boolean(capability) && capability === true || WorkDoneProgressOptions.is(capability)) {
 			if (!documentSelector) {
 				return [undefined, undefined];
 			}
-			const options: RO & { documentSelector: DocumentSelector } = (
-				Is.boolean(capability) && capability === true
-					? { documentSelector }
-					: Object.assign({}, capability, { documentSelector })
-			) as any;
+			const options: RO & { documentSelector: DocumentSelector } = (Is.boolean(capability) && capability === true ? { documentSelector } : Object.assign({}, capability, { documentSelector })) as any;
 			return [UUID.generateUuid(), options];
 		}
 		return [undefined, undefined];
 	}
 
-	protected getRegistrationOptions(
-		documentSelector: DocumentSelector | undefined,
-		capability: undefined | PO,
-	): (RO & { documentSelector: DocumentSelector }) | undefined {
+	protected getRegistrationOptions(documentSelector: DocumentSelector | undefined, capability: undefined | PO) : (RO & { documentSelector: DocumentSelector }) | undefined {
 		if (!documentSelector || !capability) {
 			return undefined;
 		}
-		return (
-			Is.boolean(capability) && capability === true
-				? { documentSelector }
-				: Object.assign({}, capability, { documentSelector })
-		) as RO & { documentSelector: DocumentSelector };
+		return (Is.boolean(capability) && capability === true ? { documentSelector } : Object.assign({}, capability, { documentSelector })) as RO & { documentSelector: DocumentSelector };
 	}
 
 	public getProvider(textDocument: TextDocument): PR | undefined {
 		for (const registration of this._registrations.values()) {
 			const selector = registration.data.registerOptions.documentSelector;
-			if (
-				selector !== null &&
-				Languages.match(
-					this._client.protocol2CodeConverter.asDocumentSelector(
-						selector,
-					),
-					textDocument,
-				) > 0
-			) {
+			if (selector !== null && Languages.match(this._client.protocol2CodeConverter.asDocumentSelector(selector), textDocument) > 0) {
 				return registration.provider;
 			}
 		}
@@ -862,20 +583,13 @@ type WorkspaceFeatureRegistration<PR> = {
 	provider: PR;
 };
 
-export abstract class WorkspaceFeature<RO, PR, M>
-	implements DynamicFeature<RO>
-{
+export abstract class WorkspaceFeature<RO, PR, M> implements DynamicFeature<RO> {
+
 	protected readonly _client: FeatureClient<M>;
 	private readonly _registrationType: RegistrationType<RO>;
-	protected readonly _registrations: Map<
-		string,
-		WorkspaceFeatureRegistration<PR>
-	>;
+	protected readonly _registrations: Map<string, WorkspaceFeatureRegistration<PR>>;
 
-	constructor(
-		client: FeatureClient<M>,
-		registrationType: RegistrationType<RO>,
-	) {
+	constructor(client: FeatureClient<M>, registrationType: RegistrationType<RO>) {
 		this._client = client;
 		this._registrationType = registrationType;
 		this._registrations = new Map();
@@ -883,34 +597,20 @@ export abstract class WorkspaceFeature<RO, PR, M>
 
 	public getState(): FeatureState {
 		const registrations = this._registrations.size > 0;
-		return {
-			kind: "workspace",
-			id: this._registrationType.method,
-			registrations,
-		};
+		return { kind: 'workspace', id: this._registrationType.method, registrations };
 	}
 
 	public get registrationType(): RegistrationType<RO> {
 		return this._registrationType;
 	}
 
-	public abstract fillClientCapabilities(
-		capabilities: ClientCapabilities,
-	): void;
+	public abstract fillClientCapabilities(capabilities: ClientCapabilities): void;
 
-	public abstract initialize(
-		capabilities: ServerCapabilities,
-		documentSelector: DocumentSelector | undefined,
-	): void;
+	public abstract initialize(capabilities: ServerCapabilities, documentSelector: DocumentSelector | undefined): void;
 
 	public register(data: RegistrationData<RO>): void {
-		const registration = this.registerLanguageProvider(
-			data.registerOptions,
-		);
-		this._registrations.set(data.id, {
-			disposable: registration[0],
-			provider: registration[1],
-		});
+		const registration = this.registerLanguageProvider(data.registerOptions);
+		this._registrations.set(data.id, { disposable: registration[0], provider: registration[1] });
 	}
 
 	protected abstract registerLanguageProvider(options: RO): [Disposable, PR];
@@ -951,7 +651,20 @@ export interface TabsModel {
 	getTabResources(): Set<Uri>;
 }
 
+// Features can refer to other feature when implementing themselves.
+// Hence the feature client needs to provide access to them. To
+// avoid cyclic dependencies these import MUST ALL be type imports.
+import type { SemanticTokensProviderShape } from './semanticTokens';
+import type { DidChangeTextDocumentFeatureShape, DidCloseTextDocumentFeatureShape, DidOpenTextDocumentFeatureShape, DidSaveTextDocumentFeatureShape } from './textSynchronization';
+import type { CodeLensProviderShape } from './codeLens';
+import type { InlineValueProviderShape } from './inlineValue';
+import type { InlayHintsProviderShape } from './inlayHint';
+import type { DiagnosticFeatureShape, DiagnosticProviderShape } from './diagnostic';
+import type { NotebookDocumentProviderShape } from './notebook';
+import { FoldingRangeProviderShape } from './foldingRange';
+
 export interface FeatureClient<M, CO = object> {
+
 	protocol2CodeConverter: p2c.Converter;
 	code2ProtocolConverter: c2p.Converter;
 
@@ -964,284 +677,83 @@ export interface FeatureClient<M, CO = object> {
 	isRunning(): boolean;
 	stop(): Promise<void>;
 
-	sendRequest<R, PR, E, RO>(
-		type: ProtocolRequestType0<R, PR, E, RO>,
-		token?: CancellationToken,
-	): Promise<R>;
-	sendRequest<P, R, PR, E, RO>(
-		type: ProtocolRequestType<P, R, PR, E, RO>,
-		params: P,
-		token?: CancellationToken,
-	): Promise<R>;
-	sendRequest<R, E>(
-		type: RequestType0<R, E>,
-		token?: CancellationToken,
-	): Promise<R>;
-	sendRequest<P, R, E>(
-		type: RequestType<P, R, E>,
-		params: P,
-		token?: CancellationToken,
-	): Promise<R>;
+	sendRequest<R, PR, E, RO>(type: ProtocolRequestType0<R, PR, E, RO>, token?: CancellationToken): Promise<R>;
+	sendRequest<P, R, PR, E, RO>(type: ProtocolRequestType<P, R, PR, E, RO>, params: P, token?: CancellationToken): Promise<R>;
+	sendRequest<R, E>(type: RequestType0<R, E>, token?: CancellationToken): Promise<R>;
+	sendRequest<P, R, E>(type: RequestType<P, R, E>, params: P, token?: CancellationToken): Promise<R>;
 	sendRequest<R>(method: string, token?: CancellationToken): Promise<R>;
-	sendRequest<R>(
-		method: string,
-		param: any,
-		token?: CancellationToken,
-	): Promise<R>;
+	sendRequest<R>(method: string, param: any, token?: CancellationToken): Promise<R>;
 
-	onRequest<R, PR, E, RO>(
-		type: ProtocolRequestType0<R, PR, E, RO>,
-		handler: RequestHandler0<R, E>,
-	): Disposable;
-	onRequest<P, R, PR, E, RO>(
-		type: ProtocolRequestType<P, R, PR, E, RO>,
-		handler: RequestHandler<P, R, E>,
-	): Disposable;
-	onRequest<R, E>(
-		type: RequestType0<R, E>,
-		handler: RequestHandler0<R, E>,
-	): Disposable;
-	onRequest<P, R, E>(
-		type: RequestType<P, R, E>,
-		handler: RequestHandler<P, R, E>,
-	): Disposable;
-	onRequest<R, E>(
-		method: string,
-		handler: GenericRequestHandler<R, E>,
-	): Disposable;
+	onRequest<R, PR, E, RO>(type: ProtocolRequestType0<R, PR, E, RO>, handler: RequestHandler0<R, E>): Disposable;
+	onRequest<P, R, PR, E, RO>(type: ProtocolRequestType<P, R, PR, E, RO>, handler: RequestHandler<P, R, E>): Disposable;
+	onRequest<R, E>(type: RequestType0<R, E>, handler: RequestHandler0<R, E>): Disposable;
+	onRequest<P, R, E>(type: RequestType<P, R, E>, handler: RequestHandler<P, R, E>): Disposable;
+	onRequest<R, E>(method: string, handler: GenericRequestHandler<R, E>): Disposable;
 
 	sendNotification<RO>(type: ProtocolNotificationType0<RO>): Promise<void>;
-	sendNotification<P, RO>(
-		type: ProtocolNotificationType<P, RO>,
-		params?: P,
-	): Promise<void>;
+	sendNotification<P, RO>(type: ProtocolNotificationType<P, RO>, params?: P): Promise<void>;
 	sendNotification(type: NotificationType0): Promise<void>;
 	sendNotification<P>(type: NotificationType<P>, params?: P): Promise<void>;
 	sendNotification(method: string): Promise<void>;
 	sendNotification(method: string, params: any): Promise<void>;
 
-	onNotification<RO>(
-		type: ProtocolNotificationType0<RO>,
-		handler: NotificationHandler0,
-	): Disposable;
-	onNotification<P, RO>(
-		type: ProtocolNotificationType<P, RO>,
-		handler: NotificationHandler<P>,
-	): Disposable;
-	onNotification(
-		type: NotificationType0,
-		handler: NotificationHandler0,
-	): Disposable;
-	onNotification<P>(
-		type: NotificationType<P>,
-		handler: NotificationHandler<P>,
-	): Disposable;
-	onNotification(
-		method: string,
-		handler: GenericNotificationHandler,
-	): Disposable;
+	onNotification<RO>(type: ProtocolNotificationType0<RO>, handler: NotificationHandler0): Disposable;
+	onNotification<P, RO>(type: ProtocolNotificationType<P, RO>, handler: NotificationHandler<P>): Disposable;
+	onNotification(type: NotificationType0, handler: NotificationHandler0): Disposable;
+	onNotification<P>(type: NotificationType<P>, handler: NotificationHandler<P>): Disposable;
+	onNotification(method: string, handler: GenericNotificationHandler): Disposable;
 
-	onProgress<P>(
-		type: ProgressType<P>,
-		token: string | number,
-		handler: NotificationHandler<P>,
-	): Disposable;
+	onProgress<P>(type: ProgressType<P>, token: string | number, handler: NotificationHandler<P>): Disposable;
 
 	info(message: string, data?: any, showNotification?: boolean): void;
 	warn(message: string, data?: any, showNotification?: boolean): void;
-	error(
-		message: string,
-		data?: any,
-		showNotification?: boolean | "force",
-	): void;
+	error(message: string, data?: any, showNotification?: boolean | 'force'): void;
 
-	handleFailedRequest<T>(
-		type: MessageSignature,
-		token: CancellationToken | undefined,
-		error: any,
-		defaultValue: T,
-		showNotification?: boolean,
-		throwOnCancel?: boolean,
-	): T;
+	handleFailedRequest<T>(type: MessageSignature, token: CancellationToken | undefined, error: any, defaultValue: T, showNotification?: boolean, throwOnCancel?: boolean): T;
 
 	hasDedicatedTextSynchronizationFeature(textDocument: TextDocument): boolean;
 
-	getFeature(
-		request: typeof DidOpenTextDocumentNotification.method,
-	): DidOpenTextDocumentFeatureShape;
-	getFeature(
-		request: typeof DidChangeTextDocumentNotification.method,
-	): DidChangeTextDocumentFeatureShape;
-	getFeature(
-		request: typeof WillSaveTextDocumentNotification.method,
-	): DynamicFeature<TextDocumentRegistrationOptions> &
-		TextDocumentSendFeature<(textDocument: TextDocument) => Promise<void>>;
-	getFeature(
-		request: typeof WillSaveTextDocumentWaitUntilRequest.method,
-	): DynamicFeature<TextDocumentRegistrationOptions> &
-		TextDocumentSendFeature<
-			(textDocument: TextDocument) => ProviderResult<VTextEdit[]>
-		>;
-	getFeature(
-		request: typeof DidSaveTextDocumentNotification.method,
-	): DidSaveTextDocumentFeatureShape;
-	getFeature(
-		request: typeof DidCloseTextDocumentNotification.method,
-	): DidCloseTextDocumentFeatureShape;
-	getFeature(
-		request: typeof DidCreateFilesNotification.method,
-	): DynamicFeature<FileOperationRegistrationOptions> & {
-		send: (event: FileCreateEvent) => Promise<void>;
-	};
-	getFeature(
-		request: typeof DidRenameFilesNotification.method,
-	): DynamicFeature<FileOperationRegistrationOptions> & {
-		send: (event: FileRenameEvent) => Promise<void>;
-	};
-	getFeature(
-		request: typeof DidDeleteFilesNotification.method,
-	): DynamicFeature<FileOperationRegistrationOptions> & {
-		send: (event: FileDeleteEvent) => Promise<void>;
-	};
-	getFeature(
-		request: typeof WillCreateFilesRequest.method,
-	): DynamicFeature<FileOperationRegistrationOptions> & {
-		send: (event: FileWillCreateEvent) => Promise<void>;
-	};
-	getFeature(
-		request: typeof WillRenameFilesRequest.method,
-	): DynamicFeature<FileOperationRegistrationOptions> & {
-		send: (event: FileWillRenameEvent) => Promise<void>;
-	};
-	getFeature(
-		request: typeof WillDeleteFilesRequest.method,
-	): DynamicFeature<FileOperationRegistrationOptions> & {
-		send: (event: FileWillDeleteEvent) => Promise<void>;
-	};
-	getFeature(
-		request: typeof CompletionRequest.method,
-	): DynamicFeature<TextDocumentRegistrationOptions> &
-		TextDocumentProviderFeature<CompletionItemProvider>;
-	getFeature(
-		request: typeof HoverRequest.method,
-	): DynamicFeature<TextDocumentRegistrationOptions> &
-		TextDocumentProviderFeature<HoverProvider>;
-	getFeature(
-		request: typeof SignatureHelpRequest.method,
-	): DynamicFeature<TextDocumentRegistrationOptions> &
-		TextDocumentProviderFeature<SignatureHelpProvider>;
-	getFeature(
-		request: typeof DefinitionRequest.method,
-	): DynamicFeature<TextDocumentRegistrationOptions> &
-		TextDocumentProviderFeature<DefinitionProvider>;
-	getFeature(
-		request: typeof ReferencesRequest.method,
-	): DynamicFeature<TextDocumentRegistrationOptions> &
-		TextDocumentProviderFeature<ReferenceProvider>;
-	getFeature(
-		request: typeof DocumentHighlightRequest.method,
-	): DynamicFeature<TextDocumentRegistrationOptions> &
-		TextDocumentProviderFeature<DocumentHighlightProvider>;
-	getFeature(
-		request: typeof CodeActionRequest.method,
-	): DynamicFeature<TextDocumentRegistrationOptions> &
-		TextDocumentProviderFeature<CodeActionProvider>;
-	getFeature(
-		request: typeof CodeLensRequest.method,
-	): DynamicFeature<TextDocumentRegistrationOptions> &
-		TextDocumentProviderFeature<CodeLensProviderShape>;
-	getFeature(
-		request: typeof DocumentFormattingRequest.method,
-	): DynamicFeature<TextDocumentRegistrationOptions> &
-		TextDocumentProviderFeature<DocumentFormattingEditProvider>;
-	getFeature(
-		request: typeof DocumentRangeFormattingRequest.method,
-	): DynamicFeature<TextDocumentRegistrationOptions> &
-		TextDocumentProviderFeature<DocumentRangeFormattingEditProvider>;
-	getFeature(
-		request: typeof DocumentOnTypeFormattingRequest.method,
-	): DynamicFeature<TextDocumentRegistrationOptions> &
-		TextDocumentProviderFeature<OnTypeFormattingEditProvider>;
-	getFeature(
-		request: typeof RenameRequest.method,
-	): DynamicFeature<TextDocumentRegistrationOptions> &
-		TextDocumentProviderFeature<RenameProvider>;
-	getFeature(
-		request: typeof DocumentSymbolRequest.method,
-	): DynamicFeature<TextDocumentRegistrationOptions> &
-		TextDocumentProviderFeature<DocumentSymbolProvider>;
-	getFeature(
-		request: typeof DocumentLinkRequest.method,
-	): DynamicFeature<TextDocumentRegistrationOptions> &
-		TextDocumentProviderFeature<DocumentLinkProvider>;
-	getFeature(
-		request: typeof DocumentColorRequest.method,
-	): DynamicFeature<TextDocumentRegistrationOptions> &
-		TextDocumentProviderFeature<DocumentColorProvider>;
-	getFeature(
-		request: typeof DeclarationRequest.method,
-	): DynamicFeature<TextDocumentRegistrationOptions> &
-		TextDocumentProviderFeature<DeclarationProvider>;
-	getFeature(
-		request: typeof FoldingRangeRequest.method,
-	): DynamicFeature<TextDocumentRegistrationOptions> &
-		TextDocumentProviderFeature<FoldingRangeProviderShape>;
-	getFeature(
-		request: typeof ImplementationRequest.method,
-	): DynamicFeature<TextDocumentRegistrationOptions> &
-		TextDocumentProviderFeature<ImplementationProvider>;
-	getFeature(
-		request: typeof SelectionRangeRequest.method,
-	): DynamicFeature<TextDocumentRegistrationOptions> &
-		TextDocumentProviderFeature<SelectionRangeProvider>;
-	getFeature(
-		request: typeof TypeDefinitionRequest.method,
-	): DynamicFeature<TextDocumentRegistrationOptions> &
-		TextDocumentProviderFeature<TypeDefinitionProvider>;
-	getFeature(
-		request: typeof CallHierarchyPrepareRequest.method,
-	): DynamicFeature<TextDocumentRegistrationOptions> &
-		TextDocumentProviderFeature<CallHierarchyProvider>;
-	getFeature(
-		request: typeof SemanticTokensRegistrationType.method,
-	): DynamicFeature<TextDocumentRegistrationOptions> &
-		TextDocumentProviderFeature<SemanticTokensProviderShape>;
-	getFeature(
-		request: typeof LinkedEditingRangeRequest.method,
-	): DynamicFeature<TextDocumentRegistrationOptions> &
-		TextDocumentProviderFeature<LinkedEditingRangeProvider>;
-	getFeature(
-		request: typeof TypeHierarchyPrepareRequest.method,
-	): DynamicFeature<TextDocumentRegistrationOptions> &
-		TextDocumentProviderFeature<TypeHierarchyProvider>;
-	getFeature(
-		request: typeof InlineValueRequest.method,
-	): DynamicFeature<TextDocumentRegistrationOptions> &
-		TextDocumentProviderFeature<InlineValueProviderShape>;
-	getFeature(
-		request: typeof InlayHintRequest.method,
-	): DynamicFeature<TextDocumentRegistrationOptions> &
-		TextDocumentProviderFeature<InlayHintsProviderShape>;
-	getFeature(
-		request: typeof WorkspaceSymbolRequest.method,
-	): DynamicFeature<TextDocumentRegistrationOptions> &
-		WorkspaceProviderFeature<WorkspaceSymbolProvider>;
-	getFeature(
-		request: typeof DocumentDiagnosticRequest.method,
-	): DynamicFeature<TextDocumentRegistrationOptions> &
-		TextDocumentProviderFeature<DiagnosticProviderShape> &
-		DiagnosticFeatureShape;
-	getFeature(
-		request: typeof NotebookDocumentSyncRegistrationType.method,
-	): DynamicFeature<NotebookDocumentSyncRegistrationOptions> &
-		NotebookDocumentProviderShape;
-	getFeature(
-		request: typeof InlineCompletionRequest.method,
-	):
-		| (DynamicFeature<InlineCompletionRegistrationOptions> &
-				TextDocumentProviderFeature<InlineCompletionItemProvider>)
-		| undefined;
-	getFeature(
-		request: typeof ExecuteCommandRequest.method,
-	): DynamicFeature<ExecuteCommandOptions>;
+	getFeature(request: typeof DidOpenTextDocumentNotification.method): DidOpenTextDocumentFeatureShape;
+	getFeature(request: typeof DidChangeTextDocumentNotification.method): DidChangeTextDocumentFeatureShape;
+	getFeature(request: typeof WillSaveTextDocumentNotification.method): DynamicFeature<TextDocumentRegistrationOptions> & TextDocumentSendFeature<(textDocument: TextDocument) => Promise<void>>;
+	getFeature(request: typeof WillSaveTextDocumentWaitUntilRequest.method): DynamicFeature<TextDocumentRegistrationOptions> & TextDocumentSendFeature<(textDocument: TextDocument) => ProviderResult<VTextEdit[]>>;
+	getFeature(request: typeof DidSaveTextDocumentNotification.method): DidSaveTextDocumentFeatureShape;
+	getFeature(request: typeof DidCloseTextDocumentNotification.method): DidCloseTextDocumentFeatureShape;
+	getFeature(request: typeof DidCreateFilesNotification.method): DynamicFeature<FileOperationRegistrationOptions> & { send: (event: FileCreateEvent) => Promise<void> };
+	getFeature(request: typeof DidRenameFilesNotification.method): DynamicFeature<FileOperationRegistrationOptions> & { send: (event: FileRenameEvent) => Promise<void> };
+	getFeature(request: typeof DidDeleteFilesNotification.method): DynamicFeature<FileOperationRegistrationOptions> & { send: (event: FileDeleteEvent) => Promise<void> };
+	getFeature(request: typeof WillCreateFilesRequest.method): DynamicFeature<FileOperationRegistrationOptions> & { send: (event: FileWillCreateEvent) => Promise<void> };
+	getFeature(request: typeof WillRenameFilesRequest.method): DynamicFeature<FileOperationRegistrationOptions> & { send: (event: FileWillRenameEvent) => Promise<void> };
+	getFeature(request: typeof WillDeleteFilesRequest.method): DynamicFeature<FileOperationRegistrationOptions> & { send: (event: FileWillDeleteEvent) => Promise<void> };
+	getFeature(request: typeof CompletionRequest.method): DynamicFeature<TextDocumentRegistrationOptions> & TextDocumentProviderFeature<CompletionItemProvider>;
+	getFeature(request: typeof HoverRequest.method): DynamicFeature<TextDocumentRegistrationOptions> & TextDocumentProviderFeature<HoverProvider>;
+	getFeature(request: typeof SignatureHelpRequest.method): DynamicFeature<TextDocumentRegistrationOptions> & TextDocumentProviderFeature<SignatureHelpProvider>;
+	getFeature(request: typeof DefinitionRequest.method): DynamicFeature<TextDocumentRegistrationOptions> & TextDocumentProviderFeature<DefinitionProvider>;
+	getFeature(request: typeof ReferencesRequest.method): DynamicFeature<TextDocumentRegistrationOptions> & TextDocumentProviderFeature<ReferenceProvider>;
+	getFeature(request: typeof DocumentHighlightRequest.method): DynamicFeature<TextDocumentRegistrationOptions> & TextDocumentProviderFeature<DocumentHighlightProvider>;
+	getFeature(request: typeof CodeActionRequest.method): DynamicFeature<TextDocumentRegistrationOptions> & TextDocumentProviderFeature<CodeActionProvider>;
+	getFeature(request: typeof CodeLensRequest.method): DynamicFeature<TextDocumentRegistrationOptions> & TextDocumentProviderFeature<CodeLensProviderShape>;
+	getFeature(request: typeof DocumentFormattingRequest.method): DynamicFeature<TextDocumentRegistrationOptions> & TextDocumentProviderFeature<DocumentFormattingEditProvider>;
+	getFeature(request: typeof DocumentRangeFormattingRequest.method): DynamicFeature<TextDocumentRegistrationOptions> & TextDocumentProviderFeature<DocumentRangeFormattingEditProvider>;
+	getFeature(request: typeof DocumentOnTypeFormattingRequest.method): DynamicFeature<TextDocumentRegistrationOptions> & TextDocumentProviderFeature<OnTypeFormattingEditProvider>;
+	getFeature(request: typeof RenameRequest.method): DynamicFeature<TextDocumentRegistrationOptions> & TextDocumentProviderFeature<RenameProvider>;
+	getFeature(request: typeof DocumentSymbolRequest.method): DynamicFeature<TextDocumentRegistrationOptions> & TextDocumentProviderFeature<DocumentSymbolProvider>;
+	getFeature(request: typeof DocumentLinkRequest.method): DynamicFeature<TextDocumentRegistrationOptions> & TextDocumentProviderFeature<DocumentLinkProvider>;
+	getFeature(request: typeof DocumentColorRequest.method): DynamicFeature<TextDocumentRegistrationOptions> & TextDocumentProviderFeature<DocumentColorProvider>;
+	getFeature(request: typeof DeclarationRequest.method): DynamicFeature<TextDocumentRegistrationOptions> & TextDocumentProviderFeature<DeclarationProvider>;
+	getFeature(request: typeof FoldingRangeRequest.method): DynamicFeature<TextDocumentRegistrationOptions> & TextDocumentProviderFeature<FoldingRangeProviderShape>;
+	getFeature(request: typeof ImplementationRequest.method): DynamicFeature<TextDocumentRegistrationOptions> & TextDocumentProviderFeature<ImplementationProvider>;
+	getFeature(request: typeof SelectionRangeRequest.method): DynamicFeature<TextDocumentRegistrationOptions> & TextDocumentProviderFeature<SelectionRangeProvider>;
+	getFeature(request: typeof TypeDefinitionRequest.method): DynamicFeature<TextDocumentRegistrationOptions> & TextDocumentProviderFeature<TypeDefinitionProvider>;
+	getFeature(request: typeof CallHierarchyPrepareRequest.method): DynamicFeature<TextDocumentRegistrationOptions> & TextDocumentProviderFeature<CallHierarchyProvider>;
+	getFeature(request: typeof SemanticTokensRegistrationType.method): DynamicFeature<TextDocumentRegistrationOptions> & TextDocumentProviderFeature<SemanticTokensProviderShape>;
+	getFeature(request: typeof LinkedEditingRangeRequest.method): DynamicFeature<TextDocumentRegistrationOptions> & TextDocumentProviderFeature<LinkedEditingRangeProvider>;
+	getFeature(request: typeof TypeHierarchyPrepareRequest.method): DynamicFeature<TextDocumentRegistrationOptions> & TextDocumentProviderFeature<TypeHierarchyProvider>;
+	getFeature(request: typeof InlineValueRequest.method): DynamicFeature<TextDocumentRegistrationOptions> & TextDocumentProviderFeature<InlineValueProviderShape>;
+	getFeature(request: typeof InlayHintRequest.method): DynamicFeature<TextDocumentRegistrationOptions> & TextDocumentProviderFeature<InlayHintsProviderShape>;
+	getFeature(request: typeof WorkspaceSymbolRequest.method): DynamicFeature<TextDocumentRegistrationOptions> & WorkspaceProviderFeature<WorkspaceSymbolProvider>;
+	getFeature(request: typeof DocumentDiagnosticRequest.method): DynamicFeature<TextDocumentRegistrationOptions> & TextDocumentProviderFeature<DiagnosticProviderShape> & DiagnosticFeatureShape;
+	getFeature(request: typeof NotebookDocumentSyncRegistrationType.method): DynamicFeature<NotebookDocumentSyncRegistrationOptions> & NotebookDocumentProviderShape;
+	getFeature(request: typeof InlineCompletionRequest.method): (DynamicFeature<InlineCompletionRegistrationOptions> & TextDocumentProviderFeature<InlineCompletionItemProvider>) | undefined;
+	getFeature(request: typeof ExecuteCommandRequest.method): DynamicFeature<ExecuteCommandOptions>;
 }

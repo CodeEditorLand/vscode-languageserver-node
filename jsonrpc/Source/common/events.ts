@@ -3,43 +3,35 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import { Disposable } from "./disposable";
-import RAL from "./ral";
+import RAL from './ral';
+import { Disposable } from './disposable';
 
 /**
  * Represents a typed event.
  */
 export interface Event<T> {
+
 	/**
 	 *
 	 * @param listener The listener function will be called when the event happens.
 	 * @param thisArgs The 'this' which will be used when calling the event listener.
 	 * @param disposables An array to which a {{IDisposable}} will be added.
 	 * @return
-	 */
-	(
-		listener: (e: T) => any,
-		thisArgs?: any,
-		disposables?: Disposable[],
-	): Disposable;
+	*/
+	(listener: (e: T) => any, thisArgs?: any, disposables?: Disposable[]): Disposable;
 }
 
 export namespace Event {
-	const _disposable = { dispose() {} };
-	export const None: Event<any> = function () {
-		return _disposable;
-	};
+	const _disposable = { dispose() { } };
+	export const None: Event<any> = function () { return _disposable; };
 }
 
 class CallbackList {
+
 	private _callbacks: Function[] | undefined;
 	private _contexts: any[] | undefined;
 
-	public add(
-		callback: Function,
-		context: any = null,
-		bucket?: Disposable[],
-	): void {
+	public add(callback: Function, context: any = null, bucket?: Disposable[]): void {
 		if (!this._callbacks) {
 			this._callbacks = [];
 			this._contexts = [];
@@ -72,9 +64,7 @@ class CallbackList {
 		}
 
 		if (foundCallbackWithDifferentContext) {
-			throw new Error(
-				"When adding a listener with a context, you should remove it with the same context",
-			);
+			throw new Error('When adding a listener with a context, you should remove it with the same context');
 		}
 	}
 
@@ -114,12 +104,14 @@ export interface EmitterOptions {
 }
 
 export class Emitter<T> {
-	private static _noop = function () {};
+
+	private static _noop = function () { };
 
 	private _event: Event<T> | undefined;
 	private _callbacks: CallbackList | undefined;
 
-	constructor(private _options?: EmitterOptions) {}
+	constructor(private _options?: EmitterOptions) {
+	}
 
 	/**
 	 * For the public to allow to subscribe
@@ -127,19 +119,11 @@ export class Emitter<T> {
 	 */
 	get event(): Event<T> {
 		if (!this._event) {
-			this._event = (
-				listener: (e: T) => any,
-				thisArgs?: any,
-				disposables?: Disposable[],
-			) => {
+			this._event = (listener: (e: T) => any, thisArgs?: any, disposables?: Disposable[]) => {
 				if (!this._callbacks) {
 					this._callbacks = new CallbackList();
 				}
-				if (
-					this._options &&
-					this._options.onFirstListenerAdd &&
-					this._callbacks.isEmpty()
-				) {
+				if (this._options && this._options.onFirstListenerAdd && this._callbacks.isEmpty()) {
 					this._options.onFirstListenerAdd(this);
 				}
 				this._callbacks.add(listener, thisArgs);
@@ -153,14 +137,10 @@ export class Emitter<T> {
 
 						this._callbacks.remove(listener, thisArgs);
 						result.dispose = Emitter._noop;
-						if (
-							this._options &&
-							this._options.onLastListenerRemove &&
-							this._callbacks.isEmpty()
-						) {
+						if (this._options && this._options.onLastListenerRemove && this._callbacks.isEmpty()) {
 							this._options.onLastListenerRemove(this);
 						}
-					},
+					}
 				};
 				if (Array.isArray(disposables)) {
 					disposables.push(result);

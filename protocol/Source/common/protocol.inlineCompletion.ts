@@ -3,21 +3,11 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { RequestHandler } from "vscode-jsonrpc";
-import {
-	InlineCompletionContext,
-	InlineCompletionItem,
-	InlineCompletionList,
-} from "vscode-languageserver-types";
+import { InlineCompletionItem, InlineCompletionContext, InlineCompletionList } from 'vscode-languageserver-types';
+import { RequestHandler } from 'vscode-jsonrpc';
 
-import { MessageDirection, ProtocolRequestType } from "./messages";
-import type {
-	StaticRegistrationOptions,
-	TextDocumentPositionParams,
-	TextDocumentRegistrationOptions,
-	WorkDoneProgressOptions,
-	WorkDoneProgressParams,
-} from "./protocol";
+import { MessageDirection, ProtocolRequestType } from './messages';
+import type { TextDocumentRegistrationOptions, WorkDoneProgressOptions, StaticRegistrationOptions, WorkDoneProgressParams, TextDocumentPositionParams } from './protocol';
 
 // ---- capabilities
 
@@ -48,9 +38,7 @@ export type InlineCompletionOptions = WorkDoneProgressOptions;
  * @since 3.18.0
  * @proposed
  */
-export type InlineCompletionRegistrationOptions = InlineCompletionOptions &
-	TextDocumentRegistrationOptions &
-	StaticRegistrationOptions;
+export type InlineCompletionRegistrationOptions = InlineCompletionOptions & TextDocumentRegistrationOptions & StaticRegistrationOptions;
 
 /**
  * A parameter literal used in inline completion requests.
@@ -58,14 +46,13 @@ export type InlineCompletionRegistrationOptions = InlineCompletionOptions &
  * @since 3.18.0
  * @proposed
  */
-export type InlineCompletionParams = WorkDoneProgressParams &
-	TextDocumentPositionParams & {
-		/**
-		 * Additional information about the context in which inline completions were
-		 * requested.
-		 */
-		context: InlineCompletionContext;
-	};
+export type InlineCompletionParams = WorkDoneProgressParams & TextDocumentPositionParams & {
+	/**
+	 * Additional information about the context in which inline completions were
+	 * requested.
+	 */
+	context: InlineCompletionContext;
+};
 
 /**
  * A request to provide inline completions in a document. The request's parameter is of
@@ -76,20 +63,8 @@ export type InlineCompletionParams = WorkDoneProgressParams &
  * @proposed
  */
 export namespace InlineCompletionRequest {
-	export const method: "textDocument/inlineCompletion" =
-		"textDocument/inlineCompletion";
-	export const messageDirection: MessageDirection =
-		MessageDirection.clientToServer;
-	export const type = new ProtocolRequestType<
-		InlineCompletionParams,
-		InlineCompletionList | InlineCompletionItem[] | null,
-		InlineCompletionItem[],
-		void,
-		InlineCompletionRegistrationOptions
-	>(method);
-	export type HandlerSignature = RequestHandler<
-		InlineCompletionParams,
-		InlineCompletionList | InlineCompletionItem[] | null,
-		void
-	>;
+	export const method: 'textDocument/inlineCompletion' = 'textDocument/inlineCompletion';
+	export const messageDirection: MessageDirection = MessageDirection.clientToServer;
+	export const type = new ProtocolRequestType<InlineCompletionParams, InlineCompletionList | InlineCompletionItem[] | null, InlineCompletionItem[], void, InlineCompletionRegistrationOptions>(method);
+	export type HandlerSignature = RequestHandler<InlineCompletionParams, InlineCompletionList | InlineCompletionItem[] | null, void>;
 }

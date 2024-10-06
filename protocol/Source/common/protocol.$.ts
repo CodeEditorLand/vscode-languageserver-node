@@ -3,48 +3,29 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import {
-	ErrorCodes,
-	LogTraceParams,
-	ProgressToken,
-	SetTraceParams,
-} from "vscode-jsonrpc";
-import {
-	LSPAny,
-	SemanticTokenModifiers,
-	SemanticTokenTypes,
-} from "vscode-languageserver-types";
+import { LogTraceParams, SetTraceParams, ProgressToken, ErrorCodes } from 'vscode-jsonrpc';
+import { SemanticTokenTypes, SemanticTokenModifiers, LSPAny } from 'vscode-languageserver-types';
 
-import { LSPErrorCodes } from "./api";
-import { MessageDirection, ProtocolNotificationType } from "./messages";
-import { DocumentDiagnosticReportKind } from "./protocol.diagnostic";
-import {
-	WorkDoneProgressBegin,
-	WorkDoneProgressEnd,
-	WorkDoneProgressReport,
-} from "./protocol.progress";
+import { MessageDirection, ProtocolNotificationType } from './messages';
+import { LSPErrorCodes } from './api';
+import { WorkDoneProgressBegin, WorkDoneProgressEnd, WorkDoneProgressReport } from './protocol.progress';
+import { DocumentDiagnosticReportKind } from './protocol.diagnostic';
 
 // This file is used to define the $ notification partly specified in JSON-RPC
 // so that we generate proper data for them in the meta model.
 
 // @ts-ignore 6196
 namespace SetTraceNotification {
-	export const method: "$/setTrace" = "$/setTrace";
-	export const messageDirection: MessageDirection =
-		MessageDirection.clientToServer;
-	export const type = new ProtocolNotificationType<SetTraceParams, void>(
-		method,
-	);
+	export const method: '$/setTrace' = '$/setTrace';
+	export const messageDirection: MessageDirection = MessageDirection.clientToServer;
+	export const type = new ProtocolNotificationType<SetTraceParams, void>(method);
 }
 
 // @ts-ignore 6196
 namespace LogTraceNotification {
-	export const method: "$/logTrace" = "$/logTrace";
-	export const messageDirection: MessageDirection =
-		MessageDirection.serverToClient;
-	export const type = new ProtocolNotificationType<LogTraceParams, void>(
-		method,
-	);
+	export const method: '$/logTrace' = '$/logTrace';
+	export const messageDirection: MessageDirection = MessageDirection.serverToClient;
+	export const type = new ProtocolNotificationType<LogTraceParams, void>(method);
 }
 
 // @ts-ignore 6196
@@ -71,11 +52,9 @@ interface CancelParams {
 
 // @ts-ignore 6196
 namespace CancelNotification {
-	export const method: "$/cancelRequest" = "$/cancelRequest";
+	export const method: '$/cancelRequest' = '$/cancelRequest';
 	export const messageDirection: MessageDirection = MessageDirection.both;
-	export const type = new ProtocolNotificationType<CancelParams, void>(
-		method,
-	);
+	export const type = new ProtocolNotificationType<CancelParams, void>(method);
 }
 
 interface ProgressParams {
@@ -92,11 +71,9 @@ interface ProgressParams {
 
 // @ts-ignore 6196
 namespace ProgressNotification {
-	export const method: "$/progress" = "$/progress";
+	export const method: '$/progress' = '$/progress';
 	export const messageDirection: MessageDirection = MessageDirection.both;
-	export const type = new ProtocolNotificationType<ProgressParams, void>(
-		method,
-	);
+	export const type = new ProtocolNotificationType<ProgressParams, void>(method);
 }
 
 // @ts-ignore 6196

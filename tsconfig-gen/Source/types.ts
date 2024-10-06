@@ -3,27 +3,12 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import {
-	ImportsNotUsedAsValues,
-	JsxEmit,
-	ModuleDetectionKind,
-	ModuleKind,
-	ModuleResolutionKind,
-	NewLineKind,
-	ScriptTarget,
-	CompilerOptions as TCompilerOptions,
-} from "typescript";
+import { CompilerOptions as TCompilerOptions, ImportsNotUsedAsValues, JsxEmit, ModuleKind, ModuleResolutionKind, ModuleDetectionKind, NewLineKind, ScriptTarget } from 'typescript';
 
-type ConvertCompilerOptionsValue<T> = T extends
-	| ImportsNotUsedAsValues
-	| JsxEmit
-	| ModuleKind
-	| ModuleResolutionKind
-	| ModuleDetectionKind
-	| NewLineKind
-	| ScriptTarget
-	? string
-	: T;
+type ConvertCompilerOptionsValue<T> =
+	T extends ImportsNotUsedAsValues | JsxEmit | ModuleKind | ModuleResolutionKind | ModuleDetectionKind | NewLineKind | ScriptTarget
+		? string
+		: T;
 
 type CompilerOptionsMap<T extends TCompilerOptions> = {
 	[k in keyof T]: ConvertCompilerOptionsValue<T[k]>;
@@ -32,27 +17,12 @@ type CompilerOptionsMap<T extends TCompilerOptions> = {
 export type CompilerOptions = CompilerOptionsMap<TCompilerOptions>;
 
 export namespace CompilerOptions {
-	export function assign(
-		opt1: CompilerOptions,
-		opt2: CompilerOptions,
-	): CompilerOptions;
-	export function assign(
-		opt1: CompilerOptions,
-		opt2: CompilerOptions | undefined,
-	): CompilerOptions;
-	export function assign(
-		opt1: CompilerOptions | undefined,
-		opt2: CompilerOptions,
-	): CompilerOptions;
+	export function assign(opt1: CompilerOptions, opt2: CompilerOptions): CompilerOptions;
+	export function assign(opt1: CompilerOptions, opt2: CompilerOptions | undefined): CompilerOptions;
+	export function assign(opt1: CompilerOptions | undefined, opt2: CompilerOptions): CompilerOptions;
 	export function assign(opt1: undefined, opt2: undefined): undefined;
-	export function assign(
-		opt1: CompilerOptions | undefined,
-		opt2: CompilerOptions | undefined,
-	): CompilerOptions | undefined;
-	export function assign(
-		opt1: CompilerOptions | undefined,
-		opt2: CompilerOptions | undefined,
-	): CompilerOptions | undefined {
+	export function assign(opt1: CompilerOptions | undefined, opt2: CompilerOptions | undefined): CompilerOptions | undefined;
+	export function assign(opt1: CompilerOptions | undefined, opt2: CompilerOptions | undefined): CompilerOptions | undefined {
 		if (opt1 === undefined) {
 			return opt2;
 		}
@@ -80,10 +50,7 @@ export namespace CompilerOptions {
 }
 
 export namespace Arrays {
-	export function assign<T>(
-		arr1: T[] | undefined,
-		arr2: T[] | undefined,
-	): T[] | undefined {
+	export function assign<T>(arr1: T[] | undefined, arr2:T[] | undefined): T[] | undefined {
 		if (arr1 === undefined) {
 			return arr2;
 		}
@@ -129,5 +96,5 @@ export type ProjectOptions = {
 	compilerOptions?: CompilerOptions;
 };
 
-export type ProjectEntry = [ProjectDescription, ProjectOptions[]];
+export type ProjectEntry = [ ProjectDescription, ProjectOptions[] ];
 export type Projects = ProjectEntry[];

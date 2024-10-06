@@ -3,45 +3,30 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import {
-	createMessageConnection as _createMessageConnection,
-	AbstractMessageReader,
-	AbstractMessageWriter,
-	ConnectionOptions,
-	ConnectionStrategy,
-	DataCallback,
-	Disposable,
-	Emitter,
-	Logger,
-	Message,
-	MessageConnection,
-	MessageReader,
-	MessageWriter,
-	NullLogger,
-} from "../common/api";
-import RIL from "./ril";
+import RIL from './ril';
 
 // Install the browser runtime abstract.
 RIL.install();
 
-export * from "../common/api";
+import {
+	AbstractMessageReader, DataCallback, AbstractMessageWriter, Message, Disposable, Emitter, NullLogger, ConnectionStrategy, ConnectionOptions,
+	createMessageConnection as _createMessageConnection, MessageReader, MessageWriter, Logger, MessageConnection
+} from '../common/api';
 
-export class BrowserMessageReader
-	extends AbstractMessageReader
-	implements MessageReader
-{
+export * from '../common/api';
+
+export class BrowserMessageReader extends AbstractMessageReader implements MessageReader {
+
 	private _onData: Emitter<Message>;
 	private _messageListener: (event: MessageEvent) => void;
 
-	public constructor(
-		port: MessagePort | Worker | DedicatedWorkerGlobalScope,
-	) {
+	public constructor(port: MessagePort | Worker | DedicatedWorkerGlobalScope) {
 		super();
 		this._onData = new Emitter<Message>();
 		this._messageListener = (event: MessageEvent) => {
 			this._onData.fire(event.data);
 		};
-		port.addEventListener("error", (event) => this.fireError(event));
+		port.addEventListener('error', (event) => this.fireError(event));
 		port.onmessage = this._messageListener;
 	}
 
@@ -50,18 +35,14 @@ export class BrowserMessageReader
 	}
 }
 
-export class BrowserMessageWriter
-	extends AbstractMessageWriter
-	implements MessageWriter
-{
+export class BrowserMessageWriter extends AbstractMessageWriter implements MessageWriter {
+
 	private errorCount: number;
 
-	public constructor(
-		private port: MessagePort | Worker | DedicatedWorkerGlobalScope,
-	) {
+	public constructor(private port: MessagePort | Worker | DedicatedWorkerGlobalScope) {
 		super();
 		this.errorCount = 0;
-		port.addEventListener("error", (event) => this.fireError(event));
+		port.addEventListener('error', (event) => this.fireError(event));
 	}
 
 	public write(msg: Message): Promise<void> {
@@ -79,15 +60,11 @@ export class BrowserMessageWriter
 		this.fireError(error, msg, this.errorCount);
 	}
 
-	public end(): void {}
+	public end(): void {
+	}
 }
 
-export function createMessageConnection(
-	reader: MessageReader,
-	writer: MessageWriter,
-	logger?: Logger,
-	options?: ConnectionStrategy | ConnectionOptions,
-): MessageConnection {
+export function createMessageConnection(reader: MessageReader, writer: MessageWriter, logger?: Logger, options?: ConnectionStrategy | ConnectionOptions): MessageConnection {
 	if (logger === undefined) {
 		logger = NullLogger;
 	}

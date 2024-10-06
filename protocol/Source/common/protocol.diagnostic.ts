@@ -3,28 +3,16 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import { ProgressType, RequestHandler, RequestHandler0 } from "vscode-jsonrpc";
-import {
-	Diagnostic,
-	DocumentUri,
-	integer,
-	TextDocumentIdentifier,
-} from "vscode-languageserver-types";
+import { RequestHandler0, RequestHandler, ProgressType } from 'vscode-jsonrpc';
+import { TextDocumentIdentifier, Diagnostic, DocumentUri, integer } from 'vscode-languageserver-types';
 
-import {
-	MessageDirection,
-	ProtocolRequestType,
-	ProtocolRequestType0,
-} from "./messages";
+import * as Is from './utils/is';
+import { MessageDirection, ProtocolRequestType0, ProtocolRequestType } from './messages';
 import type {
-	DiagnosticsCapabilities,
-	PartialResultParams,
-	StaticRegistrationOptions,
-	TextDocumentRegistrationOptions,
-	WorkDoneProgressOptions,
-	WorkDoneProgressParams,
-} from "./protocol";
-import * as Is from "./utils/is";
+	PartialResultParams, StaticRegistrationOptions, WorkDoneProgressParams, TextDocumentRegistrationOptions, WorkDoneProgressOptions,
+	DiagnosticsCapabilities
+} from './protocol';
+
 
 /**
  * Client capabilities specific to diagnostic pull requests.
@@ -94,9 +82,7 @@ export type DiagnosticOptions = WorkDoneProgressOptions & {
  *
  * @since 3.17.0
  */
-export type DiagnosticRegistrationOptions = TextDocumentRegistrationOptions &
-	DiagnosticOptions &
-	StaticRegistrationOptions;
+export type DiagnosticRegistrationOptions = TextDocumentRegistrationOptions & DiagnosticOptions & StaticRegistrationOptions;
 
 export type $DiagnosticServerCapabilities = {
 	diagnosticProvider?: DiagnosticOptions;
@@ -126,23 +112,22 @@ export namespace DiagnosticServerCancellationData {
  *
  * @since 3.17.0
  */
-export type DocumentDiagnosticParams = WorkDoneProgressParams &
-	PartialResultParams & {
-		/**
-		 * The text document.
-		 */
-		textDocument: TextDocumentIdentifier;
+export type DocumentDiagnosticParams = WorkDoneProgressParams & PartialResultParams & {
+	/**
+	 * The text document.
+	 */
+	textDocument: TextDocumentIdentifier;
 
-		/**
-		 * The additional identifier  provided during registration.
-		 */
-		identifier?: string;
+	/**
+	 * The additional identifier  provided during registration.
+	 */
+	identifier?: string;
 
-		/**
-		 * The result id of a previous response if provided.
-		 */
-		previousResultId?: string;
-	};
+	/**
+	 * The result id of a previous response if provided.
+	 */
+	previousResultId?: string;
+};
 
 /**
  * The document diagnostic report kinds.
@@ -154,16 +139,16 @@ export namespace DocumentDiagnosticReportKind {
 	 * A diagnostic report with a full
 	 * set of problems.
 	 */
-	export const Full = "full";
+	export const Full = 'full';
 
 	/**
 	 * A report indicating that the last
 	 * returned report is still accurate.
 	 */
-	export const Unchanged = "unchanged";
+	export const Unchanged = 'unchanged';
 }
 
-export type DocumentDiagnosticReportKind = "full" | "unchanged";
+export type DocumentDiagnosticReportKind = 'full' | 'unchanged';
 
 /**
  * A diagnostic report with a full set of problems.
@@ -194,23 +179,20 @@ export type FullDocumentDiagnosticReport = {
  *
  * @since 3.17.0
  */
-export type RelatedFullDocumentDiagnosticReport =
-	FullDocumentDiagnosticReport & {
-		/**
-		 * Diagnostics of related documents. This information is useful
-		 * in programming languages where code in a file A can generate
-		 * diagnostics in a file B which A depends on. An example of
-		 * such a language is C/C++ where marco definitions in a file
-		 * a.cpp and result in errors in a header file b.hpp.
-		 *
-		 * @since 3.17.0
-		 */
-		relatedDocuments?: {
-			[uri: DocumentUri]:
-				| FullDocumentDiagnosticReport
-				| UnchangedDocumentDiagnosticReport;
-		};
+export type RelatedFullDocumentDiagnosticReport = FullDocumentDiagnosticReport & {
+	/**
+	 * Diagnostics of related documents. This information is useful
+	 * in programming languages where code in a file A can generate
+	 * diagnostics in a file B which A depends on. An example of
+	 * such a language is C/C++ where marco definitions in a file
+	 * a.cpp and result in errors in a header file b.hpp.
+	 *
+	 * @since 3.17.0
+	 */
+	relatedDocuments?: {
+		[uri: DocumentUri]: FullDocumentDiagnosticReport | UnchangedDocumentDiagnosticReport;
 	};
+};
 
 /**
  * A diagnostic report indicating that the last returned
@@ -239,23 +221,20 @@ export type UnchangedDocumentDiagnosticReport = {
  *
  * @since 3.17.0
  */
-export type RelatedUnchangedDocumentDiagnosticReport =
-	UnchangedDocumentDiagnosticReport & {
-		/**
-		 * Diagnostics of related documents. This information is useful
-		 * in programming languages where code in a file A can generate
-		 * diagnostics in a file B which A depends on. An example of
-		 * such a language is C/C++ where marco definitions in a file
-		 * a.cpp and result in errors in a header file b.hpp.
-		 *
-		 * @since 3.17.0
-		 */
-		relatedDocuments?: {
-			[uri: DocumentUri]:
-				| FullDocumentDiagnosticReport
-				| UnchangedDocumentDiagnosticReport;
-		};
+export type RelatedUnchangedDocumentDiagnosticReport = UnchangedDocumentDiagnosticReport & {
+	/**
+	 * Diagnostics of related documents. This information is useful
+	 * in programming languages where code in a file A can generate
+	 * diagnostics in a file B which A depends on. An example of
+	 * such a language is C/C++ where marco definitions in a file
+	 * a.cpp and result in errors in a header file b.hpp.
+	 *
+	 * @since 3.17.0
+	 */
+	relatedDocuments?: {
+		[uri: DocumentUri]: FullDocumentDiagnosticReport | UnchangedDocumentDiagnosticReport;
 	};
+};
 
 /**
  * The result of a document diagnostic pull request. A report can
@@ -266,9 +245,7 @@ export type RelatedUnchangedDocumentDiagnosticReport =
  *
  * @since 3.17.0
  */
-export type DocumentDiagnosticReport =
-	| RelatedFullDocumentDiagnosticReport
-	| RelatedUnchangedDocumentDiagnosticReport;
+export type DocumentDiagnosticReport = RelatedFullDocumentDiagnosticReport | RelatedUnchangedDocumentDiagnosticReport;
 
 /**
  * A partial result for a document diagnostic report.
@@ -277,9 +254,7 @@ export type DocumentDiagnosticReport =
  */
 export type DocumentDiagnosticReportPartialResult = {
 	relatedDocuments: {
-		[uri: DocumentUri]:
-			| FullDocumentDiagnosticReport
-			| UnchangedDocumentDiagnosticReport;
+		[uri: DocumentUri]: FullDocumentDiagnosticReport | UnchangedDocumentDiagnosticReport;
 	};
 };
 
@@ -289,23 +264,11 @@ export type DocumentDiagnosticReportPartialResult = {
  * @since 3.17.0
  */
 export namespace DocumentDiagnosticRequest {
-	export const method: "textDocument/diagnostic" = "textDocument/diagnostic";
-	export const messageDirection: MessageDirection =
-		MessageDirection.clientToServer;
-	export const type = new ProtocolRequestType<
-		DocumentDiagnosticParams,
-		DocumentDiagnosticReport,
-		DocumentDiagnosticReportPartialResult,
-		DiagnosticServerCancellationData,
-		DiagnosticRegistrationOptions
-	>(method);
-	export const partialResult =
-		new ProgressType<DocumentDiagnosticReportPartialResult>();
-	export type HandlerSignature = RequestHandler<
-		DocumentDiagnosticParams,
-		DocumentDiagnosticReport,
-		void
-	>;
+	export const method: 'textDocument/diagnostic' = 'textDocument/diagnostic';
+	export const messageDirection: MessageDirection = MessageDirection.clientToServer;
+	export const type = new ProtocolRequestType<DocumentDiagnosticParams, DocumentDiagnosticReport, DocumentDiagnosticReportPartialResult, DiagnosticServerCancellationData, DiagnosticRegistrationOptions>(method);
+	export const partialResult = new ProgressType<DocumentDiagnosticReportPartialResult>();
+	export type HandlerSignature = RequestHandler<DocumentDiagnosticParams, DocumentDiagnosticReport, void>;
 }
 
 /**
@@ -331,66 +294,64 @@ export type PreviousResultId = {
  *
  * @since 3.17.0
  */
-export type WorkspaceDiagnosticParams = WorkDoneProgressParams &
-	PartialResultParams & {
-		/**
-		 * The additional identifier provided during registration.
-		 */
-		identifier?: string;
+export type WorkspaceDiagnosticParams = WorkDoneProgressParams & PartialResultParams & {
+	/**
+	 * The additional identifier provided during registration.
+	 */
+	identifier?: string;
 
-		/**
-		 * The currently known diagnostic reports with their
-		 * previous result ids.
-		 */
-		previousResultIds: PreviousResultId[];
-	};
+	/**
+	 * The currently known diagnostic reports with their
+	 * previous result ids.
+	 */
+	previousResultIds: PreviousResultId[];
+};
 
 /**
  * A full document diagnostic report for a workspace diagnostic result.
  *
  * @since 3.17.0
  */
-export type WorkspaceFullDocumentDiagnosticReport =
-	FullDocumentDiagnosticReport & {
-		/**
-		 * The URI for which diagnostic information is reported.
-		 */
-		uri: DocumentUri;
+export type WorkspaceFullDocumentDiagnosticReport = FullDocumentDiagnosticReport & {
 
-		/**
-		 * The version number for which the diagnostics are reported.
-		 * If the document is not marked as open `null` can be provided.
-		 */
-		version: integer | null;
-	};
+	/**
+	 * The URI for which diagnostic information is reported.
+	 */
+	uri: DocumentUri;
+
+	/**
+	 * The version number for which the diagnostics are reported.
+	 * If the document is not marked as open `null` can be provided.
+	 */
+	version: integer | null;
+};
 
 /**
  * An unchanged document diagnostic report for a workspace diagnostic result.
  *
  * @since 3.17.0
  */
-export type WorkspaceUnchangedDocumentDiagnosticReport =
-	UnchangedDocumentDiagnosticReport & {
-		/**
-		 * The URI for which diagnostic information is reported.
-		 */
-		uri: DocumentUri;
+export type WorkspaceUnchangedDocumentDiagnosticReport = UnchangedDocumentDiagnosticReport & {
 
-		/**
-		 * The version number for which the diagnostics are reported.
-		 * If the document is not marked as open `null` can be provided.
-		 */
-		version: integer | null;
-	};
+	/**
+	 * The URI for which diagnostic information is reported.
+	 */
+	uri: DocumentUri;
+
+	/**
+	 * The version number for which the diagnostics are reported.
+	 * If the document is not marked as open `null` can be provided.
+	 */
+	version: integer | null;
+};
 
 /**
  * A workspace diagnostic document report.
  *
  * @since 3.17.0
  */
-export type WorkspaceDocumentDiagnosticReport =
-	| WorkspaceFullDocumentDiagnosticReport
-	| WorkspaceUnchangedDocumentDiagnosticReport;
+export type WorkspaceDocumentDiagnosticReport = WorkspaceFullDocumentDiagnosticReport | WorkspaceUnchangedDocumentDiagnosticReport;
+
 
 /**
  * A workspace diagnostic report.
@@ -416,23 +377,11 @@ export type WorkspaceDiagnosticReportPartialResult = {
  * @since 3.17.0
  */
 export namespace WorkspaceDiagnosticRequest {
-	export const method: "workspace/diagnostic" = "workspace/diagnostic";
-	export const messageDirection: MessageDirection =
-		MessageDirection.clientToServer;
-	export const type = new ProtocolRequestType<
-		WorkspaceDiagnosticParams,
-		WorkspaceDiagnosticReport,
-		WorkspaceDiagnosticReportPartialResult,
-		DiagnosticServerCancellationData,
-		void
-	>(method);
-	export const partialResult =
-		new ProgressType<WorkspaceDiagnosticReportPartialResult>();
-	export type HandlerSignature = RequestHandler<
-		WorkspaceDiagnosticParams,
-		WorkspaceDiagnosticReport | null,
-		void
-	>;
+	export const method: 'workspace/diagnostic' = 'workspace/diagnostic';
+	export const messageDirection: MessageDirection = MessageDirection.clientToServer;
+	export const type = new ProtocolRequestType<WorkspaceDiagnosticParams, WorkspaceDiagnosticReport, WorkspaceDiagnosticReportPartialResult, DiagnosticServerCancellationData, void>(method);
+	export const partialResult = new ProgressType<WorkspaceDiagnosticReportPartialResult>();
+	export type HandlerSignature = RequestHandler<WorkspaceDiagnosticParams, WorkspaceDiagnosticReport | null, void>;
 }
 
 /**
@@ -442,10 +391,7 @@ export namespace WorkspaceDiagnosticRequest {
  */
 export namespace DiagnosticRefreshRequest {
 	export const method: `workspace/diagnostic/refresh` = `workspace/diagnostic/refresh`;
-	export const messageDirection: MessageDirection =
-		MessageDirection.serverToClient;
-	export const type = new ProtocolRequestType0<void, void, void, void>(
-		method,
-	);
+	export const messageDirection: MessageDirection = MessageDirection.serverToClient;
+	export const type = new ProtocolRequestType0<void, void, void, void>(method);
 	export type HandlerSignature = RequestHandler0<void, void>;
 }

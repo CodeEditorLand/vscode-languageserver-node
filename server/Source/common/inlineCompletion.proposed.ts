@@ -2,17 +2,11 @@
  * Copyright (c) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
-"use strict";
+'use strict';
 
-import {
-	Disposable,
-	InlineCompletionItem,
-	InlineCompletionList,
-	InlineCompletionParams,
-	InlineCompletionRequest,
-} from "vscode-languageserver-protocol";
+import { InlineCompletionItem, Disposable, InlineCompletionParams, InlineCompletionList, InlineCompletionRequest } from 'vscode-languageserver-protocol';
 
-import type { _Languages, Feature, ServerRequestHandler } from "./server";
+import type { Feature, _Languages, ServerRequestHandler } from './server';
 
 /**
  * Shape of the inline completions feature
@@ -26,49 +20,19 @@ export interface InlineCompletionFeatureShape {
 		 *
 		 * @param handler The corresponding handler.
 		 */
-		on(
-			handler: ServerRequestHandler<
-				InlineCompletionParams,
-				| InlineCompletionList
-				| InlineCompletionItem[]
-				| undefined
-				| null,
-				InlineCompletionItem[],
-				void
-			>,
-		): Disposable;
+		on(handler: ServerRequestHandler<InlineCompletionParams, InlineCompletionList | InlineCompletionItem[] | undefined | null, InlineCompletionItem[], void>): Disposable;
 	};
 }
 
-export const InlineCompletionFeature: Feature<
-	_Languages,
-	InlineCompletionFeatureShape
-> = (Base) => {
+export const InlineCompletionFeature: Feature<_Languages, InlineCompletionFeatureShape> = (Base) => {
 	return class extends Base implements InlineCompletionFeatureShape {
 		public get inlineCompletion() {
 			return {
-				on: (
-					handler: ServerRequestHandler<
-						InlineCompletionParams,
-						| InlineCompletionList
-						| InlineCompletionItem[]
-						| undefined
-						| null,
-						InlineCompletionItem[],
-						void
-					>,
-				): Disposable => {
-					return this.connection.onRequest(
-						InlineCompletionRequest.type,
-						(params, cancel) => {
-							return handler(
-								params,
-								cancel,
-								this.attachWorkDoneProgress(params),
-							);
-						},
-					);
-				},
+				on: (handler: ServerRequestHandler<InlineCompletionParams, InlineCompletionList | InlineCompletionItem[] | undefined | null, InlineCompletionItem[], void>): Disposable => {
+					return this.connection.onRequest(InlineCompletionRequest.type, (params, cancel) => {
+						return handler(params, cancel, this.attachWorkDoneProgress(params));
+					});
+				}
 			};
 		}
 	};

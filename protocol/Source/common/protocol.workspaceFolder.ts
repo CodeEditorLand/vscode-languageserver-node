@@ -3,19 +3,10 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import {
-	CancellationToken,
-	HandlerResult,
-	NotificationHandler,
-	RequestHandler0,
-} from "vscode-jsonrpc";
-import { WorkspaceFolder } from "vscode-languageserver-types";
+import { WorkspaceFolder } from 'vscode-languageserver-types';
+import { RequestHandler0, NotificationHandler, HandlerResult, CancellationToken } from 'vscode-jsonrpc';
 
-import {
-	MessageDirection,
-	ProtocolNotificationType,
-	ProtocolRequestType0,
-} from "./messages";
+import { MessageDirection, ProtocolRequestType0, ProtocolNotificationType } from './messages';
 
 export interface WorkspaceFoldersInitializeParams {
 	/**
@@ -31,6 +22,7 @@ export interface WorkspaceFoldersInitializeParams {
 }
 
 export interface WorkspaceFoldersServerCapabilities {
+
 	/**
 	 * The server has support for workspace folders
 	 */
@@ -52,24 +44,11 @@ export interface WorkspaceFoldersServerCapabilities {
  * The `workspace/workspaceFolders` is sent from the server to the client to fetch the open workspace folders.
  */
 export namespace WorkspaceFoldersRequest {
-	export const method: "workspace/workspaceFolders" =
-		"workspace/workspaceFolders";
-	export const messageDirection: MessageDirection =
-		MessageDirection.serverToClient;
-	export const type = new ProtocolRequestType0<
-		WorkspaceFolder[] | null,
-		never,
-		void,
-		void
-	>(method);
-	export type HandlerSignature = RequestHandler0<
-		WorkspaceFolder[] | null,
-		void
-	>;
-	export type MiddlewareSignature = (
-		token: CancellationToken,
-		next: HandlerSignature,
-	) => HandlerResult<WorkspaceFolder[] | null, void>;
+	export const method: 'workspace/workspaceFolders' = 'workspace/workspaceFolders';
+	export const messageDirection: MessageDirection = MessageDirection.serverToClient;
+	export const type = new ProtocolRequestType0<WorkspaceFolder[] | null, never, void, void>(method);
+	export type HandlerSignature = RequestHandler0<WorkspaceFolder[] | null, void>;
+	export type MiddlewareSignature = (token: CancellationToken, next: HandlerSignature) => HandlerResult<WorkspaceFolder[] | null, void>;
 }
 
 /**
@@ -77,20 +56,11 @@ export namespace WorkspaceFoldersRequest {
  * folder configuration changes.
  */
 export namespace DidChangeWorkspaceFoldersNotification {
-	export const method: "workspace/didChangeWorkspaceFolders" =
-		"workspace/didChangeWorkspaceFolders";
-	export const messageDirection: MessageDirection =
-		MessageDirection.clientToServer;
-	export const type = new ProtocolNotificationType<
-		DidChangeWorkspaceFoldersParams,
-		void
-	>(method);
-	export type HandlerSignature =
-		NotificationHandler<DidChangeWorkspaceFoldersParams>;
-	export type MiddlewareSignature = (
-		params: DidChangeWorkspaceFoldersParams,
-		next: HandlerSignature,
-	) => void;
+	export const method: 'workspace/didChangeWorkspaceFolders' = 'workspace/didChangeWorkspaceFolders';
+	export const messageDirection: MessageDirection = MessageDirection.clientToServer;
+	export const type = new ProtocolNotificationType<DidChangeWorkspaceFoldersParams, void>(method);
+	export type HandlerSignature = NotificationHandler<DidChangeWorkspaceFoldersParams>;
+	export type MiddlewareSignature = (params: DidChangeWorkspaceFoldersParams, next: HandlerSignature) => void;
 }
 
 /**

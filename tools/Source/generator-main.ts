@@ -3,45 +3,35 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import * as path from "path";
-import * as ts from "typescript";
+import * as path from 'path';
 
-import * as tss from "./typescripts";
-import Visitor from "./visitor";
+import * as ts from 'typescript';
+
+import * as tss from './typescripts';
+import Visitor from './visitor';
 
 function loadConfigFile(file: string): ts.ParsedCommandLine {
 	const absolute = path.resolve(file);
 
 	const readResult = ts.readConfigFile(absolute, ts.sys.readFile);
 	if (readResult.error) {
-		throw new Error(
-			ts.formatDiagnostics([readResult.error], ts.createCompilerHost({})),
-		);
+		throw new Error(ts.formatDiagnostics([readResult.error], ts.createCompilerHost({})));
 	}
 	const config = readResult.config;
 	if (config.compilerOptions !== undefined) {
-		config.compilerOptions = Object.assign(
-			config.compilerOptions,
-			tss.CompileOptions.getDefaultOptions(file),
-		);
+		config.compilerOptions = Object.assign(config.compilerOptions, tss.CompileOptions.getDefaultOptions(file));
 	}
-	const result = ts.parseJsonConfigFileContent(
-		config,
-		ts.sys,
-		path.dirname(absolute),
-	);
+	const result = ts.parseJsonConfigFileContent(config, ts.sys, path.dirname(absolute));
 	if (result.errors.length > 0) {
-		throw new Error(
-			ts.formatDiagnostics(result.errors, ts.createCompilerHost({})),
-		);
+		throw new Error(ts.formatDiagnostics(result.errors, ts.createCompilerHost({})));
 	}
 	return result;
 }
 
 async function main(): Promise<number> {
-	let config: ts.ParsedCommandLine = ts.parseCommandLine(ts.sys.args);
-	const configFilePath: string | undefined =
-		tss.CompileOptions.getConfigFilePath(config.options);
+
+	let config: ts.ParsedCommandLine = 	ts.parseCommandLine(ts.sys.args);
+	const configFilePath: string | undefined = tss.CompileOptions.getConfigFilePath(config.options);
 	if (configFilePath && config.options.project) {
 		config = loadConfigFile(configFilePath);
 	}
@@ -59,15 +49,12 @@ async function main(): Promise<number> {
 		},
 		getScriptVersion: (_fileName: string): string => {
 			// The files are immutable.
-			return "0";
+			return '0';
 		},
 		// The project is immutable
-		getProjectVersion: () => "0",
-		getScriptSnapshot: (
-			fileName: string,
-		): ts.IScriptSnapshot | undefined => {
-			let result: ts.IScriptSnapshot | undefined =
-				scriptSnapshots.get(fileName);
+		getProjectVersion: () => '0',
+		getScriptSnapshot: (fileName: string): ts.IScriptSnapshot | undefined => {
+			let result: ts.IScriptSnapshot | undefined = scriptSnapshots.get(fileName);
 			if (result === undefined) {
 				const content: string | undefined = ts.sys.readFile(fileName);
 				if (content === undefined) {
@@ -97,7 +84,7 @@ async function main(): Promise<number> {
 		readFile: ts.sys.readFile,
 		readDirectory: ts.sys.readDirectory,
 		// this is necessary to make source references work.
-		realpath: ts.sys.realpath,
+		realpath: ts.sys.realpath
 	};
 
 	tss.LanguageServiceHost.useSourceOfProjectReferenceRedirect(host, () => {
@@ -107,9 +94,7 @@ async function main(): Promise<number> {
 	const languageService = ts.createLanguageService(host);
 	const program = languageService.getProgram();
 	if (program === undefined) {
-		console.error(
-			"Couldn't create language service with underlying program.",
-		);
+		console.error('Couldn\'t create language service with underlying program.');
 		process.exitCode = -1;
 		return -1;
 	}
@@ -117,7 +102,7 @@ async function main(): Promise<number> {
 	await visitor.visitProgram();
 	await visitor.endVisitProgram();
 
-	console.log(JSON.stringify(visitor.getMetaModel(), undefined, "\t"));
+	console.log(JSON.stringify(visitor.getMetaModel(), undefined, '\t'));
 	return 0;
 }
 

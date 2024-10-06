@@ -3,14 +3,9 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import { NotificationHandler, RequestHandler } from "vscode-jsonrpc";
-import { WorkspaceEdit } from "vscode-languageserver-types";
-
-import {
-	MessageDirection,
-	ProtocolNotificationType,
-	ProtocolRequestType,
-} from "./messages";
+import { NotificationHandler, RequestHandler } from 'vscode-jsonrpc';
+import { WorkspaceEdit } from 'vscode-languageserver-types';
+import { MessageDirection, ProtocolNotificationType, ProtocolRequestType } from './messages';
 
 /**
  * Options for notifications/requests for user operations on files.
@@ -18,34 +13,35 @@ import {
  * @since 3.16.0
  */
 export interface FileOperationOptions {
+
 	/**
-	 * The server is interested in receiving didCreateFiles notifications.
-	 */
+	* The server is interested in receiving didCreateFiles notifications.
+	*/
 	didCreate?: FileOperationRegistrationOptions;
 
 	/**
-	 * The server is interested in receiving willCreateFiles requests.
-	 */
+	* The server is interested in receiving willCreateFiles requests.
+	*/
 	willCreate?: FileOperationRegistrationOptions;
 
 	/**
-	 * The server is interested in receiving didRenameFiles notifications.
-	 */
+	* The server is interested in receiving didRenameFiles notifications.
+	*/
 	didRename?: FileOperationRegistrationOptions;
 
 	/**
-	 * The server is interested in receiving willRenameFiles requests.
-	 */
+	* The server is interested in receiving willRenameFiles requests.
+	*/
 	willRename?: FileOperationRegistrationOptions;
 
 	/**
-	 * The server is interested in receiving didDeleteFiles file notifications.
-	 */
+	* The server is interested in receiving didDeleteFiles file notifications.
+	*/
 	didDelete?: FileOperationRegistrationOptions;
 
 	/**
-	 * The server is interested in receiving willDeleteFiles file requests.
-	 */
+	* The server is interested in receiving willDeleteFiles file requests.
+	*/
 	willDelete?: FileOperationRegistrationOptions;
 }
 
@@ -55,6 +51,7 @@ export interface FileOperationOptions {
  * @since 3.16.0
  */
 export interface FileOperationRegistrationOptions {
+
 	/**
 	 * The actual filters.
 	 */
@@ -68,17 +65,19 @@ export interface FileOperationRegistrationOptions {
  * @since 3.16.0
  */
 export namespace FileOperationPatternKind {
+
 	/**
 	 * The pattern matches a file only.
 	 */
-	export const file: "file" = "file";
+	export const file: 'file' = 'file';
 
 	/**
 	 * The pattern matches a folder only.
 	 */
-	export const folder: "folder" = "folder";
+	export const folder: 'folder' = 'folder';
 }
-export type FileOperationPatternKind = "file" | "folder";
+export type FileOperationPatternKind = 'file' | 'folder';
+
 
 /**
  * Matching options for the file operation pattern.
@@ -86,6 +85,7 @@ export type FileOperationPatternKind = "file" | "folder";
  * @since 3.16.0
  */
 export interface FileOperationPatternOptions {
+
 	/**
 	 * The pattern should be matched ignoring casing.
 	 */
@@ -99,6 +99,7 @@ export interface FileOperationPatternOptions {
  * @since 3.16.0
  */
 interface FileOperationPattern {
+
 	/**
 	 * The glob pattern to match. Glob patterns can have the following syntax:
 	 * - `*` to match one or more characters in a path segment
@@ -130,6 +131,7 @@ interface FileOperationPattern {
  * @since 3.16.0
  */
 export interface FileOperationFilter {
+
 	/**
 	 * A Uri scheme like `file` or `untitled`.
 	 */
@@ -150,6 +152,7 @@ export interface FileOperationFilter {
  * @since 3.16.0
  */
 export interface FileOperationClientCapabilities {
+
 	/**
 	 * Whether the client supports dynamic registration for file requests/notifications.
 	 */
@@ -193,6 +196,7 @@ export interface FileOperationClientCapabilities {
  * @since 3.16.0
  */
 export interface CreateFilesParams {
+
 	/**
 	 * An array of all files/folders created in this operation.
 	 */
@@ -205,6 +209,7 @@ export interface CreateFilesParams {
  * @since 3.16.0
  */
 export interface FileCreate {
+
 	/**
 	 * A file:// URI for the location of the file/folder being created.
 	 */
@@ -218,6 +223,7 @@ export interface FileCreate {
  * @since 3.16.0
  */
 export interface RenameFilesParams {
+
 	/**
 	 * An array of all files/folders renamed in this operation. When a folder is renamed, only
 	 * the folder will be included, and not its children.
@@ -231,6 +237,7 @@ export interface RenameFilesParams {
  * @since 3.16.0
  */
 export interface FileRename {
+
 	/**
 	 * A file:// URI for the original location of the file/folder being renamed.
 	 */
@@ -249,6 +256,7 @@ export interface FileRename {
  * @since 3.16.0
  */
 export interface DeleteFilesParams {
+
 	/**
 	 * An array of all files/folders deleted in this operation.
 	 */
@@ -261,11 +269,13 @@ export interface DeleteFilesParams {
  * @since 3.16.0
  */
 export interface FileDelete {
+
 	/**
 	 * A file:// URI for the location of the file/folder being deleted.
 	 */
 	uri: string;
 }
+
 
 /**
  * The will create files request is sent from the client to the server before files are actually
@@ -278,22 +288,10 @@ export interface FileDelete {
  * @since 3.16.0
  */
 export namespace WillCreateFilesRequest {
-	export const method: "workspace/willCreateFiles" =
-		"workspace/willCreateFiles";
-	export const messageDirection: MessageDirection =
-		MessageDirection.clientToServer;
-	export const type = new ProtocolRequestType<
-		CreateFilesParams,
-		WorkspaceEdit | null,
-		never,
-		void,
-		FileOperationRegistrationOptions
-	>(method);
-	export type HandlerSignature = RequestHandler<
-		CreateFilesParams,
-		WorkspaceEdit | undefined | null,
-		void
-	>;
+	export const method: 'workspace/willCreateFiles' = 'workspace/willCreateFiles';
+	export const messageDirection: MessageDirection = MessageDirection.clientToServer;
+	export const type = new ProtocolRequestType<CreateFilesParams, WorkspaceEdit | null, never, void, FileOperationRegistrationOptions>(method);
+	export type HandlerSignature = RequestHandler<CreateFilesParams, WorkspaceEdit | undefined | null, void>;
 }
 
 /**
@@ -303,14 +301,9 @@ export namespace WillCreateFilesRequest {
  * @since 3.16.0
  */
 export namespace DidCreateFilesNotification {
-	export const method: "workspace/didCreateFiles" =
-		"workspace/didCreateFiles";
-	export const messageDirection: MessageDirection =
-		MessageDirection.clientToServer;
-	export const type = new ProtocolNotificationType<
-		CreateFilesParams,
-		FileOperationRegistrationOptions
-	>(method);
+	export const method: 'workspace/didCreateFiles' = 'workspace/didCreateFiles';
+	export const messageDirection: MessageDirection = MessageDirection.clientToServer;
+	export const type = new ProtocolNotificationType<CreateFilesParams, FileOperationRegistrationOptions>(method);
 	export type HandlerSignature = NotificationHandler<CreateFilesParams>;
 }
 
@@ -321,22 +314,10 @@ export namespace DidCreateFilesNotification {
  * @since 3.16.0
  */
 export namespace WillRenameFilesRequest {
-	export const method: "workspace/willRenameFiles" =
-		"workspace/willRenameFiles";
-	export const messageDirection: MessageDirection =
-		MessageDirection.clientToServer;
-	export const type = new ProtocolRequestType<
-		RenameFilesParams,
-		WorkspaceEdit | null,
-		never,
-		void,
-		FileOperationRegistrationOptions
-	>(method);
-	export type HandlerSignature = RequestHandler<
-		RenameFilesParams,
-		WorkspaceEdit | undefined | null,
-		void
-	>;
+	export const method: 'workspace/willRenameFiles' = 'workspace/willRenameFiles';
+	export const messageDirection: MessageDirection = MessageDirection.clientToServer;
+	export const type = new ProtocolRequestType<RenameFilesParams, WorkspaceEdit | null, never, void, FileOperationRegistrationOptions>(method);
+	export type HandlerSignature = RequestHandler<RenameFilesParams, WorkspaceEdit | undefined | null, void>;
 }
 
 /**
@@ -346,14 +327,9 @@ export namespace WillRenameFilesRequest {
  * @since 3.16.0
  */
 export namespace DidRenameFilesNotification {
-	export const method: "workspace/didRenameFiles" =
-		"workspace/didRenameFiles";
-	export const messageDirection: MessageDirection =
-		MessageDirection.clientToServer;
-	export const type = new ProtocolNotificationType<
-		RenameFilesParams,
-		FileOperationRegistrationOptions
-	>(method);
+	export const method: 'workspace/didRenameFiles' = 'workspace/didRenameFiles';
+	export const messageDirection: MessageDirection = MessageDirection.clientToServer;
+	export const type = new ProtocolNotificationType<RenameFilesParams, FileOperationRegistrationOptions>(method);
 	export type HandlerSignature = NotificationHandler<RenameFilesParams>;
 }
 
@@ -364,14 +340,9 @@ export namespace DidRenameFilesNotification {
  * @since 3.16.0
  */
 export namespace DidDeleteFilesNotification {
-	export const method: "workspace/didDeleteFiles" =
-		"workspace/didDeleteFiles";
-	export const messageDirection: MessageDirection =
-		MessageDirection.clientToServer;
-	export const type = new ProtocolNotificationType<
-		DeleteFilesParams,
-		FileOperationRegistrationOptions
-	>(method);
+	export const method: 'workspace/didDeleteFiles' = 'workspace/didDeleteFiles';
+	export const messageDirection: MessageDirection = MessageDirection.clientToServer;
+	export const type = new ProtocolNotificationType<DeleteFilesParams, FileOperationRegistrationOptions>(method);
 	export type HandlerSignature = NotificationHandler<DeleteFilesParams>;
 }
 
@@ -382,20 +353,8 @@ export namespace DidDeleteFilesNotification {
  * @since 3.16.0
  */
 export namespace WillDeleteFilesRequest {
-	export const method: "workspace/willDeleteFiles" =
-		"workspace/willDeleteFiles";
-	export const messageDirection: MessageDirection =
-		MessageDirection.clientToServer;
-	export const type = new ProtocolRequestType<
-		DeleteFilesParams,
-		WorkspaceEdit | null,
-		never,
-		void,
-		FileOperationRegistrationOptions
-	>(method);
-	export type HandlerSignature = RequestHandler<
-		DeleteFilesParams,
-		WorkspaceEdit | undefined | null,
-		void
-	>;
+	export const method: 'workspace/willDeleteFiles' = 'workspace/willDeleteFiles';
+	export const messageDirection: MessageDirection = MessageDirection.clientToServer;
+	export const type = new ProtocolRequestType<DeleteFilesParams, WorkspaceEdit | null, never, void, FileOperationRegistrationOptions>(method);
+	export type HandlerSignature = RequestHandler<DeleteFilesParams, WorkspaceEdit | undefined | null, void>;
 }

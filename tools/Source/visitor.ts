@@ -3,209 +3,104 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import * as ts from "typescript";
+import * as ts from 'typescript';
 
-import {
-	BaseTypes,
-	Enumeration,
-	EnumerationEntry,
-	EnumerationType,
-	Notification as JsonNotification,
-	Request as JsonRequest,
-	Type as JsonType,
-	MessageDirection,
-	MetaModel,
-	Property,
-	Structure,
-	StructureLiteral,
-	TypeAlias,
-} from "./metaModel";
-import { Symbols } from "./typescripts";
+import { Symbols } from './typescripts';
 
-import path = require("path");
+import { Type as JsonType, Request as JsonRequest, Notification as JsonNotification, Structure, Property, StructureLiteral, BaseTypes, TypeAlias, MetaModel, Enumeration, EnumerationEntry, EnumerationType, MessageDirection } from './metaModel';
+import path = require('path');
 
-const LSPBaseTypes = new Set([
-	"URI",
-	"DocumentUri",
-	"integer",
-	"uinteger",
-	"decimal",
-]);
-type BaseTypeInfoKind =
-	| "string"
-	| "boolean"
-	| "URI"
-	| "DocumentUri"
-	| "integer"
-	| "uinteger"
-	| "decimal"
-	| "void"
-	| "never"
-	| "unknown"
-	| "null"
-	| "undefined"
-	| "any"
-	| "object";
+const LSPBaseTypes = new Set(['URI', 'DocumentUri', 'integer', 'uinteger', 'decimal']);
+type BaseTypeInfoKind = 'string' | 'boolean' | 'URI' | 'DocumentUri' | 'integer' | 'uinteger' | 'decimal' | 'void' | 'never' | 'unknown' | 'null' | 'undefined' | 'any' | 'object';
 
-export type TypeInfoKind =
-	| "base"
-	| "reference"
-	| "array"
-	| "map"
-	| "intersection"
-	| "union"
-	| "tuple"
-	| "literal"
-	| "stringLiteral"
-	| "integerLiteral"
-	| "booleanLiteral";
+export type TypeInfoKind = 'base' | 'reference' | 'array' | 'map' | 'intersection' | 'union' | 'tuple' | 'literal' | 'stringLiteral' | 'integerLiteral' | 'booleanLiteral';
 
-type MapKeyType =
-	| { kind: "base"; name: "URI" | "DocumentUri" | "string" | "integer" }
-	| { kind: "reference"; name: string; symbol: ts.Symbol };
+type MapKeyType = { kind: 'base'; name: 'URI' | 'DocumentUri' | 'string' | 'integer' } | { kind: 'reference'; name: string; symbol: ts.Symbol };
 namespace MapKeyType {
 	export function is(value: TypeInfo): value is MapKeyType {
-		return (
-			value.kind === "reference" ||
-			(value.kind === "base" &&
-				(value.name === "string" ||
-					value.name === "integer" ||
-					value.name === "DocumentUri" ||
-					value.name === "URI"))
-		);
+		return value.kind === 'reference' || (value.kind === 'base' && (value.name === 'string' || value.name === 'integer' || value.name === 'DocumentUri' || value.name === 'URI'));
 	}
 }
-type LiteralInfo = {
-	type: TypeInfo;
-	optional: boolean;
-	documentation?: string;
-	since?: string;
-	sinceTags?: string[];
-	proposed?: boolean;
-	deprecated?: string;
-};
+type LiteralInfo = { type: TypeInfo; optional: boolean; documentation?: string; since?: string; sinceTags?: string[]; proposed?: boolean; deprecated?: string };
 
-type TypeInfo = {
+type TypeInfo =
+{
 	kind: TypeInfoKind;
-} & (
-	| {
-			kind: "base";
-			name: BaseTypeInfoKind;
-	  }
-	| {
-			kind: "reference";
-			name: string;
-			symbol: ts.Symbol;
-	  }
-	| {
-			kind: "array";
-			elementType: TypeInfo;
-	  }
-	| {
-			kind: "map";
-			key: MapKeyType;
-			value: TypeInfo;
-	  }
-	| {
-			kind: "union";
-			items: TypeInfo[];
-	  }
-	| {
-			kind: "intersection";
-			items: TypeInfo[];
-	  }
-	| {
-			kind: "tuple";
-			items: TypeInfo[];
-	  }
-	| {
-			kind: "literal";
-			items: Map<string, LiteralInfo>;
-	  }
-	| {
-			kind: "stringLiteral";
-			value: string;
-	  }
-	| {
-			kind: "integerLiteral";
-			value: number;
-	  }
-	| {
-			kind: "booleanLiteral";
-			value: boolean;
-	  }
-);
+} &
+({
+	kind: 'base';
+	name: BaseTypeInfoKind;
+} | {
+	kind: 'reference';
+	name: string;
+	symbol: ts.Symbol;
+} | {
+	kind: 'array';
+	elementType: TypeInfo;
+} | {
+	kind: 'map';
+	key: MapKeyType;
+	value: TypeInfo;
+} | {
+	kind: 'union';
+	items: TypeInfo[];
+} | {
+	kind: 'intersection';
+	items: TypeInfo[];
+} | {
+	kind: 'tuple';
+	items: TypeInfo[];
+} | {
+	kind: 'literal';
+	items: Map<string, LiteralInfo>;
+} | {
+	kind: 'stringLiteral';
+	value: string;
+} | {
+	kind: 'integerLiteral';
+	value: number;
+} | {
+	kind: 'booleanLiteral';
+	value: boolean;
+});
 
 namespace TypeInfo {
+
 	export function isNonLSPType(info: TypeInfo): boolean {
-		return (
-			info.kind === "base" &&
-			(info.name === "void" ||
-				info.name === "undefined" ||
-				info.name === "never" ||
-				info.name === "unknown")
-		);
+		return info.kind === 'base' && (info.name === 'void' || info.name === 'undefined' || info.name === 'never' || info.name === 'unknown');
 	}
 
-	export function isVoid(
-		info: TypeInfo,
-	): info is { kind: "base"; name: "void" } {
-		return info.kind === "base" && info.name === "void";
+	export function isVoid(info: TypeInfo): info is { kind: 'base'; name: 'void' } {
+		return info.kind === 'base' && info.name === 'void';
 	}
 
-	const baseSet = new Set([
-		"null",
-		"void",
-		"string",
-		"boolean",
-		"URI",
-		"DocumentUri",
-		"integer",
-		"uinteger",
-		"decimal",
-	]);
+	const baseSet = new Set(['null', 'void', 'string', 'boolean', 'URI', 'DocumentUri', 'integer', 'uinteger', 'decimal']);
 	export function asJsonType(info: TypeInfo): JsonType {
 		const literal: StructureLiteral = { properties: [] };
 		switch (info.kind) {
-			case "base":
+			case 'base':
 				if (baseSet.has(info.name)) {
-					return { kind: "base", name: info.name as BaseTypes };
+					return { kind: 'base', name: info.name as BaseTypes };
 				}
-				if (info.name === "object") {
-					return { kind: "reference", name: "LSPAny" };
+				if (info.name === 'object') {
+					return { kind: 'reference', name: 'LSPAny' };
 				}
 				break;
-			case "reference":
-				return { kind: "reference", name: info.name };
-			case "array":
-				return { kind: "array", element: asJsonType(info.elementType) };
-			case "map":
-				return {
-					kind: "map",
-					key: asJsonType(info.key) as MapKeyType,
-					value: asJsonType(info.value),
-				};
-			case "union":
-				return {
-					kind: "or",
-					items: info.items.map((info) => asJsonType(info)),
-				};
-			case "intersection":
-				return {
-					kind: "and",
-					items: info.items.map((info) => asJsonType(info)),
-				};
-			case "tuple":
-				return {
-					kind: "tuple",
-					items: info.items.map((info) => asJsonType(info)),
-				};
-			case "literal":
+			case 'reference':
+				return { kind: 'reference', name: info.name };
+			case 'array':
+				return { kind: 'array', element: asJsonType(info.elementType) };
+			case 'map':
+				return { kind: 'map', key: asJsonType(info.key) as MapKeyType, value: asJsonType(info.value) };
+			case 'union':
+				return { kind: 'or', items: info.items.map(info => asJsonType(info)) };
+			case 'intersection':
+				return { kind: 'and', items: info.items.map(info => asJsonType(info)) };
+			case 'tuple':
+				return { kind: 'tuple', items: info.items.map(info => asJsonType(info)) };
+			case 'literal':
 				for (const entry of info.items) {
-					const property: Property = {
-						name: entry[0],
-						type: asJsonType(entry[1].type),
-					};
+					const property: Property = { name: entry[0], type: asJsonType(entry[1].type) };
 					const value = entry[1];
 					if (value.optional === true) {
 						property.optional = true;
@@ -221,17 +116,15 @@ namespace TypeInfo {
 					}
 					literal.properties.push(property);
 				}
-				return { kind: "literal", value: literal };
-			case "stringLiteral":
-				return { kind: "stringLiteral", value: info.value };
-			case "integerLiteral":
-				return { kind: "integerLiteral", value: info.value };
-			case "booleanLiteral":
-				return { kind: "booleanLiteral", value: info.value };
+				return { kind: 'literal', value: literal };
+			case 'stringLiteral':
+				return { kind: 'stringLiteral', value: info.value };
+			case 'integerLiteral':
+				return { kind: 'integerLiteral', value: info.value };
+			case 'booleanLiteral':
+				return { kind: 'booleanLiteral', value: info.value };
 		}
-		throw new Error(
-			`Can't convert type info ${JSON.stringify(info, undefined, 0)}`,
-		);
+		throw new Error(`Can't convert type info ${JSON.stringify(info, undefined, 0)}`);
 	}
 }
 
@@ -249,20 +142,17 @@ type NotificationTypes = {
 };
 
 namespace MessageDirection {
-	export const clientToServer: "clientToServer" = "clientToServer";
-	export const serverToClient: "serverToClient" = "serverToClient";
-	export const both: "both" = "both";
+	export const clientToServer: 'clientToServer' = 'clientToServer';
+	export const serverToClient: 'serverToClient' = 'serverToClient';
+	export const both: 'both' = 'both';
 
 	export function is(value: string): value is MessageDirection {
-		return (
-			value === clientToServer ||
-			value === serverToClient ||
-			value === both
-		);
+		return value === clientToServer || value === serverToClient || value === both;
 	}
 }
 
 export default class Visitor {
+
 	private readonly program: ts.Program;
 	private readonly typeChecker: ts.TypeChecker;
 	private readonly symbols: Symbols;
@@ -276,8 +166,9 @@ export default class Visitor {
 	private readonly typeAliases: TypeAlias[];
 	private readonly symbolQueue: Map<string, ts.Symbol>;
 	private readonly processedStructures: Map<string, ts.Symbol>;
-	private readonly filter: Map<string, (symbol: ts.Symbol) => boolean> =
-		new Map([["TraceValues", Symbols.isTypeAlias]]);
+	private readonly filter: Map<string, (symbol: ts.Symbol) => boolean> = new Map([
+		['TraceValues', Symbols.isTypeAlias]
+	]);
 
 	constructor(program: ts.Program) {
 		this.program = program;
@@ -290,6 +181,7 @@ export default class Visitor {
 		this.typeAliases = [];
 		this.symbolQueue = new Map();
 		this.processedStructures = new Map();
+
 	}
 
 	protected get currentSourceFile(): ts.SourceFile {
@@ -309,17 +201,11 @@ export default class Visitor {
 		while (this.symbolQueue.size > 0) {
 			const toProcess = new Map(this.symbolQueue);
 			for (const [name, symbol] of toProcess) {
-				if (
-					!(this.filter.has(name) && this.filter.get(name)!(symbol))
-				) {
+				if (!(this.filter.has(name) && this.filter.get(name)!(symbol))) {
 					const element = this.processSymbol(name, symbol);
 					if (element === undefined) {
-						throw new Error(
-							`Can't create structure for type ${name}`,
-						);
-					} else if (
-						Array.isArray((element as Structure).properties)
-					) {
+						throw new Error(`Can't create structure for type ${name}`);
+					} else if (Array.isArray((element as Structure).properties)) {
 						this.structures.push(element as Structure);
 					} else if (Array.isArray((element as Enumeration).values)) {
 						this.enumerations.push(element as Enumeration);
@@ -335,30 +221,22 @@ export default class Visitor {
 
 	public getMetaModel(): MetaModel {
 		return {
-			metaData: { version: "3.17.0" },
+			metaData: { version: '3.17.0' },
 			requests: this.requests,
 			notifications: this.notifications,
 			structures: this.structures,
 			enumerations: this.enumerations,
-			typeAliases: this.typeAliases,
+			typeAliases: this.typeAliases
 		};
 	}
 
 	protected visit(node: ts.Node): void {
 		switch (node.kind) {
 			case ts.SyntaxKind.SourceFile:
-				this.doVisit(
-					this.visitSourceFile,
-					this.endVisitSourceFile,
-					node as ts.SourceFile,
-				);
+				this.doVisit(this.visitSourceFile, this.endVisitSourceFile, node as ts.SourceFile);
 				break;
 			case ts.SyntaxKind.ModuleDeclaration:
-				this.doVisit(
-					this.visitModuleDeclaration,
-					this.endVisitModuleDeclaration,
-					node as ts.ModuleDeclaration,
-				);
+				this.doVisit(this.visitModuleDeclaration, this.endVisitModuleDeclaration, node as ts.ModuleDeclaration);
 				break;
 			default:
 				this.doVisit(this.visitGeneric, this.endVisitGeneric, node);
@@ -366,13 +244,9 @@ export default class Visitor {
 		}
 	}
 
-	private doVisit<T extends ts.Node>(
-		visit: (node: T) => boolean,
-		endVisit: (node: T) => void,
-		node: T,
-	): void {
+	private doVisit<T extends ts.Node>(visit: (node: T) => boolean, endVisit: (node: T) => void, node: T): void {
 		if (visit.call(this, node)) {
-			node.forEachChild((child) => this.visit(child));
+			node.forEachChild(child => this.visit(child));
 		}
 		endVisit.call(this, node);
 	}
@@ -381,7 +255,8 @@ export default class Visitor {
 		return true;
 	}
 
-	private endVisitGeneric(): void {}
+	private endVisitGeneric(): void {
+	}
 
 	private visitSourceFile(node: ts.SourceFile): boolean {
 		this.#currentSourceFile = node;
@@ -389,26 +264,17 @@ export default class Visitor {
 		// that are not reference through the protocol module but part of
 		// the LSP specification. So treat the definitions as such. They all need
 		// to start with a $ to make this clear.
-		if (path.basename(node.fileName) === "protocol.$.ts") {
+		if (path.basename(node.fileName) === 'protocol.$.ts') {
 			for (const statement of node.statements) {
-				if (
-					ts.isTypeAliasDeclaration(statement) &&
-					statement.name.getText()[0] === "$"
-				) {
+				if (ts.isTypeAliasDeclaration(statement) && statement.name.getText()[0] === '$') {
 					this.visitTypeReference(statement);
 				}
 				if (ts.isVariableStatement(statement)) {
-					for (const declaration of statement.declarationList
-						.declarations) {
-						if (
-							declaration.name.getText()[0] !== "$" ||
-							declaration.initializer === undefined
-						) {
+					for (const declaration of statement.declarationList.declarations) {
+						if (declaration.name.getText()[0] !== '$' || declaration.initializer === undefined) {
 							continue;
 						}
-						const symbol = this.typeChecker.getSymbolAtLocation(
-							declaration.initializer,
-						);
+						const symbol = this.typeChecker.getSymbolAtLocation(declaration.initializer);
 						if (symbol === undefined) {
 							continue;
 						}
@@ -427,21 +293,17 @@ export default class Visitor {
 	private visitModuleDeclaration(node: ts.ModuleDeclaration): boolean {
 		const identifier = node.name.getText();
 		// We have a request or notification definition.
-		if (identifier.endsWith("Request")) {
+		if (identifier.endsWith('Request')) {
 			const request = this.visitRequest(node);
 			if (request === undefined) {
-				throw new Error(
-					`Creating meta data for request ${identifier} failed.`,
-				);
+				throw new Error(`Creating meta data for request ${identifier} failed.`);
 			} else {
 				this.requests.push(request);
 			}
-		} else if (identifier.endsWith("Notification")) {
+		} else if (identifier.endsWith('Notification')) {
 			const notification = this.visitNotification(node);
 			if (notification === undefined) {
-				throw new Error(
-					`Creating meta data for notification ${identifier} failed.`,
-				);
+				throw new Error(`Creating meta data for notification ${identifier} failed.`);
 			} else {
 				this.notifications.push(notification);
 			}
@@ -454,7 +316,7 @@ export default class Visitor {
 		if (symbol === undefined) {
 			return;
 		}
-		const type = symbol.exports?.get("type" as ts.__String);
+		const type = symbol.exports?.get('type' as ts.__String);
 		if (type === undefined) {
 			return;
 		}
@@ -480,33 +342,24 @@ export default class Visitor {
 		const result: JsonRequest = {
 			method: methodName,
 			typeName: symbol.name,
-			result: TypeInfo.isVoid(requestTypes.result)
-				? TypeInfo.asJsonType({ kind: "base", name: "null" })
-				: TypeInfo.asJsonType(requestTypes.result),
-			messageDirection: this.getMessageDirection(symbol),
+			result: TypeInfo.isVoid(requestTypes.result) ? TypeInfo.asJsonType({ kind: 'base', name: 'null' }) : TypeInfo.asJsonType(requestTypes.result),
+			messageDirection: this.getMessageDirection(symbol)
 		};
-		result.params =
-			requestTypes.param !== undefined
-				? asJsonType(requestTypes.param)
-				: undefined;
+		result.params = requestTypes.param !== undefined ? asJsonType(requestTypes.param) : undefined;
 		result.partialResult = asJsonType(requestTypes.partialResult);
 		result.errorData = asJsonType(requestTypes.errorData);
 		result.registrationMethod = this.getRegistrationMethodName(symbol);
-		result.registrationOptions = asJsonType(
-			requestTypes.registrationOptions,
-		);
+		result.registrationOptions = asJsonType(requestTypes.registrationOptions);
 		this.fillDocProperties(node, result);
 		return result;
 	}
 
-	private visitNotification(
-		node: ts.ModuleDeclaration,
-	): JsonNotification | undefined {
+	private visitNotification(node: ts.ModuleDeclaration): JsonNotification | undefined {
 		const symbol = this.typeChecker.getSymbolAtLocation(node.name);
 		if (symbol === undefined) {
 			return;
 		}
-		const type = symbol.exports?.get("type" as ts.__String);
+		const type = symbol.exports?.get('type' as ts.__String);
 		if (type === undefined) {
 			return;
 		}
@@ -529,16 +382,11 @@ export default class Visitor {
 		const result: JsonNotification = {
 			method: methodName,
 			typeName: symbol.name,
-			messageDirection: this.getMessageDirection(symbol),
+			messageDirection: this.getMessageDirection(symbol)
 		};
-		result.params =
-			notificationTypes.param !== undefined
-				? asJsonType(notificationTypes.param)
-				: undefined;
+		result.params = notificationTypes.param !== undefined ? asJsonType(notificationTypes.param) : undefined;
 		result.registrationMethod = this.getRegistrationMethodName(symbol);
-		result.registrationOptions = asJsonType(
-			notificationTypes.registrationOptions,
-		);
+		result.registrationOptions = asJsonType(notificationTypes.registrationOptions);
 		this.fillDocProperties(node, result);
 		return result;
 	}
@@ -556,71 +404,47 @@ export default class Visitor {
 	}
 
 	private queueTypeInfo(typeInfo: TypeInfo): void {
-		if (typeInfo.kind === "reference") {
+		if (typeInfo.kind === 'reference') {
 			this.queueSymbol(typeInfo.name, typeInfo.symbol);
-		} else if (typeInfo.kind === "array") {
+		} else if (typeInfo.kind === 'array') {
 			this.queueTypeInfo(typeInfo.elementType);
-		} else if (
-			typeInfo.kind === "union" ||
-			typeInfo.kind === "intersection" ||
-			typeInfo.kind === "tuple"
-		) {
-			typeInfo.items.forEach((item) => this.queueTypeInfo(item));
-		} else if (typeInfo.kind === "map") {
+		} else if (typeInfo.kind === 'union' || typeInfo.kind === 'intersection' || typeInfo.kind === 'tuple') {
+			typeInfo.items.forEach(item => this.queueTypeInfo(item));
+		} else if (typeInfo.kind === 'map') {
 			this.queueTypeInfo(typeInfo.key);
 			this.queueTypeInfo(typeInfo.value);
-		} else if (typeInfo.kind === "literal") {
-			typeInfo.items.forEach((item) => this.queueTypeInfo(item.type));
+		} else if (typeInfo.kind === 'literal') {
+			typeInfo.items.forEach(item => this.queueTypeInfo(item.type));
 		}
 	}
 
 	private queueSymbol(name: string, symbol: ts.Symbol): void {
 		if (name !== symbol.getName()) {
-			throw new Error(
-				`Different symbol names [${name}, ${symbol.getName()}]`,
-			);
+			throw new Error(`Different symbol names [${name}, ${symbol.getName()}]`);
 		}
-		const existing =
-			this.symbolQueue.get(name) ?? this.processedStructures.get(name);
+		const existing = this.symbolQueue.get(name) ?? this.processedStructures.get(name);
 		if (existing === undefined) {
-			const aliased = Symbols.isAliasSymbol(symbol)
-				? this.typeChecker.getAliasedSymbol(symbol)
-				: undefined;
-			if (
-				aliased !== undefined &&
-				aliased.getName() !== symbol.getName()
-			) {
-				throw new Error(
-					`The symbol ${symbol.getName()} has a different name than the aliased symbol ${aliased.getName()}`,
-				);
+			const aliased = Symbols.isAliasSymbol(symbol) ? this.typeChecker.getAliasedSymbol(symbol) : undefined;
+			if (aliased !== undefined && aliased.getName() !== symbol.getName()) {
+				throw new Error(`The symbol ${symbol.getName()} has a different name than the aliased symbol ${aliased.getName()}`);
 			}
 			this.symbolQueue.set(name, aliased ?? symbol);
 		} else {
-			const left = Symbols.isAliasSymbol(symbol)
-				? this.typeChecker.getAliasedSymbol(symbol)
-				: symbol;
-			const right = Symbols.isAliasSymbol(existing)
-				? this.typeChecker.getAliasedSymbol(existing)
-				: existing;
-			if (
-				this.symbols.createKey(left) !== this.symbols.createKey(right)
-			) {
-				throw new Error(
-					`The type ${name} has two different declarations`,
-				);
+			const left = Symbols.isAliasSymbol(symbol) ? this.typeChecker.getAliasedSymbol(symbol) : symbol;
+			const right = Symbols.isAliasSymbol(existing) ? this.typeChecker.getAliasedSymbol(existing) : existing;
+			if (this.symbols.createKey(left) !== this.symbols.createKey(right)) {
+				throw new Error(`The type ${name} has two different declarations`);
 			}
 		}
 	}
 
-	private endVisitModuleDeclaration(_node: ts.ModuleDeclaration): void {}
+	private endVisitModuleDeclaration(_node: ts.ModuleDeclaration): void {
+	}
 
 	private getSourceFilesToIndex(): ReadonlyArray<ts.SourceFile> {
 		const result: ts.SourceFile[] = [];
 		for (const sourceFile of this.program.getSourceFiles()) {
-			if (
-				this.program.isSourceFileFromExternalLibrary(sourceFile) ||
-				this.program.isSourceFileDefaultLibrary(sourceFile)
-			) {
+			if (this.program.isSourceFileFromExternalLibrary(sourceFile) || this.program.isSourceFileDefaultLibrary(sourceFile)) {
 				continue;
 			}
 			result.push(sourceFile);
@@ -628,11 +452,8 @@ export default class Visitor {
 		return result;
 	}
 
-	private getMethodName(
-		namespace: ts.Symbol,
-		type: ts.Symbol,
-	): string | undefined {
-		const method = namespace.exports?.get("method" as ts.__String);
+	private getMethodName(namespace: ts.Symbol, type: ts.Symbol): string | undefined {
+		const method = namespace.exports?.get('method' as ts.__String);
 		let text: string;
 		if (method !== undefined) {
 			const declaration = this.getFirstDeclaration(method);
@@ -643,11 +464,7 @@ export default class Visitor {
 				return undefined;
 			}
 			const initializer = declaration.initializer;
-			if (
-				initializer === undefined ||
-				(!ts.isStringLiteral(initializer) &&
-					!ts.isNoSubstitutionTemplateLiteral(initializer))
-			) {
+			if (initializer === undefined || (!ts.isStringLiteral(initializer) && !ts.isNoSubstitutionTemplateLiteral(initializer))) {
 				return undefined;
 			}
 			text = initializer.getText();
@@ -672,44 +489,24 @@ export default class Visitor {
 		return this.removeQuotes(text);
 	}
 
-	private getRegistrationMethodName(
-		namespace: ts.Symbol,
-	): string | undefined {
-		const registrationMethod = namespace.exports?.get(
-			"registrationMethod" as ts.__String,
-		);
+	private getRegistrationMethodName(namespace: ts.Symbol): string | undefined {
+		const registrationMethod = namespace.exports?.get('registrationMethod' as ts.__String);
 		if (registrationMethod === undefined) {
 			return undefined;
 		}
 		const declaration = this.getFirstDeclaration(registrationMethod);
-		if (
-			declaration === undefined ||
-			!ts.isVariableDeclaration(declaration) ||
-			declaration.initializer === undefined ||
-			!ts.isPropertyAccessExpression(declaration.initializer)
-		) {
+		if (declaration === undefined || !ts.isVariableDeclaration(declaration) || declaration.initializer === undefined || !ts.isPropertyAccessExpression(declaration.initializer)) {
 			return undefined;
 		}
-		const initializerSymbol = this.typeChecker.getSymbolAtLocation(
-			declaration.initializer.name,
-		);
-		if (
-			initializerSymbol === undefined ||
-			initializerSymbol.valueDeclaration === undefined
-		) {
+		const initializerSymbol = this.typeChecker.getSymbolAtLocation(declaration.initializer.name);
+		if (initializerSymbol === undefined || initializerSymbol.valueDeclaration === undefined) {
 			return undefined;
 		}
 		const valueDeclaration = initializerSymbol.valueDeclaration;
 		if (!ts.isVariableDeclaration(valueDeclaration)) {
 			return undefined;
 		}
-		if (
-			valueDeclaration.initializer === undefined ||
-			(!ts.isStringLiteral(valueDeclaration.initializer) &&
-				!ts.isNoSubstitutionTemplateLiteral(
-					valueDeclaration.initializer,
-				))
-		) {
+		if (valueDeclaration.initializer === undefined || (!ts.isStringLiteral(valueDeclaration.initializer) && !ts.isNoSubstitutionTemplateLiteral(valueDeclaration.initializer))) {
 			return undefined;
 		}
 
@@ -718,38 +515,23 @@ export default class Visitor {
 
 	private getMessageDirection(namespace: ts.Symbol): MessageDirection {
 		const errorMessage = `No message direction specified for request ${namespace.getName()}`;
-		const messageDirection = namespace.exports?.get(
-			"messageDirection" as ts.__String,
-		);
+		const messageDirection = namespace.exports?.get('messageDirection' as ts.__String);
 		if (messageDirection === undefined) {
 			throw new Error(errorMessage);
 		}
 		const declaration = this.getFirstDeclaration(messageDirection);
-		if (
-			declaration === undefined ||
-			!ts.isVariableDeclaration(declaration) ||
-			declaration.initializer === undefined ||
-			!ts.isPropertyAccessExpression(declaration.initializer)
-		) {
+		if (declaration === undefined || !ts.isVariableDeclaration(declaration) || declaration.initializer === undefined || !ts.isPropertyAccessExpression(declaration.initializer)) {
 			throw new Error(errorMessage);
 		}
-		const initializerSymbol = this.typeChecker.getSymbolAtLocation(
-			declaration.initializer.name,
-		);
-		if (
-			initializerSymbol === undefined ||
-			initializerSymbol.valueDeclaration === undefined
-		) {
+		const initializerSymbol = this.typeChecker.getSymbolAtLocation(declaration.initializer.name);
+		if (initializerSymbol === undefined || initializerSymbol.valueDeclaration === undefined) {
 			throw new Error(errorMessage);
 		}
 		const valueDeclaration = initializerSymbol.valueDeclaration;
 		if (!ts.isEnumMember(valueDeclaration)) {
 			throw new Error(errorMessage);
 		}
-		if (
-			valueDeclaration.initializer === undefined ||
-			!ts.isStringLiteral(valueDeclaration.initializer)
-		) {
+		if (valueDeclaration.initializer === undefined || !ts.isStringLiteral(valueDeclaration.initializer)) {
 			throw new Error(errorMessage);
 		}
 		const value = this.removeQuotes(valueDeclaration.initializer.getText());
@@ -787,27 +569,14 @@ export default class Visitor {
 		}
 		switch (initializer.typeArguments.length) {
 			case 4:
-				return {
-					result: typeInfos[0],
-					partialResult: typeInfos[1],
-					errorData: typeInfos[2],
-					registrationOptions: typeInfos[3],
-				};
+				return { result: typeInfos[0], partialResult: typeInfos[1], errorData: typeInfos[2], registrationOptions: typeInfos[3] };
 			case 5:
-				return {
-					param: typeInfos[0],
-					result: typeInfos[1],
-					partialResult: typeInfos[2],
-					errorData: typeInfos[3],
-					registrationOptions: typeInfos[4],
-				};
+				return { param: typeInfos[0], result: typeInfos[1], partialResult: typeInfos[2], errorData: typeInfos[3], registrationOptions: typeInfos[4] };
 		}
 		return undefined;
 	}
 
-	private getNotificationTypes(
-		symbol: ts.Symbol,
-	): NotificationTypes | undefined {
+	private getNotificationTypes(symbol: ts.Symbol): NotificationTypes | undefined {
 		const declaration = this.getFirstDeclaration(symbol);
 		if (declaration === undefined) {
 			return undefined;
@@ -837,48 +606,38 @@ export default class Visitor {
 			case 1:
 				return { registrationOptions: typeInfos[0] };
 			case 2:
-				return {
-					param: typeInfos[0],
-					registrationOptions: typeInfos[1],
-				};
+				return { param: typeInfos[0], registrationOptions: typeInfos[1] };
 		}
 		return undefined;
 	}
 
-	private getTypeInfo(
-		typeNode: ts.TypeNode | ts.Identifier,
-		isLSPAny = false,
-	): TypeInfo | undefined {
+	private getTypeInfo(typeNode: ts.TypeNode | ts.Identifier, isLSPAny = false): TypeInfo | undefined {
 		if (ts.isIdentifier(typeNode)) {
 			const typeName = typeNode.text;
 			if (LSPBaseTypes.has(typeName)) {
-				return { kind: "base", name: typeName as BaseTypeInfoKind };
+				return { kind: 'base', name: typeName as BaseTypeInfoKind };
 			}
 			const symbol = this.typeChecker.getSymbolAtLocation(typeNode);
 			if (symbol === undefined) {
 				return undefined;
 			}
-			return { kind: "reference", name: typeName, symbol };
+			return { kind: 'reference', name: typeName, symbol };
 		} else if (ts.isTypeReferenceNode(typeNode)) {
-			const typeName = ts.isIdentifier(typeNode.typeName)
-				? typeNode.typeName.text
-				: typeNode.typeName.right.text;
+			const typeName = ts.isIdentifier(typeNode.typeName) ? typeNode.typeName.text : typeNode.typeName.right.text;
 			if (LSPBaseTypes.has(typeName)) {
-				return { kind: "base", name: typeName as BaseTypeInfoKind };
+				return { kind: 'base', name: typeName as BaseTypeInfoKind };
 			}
-			const symbol = this.typeChecker.getSymbolAtLocation(
-				typeNode.typeName,
-			);
+			const symbol = this.typeChecker.getSymbolAtLocation(typeNode.typeName);
 			if (symbol === undefined) {
 				return undefined;
 			}
-			return { kind: "reference", name: typeName, symbol };
+			return { kind: 'reference', name: typeName, symbol };
 		} else if (ts.isArrayTypeNode(typeNode)) {
 			const elementType = this.getTypeInfo(typeNode.elementType);
 			if (elementType === undefined) {
 				return undefined;
 			}
-			return { kind: "array", elementType: elementType };
+			return { kind: 'array', elementType: elementType };
 		} else if (ts.isUnionTypeNode(typeNode)) {
 			const items: TypeInfo[] = [];
 			for (const item of typeNode.types) {
@@ -888,16 +647,12 @@ export default class Visitor {
 				}
 				// We need to remove undefined from LSP Any since
 				// it is not a valid type on the wire
-				if (
-					isLSPAny &&
-					typeInfo.kind === "base" &&
-					typeInfo.name === "undefined"
-				) {
+				if (isLSPAny && typeInfo.kind === 'base' && typeInfo.name === 'undefined') {
 					continue;
 				}
 				items.push(typeInfo);
 			}
-			return { kind: "union", items };
+			return { kind: 'union', items };
 		} else if (ts.isIntersectionTypeNode(typeNode)) {
 			const items: TypeInfo[] = [];
 			for (const item of typeNode.types) {
@@ -907,19 +662,13 @@ export default class Visitor {
 				}
 				items.push(typeInfo);
 			}
-			return { kind: "intersection", items };
+			return { kind: 'intersection', items };
 		} else if (ts.isTypeLiteralNode(typeNode)) {
 			const type = this.typeChecker.getTypeAtLocation(typeNode);
-			const info = this.typeChecker.getIndexInfoOfType(
-				type,
-				ts.IndexKind.String,
-			);
+			const info = this.typeChecker.getIndexInfoOfType(type, ts.IndexKind.String);
 			if (info !== undefined) {
 				const declaration = info.declaration;
-				if (
-					declaration === undefined ||
-					declaration.parameters.length < 1
-				) {
+				if (declaration === undefined || declaration.parameters.length < 1) {
 					return undefined;
 				}
 				const keyTypeNode = declaration.parameters[0].type;
@@ -934,7 +683,7 @@ export default class Visitor {
 				if (!MapKeyType.is(key)) {
 					return undefined;
 				}
-				return { kind: "map", key: key, value: value };
+				return { kind: 'map', key: key, value: value };
 			} else {
 				// We can't directly ask for the symbol since the literal has no name.
 				const type = this.typeChecker.getTypeAtLocation(typeNode);
@@ -943,43 +692,26 @@ export default class Visitor {
 					return undefined;
 				}
 				if (symbol.members === undefined) {
-					return { kind: "literal", items: new Map() };
+					return { kind: 'literal', items: new Map() };
 				}
-				const items = new Map<
-					string,
-					{ type: TypeInfo; optional: boolean }
-				>();
+				const items = new Map<string, { type: TypeInfo; optional: boolean }>();
 				symbol.members.forEach((member) => {
 					if (!Symbols.isProperty(member)) {
 						return;
 					}
-					const declaration = this.getDeclaration(
-						member,
-						ts.SyntaxKind.PropertySignature,
-					);
-					if (
-						declaration === undefined ||
-						!ts.isPropertySignature(declaration) ||
-						declaration.type === undefined
-					) {
-						throw new Error(
-							`Can't parse property ${member.getName()} of structure ${symbol.getName()}`,
-						);
+					const declaration = this.getDeclaration(member, ts.SyntaxKind.PropertySignature);
+					if (declaration === undefined || !ts.isPropertySignature(declaration) || declaration.type === undefined) {
+						throw new Error(`Can't parse property ${member.getName()} of structure ${symbol.getName()}`);
 					}
 					const propertyType = this.getTypeInfo(declaration.type);
 					if (propertyType === undefined) {
-						throw new Error(
-							`Can't parse property ${member.getName()} of structure ${symbol.getName()}`,
-						);
+						throw new Error(`Can't parse property ${member.getName()} of structure ${symbol.getName()}`);
 					}
-					const literalInfo: LiteralInfo = {
-						type: propertyType,
-						optional: Symbols.isOptional(member),
-					};
+					const literalInfo: LiteralInfo = { type: propertyType, optional: Symbols.isOptional(member) };
 					this.fillDocProperties(declaration, literalInfo);
 					items.set(member.getName(), literalInfo);
 				});
-				return { kind: "literal", items };
+				return { kind: 'literal', items };
 			}
 		} else if (ts.isTupleTypeNode(typeNode)) {
 			const items: TypeInfo[] = [];
@@ -990,50 +722,25 @@ export default class Visitor {
 				}
 				items.push(typeInfo);
 			}
-			return { kind: "tuple", items };
-		} else if (
-			ts.isTypeQueryNode(typeNode) &&
-			ts.isQualifiedName(typeNode.exprName)
-		) {
+			return { kind: 'tuple', items };
+		} else if (ts.isTypeQueryNode(typeNode) && ts.isQualifiedName(typeNode.exprName)) {
 			// Currently we only us the typeof operator to get to the type of a enum
 			// value expressed by an or type (e.g. kind: typeof DocumentDiagnosticReportKind.full)
 			// So we assume a qualifed name and turn it into a string literal type
-			const typeNodeSymbol = this.typeChecker.getSymbolAtLocation(
-				typeNode.exprName,
-			);
+			const typeNodeSymbol = this.typeChecker.getSymbolAtLocation(typeNode.exprName);
 			if (typeNodeSymbol === undefined) {
-				throw new Error(
-					`Can't resolve symbol for right hand side of enum declaration`,
-				);
+				throw new Error(`Can't resolve symbol for right hand side of enum declaration`);
 			}
-			const declaration = this.getDeclaration(
-				typeNodeSymbol,
-				ts.SyntaxKind.VariableDeclaration,
-			);
-			if (
-				declaration === undefined ||
-				!ts.isVariableDeclaration(declaration) ||
-				declaration.initializer === undefined
-			) {
-				throw new Error(
-					`Can't resolve variable declaration for right hand side of enum declaration`,
-				);
+			const declaration = this.getDeclaration(typeNodeSymbol, ts.SyntaxKind.VariableDeclaration);
+			if (declaration === undefined || !ts.isVariableDeclaration(declaration) || declaration.initializer === undefined) {
+				throw new Error(`Can't resolve variable declaration for right hand side of enum declaration`);
 			}
 			if (ts.isNumericLiteral(declaration.initializer)) {
-				return {
-					kind: "integerLiteral",
-					value: Number.parseInt(declaration.initializer.getText()),
-				};
+				return { kind: 'integerLiteral', value: Number.parseInt(declaration.initializer.getText()) };
 			} else if (ts.isStringLiteral(declaration.initializer)) {
-				return {
-					kind: "stringLiteral",
-					value: this.removeQuotes(declaration.initializer.getText()),
-				};
+				return { kind: 'stringLiteral', value: this.removeQuotes(declaration.initializer.getText()) };
 			}
-			return {
-				kind: "stringLiteral",
-				value: typeNode.exprName.right.getText(),
-			};
+			return { kind: 'stringLiteral', value: typeNode.exprName.right.getText() };
 		} else if (ts.isParenthesizedTypeNode(typeNode)) {
 			return this.getTypeInfo(typeNode.type);
 		} else if (ts.isLiteralTypeNode(typeNode)) {
@@ -1043,124 +750,74 @@ export default class Visitor {
 	}
 
 	private getBaseTypeInfo(node: ts.Node): TypeInfo | undefined {
-		switch (node.kind) {
+		switch (node.kind){
 			case ts.SyntaxKind.NullKeyword:
-				return { kind: "base", name: "null" };
+				return { kind: 'base', name: 'null' };
 			case ts.SyntaxKind.UnknownKeyword:
-				return { kind: "base", name: "unknown" };
+				return { kind: 'base', name: 'unknown' };
 			case ts.SyntaxKind.NeverKeyword:
-				return { kind: "base", name: "never" };
+				return { kind: 'base', name: 'never' };
 			case ts.SyntaxKind.VoidKeyword:
-				return { kind: "base", name: "void" };
+				return { kind: 'base', name: 'void' };
 			case ts.SyntaxKind.UndefinedKeyword:
-				return { kind: "base", name: "undefined" };
+				return { kind: 'base', name: 'undefined' };
 			case ts.SyntaxKind.AnyKeyword:
-				return { kind: "base", name: "any" };
+				return { kind: 'base', name: 'any' };
 			case ts.SyntaxKind.StringKeyword:
-				return { kind: "base", name: "string" };
+				return  { kind: 'base', name: 'string' };
 			case ts.SyntaxKind.NumberKeyword:
-				return { kind: "base", name: "integer" };
+				return { kind: 'base', name: 'integer' };
 			case ts.SyntaxKind.BooleanKeyword:
-				return { kind: "base", name: "boolean" };
+				return { kind: 'base', name: 'boolean' };
 			case ts.SyntaxKind.StringLiteral:
-				return {
-					kind: "stringLiteral",
-					value: this.removeQuotes(node.getText()),
-				};
+				return { kind: 'stringLiteral', value: this.removeQuotes(node.getText()) };
 			case ts.SyntaxKind.NumericLiteral:
-				return {
-					kind: "integerLiteral",
-					value: Number.parseInt(node.getText()),
-				};
+				return { kind: 'integerLiteral', value: Number.parseInt(node.getText()) };
 			case ts.SyntaxKind.ObjectKeyword:
-				return { kind: "base", name: "object" };
+				return { kind: 'base', name: 'object' };
 		}
 		return undefined;
 	}
 
-	private static readonly Mixins: Set<string> = new Set([
-		"WorkDoneProgressParams",
-		"PartialResultParams",
-		"StaticRegistrationOptions",
-		"WorkDoneProgressOptions",
+	private static readonly Mixins: Set<string> = new Set(['WorkDoneProgressParams', 'PartialResultParams', 'StaticRegistrationOptions', 'WorkDoneProgressOptions']);
+	private static readonly PropertyFilters: Map<string, Set<string>> = new Map([
+		['TraceValue', new Set(['Compact'])],
+		['ErrorCodes', new Set(['jsonrpcReservedErrorRangeStart', 'serverErrorStart', 'MessageWriteError', 'MessageReadError', 'PendingResponseRejected', 'ConnectionInactive', 'jsonrpcReservedErrorRangeEnd', 'serverErrorEnd'])],
+		['LSPErrorCodes', new Set(['lspReservedErrorRangeStart', 'lspReservedErrorRangeEnd'])]
 	]);
-	private static readonly PropertyFilters: Map<string, Set<string>> = new Map(
-		[
-			["TraceValue", new Set(["Compact"])],
-			[
-				"ErrorCodes",
-				new Set([
-					"jsonrpcReservedErrorRangeStart",
-					"serverErrorStart",
-					"MessageWriteError",
-					"MessageReadError",
-					"PendingResponseRejected",
-					"ConnectionInactive",
-					"jsonrpcReservedErrorRangeEnd",
-					"serverErrorEnd",
-				]),
-			],
-			[
-				"LSPErrorCodes",
-				new Set([
-					"lspReservedErrorRangeStart",
-					"lspReservedErrorRangeEnd",
-				]),
-			],
-		],
-	);
-	private static readonly PropertyRenames: Map<string, Map<string, string>> =
-		new Map([
-			[
-				"MonikerKind",
-				new Map([
-					["$export", "export"],
-					["$import", "import"],
-				]),
-			],
-		]);
-	private processSymbol(
-		name: string,
-		symbol: ts.Symbol,
-	): Structure | Enumeration | TypeAlias | undefined {
+	private static readonly PropertyRenames: Map<string, Map<string, string>> = new Map([
+		['MonikerKind', new Map([
+			['$export', 'export'],
+			['$import', 'import']
+		])]
+	]);
+	private processSymbol(name: string, symbol: ts.Symbol): Structure | Enumeration | TypeAlias | undefined {
 		// We can't define LSPAny in the protocol right now due to TS issues.
 		// So we predefine it and emit it.
-		if (name === "LSPAny") {
+		if (name === 'LSPAny') {
 			this.typeAliases.push(PreDefined.LSPArray);
 			return PreDefined.LSPAny;
 		}
-		if (name === "LSPArray") {
+		if (name === 'LSPArray') {
 			// LSP Array is never reference via a indirect reference from
 			// a request or notification.
 			return undefined;
 		}
-		if (name === "LSPObject") {
+		if (name === 'LSPObject') {
 			return PreDefined.LSPObject;
 		}
 		if (Symbols.isInterface(symbol)) {
 			const result: Structure = { name: name, properties: [] };
-			const declaration = this.getDeclaration(
-				symbol,
-				ts.SyntaxKind.InterfaceDeclaration,
-			);
-			if (
-				declaration !== undefined &&
-				ts.isInterfaceDeclaration(declaration) &&
-				declaration.heritageClauses !== undefined
-			) {
+			const declaration = this.getDeclaration(symbol, ts.SyntaxKind.InterfaceDeclaration);
+			if (declaration !== undefined && ts.isInterfaceDeclaration(declaration) && declaration.heritageClauses !== undefined) {
 				const mixins: JsonType[] = [];
 				const extend: JsonType[] = [];
 				for (const clause of declaration.heritageClauses) {
 					for (const type of clause.types) {
 						if (ts.isIdentifier(type.expression)) {
 							const typeInfo = this.getTypeInfo(type.expression);
-							if (
-								typeInfo === undefined ||
-								typeInfo.kind !== "reference"
-							) {
-								throw new Error(
-									`Can't create type info for extends clause ${type.expression.getText()}`,
-								);
+							if (typeInfo === undefined || typeInfo.kind !== 'reference') {
+								throw new Error(`Can't create type info for extends clause ${type.expression.getText()}`);
 							}
 							if (Visitor.Mixins.has(typeInfo.name)) {
 								mixins.push(TypeInfo.asJsonType(typeInfo));
@@ -1184,25 +841,14 @@ export default class Visitor {
 			this.fillProperties(result, symbol);
 			return result;
 		} else if (Symbols.isTypeAlias(symbol)) {
-			const declaration = this.getDeclaration(
-				symbol,
-				ts.SyntaxKind.TypeAliasDeclaration,
-			);
-			if (
-				declaration === undefined ||
-				!ts.isTypeAliasDeclaration(declaration)
-			) {
-				throw new Error(
-					`No declaration found for type alias ${symbol.getName()}`,
-				);
+			const declaration = this.getDeclaration(symbol, ts.SyntaxKind.TypeAliasDeclaration);
+			if (declaration === undefined ||!ts.isTypeAliasDeclaration(declaration)) {
+				throw new Error (`No declaration found for type alias ${symbol.getName() }`);
 			}
 			if (ts.isTypeLiteralNode(declaration.type)) {
 				// We have a single type literal node. So treat it as a structure
 				const result: Structure = { name: name, properties: [] };
-				this.fillProperties(
-					result,
-					this.typeChecker.getTypeAtLocation(declaration.type).symbol,
-				);
+				this.fillProperties(result, this.typeChecker.getTypeAtLocation(declaration.type).symbol);
 				this.fillDocProperties(declaration, result);
 				return result;
 			} else if (ts.isIntersectionTypeNode(declaration.type)) {
@@ -1213,13 +859,8 @@ export default class Visitor {
 					const extend: JsonType[] = [];
 					for (const reference of split.references) {
 						const typeInfo = this.getTypeInfo(reference);
-						if (
-							typeInfo === undefined ||
-							typeInfo.kind !== "reference"
-						) {
-							throw new Error(
-								`Can't create type info for type reference ${reference.getText()}`,
-							);
+						if (typeInfo === undefined || typeInfo.kind !== 'reference') {
+							throw new Error(`Can't create type info for type reference ${reference.getText()}`);
 						}
 						if (Visitor.Mixins.has(typeInfo.name)) {
 							mixins.push(TypeInfo.asJsonType(typeInfo));
@@ -1235,155 +876,75 @@ export default class Visitor {
 						result.mixins = mixins;
 					}
 					if (split.literal !== undefined) {
-						this.fillProperties(
-							result,
-							this.typeChecker.getTypeAtLocation(split.literal)
-								.symbol,
-						);
+						this.fillProperties(result, this.typeChecker.getTypeAtLocation(split.literal).symbol);
 					}
 					this.fillDocProperties(declaration, result);
 					return result;
 				}
 			}
-			const target = this.getTypeInfo(
-				declaration.type,
-				name === "LSPAny",
-			);
+			const target = this.getTypeInfo(declaration.type, name === 'LSPAny');
 			if (target === undefined) {
-				throw new Error(
-					`Can't resolve target type for type alias ${symbol.getName()}`,
-				);
+				throw new Error(`Can't resolve target type for type alias ${symbol.getName()}`);
 			}
-			const namespace = this.getDeclaration(
-				symbol,
-				ts.SyntaxKind.ModuleDeclaration,
-			);
-			if (
-				namespace !== undefined &&
-				symbol.declarations !== undefined &&
-				symbol.declarations.length === 2
-			) {
-				const fixedSet =
-					target.kind === "union" ||
-					target.kind === "stringLiteral" ||
-					target.kind === "integerLiteral";
-				const openSet =
-					target.kind === "base" &&
-					(target.name === "string" ||
-						target.name === "integer" ||
-						target.name === "uinteger");
+			const namespace = this.getDeclaration(symbol, ts.SyntaxKind.ModuleDeclaration);
+			if (namespace !== undefined && symbol.declarations !== undefined && symbol.declarations.length === 2) {
+				const fixedSet = (target.kind === 'union' || target.kind === 'stringLiteral' || target.kind === 'integerLiteral');
+				const openSet = (target.kind === 'base' && (target.name === 'string' || target.name === 'integer' || target.name === 'uinteger'));
 				if (openSet || fixedSet) {
 					// Check if we have a enum declaration.
-					const body = namespace
-						.getChildren()
-						.find(
-							(node) => node.kind === ts.SyntaxKind.ModuleBlock,
-						);
+					const body = namespace.getChildren().find(node => node.kind === ts.SyntaxKind.ModuleBlock);
 					if (body !== undefined && ts.isModuleBlock(body)) {
 						const enumValues = this.getEnumValues(target);
-						const variableStatements = body.statements.filter(
-							(statement) => ts.isVariableStatement(statement),
-						);
-						if (
-							(fixedSet &&
-								enumValues !== undefined &&
-								enumValues.length > 0 &&
-								variableStatements.length ===
-									enumValues.length) ||
-							(openSet && variableStatements.length > 0)
-						) {
+						const variableStatements = body.statements.filter((statement => ts.isVariableStatement(statement)));
+						if ((fixedSet && enumValues !== undefined && enumValues.length > 0 && variableStatements.length === enumValues.length) || (openSet && variableStatements.length > 0)) {
 							// Same length and all variable statement.
-							const enumValuesSet:
-								| Set<number | string>
-								| undefined = enumValues
-								? new Set<any>(enumValues as any)
-								: undefined;
+							const enumValuesSet: Set<number | string> | undefined = enumValues ? new Set<any>(enumValues as any) : undefined;
 							let isEnum = true;
 							const enumerations: EnumerationEntry[] = [];
 							for (const variable of variableStatements) {
-								if (
-									!ts.isVariableStatement(variable) ||
-									variable.declarationList.declarations
-										.length !== 1
-								) {
+								if (!ts.isVariableStatement(variable) || variable.declarationList.declarations.length !== 1) {
 									isEnum = false;
 									break;
 								}
-								const declaration =
-									variable.declarationList.declarations[0];
+								const declaration = variable.declarationList.declarations[0];
 								if (!ts.isVariableDeclaration(declaration)) {
 									isEnum = false;
 									break;
 								}
-								const value: number | string | undefined =
-									this.getEnumValue(declaration);
+								const value: number | string | undefined = this.getEnumValue(declaration);
 								if (value === undefined) {
 									isEnum = false;
 									break;
 								}
-								if (
-									enumValuesSet &&
-									!enumValuesSet.has(value)
-								) {
+								if (enumValuesSet && !enumValuesSet.has(value)) {
 									isEnum = false;
 									break;
 								}
 								let propertyName = declaration.name.getText();
-								if (
-									Visitor.PropertyRenames.has(name) &&
-									Visitor.PropertyRenames.get(name)?.has(
-										propertyName,
-									)
-								) {
-									propertyName =
-										Visitor.PropertyRenames.get(name)!.get(
-											propertyName,
-										)!;
+								if (Visitor.PropertyRenames.has(name) && Visitor.PropertyRenames.get(name)?.has(propertyName)) {
+									propertyName = Visitor.PropertyRenames.get(name)!.get(propertyName)!;
 								}
-								if (
-									Visitor.PropertyFilters.has(name) &&
-									Visitor.PropertyFilters.get(name)?.has(
-										propertyName,
-									)
-								) {
+								if (Visitor.PropertyFilters.has(name) && Visitor.PropertyFilters.get(name)?.has(propertyName)) {
 									continue;
 								}
-								const entry: EnumerationEntry = {
-									name: propertyName,
-									value: value,
-								};
+								const entry: EnumerationEntry = { name: propertyName, value: value };
 								this.fillDocProperties(variable, entry);
 								enumerations.push(entry);
 							}
 							if (isEnum) {
-								const type: EnumerationType | undefined =
-									enumValues
-										? this.getEnumBaseType(enumValues)
-										: openSet
-											? (target as EnumerationType)
-											: undefined;
+								const type: EnumerationType | undefined = enumValues
+									? this.getEnumBaseType(enumValues)
+									: openSet ? target as EnumerationType : undefined;
 								if (type !== undefined) {
-									const enumeration: Enumeration = {
-										name: name,
-										type: type,
-										values: enumerations,
-									};
+									const enumeration: Enumeration = { name: name, type: type, values: enumerations };
 									if (openSet && !fixedSet) {
 										enumeration.supportsCustomValues = true;
 									}
 									// First fill the documentation from the namespace and then from the
 									// type declaration.
-									this.fillDocProperties(
-										namespace,
-										enumeration,
-									);
-									if (
-										enumeration.documentation === undefined
-									) {
-										this.fillDocProperties(
-											namespace,
-											enumeration,
-										);
+									this.fillDocProperties(namespace, enumeration);
+									if (enumeration.documentation === undefined) {
+										this.fillDocProperties(namespace, enumeration);
 									}
 									return enumeration;
 								}
@@ -1394,98 +955,61 @@ export default class Visitor {
 			}
 			// We have a single reference to another type. Treat is as an extend of
 			// that structure
-			if (
-				target.kind === "reference" &&
-				Visitor.Mixins.has(target.name)
-			) {
+			if (target.kind === 'reference' && Visitor.Mixins.has(target.name)) {
 				this.queueTypeInfo(target);
-				const result: Structure = {
-					name: name,
-					mixins: [TypeInfo.asJsonType(target)],
-					properties: [],
-				};
+				const result: Structure = { name: name, mixins: [TypeInfo.asJsonType(target)], properties: [] };
 				this.fillDocProperties(declaration, result);
 				return result;
 			} else {
 				this.queueTypeInfo(target);
 
 				// In the protocol document filter can't be a string but the implementation allows it for backwards compatibility
-				if (name === "DocumentSelector") {
+				if (name === 'DocumentSelector') {
 					return PreDefined.DocumentSelector;
 				}
-				const result: TypeAlias = {
-					name: name,
-					type: TypeInfo.asJsonType(target),
-				};
+				const result: TypeAlias = { name: name, type: TypeInfo.asJsonType(target) };
 				this.fillDocProperties(declaration, result);
 				return result;
 			}
 		} else if (Symbols.isRegularEnum(symbol)) {
 			const entries: EnumerationEntry[] = [];
 			const exports = this.typeChecker.getExportsOfModule(symbol);
-			let enumBaseType: "string" | "integer" | "uinteger" | undefined =
-				undefined;
+			let enumBaseType: 'string' | 'integer' | 'uinteger' | undefined = undefined;
 			for (const item of exports) {
-				const declaration = this.getDeclaration(
-					item,
-					ts.SyntaxKind.EnumMember,
-				);
-				if (
-					declaration === undefined ||
-					!ts.isEnumMember(declaration) ||
-					declaration.initializer === undefined
-				) {
+				const declaration = this.getDeclaration(item, ts.SyntaxKind.EnumMember);
+				if (declaration === undefined || !ts.isEnumMember(declaration) || declaration.initializer === undefined) {
 					continue;
 				}
 				let value: string | number | undefined;
 				if (ts.isNumericLiteral(declaration.initializer)) {
 					value = Number.parseInt(declaration.initializer.getText());
 					if (value >= 0 && enumBaseType === undefined) {
-						enumBaseType = "uinteger";
+						enumBaseType = 'uinteger';
 					} else {
-						enumBaseType = "integer";
+						enumBaseType = 'integer';
 					}
 				} else if (ts.isStringLiteral(declaration.initializer)) {
-					value = this.removeQuotes(
-						declaration.initializer.getText(),
-					);
-					enumBaseType = "string";
+					value = this.removeQuotes(declaration.initializer.getText());
+					enumBaseType = 'string';
 				}
 				if (value === undefined) {
 					continue;
 				}
-				const entry: EnumerationEntry = {
-					name: item.getName(),
-					value: value,
-				};
-				if (
-					Visitor.PropertyFilters.has(name) &&
-					Visitor.PropertyFilters.get(name)?.has(entry.name)
-				) {
+				const entry: EnumerationEntry = { name: item.getName(), value: value };
+				if (Visitor.PropertyFilters.has(name) && Visitor.PropertyFilters.get(name)?.has(entry.name)) {
 					continue;
 				}
 				this.fillDocProperties(declaration, entry);
 				entries.push(entry);
 			}
-			const type: EnumerationType =
-				enumBaseType === undefined
-					? { kind: "base", name: "uinteger" }
-					: { kind: "base", name: enumBaseType };
-			const result: Enumeration = {
-				name: name,
-				type: type,
-				values: entries,
-			};
-			if (
-				name === "SemanticTokenTypes" ||
-				name === "SemanticTokenModifiers"
-			) {
+			const type: EnumerationType = enumBaseType === undefined
+				? { kind: 'base', name: 'uinteger' }
+				: { kind: 'base', name: enumBaseType };
+			const result: Enumeration = { name: name, type: type, values: entries };
+			if (name === 'SemanticTokenTypes' || name === 'SemanticTokenModifiers') {
 				result.supportsCustomValues = true;
 			}
-			const declaration = this.getDeclaration(
-				symbol,
-				ts.SyntaxKind.EnumDeclaration,
-			);
+			const declaration = this.getDeclaration(symbol, ts.SyntaxKind.EnumDeclaration);
 			if (declaration !== undefined) {
 				this.fillDocProperties(declaration, result);
 			}
@@ -1494,8 +1018,7 @@ export default class Visitor {
 			const result: Structure = { name: name, properties: [] };
 			this.fillProperties(result, symbol);
 			const declaration = this.getFirstDeclaration(symbol);
-			declaration !== undefined &&
-				this.fillDocProperties(declaration, result);
+			declaration !== undefined && this.fillDocProperties(declaration, result);
 			return result;
 		}
 	}
@@ -1511,44 +1034,19 @@ export default class Visitor {
 			if (!Symbols.isProperty(member)) {
 				return;
 			}
-			const declaration = this.getDeclaration(
-				member,
-				ts.SyntaxKind.PropertySignature,
-			);
-			if (
-				declaration === undefined ||
-				!ts.isPropertySignature(declaration) ||
-				declaration.type === undefined
-			) {
-				throw new Error(
-					`Can't parse property ${member.getName()} of structure ${symbol.getName()}`,
-				);
+			const declaration = this.getDeclaration(member, ts.SyntaxKind.PropertySignature);
+			if (declaration === undefined || !ts.isPropertySignature(declaration) || declaration.type === undefined) {
+				throw new Error(`Can't parse property ${member.getName()} of structure ${symbol.getName()}`);
 			}
 			const typeInfo = this.getTypeInfo(declaration.type);
 			if (typeInfo === undefined) {
-				throw new Error(
-					`Can't parse property ${member.getName()} of structure ${symbol.getName()}`,
-				);
+				throw new Error(`Can't parse property ${member.getName()} of structure ${symbol.getName()}`);
 			}
 
-			const isExperimentalProperty =
-				result.name === "ServerCapabilities" &&
-				member.getName() === "experimental" &&
-				typeInfo.kind === "reference" &&
-				typeInfo.name === "T";
+			const isExperimentalProperty = (result.name === 'ServerCapabilities' && member.getName() === 'experimental' && typeInfo.kind === 'reference' && typeInfo.name === 'T');
 			const property: Property = isExperimentalProperty
-				? {
-						name: member.getName(),
-						type: TypeInfo.asJsonType({
-							kind: "reference",
-							name: "LSPAny",
-							symbol: typeInfo.symbol,
-						}),
-					}
-				: {
-						name: member.getName(),
-						type: TypeInfo.asJsonType(typeInfo),
-					};
+				? { name: member.getName(), type: TypeInfo.asJsonType({ kind: 'reference', name: 'LSPAny', symbol: typeInfo.symbol }) }
+				: { name: member.getName(), type: TypeInfo.asJsonType(typeInfo) };
 			if (Symbols.isOptional(member)) {
 				property.optional = true;
 			}
@@ -1560,11 +1058,7 @@ export default class Visitor {
 		});
 	}
 
-	private splitIntersectionType(node: ts.IntersectionTypeNode): {
-		literal: ts.TypeLiteralNode | undefined;
-		references: ts.TypeReferenceNode[];
-		rest: ts.TypeNode[];
-	} {
+	private splitIntersectionType(node: ts.IntersectionTypeNode): { literal: ts.TypeLiteralNode | undefined; references: ts.TypeReferenceNode[]; rest: ts.TypeNode[] } {
 		let literal: ts.TypeLiteralNode | undefined;
 		const rest: ts.TypeNode[] = [];
 		const references: ts.TypeReferenceNode[] = [];
@@ -1586,15 +1080,10 @@ export default class Visitor {
 
 	private getFirstDeclaration(symbol: ts.Symbol): ts.Node | undefined {
 		const declarations = symbol.getDeclarations();
-		return declarations !== undefined && declarations.length > 0
-			? declarations[0]
-			: undefined;
+		return declarations !== undefined && declarations.length > 0 ? declarations[0] : undefined;
 	}
 
-	private getDeclaration(
-		symbol: ts.Symbol,
-		kind: ts.SyntaxKind,
-	): ts.Node | undefined {
+	private getDeclaration(symbol: ts.Symbol, kind: ts.SyntaxKind): ts.Node | undefined {
 		const declarations = symbol.getDeclarations();
 		if (declarations === undefined) {
 			return undefined;
@@ -1608,22 +1097,17 @@ export default class Visitor {
 	}
 
 	private getEnumValues(typeInfo: TypeInfo): string[] | number[] | undefined {
-		if (typeInfo.kind === "stringLiteral") {
+		if (typeInfo.kind === 'stringLiteral') {
 			return [typeInfo.value];
 		}
-		if (typeInfo.kind === "integerLiteral") {
+		if (typeInfo.kind === 'integerLiteral') {
 			return [typeInfo.value];
 		}
-		if (typeInfo.kind !== "union" || typeInfo.items.length === 0) {
+		if (typeInfo.kind !== 'union' || typeInfo.items.length === 0) {
 			return undefined;
 		}
 		const first = typeInfo.items[0];
-		const item: [string, string] | [string, number] | undefined =
-			first.kind === "stringLiteral"
-				? [first.kind, first.value]
-				: first.kind === "integerLiteral"
-					? [first.kind, first.value]
-					: undefined;
+		const item: [string, string] | [string, number] | undefined = first.kind === 'stringLiteral' ? [first.kind, first.value] : (first.kind === 'integerLiteral' ? [first.kind, first.value] : undefined);
 		if (item === undefined) {
 			return undefined;
 		}
@@ -1635,37 +1119,25 @@ export default class Visitor {
 			if (info.kind !== kind) {
 				return undefined;
 			}
-			if (
-				info.kind !== "integerLiteral" &&
-				info.kind !== "stringLiteral"
-			) {
+			if (info.kind !== 'integerLiteral' && info.kind !== 'stringLiteral') {
 				return undefined;
 			}
 			result.push(info.value);
 		}
-		return result as string[] | number[];
+		return (result as string[] | number[]);
 	}
 
-	private getEnumValue(
-		declaration: ts.VariableDeclaration,
-	): number | string | undefined {
+	private getEnumValue(declaration: ts.VariableDeclaration): number | string | undefined {
 		let enumValueNode: ts.Node | undefined;
 		if (declaration.initializer !== undefined) {
 			enumValueNode = declaration.initializer;
-		} else if (
-			declaration.type !== undefined &&
-			ts.isLiteralTypeNode(declaration.type)
-		) {
+		} else if (declaration.type !== undefined && ts.isLiteralTypeNode(declaration.type)) {
 			enumValueNode = declaration.type.literal;
 		}
 		if (enumValueNode === undefined) {
 			return undefined;
 		}
-		if (
-			ts.isNumericLiteral(enumValueNode) ||
-			(ts.isPrefixUnaryExpression(enumValueNode) &&
-				ts.isNumericLiteral(enumValueNode.operand))
-		) {
+		if (ts.isNumericLiteral(enumValueNode) || (ts.isPrefixUnaryExpression(enumValueNode) && ts.isNumericLiteral(enumValueNode.operand))) {
 			return Number.parseInt(enumValueNode.getText());
 		} else if (ts.isStringLiteral(enumValueNode)) {
 			return this.removeQuotes(enumValueNode.getText());
@@ -1673,59 +1145,36 @@ export default class Visitor {
 		return undefined;
 	}
 
-	getEnumBaseType(values: string[] | number[]): EnumerationType | undefined {
+	getEnumBaseType(values: string[] | number[]) : EnumerationType | undefined {
 		if (values.length === 0) {
 			return undefined;
 		}
 		const first = values[0];
-		if (typeof first === "string") {
-			return { kind: "base", name: "string" };
+		if (typeof first === 'string') {
+			return { kind: 'base', name: 'string' };
 		}
-		for (const value of values as number[]) {
+		for (const value of (values as number[])) {
 			if (value < 0) {
-				return { kind: "base", name: "integer" };
+				return { kind: 'base', name: 'integer' };
 			}
 		}
-		return { kind: "base", name: "uinteger" };
+		return { kind: 'base', name: 'uinteger' };
 	}
 
 	private removeQuotes(text: string): string {
 		const first = text[0];
-		if (
-			(first !== "'" && first !== '"' && first !== "`") ||
-			first !== text[text.length - 1]
-		) {
+		if ((first !== '\'' && first !== '"' && first !== '`') || first !== text[text.length - 1]) {
 			return text;
 		}
 		return text.substring(1, text.length - 1);
 	}
 
-	private fillDocProperties(
-		node: ts.Node,
-		value:
-			| JsonRequest
-			| JsonNotification
-			| Property
-			| Structure
-			| StructureLiteral
-			| EnumerationEntry
-			| Enumeration
-			| TypeAlias
-			| LiteralInfo,
-	): void {
+	private fillDocProperties(node: ts.Node, value: JsonRequest | JsonNotification | Property | Structure | StructureLiteral | EnumerationEntry | Enumeration | TypeAlias | LiteralInfo): void {
 		const filePath = node.getSourceFile().fileName;
 		const fileName = path.basename(filePath);
 		const tags = ts.getJSDocTags(node);
 		const { since, sinceTags, deprecated } = this.getTags(tags);
-		const proposed =
-			fileName.startsWith("proposed.") ||
-			tags.some((tag) => {
-				return (
-					ts.isJSDocUnknownTag(tag) && tag.tagName.text === "proposed"
-				);
-			})
-				? true
-				: undefined;
+		const proposed = (fileName.startsWith('proposed.') || tags.some((tag) => { return ts.isJSDocUnknownTag(tag) && tag.tagName.text === 'proposed';})) ? true : undefined;
 		value.documentation = this.getDocumentation(node);
 		value.since = since;
 		value.sinceTags = sinceTags;
@@ -1738,22 +1187,19 @@ export default class Visitor {
 		const ranges = ts.getLeadingCommentRanges(fullText, 0);
 		if (ranges !== undefined && ranges.length > 0) {
 			const start = ranges[ranges.length - 1].pos;
-			const end = ranges[ranges.length - 1].end;
+			const end = ranges[ranges.length -1 ].end;
 			const text = fullText.substring(start, end).trim();
-			if (text.startsWith("/**")) {
+			if (text.startsWith('/**')) {
 				const buffer: string[] = [];
 				const lines = text.split(/\r?\n/);
-				for (let i = 0; i < lines.length; i++) {
-					let noComment = lines[i].replace(
-						/^\s*\/\*\*(.*)\s*\*\/\s*$|^(\s*\/\*\*)|^(\s*\*\/\s*)$|^(\s*\*)/,
-						(_match, m1) => {
-							if (m1) {
-								return m1;
-							} else {
-								return "";
-							}
-						},
-					);
+				for (let i= 0; i < lines.length; i++) {
+					let noComment = lines[i].replace(/^\s*\/\*\*(.*)\s*\*\/\s*$|^(\s*\/\*\*)|^(\s*\*\/\s*)$|^(\s*\*)/, (_match, m1) => {
+						if (m1) {
+							return m1;
+						} else {
+							return '';
+						}
+					});
 					// First line
 					if (i === 0 || i === lines.length - 1) {
 						noComment = noComment.trim();
@@ -1761,44 +1207,30 @@ export default class Visitor {
 							continue;
 						}
 					}
-					if (noComment.length > 0 && noComment[0] === " ") {
+					if (noComment.length > 0 && noComment[0] === ' ') {
 						noComment = noComment.substring(1);
 					}
 					buffer.push(noComment);
 				}
-				return buffer.join("\n");
+				return buffer.join('\n');
 			}
 		}
 		return undefined;
 	}
 
-	private getTags(tags: ReadonlyArray<ts.JSDocTag>): {
-		since?: string;
-		sinceTags?: string[];
-		deprecated?: string;
-	} {
-		const result: {
-			since?: string;
-			sinceTags?: string[];
-			deprecated?: string;
-		} = {};
+	private getTags(tags: ReadonlyArray<ts.JSDocTag>): { since?: string; sinceTags?: string[]; deprecated?: string } {
+		const result: { since?: string; sinceTags?: string[];  deprecated?: string } = {};
 		for (const tag of tags) {
-			if (
-				tag.tagName.text === "since" &&
-				typeof tag.comment === "string"
-			) {
-				const value = tag.comment.replace(/\r?\n/g, "\n");
+			if (tag.tagName.text === 'since' && typeof tag.comment === 'string') {
+				const value = tag.comment.replace(/\r?\n/g, '\n');
 				result.since = value;
 				if (result.sinceTags === undefined) {
 					result.sinceTags = [value];
 				} else {
 					result.sinceTags.push(value);
 				}
-			} else if (
-				tag.tagName.text === "deprecated" &&
-				typeof tag.comment === "string"
-			) {
-				result.deprecated = tag.comment.replace(/\r?\n/g, "\n");
+			} else if (tag.tagName.text === 'deprecated' && typeof tag.comment === 'string') {
+				result.deprecated = tag.comment.replace(/\r?\n/g, '\n');
 			}
 		}
 		if (Array.isArray(result.sinceTags) && result.sinceTags.length === 1) {
@@ -1810,90 +1242,88 @@ export default class Visitor {
 
 namespace PreDefined {
 	export const LSPAny: TypeAlias = {
-		name: "LSPAny",
+		name: 'LSPAny',
 		type: {
-			kind: "or",
+			kind: 'or',
 			items: [
 				{
-					kind: "reference",
-					name: "LSPObject",
+					kind: 'reference',
+					name: 'LSPObject'
 				},
 				{
-					kind: "reference",
-					name: "LSPArray",
+					kind: 'reference',
+					name: 'LSPArray'
 				},
 				{
-					kind: "base",
-					name: "string",
+					kind: 'base',
+					name: 'string'
 				},
 				{
-					kind: "base",
-					name: "integer",
+					kind: 'base',
+					name: 'integer'
 				},
 				{
-					kind: "base",
-					name: "uinteger",
+					kind: 'base',
+					name: 'uinteger'
 				},
 				{
-					kind: "base",
-					name: "decimal",
+					kind: 'base',
+					name: 'decimal'
 				},
 				{
-					kind: "base",
-					name: "boolean",
+					kind: 'base',
+					name: 'boolean'
 				},
 				{
-					kind: "base",
-					name: "null",
-				},
-			],
+					kind: 'base',
+					name: 'null'
+				}
+			]
 		},
-		documentation:
-			"The LSP any type.\nPlease note that strictly speaking a property with the value `undefined`\ncan't be converted into JSON preserving the property name. However for\nconvenience it is allowed and assumed that all these properties are\noptional as well.\n@since 3.17.0",
-		since: "3.17.0",
+		documentation: 'The LSP any type.\nPlease note that strictly speaking a property with the value `undefined`\ncan\'t be converted into JSON preserving the property name. However for\nconvenience it is allowed and assumed that all these properties are\noptional as well.\n@since 3.17.0',
+		since: '3.17.0'
 	};
 
 	export const LSPObject: TypeAlias = {
-		"name": "LSPObject",
-		"type": {
-			"kind": "map",
-			"key": {
-				"kind": "base",
-				"name": "string",
+		'name': 'LSPObject',
+		'type': {
+			'kind': 'map',
+			'key': {
+				'kind': 'base',
+				'name': 'string'
 			},
-			"value": {
-				"kind": "reference",
-				"name": "LSPAny",
-			},
+			'value': {
+				'kind': 'reference',
+				'name': 'LSPAny'
+			}
 		},
-		"documentation": "LSP object definition.\n@since 3.17.0",
-		"since": "3.17.0",
+		'documentation': 'LSP object definition.\n@since 3.17.0',
+		'since': '3.17.0'
 	};
 
 	export const LSPArray: TypeAlias = {
-		name: "LSPArray",
+		name: 'LSPArray',
 		type: {
-			kind: "array",
+			kind: 'array',
 			element: {
-				kind: "reference",
-				name: "LSPAny",
-			},
+				kind: 'reference',
+				name: 'LSPAny'
+			}
 		},
-		documentation: "LSP arrays.\n@since 3.17.0",
-		since: "3.17.0",
+		documentation: 'LSP arrays.\n@since 3.17.0',
+		since: '3.17.0'
 	};
 
 	export const DocumentSelector: TypeAlias = {
-		name: "DocumentSelector",
+		name: 'DocumentSelector',
 		type: {
-			kind: "array",
+			kind: 'array',
 			element: {
-				kind: "reference",
-				name: "DocumentFilter",
-			},
+				kind: 'reference',
+				name: 'DocumentFilter'
+			}
 		},
-		documentation:
-			"A document selector is the combination of one or many document filters.\n\n@sample `let sel:DocumentSelector = [{ language: 'typescript' }, { language: 'json', pattern: '**∕tsconfig.json' }]`;\n\nThe use of a string as a document filter is deprecated @since 3.16.0.",
-		since: "3.16.0.",
+		documentation: 'A document selector is the combination of one or many document filters.\n\n@sample `let sel:DocumentSelector = [{ language: \'typescript\' }, { language: \'json\', pattern: \'**∕tsconfig.json\' }]`;\n\nThe use of a string as a document filter is deprecated @since 3.16.0.',
+		since: '3.16.0.'
 	};
 }

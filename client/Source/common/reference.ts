@@ -4,145 +4,70 @@
  * ------------------------------------------------------------------------------------------ */
 
 import {
-	CancellationToken,
-	Disposable,
-	languages as Languages,
-	ProviderResult,
-	ReferenceProvider,
-	TextDocument,
-	Location as VLocation,
-	Position as VPosition,
-} from "vscode";
-import {
-	ClientCapabilities,
-	DocumentSelector,
-	ReferenceOptions,
-	ReferenceRegistrationOptions,
-	ReferencesRequest,
-	ServerCapabilities,
-	TextDocumentRegistrationOptions,
-} from "vscode-languageserver-protocol";
+	languages as Languages, TextDocument, Disposable, Position as VPosition, CancellationToken, ProviderResult, ReferenceProvider, Location as VLocation
+} from 'vscode';
 
-import { ensure, FeatureClient, TextDocumentLanguageFeature } from "./features";
-import * as UUID from "./utils/uuid";
+import {
+	ClientCapabilities, DocumentSelector, ReferenceOptions, ReferenceRegistrationOptions, ReferencesRequest, ServerCapabilities, TextDocumentRegistrationOptions
+} from 'vscode-languageserver-protocol';
+
+import {
+	FeatureClient, ensure, TextDocumentLanguageFeature
+} from './features';
+
+import * as UUID from './utils/uuid';
 
 export interface ProvideReferencesSignature {
-	(
-		this: void,
-		document: TextDocument,
-		position: VPosition,
-		options: { includeDeclaration: boolean },
-		token: CancellationToken,
-	): ProviderResult<VLocation[]>;
+	(this: void, document: TextDocument, position: VPosition, options: { includeDeclaration: boolean }, token: CancellationToken): ProviderResult<VLocation[]>;
 }
 
 export interface ReferencesMiddleware {
-	provideReferences?: (
-		this: void,
-		document: TextDocument,
-		position: VPosition,
-		options: { includeDeclaration: boolean },
-		token: CancellationToken,
-		next: ProvideReferencesSignature,
-	) => ProviderResult<VLocation[]>;
+	provideReferences?: (this: void, document: TextDocument, position: VPosition, options: { includeDeclaration: boolean }, token: CancellationToken, next: ProvideReferencesSignature) => ProviderResult<VLocation[]>;
 }
 
-export class ReferencesFeature extends TextDocumentLanguageFeature<
-	boolean | ReferenceOptions,
-	ReferenceRegistrationOptions,
-	ReferenceProvider,
-	ReferencesMiddleware
-> {
+export class ReferencesFeature extends TextDocumentLanguageFeature<boolean | ReferenceOptions, ReferenceRegistrationOptions, ReferenceProvider, ReferencesMiddleware> {
+
 	constructor(client: FeatureClient<ReferencesMiddleware>) {
 		super(client, ReferencesRequest.type);
 	}
 
 	public fillClientCapabilities(capabilities: ClientCapabilities): void {
-		ensure(
-			ensure(capabilities, "textDocument")!,
-			"references",
-		)!.dynamicRegistration = true;
+		ensure(ensure(capabilities, 'textDocument')!, 'references')!.dynamicRegistration = true;
 	}
 
-	public initialize(
-		capabilities: ServerCapabilities,
-		documentSelector: DocumentSelector,
-	): void {
-		const options = this.getRegistrationOptions(
-			documentSelector,
-			capabilities.referencesProvider,
-		);
+	public initialize(capabilities: ServerCapabilities, documentSelector: DocumentSelector): void {
+		const options = this.getRegistrationOptions(documentSelector, capabilities.referencesProvider);
 		if (!options) {
 			return;
 		}
 		this.register({ id: UUID.generateUuid(), registerOptions: options });
 	}
 
-	protected registerLanguageProvider(
-		options: TextDocumentRegistrationOptions,
-	): [Disposable, ReferenceProvider] {
+	protected registerLanguageProvider(options: TextDocumentRegistrationOptions): [Disposable, ReferenceProvider] {
 		const selector = options.documentSelector!;
 		const provider: ReferenceProvider = {
 			provideReferences: (document, position, options, token) => {
 				const client = this._client;
-				const _providerReferences: ProvideReferencesSignature = (
-					document,
-					position,
-					options,
-					token,
-				) => {
-					return client
-						.sendRequest(
-							ReferencesRequest.type,
-							client.code2ProtocolConverter.asReferenceParams(
-								document,
-								position,
-								options,
-							),
-							token,
-						)
-						.then(
-							(result) => {
-								if (token.isCancellationRequested) {
-									return null;
-								}
-								return client.protocol2CodeConverter.asReferences(
-									result,
-									token,
-								);
-							},
-							(error) => {
-								return client.handleFailedRequest(
-									ReferencesRequest.type,
-									token,
-									error,
-									null,
-								);
-							},
-						);
+				const _providerReferences: ProvideReferencesSignature = (document, position, options, token) => {
+					return client.sendRequest(ReferencesRequest.type, client.code2ProtocolConverter.asReferenceParams(document, position, options), token).then((result) => {
+						if (token.isCancellationRequested) {
+							return null;
+						}
+						return client.protocol2CodeConverter.asReferences(result, token);
+					}, (error) => {
+						return client.handleFailedRequest(ReferencesRequest.type, token, error, null);
+					});
 				};
 				const middleware = client.middleware;
 				return middleware.provideReferences
-					? middleware.provideReferences(
-							document,
-							position,
-							options,
-							token,
-							_providerReferences,
-						)
+					? middleware.provideReferences(document, position, options, token, _providerReferences)
 					: _providerReferences(document, position, options, token);
-			},
+			}
 		};
 		return [this.registerProvider(selector, provider), provider];
 	}
 
-	private registerProvider(
-		selector: DocumentSelector,
-		provider: ReferenceProvider,
-	): Disposable {
-		return Languages.registerReferenceProvider(
-			this._client.protocol2CodeConverter.asDocumentSelector(selector),
-			provider,
-		);
+	private registerProvider(selector: DocumentSelector, provider: ReferenceProvider): Disposable {
+		return Languages.registerReferenceProvider(this._client.protocol2CodeConverter.asDocumentSelector(selector), provider);
 	}
 }

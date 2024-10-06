@@ -3,10 +3,11 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import type { Disposable } from "./disposable";
-import type { ContentTypeDecoder, ContentTypeEncoder } from "./encoding";
+import type { Disposable } from './disposable';
+import type { ContentTypeEncoder, ContentTypeDecoder } from './encoding';
 
 interface _MessageBuffer {
+
 	readonly encoding: RAL.MessageBufferEncoding;
 
 	/**
@@ -18,7 +19,7 @@ interface _MessageBuffer {
 
 	/**
 	 * Tries to read the headers from the buffer
-	 *
+     *
 	 * @param lowerCaseKeys Whether the keys should be stored lower case. Doing
 	 * so is recommended since HTTP headers are case insensitive.
 	 *
@@ -35,7 +36,7 @@ interface _MessageBuffer {
 	tryReadBody(length: number): Uint8Array | undefined;
 }
 
-type _MessageBufferEncoding = "ascii" | "utf-8";
+type _MessageBufferEncoding = 'ascii' | 'utf-8';
 
 interface _ReadableStream {
 	onData(listener: (data: Uint8Array) => void): Disposable;
@@ -53,9 +54,11 @@ interface _WritableStream {
 	end(): void;
 }
 
-interface _DuplexStream extends _ReadableStream, _WritableStream {}
+interface _DuplexStream extends _ReadableStream, _WritableStream {
+}
 
 interface RAL {
+
 	readonly applicationJson: {
 		readonly encoder: ContentTypeEncoder;
 		readonly decoder: ContentTypeDecoder;
@@ -66,27 +69,16 @@ interface RAL {
 	};
 
 	readonly console: {
-		info(message?: any, ...optionalParams: any[]): void;
-		log(message?: any, ...optionalParams: any[]): void;
-		warn(message?: any, ...optionalParams: any[]): void;
-		error(message?: any, ...optionalParams: any[]): void;
+	    info(message?: any, ...optionalParams: any[]): void;
+	    log(message?: any, ...optionalParams: any[]): void;
+	    warn(message?: any, ...optionalParams: any[]): void;
+	    error(message?: any, ...optionalParams: any[]): void;
 	};
 
 	readonly timer: {
-		setTimeout(
-			callback: (...args: any[]) => void,
-			ms: number,
-			...args: any[]
-		): Disposable;
-		setImmediate(
-			callback: (...args: any[]) => void,
-			...args: any[]
-		): Disposable;
-		setInterval(
-			callback: (...args: any[]) => void,
-			ms: number,
-			...args: any[]
-		): Disposable;
+		setTimeout(callback: (...args: any[]) => void, ms: number, ...args: any[]): Disposable;
+		setImmediate(callback: (...args: any[]) => void, ...args: any[]): Disposable;
+		setInterval(callback: (...args: any[]) => void, ms: number, ...args: any[]): Disposable;
 	};
 }
 

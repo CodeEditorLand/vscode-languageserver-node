@@ -2,22 +2,17 @@
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-"use strict";
+'use strict';
 
-import * as vscode from "vscode";
+import * as vscode from 'vscode';
 
 export class MemoryFileSystemProvider implements vscode.FileSystemProvider {
-	public readonly scheme = "file-test";
-	public readonly root = new FakeDirectory("");
-	public readonly onDidChangeFile = new vscode.EventEmitter<
-		vscode.FileChangeEvent[]
-	>().event;
+	public readonly scheme = 'file-test';
+	public readonly root = new FakeDirectory('');
+	public readonly onDidChangeFile = new vscode.EventEmitter<vscode.FileChangeEvent[]>().event;
 
-	public watch(
-		_: vscode.Uri,
-		__: { recursive: boolean; excludes: string[] },
-	): vscode.Disposable {
-		return { dispose() {} };
+	public watch(_: vscode.Uri, __: { recursive: boolean; excludes: string[] }): vscode.Disposable {
+		return { dispose() { } };
 	}
 
 	public stat(uri: vscode.Uri): vscode.FileStat | Thenable<vscode.FileStat> {
@@ -28,24 +23,16 @@ export class MemoryFileSystemProvider implements vscode.FileSystemProvider {
 		}
 		const child = directory.children.get(name);
 		return {
-			type:
-				child instanceof FakeFile
-					? vscode.FileType.File
-					: vscode.FileType.Directory,
+			type: child instanceof FakeFile ? vscode.FileType.File : vscode.FileType.Directory,
 			ctime: 1,
 			mtime: 1,
 			size: 1,
 		};
 	}
 
-	public readDirectory(
-		uri: vscode.Uri,
-	): [string, vscode.FileType][] | Thenable<[string, vscode.FileType][]> {
+	public readDirectory(uri: vscode.Uri): [string, vscode.FileType][] | Thenable<[string, vscode.FileType][]> {
 		const directory = this.getDirectory(uri);
-		return Array.from(directory.children.values()).map((item) => [
-			item.name,
-			item.type,
-		]);
+		return Array.from(directory.children.values()).map((item) => [item.name, item.type]);
 	}
 
 	public createDirectory(uri: vscode.Uri): void | Thenable<void> {
@@ -66,40 +53,27 @@ export class MemoryFileSystemProvider implements vscode.FileSystemProvider {
 		}
 	}
 
-	public writeFile(
-		uri: vscode.Uri,
-		content: Uint8Array,
-		options: { create: boolean; overwrite: boolean },
-	): void | Thenable<void> {
+	public writeFile(uri: vscode.Uri, content: Uint8Array, options: { create: boolean; overwrite: boolean }): void | Thenable<void> {
 		const [directoryUri, name] = this.splitUri(uri);
 		const directory = this.getDirectory(directoryUri, options);
 		const file = new FakeFile(name, directory, content);
 		directory.children.set(name, file);
 	}
 
-	public delete(
-		uri: vscode.Uri,
-		_: { recursive: boolean },
-	): void | Thenable<void> {
+	public delete(uri: vscode.Uri, _: { recursive: boolean }): void | Thenable<void> {
 		const [directoryUri, name] = this.splitUri(uri);
 		const directory = this.getDirectory(directoryUri);
 		directory.children.delete(name);
 	}
 
-	public rename(
-		oldUri: vscode.Uri,
-		newUri: vscode.Uri,
-		options: { overwrite: boolean },
-	): void | Thenable<void> {
+	public rename(oldUri: vscode.Uri, newUri: vscode.Uri, options: { overwrite: boolean }): void | Thenable<void> {
 		const [oldDirectoryUri, oldName] = this.splitUri(oldUri);
 		const [newDirectoryUri, newName] = this.splitUri(newUri);
 		const oldDirectory = this.getDirectory(oldDirectoryUri);
 		if (!oldDirectory.children.has(oldName)) {
 			throw vscode.FileSystemError.FileNotFound(oldUri);
 		}
-		const newDirectory = this.getDirectory(newDirectoryUri, {
-			create: true,
-		});
+		const newDirectory = this.getDirectory(newDirectoryUri, { create: true });
 		if (newDirectory.children.has(newName) && !options.overwrite) {
 			throw vscode.FileSystemError.FileExists(newUri);
 		}
@@ -108,23 +82,18 @@ export class MemoryFileSystemProvider implements vscode.FileSystemProvider {
 	}
 
 	private splitSegments(uri: vscode.Uri): string[] {
-		return uri.path.split("/");
+		return uri.path.split('/');
 	}
 
 	private splitUri(uri: vscode.Uri): [dirname: vscode.Uri, basename: string] {
 		const segments = this.splitSegments(uri);
-		const dirname = uri.with({
-			path: segments.slice(0, segments.length - 1).join("/"),
-		});
+		const dirname = uri.with({ path: segments.slice(0, segments.length - 1).join('/') });
 		const basename = segments[segments.length - 1];
 		return [dirname, basename];
 	}
 
-	private getDirectory(
-		uri: vscode.Uri,
-		options?: { create?: boolean },
-	): FakeDirectory {
-		if (uri.path === "" || uri.path === "/") {
+	private getDirectory(uri: vscode.Uri, options?: { create?: boolean }): FakeDirectory {
+		if (uri.path === '' || uri.path === '/') {
 			return this.root;
 		}
 		const [parentUri, name] = this.splitUri(uri);
@@ -147,19 +116,11 @@ export class MemoryFileSystemProvider implements vscode.FileSystemProvider {
 }
 
 abstract class FakeFileSystemItem {
-	constructor(
-		public name: string,
-		public parent: FakeDirectory | undefined,
-		public readonly type: vscode.FileType,
-	) {}
+	constructor(public name: string, public parent: FakeDirectory | undefined, public readonly type: vscode.FileType) { }
 }
 
 class FakeFile extends FakeFileSystemItem {
-	constructor(
-		name: string,
-		parent: FakeDirectory,
-		public readonly content: Uint8Array,
-	) {
+	constructor(name: string, parent: FakeDirectory, public readonly content: Uint8Array) {
 		super(name, parent, vscode.FileType.File);
 	}
 }

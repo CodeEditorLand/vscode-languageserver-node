@@ -4,28 +4,13 @@
  * ------------------------------------------------------------------------------------------ */
 
 import {
-	DocumentUri,
-	integer,
-	LSPAny,
-	LSPObject,
-	TextDocumentIdentifier,
-	TextDocumentItem,
-	uinteger,
-	URI,
-	VersionedTextDocumentIdentifier,
-} from "vscode-languageserver-types";
+	URI, integer, DocumentUri, uinteger, LSPAny, TextDocumentItem, TextDocumentIdentifier,
+	VersionedTextDocumentIdentifier, LSPObject
+} from 'vscode-languageserver-types';
 
-import {
-	MessageDirection,
-	ProtocolNotificationType,
-	RegistrationType,
-} from "./messages";
-import type {
-	NotebookDocumentFilter,
-	StaticRegistrationOptions,
-	TextDocumentContentChangeEvent,
-} from "./protocol";
-import * as Is from "./utils/is";
+import * as Is from './utils/is';
+import { MessageDirection, ProtocolNotificationType, RegistrationType } from './messages';
+import type { StaticRegistrationOptions, NotebookDocumentFilter, TextDocumentContentChangeEvent } from './protocol';
 
 /**
  * Notebook specific client capabilities.
@@ -33,6 +18,7 @@ import * as Is from "./utils/is";
  * @since 3.17.0
  */
 export type NotebookDocumentSyncClientCapabilities = {
+
 	/**
 	 * Whether implementation supports dynamic registration. If this is
 	 * set to `true` the client supports the new
@@ -53,6 +39,7 @@ export type NotebookDocumentSyncClientCapabilities = {
  * @since 3.17.0
  */
 export namespace NotebookCellKind {
+
 	/**
 	 * A markup-cell is formatted source that is used for display.
 	 */
@@ -85,10 +72,7 @@ export type ExecutionSummary = {
 };
 
 export namespace ExecutionSummary {
-	export function create(
-		executionOrder: number,
-		success?: boolean,
-	): ExecutionSummary {
+	export function create(executionOrder: number, success?: boolean): ExecutionSummary {
 		const result: ExecutionSummary = { executionOrder };
 		if (success === true || success === false) {
 			result.success = success;
@@ -98,32 +82,17 @@ export namespace ExecutionSummary {
 
 	export function is(value: any): value is ExecutionSummary {
 		const candidate: ExecutionSummary = value;
-		return (
-			Is.objectLiteral(candidate) &&
-			uinteger.is(candidate.executionOrder) &&
-			(candidate.success === undefined || Is.boolean(candidate.success))
-		);
+		return Is.objectLiteral(candidate) && uinteger.is(candidate.executionOrder) && (candidate.success === undefined || Is.boolean(candidate.success));
 	}
 
-	export function equals(
-		one: ExecutionSummary | undefined,
-		other: ExecutionSummary | undefined,
-	): boolean {
+	export function equals(one: ExecutionSummary | undefined, other: ExecutionSummary | undefined): boolean {
 		if (one === other) {
 			return true;
 		}
-		if (
-			one === null ||
-			one === undefined ||
-			other === null ||
-			other === undefined
-		) {
+		if (one === null || one === undefined || other === null || other === undefined) {
 			return false;
 		}
-		return (
-			one.executionOrder === other.executionOrder &&
-			one.success === other.success
-		);
+		return one.executionOrder === other.executionOrder && one.success === other.success;
 	}
 }
 
@@ -137,6 +106,7 @@ export namespace ExecutionSummary {
  * @since 3.17.0
  */
 export type NotebookCell = {
+
 	/**
 	 * The cell's kind
 	 */
@@ -163,74 +133,48 @@ export type NotebookCell = {
 };
 
 export namespace NotebookCell {
-	export function create(
-		kind: NotebookCellKind,
-		document: DocumentUri,
-	): NotebookCell {
+	export function create(kind: NotebookCellKind, document: DocumentUri): NotebookCell {
 		return { kind, document };
 	}
 
 	export function is(value: any): value is NotebookCell {
 		const candidate: NotebookCell = value;
-		return (
-			Is.objectLiteral(candidate) &&
-			NotebookCellKind.is(candidate.kind) &&
-			DocumentUri.is(candidate.document) &&
-			(candidate.metadata === undefined ||
-				Is.objectLiteral(candidate.metadata))
-		);
+		return Is.objectLiteral(candidate) && NotebookCellKind.is(candidate.kind) && DocumentUri.is(candidate.document) &&
+			(candidate.metadata === undefined || Is.objectLiteral(candidate.metadata));
 	}
 
-	export function diff(
-		one: NotebookCell,
-		two: NotebookCell,
-	): Set<keyof NotebookCell> {
+	export function diff(one: NotebookCell, two: NotebookCell): Set<keyof NotebookCell> {
 		const result: Set<keyof NotebookCell> = new Set();
 		if (one.document !== two.document) {
-			result.add("document");
+			result.add('document');
 		}
 		if (one.kind !== two.kind) {
-			result.add("kind");
+			result.add('kind');
 		}
 		if (one.executionSummary !== two.executionSummary) {
-			result.add("executionSummary");
+			result.add('executionSummary');
 		}
-		if (
-			(one.metadata !== undefined || two.metadata !== undefined) &&
-			!equalsMetadata(one.metadata, two.metadata)
-		) {
-			result.add("metadata");
+		if ((one.metadata !== undefined || two.metadata !== undefined) && !equalsMetadata(one.metadata, two.metadata)) {
+			result.add('metadata');
 		}
-		if (
-			(one.executionSummary !== undefined ||
-				two.executionSummary !== undefined) &&
-			!ExecutionSummary.equals(one.executionSummary, two.executionSummary)
-		) {
-			result.add("executionSummary");
+		if ((one.executionSummary !== undefined || two.executionSummary !== undefined) && !ExecutionSummary.equals(one.executionSummary, two.executionSummary)) {
+			result.add('executionSummary');
 		}
 		return result;
 	}
 
-	function equalsMetadata(
-		one: LSPAny | undefined,
-		other: LSPAny | undefined,
-	): boolean {
+	function equalsMetadata(one: LSPAny | undefined, other: LSPAny | undefined): boolean {
 		type LSPObject = { [key: string]: LSPAny };
 		if (one === other) {
 			return true;
 		}
-		if (
-			one === null ||
-			one === undefined ||
-			other === null ||
-			other === undefined
-		) {
+		if (one === null || one === undefined || other === null || other === undefined) {
 			return false;
 		}
 		if (typeof one !== typeof other) {
 			return false;
 		}
-		if (typeof one !== "object") {
+		if (typeof one !== 'object') {
 			return false;
 		}
 		const oneArray = Array.isArray(one);
@@ -264,12 +208,7 @@ export namespace NotebookCell {
 			}
 			for (let i = 0; i < oneKeys.length; i++) {
 				const prop = oneKeys[i];
-				if (
-					!equalsMetadata(
-						(one as LSPObject)[prop],
-						(other as LSPObject)[prop],
-					)
-				) {
+				if (!equalsMetadata((one as LSPObject)[prop], (other as LSPObject)[prop])) {
 					return false;
 				}
 			}
@@ -284,6 +223,7 @@ export namespace NotebookCell {
  * @since 3.17.0
  */
 export type NotebookDocument = {
+
 	/**
 	 * The notebook document's uri.
 	 */
@@ -315,22 +255,12 @@ export type NotebookDocument = {
 };
 
 export namespace NotebookDocument {
-	export function create(
-		uri: URI,
-		notebookType: string,
-		version: integer,
-		cells: NotebookCell[],
-	): NotebookDocument {
+	export function create(uri: URI, notebookType: string, version: integer, cells: NotebookCell[]): NotebookDocument {
 		return { uri, notebookType, version, cells };
 	}
 	export function is(value: any): value is NotebookDocument {
 		const candidate: NotebookDocument = value;
-		return (
-			Is.objectLiteral(candidate) &&
-			Is.string(candidate.uri) &&
-			integer.is(candidate.version) &&
-			Is.typedArray(candidate.cells, NotebookCell.is)
-		);
+		return Is.objectLiteral(candidate) && Is.string(candidate.uri) && integer.is(candidate.version) && Is.typedArray(candidate.cells, NotebookCell.is);
 	}
 }
 
@@ -352,6 +282,7 @@ export type NotebookDocumentIdentifier = {
  * @since 3.17.0
  */
 export type VersionedNotebookDocumentIdentifier = {
+
 	/**
 	 * The version number of this notebook document.
 	 */
@@ -386,6 +317,7 @@ export type NotebookDocumentFilterWithNotebook = {
 	 */
 	cells?: NotebookCellLanguage[];
 };
+
 
 /**
  * @since 3.18.0
@@ -423,10 +355,7 @@ export type NotebookDocumentSyncOptions = {
 	/**
 	 * The notebooks to be synced
 	 */
-	notebookSelector: (
-		| NotebookDocumentFilterWithNotebook
-		| NotebookDocumentFilterWithCells
-	)[];
+	notebookSelector: (NotebookDocumentFilterWithNotebook | NotebookDocumentFilterWithCells)[];
 
 	/**
 	 * Whether save notification should be forwarded to
@@ -440,15 +369,12 @@ export type NotebookDocumentSyncOptions = {
  *
  * @since 3.17.0
  */
-export type NotebookDocumentSyncRegistrationOptions =
-	NotebookDocumentSyncOptions & StaticRegistrationOptions;
+export type NotebookDocumentSyncRegistrationOptions = NotebookDocumentSyncOptions & StaticRegistrationOptions;
 
 export namespace NotebookDocumentSyncRegistrationType {
-	export const method: "notebookDocument/sync" = "notebookDocument/sync";
-	export const messageDirection: MessageDirection =
-		MessageDirection.clientToServer;
-	export const type =
-		new RegistrationType<NotebookDocumentSyncRegistrationOptions>(method);
+	export const method: 'notebookDocument/sync' = 'notebookDocument/sync';
+	export const messageDirection: MessageDirection = MessageDirection.clientToServer;
+	export const type = new RegistrationType<NotebookDocumentSyncRegistrationOptions>(method);
 }
 
 /**
@@ -457,6 +383,7 @@ export namespace NotebookDocumentSyncRegistrationType {
  * @since 3.17.0
  */
 export type DidOpenNotebookDocumentParams = {
+
 	/**
 	 * The notebook document that got opened.
 	 */
@@ -475,16 +402,10 @@ export type DidOpenNotebookDocumentParams = {
  * @since 3.17.0
  */
 export namespace DidOpenNotebookDocumentNotification {
-	export const method: "notebookDocument/didOpen" =
-		"notebookDocument/didOpen";
-	export const messageDirection: MessageDirection =
-		MessageDirection.clientToServer;
-	export const type = new ProtocolNotificationType<
-		DidOpenNotebookDocumentParams,
-		NotebookDocumentSyncRegistrationOptions
-	>(method);
-	export const registrationMethod: typeof NotebookDocumentSyncRegistrationType.method =
-		NotebookDocumentSyncRegistrationType.method;
+	export const method: 'notebookDocument/didOpen' = 'notebookDocument/didOpen';
+	export const messageDirection: MessageDirection = MessageDirection.clientToServer;
+	export const type = new ProtocolNotificationType<DidOpenNotebookDocumentParams, NotebookDocumentSyncRegistrationOptions>(method);
+	export const registrationMethod: typeof NotebookDocumentSyncRegistrationType.method = NotebookDocumentSyncRegistrationType.method;
 }
 
 /**
@@ -513,20 +434,10 @@ export type NotebookCellArrayChange = {
 export namespace NotebookCellArrayChange {
 	export function is(value: any): value is NotebookCellArrayChange {
 		const candidate: NotebookCellArrayChange = value;
-		return (
-			Is.objectLiteral(candidate) &&
-			uinteger.is(candidate.start) &&
-			uinteger.is(candidate.deleteCount) &&
-			(candidate.cells === undefined ||
-				Is.typedArray(candidate.cells, NotebookCell.is))
-		);
+		return Is.objectLiteral(candidate) && uinteger.is(candidate.start) && uinteger.is(candidate.deleteCount) && (candidate.cells === undefined || Is.typedArray(candidate.cells, NotebookCell.is));
 	}
 
-	export function create(
-		start: uinteger,
-		deleteCount: uinteger,
-		cells?: NotebookCell[],
-	): NotebookCellArrayChange {
+	export function create(start: uinteger, deleteCount: uinteger, cells?: NotebookCell[]): NotebookCellArrayChange {
 		const result: NotebookCellArrayChange = { start, deleteCount };
 		if (cells !== undefined) {
 			result.cells = cells;
@@ -616,6 +527,7 @@ export type NotebookDocumentChangeEvent = {
  * @since 3.17.0
  */
 export type DidChangeNotebookDocumentParams = {
+
 	/**
 	 * The notebook document that did change. The version number points
 	 * to the version after all provided changes have been applied. If
@@ -643,16 +555,10 @@ export type DidChangeNotebookDocumentParams = {
 };
 
 export namespace DidChangeNotebookDocumentNotification {
-	export const method: "notebookDocument/didChange" =
-		"notebookDocument/didChange";
-	export const messageDirection: MessageDirection =
-		MessageDirection.clientToServer;
-	export const type = new ProtocolNotificationType<
-		DidChangeNotebookDocumentParams,
-		NotebookDocumentSyncRegistrationOptions
-	>(method);
-	export const registrationMethod: typeof NotebookDocumentSyncRegistrationType.method =
-		NotebookDocumentSyncRegistrationType.method;
+	export const method: 'notebookDocument/didChange' = 'notebookDocument/didChange';
+	export const messageDirection: MessageDirection = MessageDirection.clientToServer;
+	export const type = new ProtocolNotificationType<DidChangeNotebookDocumentParams, NotebookDocumentSyncRegistrationOptions>(method);
+	export const registrationMethod: typeof NotebookDocumentSyncRegistrationType.method = NotebookDocumentSyncRegistrationType.method;
 }
 
 /**
@@ -673,16 +579,10 @@ export type DidSaveNotebookDocumentParams = {
  * @since 3.17.0
  */
 export namespace DidSaveNotebookDocumentNotification {
-	export const method: "notebookDocument/didSave" =
-		"notebookDocument/didSave";
-	export const messageDirection: MessageDirection =
-		MessageDirection.clientToServer;
-	export const type = new ProtocolNotificationType<
-		DidSaveNotebookDocumentParams,
-		NotebookDocumentSyncRegistrationOptions
-	>(method);
-	export const registrationMethod: typeof NotebookDocumentSyncRegistrationType.method =
-		NotebookDocumentSyncRegistrationType.method;
+	export const method: 'notebookDocument/didSave' = 'notebookDocument/didSave';
+	export const messageDirection: MessageDirection = MessageDirection.clientToServer;
+	export const type = new ProtocolNotificationType<DidSaveNotebookDocumentParams, NotebookDocumentSyncRegistrationOptions>(method);
+	export const registrationMethod: typeof NotebookDocumentSyncRegistrationType.method = NotebookDocumentSyncRegistrationType.method;
 }
 
 /**
@@ -691,6 +591,7 @@ export namespace DidSaveNotebookDocumentNotification {
  * @since 3.17.0
  */
 export type DidCloseNotebookDocumentParams = {
+
 	/**
 	 * The notebook document that got closed.
 	 */
@@ -709,14 +610,8 @@ export type DidCloseNotebookDocumentParams = {
  * @since 3.17.0
  */
 export namespace DidCloseNotebookDocumentNotification {
-	export const method: "notebookDocument/didClose" =
-		"notebookDocument/didClose";
-	export const messageDirection: MessageDirection =
-		MessageDirection.clientToServer;
-	export const type = new ProtocolNotificationType<
-		DidCloseNotebookDocumentParams,
-		NotebookDocumentSyncRegistrationOptions
-	>(method);
-	export const registrationMethod: typeof NotebookDocumentSyncRegistrationType.method =
-		NotebookDocumentSyncRegistrationType.method;
+	export const method: 'notebookDocument/didClose' = 'notebookDocument/didClose';
+	export const messageDirection: MessageDirection = MessageDirection.clientToServer;
+	export const type = new ProtocolNotificationType<DidCloseNotebookDocumentParams, NotebookDocumentSyncRegistrationOptions>(method);
+	export const registrationMethod: typeof NotebookDocumentSyncRegistrationType.method = NotebookDocumentSyncRegistrationType.method;
 }

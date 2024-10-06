@@ -3,10 +3,11 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { Disposable } from "./disposable";
-import { Emitter, Event } from "./events";
-import * as Is from "./is";
-import RAL from "./ral";
+import RAL from './ral';
+
+import * as Is from './is';
+import { Event, Emitter } from './events';
+import { Disposable } from './disposable';
 
 /**
  * Defines a CancellationToken. This interface is not
@@ -26,41 +27,32 @@ export interface CancellationToken {
 }
 
 export namespace CancellationToken {
+
 	export const None: CancellationToken = Object.freeze({
 		isCancellationRequested: false,
-		onCancellationRequested: Event.None,
+		onCancellationRequested: Event.None
 	});
 
 	export const Cancelled: CancellationToken = Object.freeze({
 		isCancellationRequested: true,
-		onCancellationRequested: Event.None,
+		onCancellationRequested: Event.None
 	});
 
 	export function is(value: any): value is CancellationToken {
 		const candidate = value as CancellationToken;
-		return (
-			candidate &&
-			(candidate === CancellationToken.None ||
-				candidate === CancellationToken.Cancelled ||
-				(Is.boolean(candidate.isCancellationRequested) &&
-					!!candidate.onCancellationRequested))
-		);
+		return candidate && (candidate === CancellationToken.None
+			|| candidate === CancellationToken.Cancelled
+			|| (Is.boolean(candidate.isCancellationRequested) && !!candidate.onCancellationRequested));
 	}
 }
 
-const shortcutEvent: Event<any> = Object.freeze(function (
-	callback: Function,
-	context?: any,
-): any {
+const shortcutEvent: Event<any> = Object.freeze(function (callback: Function, context?: any): any {
 	const handle = RAL().timer.setTimeout(callback.bind(context), 0);
-	return {
-		dispose() {
-			handle.dispose();
-		},
-	};
+	return { dispose() { handle.dispose(); } };
 });
 
 class MutableToken implements CancellationToken {
+
 	private _isCancelled: boolean = false;
 	private _emitter: Emitter<any> | undefined;
 
@@ -101,9 +93,8 @@ export interface AbstractCancellationTokenSource extends Disposable {
 	cancel(): void;
 }
 
-export class CancellationTokenSource
-	implements AbstractCancellationTokenSource
-{
+export class CancellationTokenSource implements AbstractCancellationTokenSource {
+
 	private _token: CancellationToken | undefined;
 
 	get token(): CancellationToken {

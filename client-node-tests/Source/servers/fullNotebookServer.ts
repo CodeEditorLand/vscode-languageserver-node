@@ -4,19 +4,13 @@
  *--------------------------------------------------------------------------------------------*/
 
 import {
-	createConnection,
-	DidChangeNotebookDocumentNotification,
+	createConnection, InitializeParams, ServerCapabilities, TextDocumentSyncKind, RequestType,
+	DidOpenNotebookDocumentNotification, DidChangeNotebookDocumentNotification, DidSaveNotebookDocumentNotification,
 	DidCloseNotebookDocumentNotification,
-	DidOpenNotebookDocumentNotification,
-	DidSaveNotebookDocumentNotification,
-	DocumentDiagnosticReport,
-	InitializeParams,
-	NotificationType,
 	PublishDiagnosticsNotification,
-	RequestType,
-	ServerCapabilities,
-	TextDocumentSyncKind,
-} from "vscode-languageserver/node";
+	DocumentDiagnosticReport,
+	NotificationType
+} from 'vscode-languageserver/node';
 
 const connection = createConnection();
 
@@ -25,17 +19,17 @@ console.error = connection.console.error.bind(connection.console);
 
 const receivedNotifications: Set<string> = new Set();
 namespace GotNotifiedRequest {
-	export const method: "testing/gotNotified" = "testing/gotNotified";
+	export const method: 'testing/gotNotified' = 'testing/gotNotified';
 	export const type = new RequestType<string, boolean, void>(method);
 }
 
 namespace ClearNotifiedRequest {
-	export const method: "testing/clearNotified" = "testing/clearNotified";
+	export const method: 'testing/clearNotified' = 'testing/clearNotified';
 	export const type = new RequestType<string, void, void>(method);
 }
 
 namespace SetDiagnosticsNotification {
-	export const method: "testing/setDiagnostics" = "testing/setDiagnostics";
+	export const method: 'testing/setDiagnostics' = 'testing/setDiagnostics';
 	export const type = new NotificationType<DocumentDiagnosticReport>(method);
 }
 
@@ -45,19 +39,17 @@ connection.onInitialize((_params: InitializeParams): any => {
 	const capabilities: ServerCapabilities = {
 		textDocumentSync: TextDocumentSyncKind.Full,
 		notebookDocumentSync: {
-			notebookSelector: [
-				{
-					notebook: { notebookType: "jupyter-notebook" },
-					cells: [{ language: "python" }],
-				},
-			],
+			notebookSelector: [{
+				notebook: { notebookType: 'jupyter-notebook' },
+				cells: [{ language: 'python' }]
+			}]
 		},
 		diagnosticProvider: {
-			identifier: "diagnostic-provider",
+			identifier: 'diagnostic-provider',
 			documentSelector: null,
 			interFileDependencies: false,
-			workspaceDiagnostics: false,
-		},
+			workspaceDiagnostics: false
+		}
 	};
 	return { capabilities };
 });
@@ -76,10 +68,7 @@ connection.notebooks.synchronization.onDidCloseNotebookDocument(() => {
 });
 connection.languages.diagnostics.on((params) => {
 	receivedNotifications.add(PublishDiagnosticsNotification.method);
-	const result = diagnostics.get(params.textDocument.uri) || {
-		kind: "unchanged",
-		resultId: params.previousResultId || "",
-	};
+	const result = diagnostics.get(params.textDocument.uri) || { kind: 'unchanged', resultId: params.previousResultId || '' };
 	return result;
 });
 

@@ -3,18 +3,17 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import { CancellationToken } from "vscode";
-import { Disposable, RAL } from "vscode-languageserver-protocol";
+import { CancellationToken } from 'vscode';
+import { RAL, Disposable } from 'vscode-languageserver-protocol';
 
 export type ITask<T> = () => T;
 
 export class Delayer<T> {
+
 	public defaultDelay: number;
 	private timeout: Disposable | undefined;
 	private completionPromise: Promise<T> | undefined;
-	private onSuccess:
-		| ((value: T | Promise<T> | undefined) => void)
-		| undefined;
+	private onSuccess: ((value: T | Promise<T> | undefined) => void) | undefined;
 	private task: ITask<T> | undefined;
 
 	constructor(defaultDelay: number) {
@@ -25,10 +24,7 @@ export class Delayer<T> {
 		this.task = undefined;
 	}
 
-	public trigger(
-		task: ITask<T>,
-		delay: number = this.defaultDelay,
-	): Promise<T> {
+	public trigger(task: ITask<T>, delay: number = this.defaultDelay): Promise<T> {
 		this.task = task;
 		if (delay >= 0) {
 			this.cancelTimeout();
@@ -47,13 +43,10 @@ export class Delayer<T> {
 		}
 
 		if (delay >= 0 || this.timeout === void 0) {
-			this.timeout = RAL().timer.setTimeout(
-				() => {
-					this.timeout = undefined;
-					this.onSuccess!(undefined);
-				},
-				delay >= 0 ? delay : this.defaultDelay,
-			);
+			this.timeout = RAL().timer.setTimeout(() => {
+				this.timeout = undefined;
+				this.onSuccess!(undefined);
+			}, delay >= 0 ? delay : this.defaultDelay);
 		}
 
 		return this.completionPromise;
@@ -97,13 +90,14 @@ type Waiting<T> = {
 };
 
 export class Semaphore<T = void> {
+
 	private _capacity: number;
 	private _active: number;
 	private _waiting: Waiting<T>[];
 
 	public constructor(capacity: number = 1) {
 		if (capacity <= 0) {
-			throw new Error("Capacity must be greater than 0");
+			throw new Error('Capacity must be greater than 0');
 		}
 		this._capacity = capacity;
 		this._active = 0;
@@ -121,7 +115,7 @@ export class Semaphore<T = void> {
 		return this._active;
 	}
 
-	private runNext(): void {
+	private runNext():  void {
 		if (this._waiting.length === 0 || this._active === this._capacity) {
 			return;
 		}
@@ -140,18 +134,15 @@ export class Semaphore<T = void> {
 		try {
 			const result = next.thunk();
 			if (result instanceof Promise) {
-				result.then(
-					(value) => {
-						this._active--;
-						next.resolve(value);
-						this.runNext();
-					},
-					(err) => {
-						this._active--;
-						next.reject(err);
-						this.runNext();
-					},
-				);
+				result.then((value) => {
+					this._active--;
+					next.resolve(value);
+					this.runNext();
+				}, (err) => {
+					this._active--;
+					next.reject(err);
+					this.runNext();
+				});
 			} else {
 				this._active--;
 				next.resolve(result);
@@ -173,11 +164,12 @@ export function clearTestMode() {
 	$test = false;
 }
 
-const defaultYieldTimeout: number = 15; /*ms*/
+const defaultYieldTimeout: number = 15 /*ms*/;
 
 declare const console: any;
 
 class Timer {
+
 	private readonly yieldAfter: number;
 	private startTime: number;
 	private counter: number;
@@ -185,10 +177,7 @@ class Timer {
 	private counterInterval: number;
 
 	constructor(yieldAfter: number = defaultYieldTimeout) {
-		this.yieldAfter =
-			$test === true
-				? Math.max(yieldAfter, 2)
-				: Math.max(yieldAfter, defaultYieldTimeout);
+		this.yieldAfter = $test === true ? Math.max(yieldAfter, 2) : Math.max(yieldAfter, defaultYieldTimeout);
 		this.startTime = Date.now();
 		this.counter = 0;
 		this.total = 0;
@@ -247,12 +236,7 @@ export type YieldOptions = {
 	yieldCallback?: () => void;
 };
 
-export async function map<P, C>(
-	items: ReadonlyArray<P>,
-	func: (item: P) => C,
-	token?: CancellationToken,
-	options?: YieldOptions,
-): Promise<C[]> {
+export async function map<P, C>(items: ReadonlyArray<P>, func: (item: P) => C, token?: CancellationToken, options?: YieldOptions): Promise<C[]> {
 	if (items.length === 0) {
 		return [];
 	}
@@ -262,7 +246,7 @@ export async function map<P, C>(
 		timer.start();
 		for (let i = start; i < items.length; i++) {
 			result[i] = func(items[i]);
-			if (timer.shouldYield()) {
+			if (timer.shouldYield())  {
 				options?.yieldCallback && options.yieldCallback();
 				return i + 1;
 			}
@@ -284,12 +268,7 @@ export async function map<P, C>(
 	return result;
 }
 
-export async function mapAsync<P, C>(
-	items: ReadonlyArray<P>,
-	func: (item: P, token?: CancellationToken) => Promise<C>,
-	token?: CancellationToken,
-	options?: YieldOptions,
-): Promise<C[]> {
+export async function mapAsync<P, C>(items: ReadonlyArray<P>, func: (item: P, token?: CancellationToken) => Promise<C>, token?: CancellationToken, options?: YieldOptions): Promise<C[]> {
 	if (items.length === 0) {
 		return [];
 	}
@@ -299,7 +278,7 @@ export async function mapAsync<P, C>(
 		timer.start();
 		for (let i = start; i < items.length; i++) {
 			result[i] = await func(items[i], token);
-			if (timer.shouldYield()) {
+			if (timer.shouldYield())  {
 				options?.yieldCallback && options.yieldCallback();
 				return i + 1;
 			}
@@ -320,12 +299,7 @@ export async function mapAsync<P, C>(
 	return result;
 }
 
-export async function forEach<P>(
-	items: ReadonlyArray<P>,
-	func: (item: P) => void,
-	token?: CancellationToken,
-	options?: YieldOptions,
-): Promise<void> {
+export async function forEach<P>(items: ReadonlyArray<P>, func: (item: P) => void, token?: CancellationToken, options?: YieldOptions): Promise<void> {
 	if (items.length === 0) {
 		return;
 	}
@@ -334,7 +308,7 @@ export async function forEach<P>(
 		timer.start();
 		for (let i = start; i < items.length; i++) {
 			func(items[i]);
-			if (timer.shouldYield()) {
+			if (timer.shouldYield())  {
 				options?.yieldCallback && options.yieldCallback();
 				return i + 1;
 			}

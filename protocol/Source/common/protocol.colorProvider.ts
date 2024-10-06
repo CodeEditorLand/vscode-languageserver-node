@@ -3,23 +3,13 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import { RequestHandler } from "vscode-jsonrpc";
-import {
-	Color,
-	ColorInformation,
-	ColorPresentation,
-	Range,
-	TextDocumentIdentifier,
-} from "vscode-languageserver-types";
+import { RequestHandler } from 'vscode-jsonrpc';
+import { TextDocumentIdentifier, Range, Color, ColorInformation, ColorPresentation } from 'vscode-languageserver-types';
 
-import { MessageDirection, ProtocolRequestType } from "./messages";
+import { MessageDirection, ProtocolRequestType } from './messages';
 import type {
-	PartialResultParams,
-	StaticRegistrationOptions,
-	TextDocumentRegistrationOptions,
-	WorkDoneProgressOptions,
-	WorkDoneProgressParams,
-} from "./protocol";
+	TextDocumentRegistrationOptions, StaticRegistrationOptions, PartialResultParams, WorkDoneProgressParams, WorkDoneProgressOptions
+} from './protocol';
 
 //---- Client capability ----
 
@@ -32,21 +22,18 @@ export interface DocumentColorClientCapabilities {
 	dynamicRegistration?: boolean;
 }
 
-export interface DocumentColorOptions extends WorkDoneProgressOptions {}
+export interface DocumentColorOptions extends WorkDoneProgressOptions {
+}
 
-export interface DocumentColorRegistrationOptions
-	extends TextDocumentRegistrationOptions,
-		StaticRegistrationOptions,
-		DocumentColorOptions {}
+export interface DocumentColorRegistrationOptions extends TextDocumentRegistrationOptions, StaticRegistrationOptions, DocumentColorOptions {
+}
 
 //---- Color Symbol Provider ---------------------------
 
 /**
  * Parameters for a {@link DocumentColorRequest}.
  */
-export interface DocumentColorParams
-	extends WorkDoneProgressParams,
-		PartialResultParams {
+export interface DocumentColorParams extends WorkDoneProgressParams, PartialResultParams {
 	/**
 	 * The text document.
 	 */
@@ -60,30 +47,16 @@ export interface DocumentColorParams
  * that resolves to such.
  */
 export namespace DocumentColorRequest {
-	export const method: "textDocument/documentColor" =
-		"textDocument/documentColor";
-	export const messageDirection: MessageDirection =
-		MessageDirection.clientToServer;
-	export const type = new ProtocolRequestType<
-		DocumentColorParams,
-		ColorInformation[],
-		ColorInformation[],
-		void,
-		DocumentColorRegistrationOptions
-	>(method);
-	export type HandlerSignature = RequestHandler<
-		DocumentColorParams,
-		ColorInformation[],
-		void
-	>;
+	export const method: 'textDocument/documentColor' = 'textDocument/documentColor';
+	export const messageDirection: MessageDirection = MessageDirection.clientToServer;
+	export const type = new ProtocolRequestType<DocumentColorParams, ColorInformation[], ColorInformation[], void, DocumentColorRegistrationOptions>(method);
+	export type HandlerSignature = RequestHandler<DocumentColorParams, ColorInformation[], void>;
 }
 
 /**
  * Parameters for a {@link ColorPresentationRequest}.
  */
-export interface ColorPresentationParams
-	extends WorkDoneProgressParams,
-		PartialResultParams {
+export interface ColorPresentationParams extends WorkDoneProgressParams, PartialResultParams {
 	/**
 	 * The text document.
 	 */
@@ -107,20 +80,8 @@ export interface ColorPresentationParams
  * that resolves to such.
  */
 export namespace ColorPresentationRequest {
-	export const method: "textDocument/colorPresentation" =
-		"textDocument/colorPresentation";
-	export const messageDirection: MessageDirection =
-		MessageDirection.clientToServer;
-	export const type = new ProtocolRequestType<
-		ColorPresentationParams,
-		ColorPresentation[],
-		ColorPresentation[],
-		void,
-		WorkDoneProgressOptions & TextDocumentRegistrationOptions
-	>(method);
-	export type HandlerSignature = RequestHandler<
-		ColorPresentationParams,
-		ColorPresentation[],
-		void
-	>;
+	export const method: 'textDocument/colorPresentation' = 'textDocument/colorPresentation';
+	export const messageDirection: MessageDirection = MessageDirection.clientToServer;
+	export const type = new ProtocolRequestType<ColorPresentationParams, ColorPresentation[], ColorPresentation[], void, WorkDoneProgressOptions & TextDocumentRegistrationOptions>(method);
+	export type HandlerSignature = RequestHandler<ColorPresentationParams, ColorPresentation[], void>;
 }

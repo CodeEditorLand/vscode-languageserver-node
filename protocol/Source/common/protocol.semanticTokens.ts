@@ -3,30 +3,13 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import { RequestHandler, RequestHandler0 } from "vscode-jsonrpc";
-import {
-	Range,
-	SemanticTokens,
-	SemanticTokensDelta,
-	SemanticTokensEdit,
-	SemanticTokensLegend,
-	TextDocumentIdentifier,
-	uinteger,
-} from "vscode-languageserver-types";
+import { TextDocumentIdentifier, Range, uinteger, SemanticTokensEdit, SemanticTokensLegend, SemanticTokens, SemanticTokensDelta } from 'vscode-languageserver-types';
+import { RequestHandler0, RequestHandler } from 'vscode-jsonrpc';
 
-import {
-	MessageDirection,
-	ProtocolRequestType,
-	ProtocolRequestType0,
-	RegistrationType,
-} from "./messages";
+import { MessageDirection, ProtocolRequestType, ProtocolRequestType0, RegistrationType } from './messages';
 import type {
-	PartialResultParams,
-	StaticRegistrationOptions,
-	TextDocumentRegistrationOptions,
-	WorkDoneProgressOptions,
-	WorkDoneProgressParams,
-} from "./protocol";
+	PartialResultParams, WorkDoneProgressParams, WorkDoneProgressOptions, TextDocumentRegistrationOptions, StaticRegistrationOptions
+} from './protocol';
 
 /**
  * @since 3.16.0
@@ -45,10 +28,11 @@ export interface SemanticTokensDeltaPartialResult {
 //------- 'textDocument/semanticTokens' -----
 
 export namespace TokenFormat {
-	export const Relative: "relative" = "relative";
+	export const Relative: 'relative' = 'relative';
 }
 
-export type TokenFormat = "relative";
+export type TokenFormat = 'relative';
+
 
 /**
  * @since 3.18.0
@@ -65,11 +49,13 @@ export type ClientSemanticTokensRequestFullDelta = {
  * @since 3.18.0
  */
 export type ClientSemanticTokensRequestOptions = {
+
 	/**
 	 * The client will send the `textDocument/semanticTokens/range` request if
 	 * the server provides a corresponding handler.
 	 */
-	range?: boolean | {};
+	range?: boolean | {
+	};
 
 	/**
 	 * The client will send the `textDocument/semanticTokens/full` request if
@@ -151,6 +137,7 @@ export interface SemanticTokensClientCapabilities {
 	augmentsSyntaxTokens?: boolean;
 }
 
+
 /**
  * Semantic tokens options to support deltas for full documents
  *
@@ -176,7 +163,8 @@ export interface SemanticTokensOptions extends WorkDoneProgressOptions {
 	 * Server supports providing semantic tokens for a specific range
 	 * of a document.
 	 */
-	range?: boolean | {};
+	range?: boolean | {
+	};
 
 	/**
 	 * Server supports providing semantic tokens for a full document.
@@ -187,17 +175,12 @@ export interface SemanticTokensOptions extends WorkDoneProgressOptions {
 /**
  * @since 3.16.0
  */
-export interface SemanticTokensRegistrationOptions
-	extends TextDocumentRegistrationOptions,
-		SemanticTokensOptions,
-		StaticRegistrationOptions {}
+export interface SemanticTokensRegistrationOptions extends TextDocumentRegistrationOptions, SemanticTokensOptions, StaticRegistrationOptions {
+}
 
 export namespace SemanticTokensRegistrationType {
-	export const method: "textDocument/semanticTokens" =
-		"textDocument/semanticTokens";
-	export const type = new RegistrationType<SemanticTokensRegistrationOptions>(
-		method,
-	);
+	export const method: 'textDocument/semanticTokens' = 'textDocument/semanticTokens';
+	export const type = new RegistrationType<SemanticTokensRegistrationOptions>(method);
 }
 
 //------- 'textDocument/semanticTokens' -----
@@ -205,9 +188,7 @@ export namespace SemanticTokensRegistrationType {
 /**
  * @since 3.16.0
  */
-export interface SemanticTokensParams
-	extends WorkDoneProgressParams,
-		PartialResultParams {
+export interface SemanticTokensParams extends WorkDoneProgressParams, PartialResultParams {
 	/**
 	 * The text document.
 	 */
@@ -218,24 +199,11 @@ export interface SemanticTokensParams
  * @since 3.16.0
  */
 export namespace SemanticTokensRequest {
-	export const method: "textDocument/semanticTokens/full" =
-		"textDocument/semanticTokens/full";
-	export const messageDirection: MessageDirection =
-		MessageDirection.clientToServer;
-	export const type = new ProtocolRequestType<
-		SemanticTokensParams,
-		SemanticTokens | null,
-		SemanticTokensPartialResult,
-		void,
-		SemanticTokensRegistrationOptions
-	>(method);
-	export const registrationMethod: typeof SemanticTokensRegistrationType.method =
-		SemanticTokensRegistrationType.method;
-	export type HandlerSignature = RequestHandler<
-		SemanticTokensDeltaParams,
-		SemanticTokens | null,
-		void
-	>;
+	export const method: 'textDocument/semanticTokens/full' = 'textDocument/semanticTokens/full';
+	export const messageDirection: MessageDirection = MessageDirection.clientToServer;
+	export const type = new ProtocolRequestType<SemanticTokensParams, SemanticTokens | null, SemanticTokensPartialResult, void, SemanticTokensRegistrationOptions>(method);
+	export const registrationMethod: typeof SemanticTokensRegistrationType.method  = SemanticTokensRegistrationType.method;
+	export type HandlerSignature = RequestHandler<SemanticTokensDeltaParams, SemanticTokens | null, void>;
 }
 
 //------- 'textDocument/semanticTokens/edits' -----
@@ -243,9 +211,7 @@ export namespace SemanticTokensRequest {
 /**
  * @since 3.16.0
  */
-export interface SemanticTokensDeltaParams
-	extends WorkDoneProgressParams,
-		PartialResultParams {
+export interface SemanticTokensDeltaParams extends WorkDoneProgressParams, PartialResultParams {
 	/**
 	 * The text document.
 	 */
@@ -262,24 +228,11 @@ export interface SemanticTokensDeltaParams
  * @since 3.16.0
  */
 export namespace SemanticTokensDeltaRequest {
-	export const method: "textDocument/semanticTokens/full/delta" =
-		"textDocument/semanticTokens/full/delta";
-	export const messageDirection: MessageDirection =
-		MessageDirection.clientToServer;
-	export const type = new ProtocolRequestType<
-		SemanticTokensDeltaParams,
-		SemanticTokens | SemanticTokensDelta | null,
-		SemanticTokensPartialResult | SemanticTokensDeltaPartialResult,
-		void,
-		SemanticTokensRegistrationOptions
-	>(method);
-	export const registrationMethod: typeof SemanticTokensRegistrationType.method =
-		SemanticTokensRegistrationType.method;
-	export type HandlerSignature = RequestHandler<
-		SemanticTokensDeltaParams,
-		SemanticTokens | SemanticTokensDelta | null,
-		void
-	>;
+	export const method: 'textDocument/semanticTokens/full/delta' = 'textDocument/semanticTokens/full/delta';
+	export const messageDirection: MessageDirection = MessageDirection.clientToServer;
+	export const type = new ProtocolRequestType<SemanticTokensDeltaParams, SemanticTokens | SemanticTokensDelta | null, SemanticTokensPartialResult | SemanticTokensDeltaPartialResult, void, SemanticTokensRegistrationOptions>(method);
+	export const registrationMethod: typeof SemanticTokensRegistrationType.method  = SemanticTokensRegistrationType.method;
+	export type HandlerSignature = RequestHandler<SemanticTokensDeltaParams, SemanticTokens | SemanticTokensDelta | null, void>;
 }
 
 //------- 'textDocument/semanticTokens/range' -----
@@ -287,9 +240,7 @@ export namespace SemanticTokensDeltaRequest {
 /**
  * @since 3.16.0
  */
-export interface SemanticTokensRangeParams
-	extends WorkDoneProgressParams,
-		PartialResultParams {
+export interface SemanticTokensRangeParams extends WorkDoneProgressParams, PartialResultParams {
 	/**
 	 * The text document.
 	 */
@@ -305,24 +256,11 @@ export interface SemanticTokensRangeParams
  * @since 3.16.0
  */
 export namespace SemanticTokensRangeRequest {
-	export const method: "textDocument/semanticTokens/range" =
-		"textDocument/semanticTokens/range";
-	export const messageDirection: MessageDirection =
-		MessageDirection.clientToServer;
-	export const type = new ProtocolRequestType<
-		SemanticTokensRangeParams,
-		SemanticTokens | null,
-		SemanticTokensPartialResult,
-		void,
-		void
-	>(method);
-	export const registrationMethod: typeof SemanticTokensRegistrationType.method =
-		SemanticTokensRegistrationType.method;
-	export type HandlerSignature = RequestHandler<
-		SemanticTokensRangeParams,
-		SemanticTokens | null,
-		void
-	>;
+	export const method: 'textDocument/semanticTokens/range' = 'textDocument/semanticTokens/range';
+	export const messageDirection: MessageDirection = MessageDirection.clientToServer;
+	export const type = new ProtocolRequestType<SemanticTokensRangeParams, SemanticTokens | null, SemanticTokensPartialResult, void, void>(method);
+	export const registrationMethod: typeof SemanticTokensRegistrationType.method  = SemanticTokensRegistrationType.method;
+	export type HandlerSignature = RequestHandler<SemanticTokensRangeParams, SemanticTokens | null, void>;
 }
 
 //------- 'workspace/semanticTokens/refresh' -----
@@ -348,10 +286,7 @@ export interface SemanticTokensWorkspaceClientCapabilities {
  */
 export namespace SemanticTokensRefreshRequest {
 	export const method: `workspace/semanticTokens/refresh` = `workspace/semanticTokens/refresh`;
-	export const messageDirection: MessageDirection =
-		MessageDirection.serverToClient;
-	export const type = new ProtocolRequestType0<void, void, void, void>(
-		method,
-	);
+	export const messageDirection: MessageDirection = MessageDirection.serverToClient;
+	export const type = new ProtocolRequestType0<void, void, void, void>(method);
 	export type HandlerSignature = RequestHandler0<void, void>;
 }
