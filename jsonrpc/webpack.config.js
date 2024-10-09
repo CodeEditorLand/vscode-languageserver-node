@@ -5,21 +5,21 @@
 //@ts-check
 /** @typedef {import('webpack').Configuration} WebpackConfig **/
 
-'use strict';
+"use strict";
 
 module.exports = {
 	context: __dirname,
-	mode: 'none',
-	target: 'webworker',
+	mode: "none",
+	target: "webworker",
 	resolve: {
-		mainFields: ['module', 'main'],
-		extensions: ['.js'] // support ts-files and js-files
+		mainFields: ["module", "main"],
+		extensions: [".js"], // support ts-files and js-files
 	},
 	entry: {
-		extension: './lib/browser/main.js',
+		extension: "./lib/browser/main.js",
 	},
-	devtool: 'source-map',
+	devtool: "source-map",
 	output: {
-		filename: 'main.js'
-	}
+		filename: "main.js",
+	},
 };

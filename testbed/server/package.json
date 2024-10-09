@@ -1,16 +1,16 @@
 {
 	"name": "testbed-server",
 	"version": "0.1.0",
-	"description": "TestBed Server",
 	"private": true,
-	"engines": {
-		"node": "*"
+	"description": "TestBed Server",
+	"scripts": {
+		"compile": "tsc -b ./tsconfig.json",
+		"watch": "tsc --watch -b ./tsconfig.json"
 	},
 	"dependencies": {
 		"vscode-uri": "^3.0.8"
 	},
-	"scripts": {
-		"compile": "tsc -b ./tsconfig.json",
-		"watch": "tsc --watch -b ./tsconfig.json"
+	"engines": {
+		"node": "*"
 	}
 }
