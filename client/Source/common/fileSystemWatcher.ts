@@ -4,33 +4,52 @@
  * ------------------------------------------------------------------------------------------ */
 
 import {
-	workspace as Workspace, Disposable, FileSystemWatcher as VFileSystemWatcher
-} from 'vscode';
+	Disposable,
+	FileSystemWatcher as VFileSystemWatcher,
+	workspace as Workspace,
+} from "vscode";
+import {
+	ClientCapabilities,
+	DidChangeWatchedFilesNotification,
+	DidChangeWatchedFilesRegistrationOptions,
+	DocumentSelector,
+	FileChangeType,
+	FileEvent,
+	RegistrationType,
+	ServerCapabilities,
+	WatchKind,
+} from "vscode-languageserver-protocol";
 
 import {
-	ClientCapabilities, DidChangeWatchedFilesNotification, DidChangeWatchedFilesRegistrationOptions, DocumentSelector, FileChangeType, FileEvent, RegistrationType,
-	ServerCapabilities, WatchKind
-} from 'vscode-languageserver-protocol';
+	DynamicFeature,
+	ensure,
+	FeatureClient,
+	FeatureState,
+	RegistrationData,
+} from "./features";
 
-import {
-	FeatureClient, DynamicFeature, ensure, RegistrationData, FeatureState
-} from './features';
-
-
-export class FileSystemWatcherFeature implements DynamicFeature<DidChangeWatchedFilesRegistrationOptions> {
-
+export class FileSystemWatcherFeature
+	implements DynamicFeature<DidChangeWatchedFilesRegistrationOptions>
+{
 	private readonly _client: FeatureClient<object>;
 	private readonly _notifyFileEvent: (event: FileEvent) => void;
 	private readonly _watchers: Map<string, Disposable[]>;
 
-	constructor(client: FeatureClient<object>, notifyFileEvent: (event: FileEvent) => void) {
+	constructor(
+		client: FeatureClient<object>,
+		notifyFileEvent: (event: FileEvent) => void,
+	) {
 		this._client = client;
 		this._notifyFileEvent = notifyFileEvent;
 		this._watchers = new Map<string, Disposable[]>();
 	}
 
 	getState(): FeatureState {
-		return { kind: 'workspace', id: this.registrationType.method, registrations: this._watchers.size > 0 };
+		return {
+			kind: "workspace",
+			id: this.registrationType.method,
+			registrations: this._watchers.size > 0,
+		};
 	}
 
 	public get registrationType(): RegistrationType<DidChangeWatchedFilesRegistrationOptions> {
@@ -38,31 +57,58 @@ export class FileSystemWatcherFeature implements DynamicFeature<DidChangeWatched
 	}
 
 	public fillClientCapabilities(capabilities: ClientCapabilities): void {
-		ensure(ensure(capabilities, 'workspace')!, 'didChangeWatchedFiles')!.dynamicRegistration = true;
-		ensure(ensure(capabilities, 'workspace')!, 'didChangeWatchedFiles')!.relativePatternSupport = true;
+		ensure(
+			ensure(capabilities, "workspace")!,
+			"didChangeWatchedFiles",
+		)!.dynamicRegistration = true;
+		ensure(
+			ensure(capabilities, "workspace")!,
+			"didChangeWatchedFiles",
+		)!.relativePatternSupport = true;
 	}
 
-	public initialize(_capabilities: ServerCapabilities, _documentSelector: DocumentSelector): void {
-	}
+	public initialize(
+		_capabilities: ServerCapabilities,
+		_documentSelector: DocumentSelector,
+	): void {}
 
-	public register(data: RegistrationData<DidChangeWatchedFilesRegistrationOptions>): void {
+	public register(
+		data: RegistrationData<DidChangeWatchedFilesRegistrationOptions>,
+	): void {
 		if (!Array.isArray(data.registerOptions.watchers)) {
 			return;
 		}
 		const disposables: Disposable[] = [];
 		for (const watcher of data.registerOptions.watchers) {
-			const globPattern = this._client.protocol2CodeConverter.asGlobPattern(watcher.globPattern);
+			const globPattern =
+				this._client.protocol2CodeConverter.asGlobPattern(
+					watcher.globPattern,
+				);
 			if (globPattern === undefined) {
 				continue;
 			}
-			let watchCreate: boolean = true, watchChange: boolean = true, watchDelete: boolean = true;
+			let watchCreate: boolean = true,
+				watchChange: boolean = true,
+				watchDelete: boolean = true;
 			if (watcher.kind !== undefined && watcher.kind !== null) {
 				watchCreate = (watcher.kind & WatchKind.Create) !== 0;
 				watchChange = (watcher.kind & WatchKind.Change) !== 0;
 				watchDelete = (watcher.kind & WatchKind.Delete) !== 0;
 			}
-			const fileSystemWatcher: VFileSystemWatcher = Workspace.createFileSystemWatcher(globPattern, !watchCreate, !watchChange, !watchDelete);
-			this.hookListeners(fileSystemWatcher, watchCreate, watchChange, watchDelete, disposables);
+			const fileSystemWatcher: VFileSystemWatcher =
+				Workspace.createFileSystemWatcher(
+					globPattern,
+					!watchCreate,
+					!watchChange,
+					!watchDelete,
+				);
+			this.hookListeners(
+				fileSystemWatcher,
+				watchCreate,
+				watchChange,
+				watchDelete,
+				disposables,
+			);
 			disposables.push(fileSystemWatcher);
 		}
 		this._watchers.set(data.id, disposables);
@@ -71,35 +117,62 @@ export class FileSystemWatcherFeature implements DynamicFeature<DidChangeWatched
 	public registerRaw(id: string, fileSystemWatchers: VFileSystemWatcher[]) {
 		const disposables: Disposable[] = [];
 		for (const fileSystemWatcher of fileSystemWatchers) {
-			this.hookListeners(fileSystemWatcher, true, true, true, disposables);
+			this.hookListeners(
+				fileSystemWatcher,
+				true,
+				true,
+				true,
+				disposables,
+			);
 		}
 		this._watchers.set(id, disposables);
 	}
 
-	private hookListeners(fileSystemWatcher: VFileSystemWatcher, watchCreate: boolean, watchChange: boolean, watchDelete: boolean, listeners?: Disposable[]): void {
+	private hookListeners(
+		fileSystemWatcher: VFileSystemWatcher,
+		watchCreate: boolean,
+		watchChange: boolean,
+		watchDelete: boolean,
+		listeners?: Disposable[],
+	): void {
 		if (watchCreate) {
-			fileSystemWatcher.onDidCreate((resource) => this._notifyFileEvent(
-				{
-					uri: this._client.code2ProtocolConverter.asUri(resource),
-					type: FileChangeType.Created
-				}
-			), null, listeners);
+			fileSystemWatcher.onDidCreate(
+				(resource) =>
+					this._notifyFileEvent({
+						uri: this._client.code2ProtocolConverter.asUri(
+							resource,
+						),
+						type: FileChangeType.Created,
+					}),
+				null,
+				listeners,
+			);
 		}
 		if (watchChange) {
-			fileSystemWatcher.onDidChange((resource) => this._notifyFileEvent(
-				{
-					uri: this._client.code2ProtocolConverter.asUri(resource),
-					type: FileChangeType.Changed
-				}
-			), null, listeners);
+			fileSystemWatcher.onDidChange(
+				(resource) =>
+					this._notifyFileEvent({
+						uri: this._client.code2ProtocolConverter.asUri(
+							resource,
+						),
+						type: FileChangeType.Changed,
+					}),
+				null,
+				listeners,
+			);
 		}
 		if (watchDelete) {
-			fileSystemWatcher.onDidDelete((resource) => this._notifyFileEvent(
-				{
-					uri: this._client.code2ProtocolConverter.asUri(resource),
-					type: FileChangeType.Deleted
-				}
-			), null, listeners);
+			fileSystemWatcher.onDidDelete(
+				(resource) =>
+					this._notifyFileEvent({
+						uri: this._client.code2ProtocolConverter.asUri(
+							resource,
+						),
+						type: FileChangeType.Deleted,
+					}),
+				null,
+				listeners,
+			);
 		}
 	}
 

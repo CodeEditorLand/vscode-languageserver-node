@@ -3,28 +3,36 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import RAL from './ral';
+import RAL from "./ral";
 
 const CR: number = 13;
 const LF: number = 10;
-const CRLF: string = '\r\n';
+const CRLF: string = "\r\n";
 
 export abstract class AbstractMessageBuffer implements RAL.MessageBuffer {
-
 	private _encoding: RAL.MessageBufferEncoding;
 	private _chunks: Uint8Array[];
 	private _totalLength: number;
 
-	constructor(encoding: RAL.MessageBufferEncoding = 'utf-8') {
+	constructor(encoding: RAL.MessageBufferEncoding = "utf-8") {
 		this._encoding = encoding;
 		this._chunks = [];
 		this._totalLength = 0;
 	}
 
 	protected abstract emptyBuffer(): Uint8Array;
-	protected abstract fromString(value: string, encoding: RAL.MessageBufferEncoding): Uint8Array;
-	protected abstract toString(value: Uint8Array, encoding: RAL.MessageBufferEncoding): string;
-	protected abstract asNative(buffer: Uint8Array, length?: number): Uint8Array;
+	protected abstract fromString(
+		value: string,
+		encoding: RAL.MessageBufferEncoding,
+	): Uint8Array;
+	protected abstract toString(
+		value: Uint8Array,
+		encoding: RAL.MessageBufferEncoding,
+	): string;
+	protected abstract asNative(
+		buffer: Uint8Array,
+		length?: number,
+	): Uint8Array;
 	protected abstract allocNative(length: number): Uint8Array;
 
 	public get encoding(): RAL.MessageBufferEncoding {
@@ -32,12 +40,17 @@ export abstract class AbstractMessageBuffer implements RAL.MessageBuffer {
 	}
 
 	public append(chunk: Uint8Array | string) {
-		const toAppend = typeof chunk === 'string' ? this.fromString(chunk, this._encoding) : chunk;
+		const toAppend =
+			typeof chunk === "string"
+				? this.fromString(chunk, this._encoding)
+				: chunk;
 		this._chunks.push(toAppend);
 		this._totalLength += toAppend.byteLength;
 	}
 
-	public tryReadHeaders(lowerCaseKeys: boolean = false): Map<string, string> | undefined {
+	public tryReadHeaders(
+		lowerCaseKeys: boolean = false,
+	): Map<string, string> | undefined {
 		if (this._chunks.length === 0) {
 			return undefined;
 		}
@@ -92,15 +105,17 @@ export abstract class AbstractMessageBuffer implements RAL.MessageBuffer {
 		// have two empty lines after the split at the end as well.
 		const buffer = this._read(chunkBytesRead + offset);
 		const result: Map<string, string> = new Map();
-		const headers = this.toString(buffer, 'ascii').split(CRLF);
+		const headers = this.toString(buffer, "ascii").split(CRLF);
 		if (headers.length < 2) {
 			return result;
 		}
 		for (let i = 0; i < headers.length - 2; i++) {
 			const header = headers[i];
-			const index: number = header.indexOf(':');
+			const index: number = header.indexOf(":");
 			if (index === -1) {
-				throw new Error(`Message header must separate key and value using ':'\n${header}`);
+				throw new Error(
+					`Message header must separate key and value using ':'\n${header}`,
+				);
 			}
 			const key = header.substr(0, index);
 			const value = header.substr(index + 1).trim();
@@ -122,7 +137,6 @@ export abstract class AbstractMessageBuffer implements RAL.MessageBuffer {
 	}
 
 	private _read(byteCount: number): Uint8Array {
-
 		if (byteCount === 0) {
 			return this.emptyBuffer();
 		}

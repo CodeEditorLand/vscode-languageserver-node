@@ -7,7 +7,7 @@
 		"lib": ["ES2023"],
 		"sourceMap": true,
 		"incremental": true,
-		"tsBuildInfoFile":"./out/tsconfig.tsbuildInfo",
+		"tsBuildInfoFile": "./out/tsconfig.tsbuildInfo"
 	},
 	"include": ["src"],
 	"exclude": ["node_modules"]

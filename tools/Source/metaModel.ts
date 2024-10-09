@@ -3,20 +3,40 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-export type BaseTypes = 'URI' | 'DocumentUri' | 'integer' | 'uinteger' | 'decimal' | 'RegExp' | 'string' | 'boolean' | 'null';
+export type BaseTypes =
+	| "URI"
+	| "DocumentUri"
+	| "integer"
+	| "uinteger"
+	| "decimal"
+	| "RegExp"
+	| "string"
+	| "boolean"
+	| "null";
 
-export type TypeKind = 'base' | 'reference' | 'array' | 'map' | 'and' | 'or' | 'tuple' | 'literal' | 'stringLiteral' | 'integerLiteral' | 'booleanLiteral';
+export type TypeKind =
+	| "base"
+	| "reference"
+	| "array"
+	| "map"
+	| "and"
+	| "or"
+	| "tuple"
+	| "literal"
+	| "stringLiteral"
+	| "integerLiteral"
+	| "booleanLiteral";
 
 /**
  * Indicates in which direction a message is sent in the protocol.
  */
-export type MessageDirection = 'clientToServer' | 'serverToClient' | 'both';
+export type MessageDirection = "clientToServer" | "serverToClient" | "both";
 
 /**
  * Represents a base type like `string` or `DocumentUri`.
  */
 export type BaseType = {
-	kind: 'base';
+	kind: "base";
 	name: BaseTypes;
 };
 
@@ -26,7 +46,7 @@ export type BaseType = {
  * in the same meta model.
  */
 export type ReferenceType = {
-	kind: 'reference';
+	kind: "reference";
 	name: string;
 };
 
@@ -34,7 +54,7 @@ export type ReferenceType = {
  * Represents an array type (e.g. `TextDocument[]`).
  */
 export type ArrayType = {
-	kind: 'array';
+	kind: "array";
 	element: Type;
 };
 
@@ -44,14 +64,16 @@ export type ArrayType = {
  * type must either resolve to a `string` or `integer`
  * type. (e.g. `type ChangeAnnotationIdentifier === string`).
  */
-export type MapKeyType = { kind: 'base'; name: 'URI' | 'DocumentUri' | 'string' | 'integer' } | ReferenceType;
+export type MapKeyType =
+	| { kind: "base"; name: "URI" | "DocumentUri" | "string" | "integer" }
+	| ReferenceType;
 
 /**
  * Represents a JSON object map
  * (e.g. `interface Map<K extends string | integer, V> { [key: K] => V; }`).
  */
 export type MapType = {
-	kind: 'map';
+	kind: "map";
 	key: MapKeyType;
 	value: Type;
 };
@@ -61,7 +83,7 @@ export type MapType = {
  * (e.g. TextDocumentParams & WorkDoneProgressParams`).
  */
 export type AndType = {
-	kind: 'and';
+	kind: "and";
 	items: Type[];
 };
 
@@ -70,7 +92,7 @@ export type AndType = {
  * (e.g. `Location | LocationLink`).
  */
 export type OrType = {
-	kind: 'or';
+	kind: "or";
 	items: Type[];
 };
 
@@ -79,7 +101,7 @@ export type OrType = {
  * (e.g. `[integer, integer]`).
  */
 export type TupleType = {
-	kind: 'tuple';
+	kind: "tuple";
 	items: Type[];
 };
 
@@ -87,8 +109,8 @@ export type TupleType = {
  * Represents a literal structure
  * (e.g. `property: { start: uinteger; end: uinteger; }`).
  */
-export type StructureLiteralType =  {
-	kind: 'literal';
+export type StructureLiteralType = {
+	kind: "literal";
 	value: StructureLiteral;
 };
 
@@ -97,7 +119,7 @@ export type StructureLiteralType =  {
  * (e.g. `kind: 'rename'`).
  */
 export type StringLiteralType = {
-	kind: 'stringLiteral';
+	kind: "stringLiteral";
 	value: string;
 };
 
@@ -106,7 +128,7 @@ export type IntegerLiteralType = {
 	 * Represents an integer literal type
 	 * (e.g. `kind: 1`).
 	 */
-	kind: 'integerLiteral';
+	kind: "integerLiteral";
 	value: number;
 };
 
@@ -115,11 +137,22 @@ export type IntegerLiteralType = {
  * (e.g. `kind: true`).
  */
 export type BooleanLiteralType = {
-	kind: 'booleanLiteral';
+	kind: "booleanLiteral";
 	value: boolean;
 };
 
-export type Type = BaseType | ReferenceType | ArrayType | MapType | AndType | OrType | TupleType | StructureLiteralType | StringLiteralType | IntegerLiteralType | BooleanLiteralType;
+export type Type =
+	| BaseType
+	| ReferenceType
+	| ArrayType
+	| MapType
+	| AndType
+	| OrType
+	| TupleType
+	| StructureLiteralType
+	| StringLiteralType
+	| IntegerLiteralType
+	| BooleanLiteralType;
 
 /**
  * Represents a LSP request
@@ -383,7 +416,6 @@ export type Structure = {
  * Defines an unnamed structure of an object literal.
  */
 export type StructureLiteral = {
-
 	/**
 	 * The properties.
 	 */
@@ -437,7 +469,7 @@ export type TypeAlias = {
 	/**
 	 * An optional documentation.
 	 */
-	 documentation?: string;
+	documentation?: string;
 
 	/**
 	 * Since when (release number) this structure is
@@ -451,7 +483,7 @@ export type TypeAlias = {
 	 */
 	sinceTags?: string[];
 
-	 /**
+	/**
 	 * Whether this is a proposed type alias. If omitted,
 	 * the type alias is final.
 	 */
@@ -481,7 +513,7 @@ export type EnumerationEntry = {
 	/**
 	 * An optional documentation.
 	 */
-	 documentation?: string;
+	documentation?: string;
 
 	/**
 	 * Since when (release number) this enumeration entry is
@@ -495,7 +527,7 @@ export type EnumerationEntry = {
 	 */
 	sinceTags?: string[];
 
-	 /**
+	/**
 	 * Whether this is a proposed enumeration entry. If omitted,
 	 * the enumeration entry is final.
 	 */
@@ -508,7 +540,10 @@ export type EnumerationEntry = {
 	deprecated?: string;
 };
 
-export type EnumerationType = { kind: 'base'; name: 'string' | 'integer' | 'uinteger' };
+export type EnumerationType = {
+	kind: "base";
+	name: "string" | "integer" | "uinteger";
+};
 
 /**
  * Defines an enumeration.
@@ -539,7 +574,7 @@ export type Enumeration = {
 	/**
 	 * An optional documentation.
 	 */
-	 documentation?: string;
+	documentation?: string;
 
 	/**
 	 * Since when (release number) this enumeration is
@@ -553,7 +588,7 @@ export type Enumeration = {
 	 */
 	sinceTags?: string[];
 
-	 /**
+	/**
 	 * Whether this is a proposed enumeration. If omitted,
 	 * the enumeration is final.
 	 */

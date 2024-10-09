@@ -4,25 +4,35 @@
  * ------------------------------------------------------------------------------------------ */
 
 import {
-	MessageReader, MessageWriter, Logger, ConnectionStrategy, ConnectionOptions, ProtocolConnection, WatchDog, InitializeParams, createProtocolConnection,
-	createConnection as createCommonConnection, Connection, Features, _Connection, _
-} from '../common/api';
+	_,
+	_Connection,
+	Connection,
+	ConnectionOptions,
+	ConnectionStrategy,
+	createConnection as createCommonConnection,
+	createProtocolConnection,
+	Features,
+	InitializeParams,
+	Logger,
+	MessageReader,
+	MessageWriter,
+	ProtocolConnection,
+	WatchDog,
+} from "../common/api";
 
-export * from 'vscode-languageserver-protocol/browser';
-export * from '../common/api';
+export * from "vscode-languageserver-protocol/browser";
+export * from "../common/api";
 
 let _shutdownReceived: boolean = false;
 const watchDog: WatchDog = {
-	initialize: (_params: InitializeParams): void => {
-	},
+	initialize: (_params: InitializeParams): void => {},
 	get shutdownReceived(): boolean {
 		return _shutdownReceived;
 	},
 	set shutdownReceived(value: boolean) {
 		_shutdownReceived = value;
 	},
-	exit: (_code: number): void => {
-	}
+	exit: (_code: number): void => {},
 };
 
 /**
@@ -33,11 +43,36 @@ const watchDog: WatchDog = {
  * @param writer The message writer to write message to.
  * @param options An optional connection strategy or connection options to control additional settings
  */
-export function createConnection<PConsole = _, PTracer = _, PTelemetry = _, PClient = _, PWindow = _, PWorkspace = _, PLanguages = _>(
-	factories: Features<PConsole, PTracer, PTelemetry, PClient, PWindow, PWorkspace, PLanguages>,
-	reader: MessageReader, writer: MessageWriter, options?: ConnectionStrategy | ConnectionOptions
-): _Connection<PConsole, PTracer, PTelemetry, PClient, PWindow, PWorkspace, PLanguages>;
-
+export function createConnection<
+	PConsole = _,
+	PTracer = _,
+	PTelemetry = _,
+	PClient = _,
+	PWindow = _,
+	PWorkspace = _,
+	PLanguages = _,
+>(
+	factories: Features<
+		PConsole,
+		PTracer,
+		PTelemetry,
+		PClient,
+		PWindow,
+		PWorkspace,
+		PLanguages
+	>,
+	reader: MessageReader,
+	writer: MessageWriter,
+	options?: ConnectionStrategy | ConnectionOptions,
+): _Connection<
+	PConsole,
+	PTracer,
+	PTelemetry,
+	PClient,
+	PWindow,
+	PWorkspace,
+	PLanguages
+>;
 
 /**
  * Creates a new connection.
@@ -46,16 +81,27 @@ export function createConnection<PConsole = _, PTracer = _, PTelemetry = _, PCli
  * @param writer The message writer to write message to.
  * @param options An optional connection strategy or connection options to control additional settings
  */
-export function createConnection(reader: MessageReader, writer: MessageWriter, options?: ConnectionStrategy | ConnectionOptions): Connection;
-export function createConnection(arg1: any, arg2: any, arg3?: any, arg4?: any): Connection {
+export function createConnection(
+	reader: MessageReader,
+	writer: MessageWriter,
+	options?: ConnectionStrategy | ConnectionOptions,
+): Connection;
+export function createConnection(
+	arg1: any,
+	arg2: any,
+	arg3?: any,
+	arg4?: any,
+): Connection {
 	let factories: Features | undefined;
 	let reader: MessageReader | undefined;
 	let writer: MessageWriter | undefined;
 	let options: ConnectionStrategy | ConnectionOptions | undefined;
 
-	if (arg1 !== void 0 && (arg1 as Features).__brand === 'features') {
+	if (arg1 !== void 0 && (arg1 as Features).__brand === "features") {
 		factories = arg1;
-		arg1 = arg2; arg2 = arg3; arg3 = arg4;
+		arg1 = arg2;
+		arg2 = arg3;
+		arg3 = arg4;
 	}
 	if (ConnectionStrategy.is(arg1) || ConnectionOptions.is(arg1)) {
 		options = arg1;

@@ -1,29 +1,25 @@
 {
-    "compilerOptions": {
-        "module": "node16",
-        "moduleResolution": "node16",
-        "rootDir": ".",
-        "types": [],
-        "strict": true,
-        "noImplicitAny": true,
-        "noImplicitReturns": true,
-        "noImplicitThis": true,
-        "declaration": true,
-        "stripInternal": true,
-        "sourceMap": true,
-        "declarationMap": true,
-        "noUnusedLocals": true,
-        "noUnusedParameters": true,
-        "target": "es2022",
-        "lib": [
-            "es2023"
-        ],
-        "outDir": "../../lib/common",
-        "tsBuildInfoFile": "../../lib/common/compile.tsbuildInfo",
-        "incremental": true,
-        "composite": true
-    },
-    "include": [
-        "."
-    ]
+	"compilerOptions": {
+		"module": "node16",
+		"moduleResolution": "node16",
+		"rootDir": ".",
+		"types": [],
+		"strict": true,
+		"noImplicitAny": true,
+		"noImplicitReturns": true,
+		"noImplicitThis": true,
+		"declaration": true,
+		"stripInternal": true,
+		"sourceMap": true,
+		"declarationMap": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"target": "es2022",
+		"lib": ["es2023"],
+		"outDir": "../../lib/common",
+		"tsBuildInfoFile": "../../lib/common/compile.tsbuildInfo",
+		"incremental": true,
+		"composite": true
+	},
+	"include": ["."]
 }

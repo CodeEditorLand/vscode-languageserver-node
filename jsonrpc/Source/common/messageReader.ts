@@ -3,14 +3,13 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import RAL from './ral';
-
-import * as Is from './is';
-import { Event, Emitter } from './events';
-import { Message } from './messages';
-import { ContentDecoder, ContentTypeDecoder } from './encoding';
-import { Disposable } from './api';
-import { Semaphore } from './semaphore';
+import { Disposable } from "./api";
+import { ContentDecoder, ContentTypeDecoder } from "./encoding";
+import { Emitter, Event } from "./events";
+import * as Is from "./is";
+import { Message } from "./messages";
+import RAL from "./ral";
+import { Semaphore } from "./semaphore";
 
 /**
  * A callback that receives each incoming JSON-RPC message.
@@ -51,13 +50,18 @@ export interface MessageReader {
 export namespace MessageReader {
 	export function is(value: any): value is MessageReader {
 		const candidate: MessageReader = value;
-		return candidate && Is.func(candidate.listen) && Is.func(candidate.dispose) &&
-			Is.func(candidate.onError) && Is.func(candidate.onClose) && Is.func(candidate.onPartialMessage);
+		return (
+			candidate &&
+			Is.func(candidate.listen) &&
+			Is.func(candidate.dispose) &&
+			Is.func(candidate.onError) &&
+			Is.func(candidate.onClose) &&
+			Is.func(candidate.onPartialMessage)
+		);
 	}
 }
 
 export abstract class AbstractMessageReader implements MessageReader {
-
 	private errorEmitter: Emitter<Error>;
 	private closeEmitter: Emitter<void>;
 
@@ -102,7 +106,9 @@ export abstract class AbstractMessageReader implements MessageReader {
 		if (error instanceof Error) {
 			return error;
 		} else {
-			return new Error(`Reader received error. Reason: ${Is.string(error.message) ? error.message : 'unknown'}`);
+			return new Error(
+				`Reader received error. Reason: ${Is.string(error.message) ? error.message : "unknown"}`,
+			);
 		}
 	}
 
@@ -126,18 +132,20 @@ interface ResolvedMessageReaderOptions {
 }
 
 namespace ResolvedMessageReaderOptions {
-
-	export function fromOptions(options?: RAL.MessageBufferEncoding | MessageReaderOptions): ResolvedMessageReaderOptions {
+	export function fromOptions(
+		options?: RAL.MessageBufferEncoding | MessageReaderOptions,
+	): ResolvedMessageReaderOptions {
 		let charset: RAL.MessageBufferEncoding;
 		let result: ResolvedMessageReaderOptions;
 		let contentDecoder: ContentDecoder | undefined;
 		const contentDecoders: typeof result.contentDecoders = new Map();
 		let contentTypeDecoder: ContentTypeDecoder | undefined;
-		const contentTypeDecoders: typeof result.contentTypeDecoders = new Map();
-		if (options === undefined || typeof options === 'string') {
-			charset = options ?? 'utf-8';
+		const contentTypeDecoders: typeof result.contentTypeDecoders =
+			new Map();
+		if (options === undefined || typeof options === "string") {
+			charset = options ?? "utf-8";
 		} else {
-			charset = options.charset ?? 'utf-8';
+			charset = options.charset ?? "utf-8";
 			if (options.contentDecoder !== undefined) {
 				contentDecoder = options.contentDecoder;
 				contentDecoders.set(contentDecoder.name, contentDecoder);
@@ -149,7 +157,10 @@ namespace ResolvedMessageReaderOptions {
 			}
 			if (options.contentTypeDecoder !== undefined) {
 				contentTypeDecoder = options.contentTypeDecoder;
-				contentTypeDecoders.set(contentTypeDecoder.name, contentTypeDecoder);
+				contentTypeDecoders.set(
+					contentTypeDecoder.name,
+					contentTypeDecoder,
+				);
 			}
 			if (options.contentTypeDecoders !== undefined) {
 				for (const decoder of options.contentTypeDecoders) {
@@ -159,14 +170,22 @@ namespace ResolvedMessageReaderOptions {
 		}
 		if (contentTypeDecoder === undefined) {
 			contentTypeDecoder = RAL().applicationJson.decoder;
-			contentTypeDecoders.set(contentTypeDecoder.name, contentTypeDecoder);
+			contentTypeDecoders.set(
+				contentTypeDecoder.name,
+				contentTypeDecoder,
+			);
 		}
-		return { charset, contentDecoder, contentDecoders, contentTypeDecoder, contentTypeDecoders };
+		return {
+			charset,
+			contentDecoder,
+			contentDecoders,
+			contentTypeDecoder,
+			contentTypeDecoders,
+		};
 	}
 }
 
 export class ReadableStreamMessageReader extends AbstractMessageReader {
-
 	private readable: RAL.ReadableStream;
 	private options: ResolvedMessageReaderOptions;
 	private callback!: DataCallback;
@@ -178,7 +197,10 @@ export class ReadableStreamMessageReader extends AbstractMessageReader {
 	private _partialMessageTimeout: number;
 	private readSemaphore: Semaphore<void>;
 
-	public constructor(readable: RAL.ReadableStream, options?: RAL.MessageBufferEncoding | MessageReaderOptions) {
+	public constructor(
+		readable: RAL.ReadableStream,
+		options?: RAL.MessageBufferEncoding | MessageReaderOptions,
+	) {
 		super();
 		this.readable = readable;
 		this.options = ResolvedMessageReaderOptions.fromOptions(options);
@@ -212,7 +234,6 @@ export class ReadableStreamMessageReader extends AbstractMessageReader {
 
 	private onData(data: Uint8Array): void {
 		try {
-
 			this.buffer.append(data);
 			while (true) {
 				if (this.nextMessageLength === -1) {
@@ -220,14 +241,22 @@ export class ReadableStreamMessageReader extends AbstractMessageReader {
 					if (!headers) {
 						return;
 					}
-					const contentLength = headers.get('content-length');
+					const contentLength = headers.get("content-length");
 					if (!contentLength) {
-						this.fireError(new Error(`Header must provide a Content-Length property.\n${JSON.stringify(Object.fromEntries(headers))}`));
+						this.fireError(
+							new Error(
+								`Header must provide a Content-Length property.\n${JSON.stringify(Object.fromEntries(headers))}`,
+							),
+						);
 						return;
 					}
 					const length = parseInt(contentLength);
 					if (isNaN(length)) {
-						this.fireError(new Error(`Content-Length value must be a number. Got ${contentLength}`));
+						this.fireError(
+							new Error(
+								`Content-Length value must be a number. Got ${contentLength}`,
+							),
+						);
 						return;
 					}
 					this.nextMessageLength = length;
@@ -244,15 +273,22 @@ export class ReadableStreamMessageReader extends AbstractMessageReader {
 				// other. Otherwise it could happen that a decoding of a second
 				// smaller message finished before the decoding of a first larger
 				// message and then we would deliver the second message first.
-				this.readSemaphore.lock(async () => {
-					const bytes: Uint8Array = this.options.contentDecoder !== undefined
-						? await this.options.contentDecoder.decode(body)
-						: body;
-					const message = await this.options.contentTypeDecoder.decode(bytes, this.options);
-					this.callback(message);
-				}).catch((error) => {
-					this.fireError(error);
-				});
+				this.readSemaphore
+					.lock(async () => {
+						const bytes: Uint8Array =
+							this.options.contentDecoder !== undefined
+								? await this.options.contentDecoder.decode(body)
+								: body;
+						const message =
+							await this.options.contentTypeDecoder.decode(
+								bytes,
+								this.options,
+							);
+						this.callback(message);
+					})
+					.catch((error) => {
+						this.fireError(error);
+					});
 			}
 		} catch (error) {
 			this.fireError(error);
@@ -271,12 +307,20 @@ export class ReadableStreamMessageReader extends AbstractMessageReader {
 		if (this._partialMessageTimeout <= 0) {
 			return;
 		}
-		this.partialMessageTimer = RAL().timer.setTimeout((token, timeout) => {
-			this.partialMessageTimer = undefined;
-			if (token === this.messageToken) {
-				this.firePartialMessage({ messageToken: token, waitingTime: timeout });
-				this.setPartialMessageTimer();
-			}
-		}, this._partialMessageTimeout, this.messageToken, this._partialMessageTimeout);
+		this.partialMessageTimer = RAL().timer.setTimeout(
+			(token, timeout) => {
+				this.partialMessageTimer = undefined;
+				if (token === this.messageToken) {
+					this.firePartialMessage({
+						messageToken: token,
+						waitingTime: timeout,
+					});
+					this.setPartialMessageTimer();
+				}
+			},
+			this._partialMessageTimeout,
+			this.messageToken,
+			this._partialMessageTimeout,
+		);
 	}
 }

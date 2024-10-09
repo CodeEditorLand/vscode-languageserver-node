@@ -3,14 +3,22 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import { RequestHandler } from 'vscode-jsonrpc';
-import { CallHierarchyItem, CallHierarchyIncomingCall, CallHierarchyOutgoingCall } from 'vscode-languageserver-types';
+import { RequestHandler } from "vscode-jsonrpc";
+import {
+	CallHierarchyIncomingCall,
+	CallHierarchyItem,
+	CallHierarchyOutgoingCall,
+} from "vscode-languageserver-types";
 
-import { MessageDirection, ProtocolRequestType } from './messages';
+import { MessageDirection, ProtocolRequestType } from "./messages";
 import type {
-	TextDocumentRegistrationOptions, StaticRegistrationOptions, TextDocumentPositionParams, PartialResultParams,
-	WorkDoneProgressParams, WorkDoneProgressOptions
-} from './protocol';
+	PartialResultParams,
+	StaticRegistrationOptions,
+	TextDocumentPositionParams,
+	TextDocumentRegistrationOptions,
+	WorkDoneProgressOptions,
+	WorkDoneProgressParams,
+} from "./protocol";
 
 /**
  * @since 3.16.0
@@ -29,24 +37,26 @@ export interface CallHierarchyClientCapabilities {
  *
  * @since 3.16.0
  */
-export interface CallHierarchyOptions extends WorkDoneProgressOptions {
-}
+export interface CallHierarchyOptions extends WorkDoneProgressOptions {}
 
 /**
  * Call hierarchy options used during static or dynamic registration.
  *
  * @since 3.16.0
  */
-export interface CallHierarchyRegistrationOptions extends TextDocumentRegistrationOptions, CallHierarchyOptions, StaticRegistrationOptions {
-}
+export interface CallHierarchyRegistrationOptions
+	extends TextDocumentRegistrationOptions,
+		CallHierarchyOptions,
+		StaticRegistrationOptions {}
 
 /**
  * The parameter of a `textDocument/prepareCallHierarchy` request.
  *
  * @since 3.16.0
  */
-export interface CallHierarchyPrepareParams extends TextDocumentPositionParams, WorkDoneProgressParams {
-}
+export interface CallHierarchyPrepareParams
+	extends TextDocumentPositionParams,
+		WorkDoneProgressParams {}
 
 /**
  * A request to result a `CallHierarchyItem` in a document at a given position.
@@ -55,10 +65,22 @@ export interface CallHierarchyPrepareParams extends TextDocumentPositionParams, 
  * @since 3.16.0
  */
 export namespace CallHierarchyPrepareRequest {
-	export const method: 'textDocument/prepareCallHierarchy' = 'textDocument/prepareCallHierarchy';
-	export const messageDirection: MessageDirection = MessageDirection.clientToServer;
-	export const type = new ProtocolRequestType<CallHierarchyPrepareParams, CallHierarchyItem[] | null, never, void, CallHierarchyRegistrationOptions>(method);
-	export type HandlerSignature = RequestHandler<CallHierarchyPrepareParams, CallHierarchyItem[] | null, void>;
+	export const method: "textDocument/prepareCallHierarchy" =
+		"textDocument/prepareCallHierarchy";
+	export const messageDirection: MessageDirection =
+		MessageDirection.clientToServer;
+	export const type = new ProtocolRequestType<
+		CallHierarchyPrepareParams,
+		CallHierarchyItem[] | null,
+		never,
+		void,
+		CallHierarchyRegistrationOptions
+	>(method);
+	export type HandlerSignature = RequestHandler<
+		CallHierarchyPrepareParams,
+		CallHierarchyItem[] | null,
+		void
+	>;
 }
 
 /**
@@ -66,7 +88,9 @@ export namespace CallHierarchyPrepareRequest {
  *
  * @since 3.16.0
  */
-export interface CallHierarchyIncomingCallsParams extends WorkDoneProgressParams, PartialResultParams {
+export interface CallHierarchyIncomingCallsParams
+	extends WorkDoneProgressParams,
+		PartialResultParams {
 	item: CallHierarchyItem;
 }
 
@@ -76,10 +100,22 @@ export interface CallHierarchyIncomingCallsParams extends WorkDoneProgressParams
  * @since 3.16.0
  */
 export namespace CallHierarchyIncomingCallsRequest {
-	export const method: 'callHierarchy/incomingCalls' = 'callHierarchy/incomingCalls';
-	export const messageDirection: MessageDirection = MessageDirection.clientToServer;
-	export const type = new ProtocolRequestType<CallHierarchyIncomingCallsParams, CallHierarchyIncomingCall[] | null, CallHierarchyIncomingCall[], void, void>(method);
-	export type HandlerSignature = RequestHandler<CallHierarchyIncomingCallsParams, CallHierarchyIncomingCall[] | null, void>;
+	export const method: "callHierarchy/incomingCalls" =
+		"callHierarchy/incomingCalls";
+	export const messageDirection: MessageDirection =
+		MessageDirection.clientToServer;
+	export const type = new ProtocolRequestType<
+		CallHierarchyIncomingCallsParams,
+		CallHierarchyIncomingCall[] | null,
+		CallHierarchyIncomingCall[],
+		void,
+		void
+	>(method);
+	export type HandlerSignature = RequestHandler<
+		CallHierarchyIncomingCallsParams,
+		CallHierarchyIncomingCall[] | null,
+		void
+	>;
 }
 
 /**
@@ -87,7 +123,9 @@ export namespace CallHierarchyIncomingCallsRequest {
  *
  * @since 3.16.0
  */
-export interface CallHierarchyOutgoingCallsParams extends WorkDoneProgressParams, PartialResultParams {
+export interface CallHierarchyOutgoingCallsParams
+	extends WorkDoneProgressParams,
+		PartialResultParams {
 	item: CallHierarchyItem;
 }
 
@@ -97,8 +135,20 @@ export interface CallHierarchyOutgoingCallsParams extends WorkDoneProgressParams
  * @since 3.16.0
  */
 export namespace CallHierarchyOutgoingCallsRequest {
-	export const method: 'callHierarchy/outgoingCalls' = 'callHierarchy/outgoingCalls';
-	export const messageDirection: MessageDirection = MessageDirection.clientToServer;
-	export const type = new ProtocolRequestType<CallHierarchyOutgoingCallsParams, CallHierarchyOutgoingCall[] | null, CallHierarchyOutgoingCall[], void, void>(method);
-	export type HandlerSignature = RequestHandler<CallHierarchyOutgoingCallsParams, CallHierarchyOutgoingCall[] | null, void>;
+	export const method: "callHierarchy/outgoingCalls" =
+		"callHierarchy/outgoingCalls";
+	export const messageDirection: MessageDirection =
+		MessageDirection.clientToServer;
+	export const type = new ProtocolRequestType<
+		CallHierarchyOutgoingCallsParams,
+		CallHierarchyOutgoingCall[] | null,
+		CallHierarchyOutgoingCall[],
+		void,
+		void
+	>(method);
+	export type HandlerSignature = RequestHandler<
+		CallHierarchyOutgoingCallsParams,
+		CallHierarchyOutgoingCall[] | null,
+		void
+	>;
 }

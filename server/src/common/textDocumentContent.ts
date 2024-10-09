@@ -3,9 +3,17 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import { TextDocumentContentRefreshRequest, TextDocumentContentRequest, type Disposable, type DocumentUri, type RequestHandler, type TextDocumentContentParams, type TextDocumentContentResult } from 'vscode-languageserver-protocol';
+import {
+	TextDocumentContentRefreshRequest,
+	TextDocumentContentRequest,
+	type Disposable,
+	type DocumentUri,
+	type RequestHandler,
+	type TextDocumentContentParams,
+	type TextDocumentContentResult,
+} from "vscode-languageserver-protocol";
 
-import type { Feature, _RemoteWorkspace } from './server';
+import type { _RemoteWorkspace, Feature } from "./server";
 
 /**
  * Shape of the text document content feature
@@ -16,22 +24,43 @@ import type { Feature, _RemoteWorkspace } from './server';
 export interface TextDocumentContentFeatureShape {
 	textDocumentContent: {
 		refresh(uri: DocumentUri): Promise<void>;
-		on(handler: RequestHandler<TextDocumentContentParams, TextDocumentContentResult | null, void>): Disposable;
+		on(
+			handler: RequestHandler<
+				TextDocumentContentParams,
+				TextDocumentContentResult | null,
+				void
+			>,
+		): Disposable;
 	};
 }
 
-export const TextDocumentContentFeature: Feature<_RemoteWorkspace, TextDocumentContentFeatureShape> = (Base) => {
+export const TextDocumentContentFeature: Feature<
+	_RemoteWorkspace,
+	TextDocumentContentFeatureShape
+> = (Base) => {
 	return class extends Base {
 		public get textDocumentContent() {
 			return {
 				refresh: (uri: DocumentUri): Promise<void> => {
-					return this.connection.sendRequest(TextDocumentContentRefreshRequest.type, { uri });
+					return this.connection.sendRequest(
+						TextDocumentContentRefreshRequest.type,
+						{ uri },
+					);
 				},
-				on: (handler: RequestHandler<TextDocumentContentParams, TextDocumentContentResult | null, void>): Disposable => {
-					return this.connection.onRequest(TextDocumentContentRequest.type, (params, cancel) => {
-						return handler(params, cancel);
-					});
-				}
+				on: (
+					handler: RequestHandler<
+						TextDocumentContentParams,
+						TextDocumentContentResult | null,
+						void
+					>,
+				): Disposable => {
+					return this.connection.onRequest(
+						TextDocumentContentRequest.type,
+						(params, cancel) => {
+							return handler(params, cancel);
+						},
+					);
+				},
 			};
 		}
 	};

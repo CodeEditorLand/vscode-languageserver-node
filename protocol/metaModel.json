@@ -8872,10 +8872,7 @@
 			],
 			"documentation": "Information about the server\n\n@since 3.15.0\n@since 3.18.0 ServerInfo type name added.",
 			"since": "3.18.0 ServerInfo type name added.",
-			"sinceTags": [
-				"3.15.0",
-				"3.18.0 ServerInfo type name added."
-			]
+			"sinceTags": ["3.15.0", "3.18.0 ServerInfo type name added."]
 		},
 		{
 			"name": "VersionedTextDocumentIdentifier",
@@ -10478,10 +10475,7 @@
 			],
 			"documentation": "Information about the client\n\n@since 3.15.0\n@since 3.18.0 ClientInfo type name added.",
 			"since": "3.18.0 ClientInfo type name added.",
-			"sinceTags": [
-				"3.15.0",
-				"3.18.0 ClientInfo type name added."
-			]
+			"sinceTags": ["3.15.0", "3.18.0 ClientInfo type name added."]
 		},
 		{
 			"name": "ClientCapabilities",

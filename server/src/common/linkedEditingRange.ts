@@ -3,9 +3,14 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import { LinkedEditingRangeParams, LinkedEditingRanges, LinkedEditingRangeRequest, Disposable } from 'vscode-languageserver-protocol';
+import {
+	Disposable,
+	LinkedEditingRangeParams,
+	LinkedEditingRangeRequest,
+	LinkedEditingRanges,
+} from "vscode-languageserver-protocol";
 
-import type { Feature, _Languages, ServerRequestHandler } from './server';
+import type { _Languages, Feature, ServerRequestHandler } from "./server";
 
 /**
  * Shape of the linked editing feature
@@ -18,15 +23,40 @@ export interface LinkedEditingRangeFeatureShape {
 	 *
 	 * @param handler The corresponding handler.
 	 */
-	onLinkedEditingRange(handler: ServerRequestHandler<LinkedEditingRangeParams, LinkedEditingRanges | undefined | null, never, never>): Disposable;
+	onLinkedEditingRange(
+		handler: ServerRequestHandler<
+			LinkedEditingRangeParams,
+			LinkedEditingRanges | undefined | null,
+			never,
+			never
+		>,
+	): Disposable;
 }
 
-export const LinkedEditingRangeFeature: Feature<_Languages, LinkedEditingRangeFeatureShape> = (Base) => {
+export const LinkedEditingRangeFeature: Feature<
+	_Languages,
+	LinkedEditingRangeFeatureShape
+> = (Base) => {
 	return class extends Base {
-		public onLinkedEditingRange(handler: ServerRequestHandler<LinkedEditingRangeParams, LinkedEditingRanges | undefined | null, never, never>): Disposable {
-			return this.connection.onRequest(LinkedEditingRangeRequest.type, (params, cancel) => {
-				return handler(params, cancel, this.attachWorkDoneProgress(params), undefined);
-			});
+		public onLinkedEditingRange(
+			handler: ServerRequestHandler<
+				LinkedEditingRangeParams,
+				LinkedEditingRanges | undefined | null,
+				never,
+				never
+			>,
+		): Disposable {
+			return this.connection.onRequest(
+				LinkedEditingRangeRequest.type,
+				(params, cancel) => {
+					return handler(
+						params,
+						cancel,
+						this.attachWorkDoneProgress(params),
+						undefined,
+					);
+				},
+			);
 		}
 	};
 };

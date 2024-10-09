@@ -3,11 +3,11 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import type { DocumentUri } from 'vscode-languageserver-types';
-import type { RequestHandler } from 'vscode-jsonrpc';
+import type { RequestHandler } from "vscode-jsonrpc";
+import type { DocumentUri } from "vscode-languageserver-types";
 
-import { MessageDirection, ProtocolRequestType } from './messages';
-import type { StaticRegistrationOptions } from './protocol';
+import { MessageDirection, ProtocolRequestType } from "./messages";
+import type { StaticRegistrationOptions } from "./protocol";
 
 /**
  * Client capabilities for a text document content provider.
@@ -41,7 +41,8 @@ export type TextDocumentContentOptions = {
  * @since 3.18.0
  * @proposed
  */
-export type TextDocumentContentRegistrationOptions = TextDocumentContentOptions & StaticRegistrationOptions;
+export type TextDocumentContentRegistrationOptions =
+	TextDocumentContentOptions & StaticRegistrationOptions;
 
 /**
  * Parameters for the `workspace/textDocumentContent` request.
@@ -80,10 +81,22 @@ export interface TextDocumentContentResult {
  * @proposed
  */
 export namespace TextDocumentContentRequest {
-	export const method: 'workspace/textDocumentContent' = 'workspace/textDocumentContent';
-	export const messageDirection: MessageDirection = MessageDirection.clientToServer;
-	export const type = new ProtocolRequestType<TextDocumentContentParams, TextDocumentContentResult, void, void, TextDocumentContentRegistrationOptions>(method);
-	export type HandlerSignature = RequestHandler<TextDocumentContentParams, TextDocumentContentResult, void>;
+	export const method: "workspace/textDocumentContent" =
+		"workspace/textDocumentContent";
+	export const messageDirection: MessageDirection =
+		MessageDirection.clientToServer;
+	export const type = new ProtocolRequestType<
+		TextDocumentContentParams,
+		TextDocumentContentResult,
+		void,
+		void,
+		TextDocumentContentRegistrationOptions
+	>(method);
+	export type HandlerSignature = RequestHandler<
+		TextDocumentContentParams,
+		TextDocumentContentResult,
+		void
+	>;
 }
 
 /**
@@ -108,7 +121,18 @@ export interface TextDocumentContentRefreshParams {
  */
 export namespace TextDocumentContentRefreshRequest {
 	export const method: `workspace/textDocumentContent/refresh` = `workspace/textDocumentContent/refresh`;
-	export const messageDirection: MessageDirection = MessageDirection.serverToClient;
-	export const type = new ProtocolRequestType<TextDocumentContentRefreshParams, void, void, void, void>(method);
-	export type HandlerSignature = RequestHandler<TextDocumentContentRefreshParams, void, void>;
+	export const messageDirection: MessageDirection =
+		MessageDirection.serverToClient;
+	export const type = new ProtocolRequestType<
+		TextDocumentContentRefreshParams,
+		void,
+		void,
+		void,
+		void
+	>(method);
+	export type HandlerSignature = RequestHandler<
+		TextDocumentContentRefreshParams,
+		void,
+		void
+	>;
 }

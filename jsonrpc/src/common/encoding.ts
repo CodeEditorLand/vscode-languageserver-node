@@ -3,9 +3,8 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import type RAL from './ral';
-
-import { Message } from './messages';
+import { Message } from "./messages";
+import type RAL from "./ral";
 
 export interface FunctionContentEncoder {
 	name: string;
@@ -17,7 +16,9 @@ export interface StreamContentEncoder {
 	create(): RAL.WritableStream;
 }
 
-export type ContentEncoder = FunctionContentEncoder | (FunctionContentEncoder & StreamContentEncoder);
+export type ContentEncoder =
+	| FunctionContentEncoder
+	| (FunctionContentEncoder & StreamContentEncoder);
 
 export interface FunctionContentDecoder {
 	name: string;
@@ -29,7 +30,9 @@ export interface StreamContentDecoder {
 	create(): RAL.WritableStream;
 }
 
-export type ContentDecoder = FunctionContentDecoder | (FunctionContentDecoder & StreamContentDecoder);
+export type ContentDecoder =
+	| FunctionContentDecoder
+	| (FunctionContentDecoder & StreamContentDecoder);
 
 export interface ContentTypeEncoderOptions {
 	charset: RAL.MessageBufferEncoding;
@@ -37,7 +40,10 @@ export interface ContentTypeEncoderOptions {
 
 export interface FunctionContentTypeEncoder {
 	name: string;
-	encode(msg: Message, options: ContentTypeEncoderOptions): Promise<Uint8Array>;
+	encode(
+		msg: Message,
+		options: ContentTypeEncoderOptions,
+	): Promise<Uint8Array>;
 }
 
 export interface StreamContentTypeEncoder {
@@ -45,7 +51,9 @@ export interface StreamContentTypeEncoder {
 	create(options: ContentTypeEncoderOptions): RAL.WritableStream;
 }
 
-export type ContentTypeEncoder = FunctionContentTypeEncoder | (FunctionContentTypeEncoder & StreamContentTypeEncoder);
+export type ContentTypeEncoder =
+	| FunctionContentTypeEncoder
+	| (FunctionContentTypeEncoder & StreamContentTypeEncoder);
 
 export interface ContentTypeDecoderOptions {
 	charset: RAL.MessageBufferEncoding;
@@ -53,7 +61,10 @@ export interface ContentTypeDecoderOptions {
 
 export interface FunctionContentTypeDecoder {
 	name: string;
-	decode(buffer: Uint8Array, options: ContentTypeDecoderOptions): Promise<Message>;
+	decode(
+		buffer: Uint8Array,
+		options: ContentTypeDecoderOptions,
+	): Promise<Message>;
 }
 
 export interface StreamContentTypeDecoder {
@@ -61,33 +72,40 @@ export interface StreamContentTypeDecoder {
 	create(options: ContentTypeDecoderOptions): RAL.WritableStream;
 }
 
-export type ContentTypeDecoder = FunctionContentTypeDecoder | (FunctionContentTypeDecoder & StreamContentTypeDecoder);
+export type ContentTypeDecoder =
+	| FunctionContentTypeDecoder
+	| (FunctionContentTypeDecoder & StreamContentTypeDecoder);
 
 interface Named {
 	name: string;
 }
 
 export namespace Encodings {
-
-	export function getEncodingHeaderValue(encodings: Named[]): string | undefined {
+	export function getEncodingHeaderValue(
+		encodings: Named[],
+	): string | undefined {
 		if (encodings.length === 1) {
 			return encodings[0].name;
 		}
 		const distribute = encodings.length - 1;
 		if (distribute > 1000) {
-			throw new Error(`Quality value can only have three decimal digits but trying to distribute ${encodings.length} elements.`);
+			throw new Error(
+				`Quality value can only have three decimal digits but trying to distribute ${encodings.length} elements.`,
+			);
 		}
-		const digits =  Math.ceil(Math.log10(distribute));
-		const factor = Math.pow(10,digits);
+		const digits = Math.ceil(Math.log10(distribute));
+		const factor = Math.pow(10, digits);
 		const diff = Math.floor((1 / distribute) * factor) / factor;
 
 		const result: string[] = [];
 		let q = 1;
 		for (const encoding of encodings) {
-			result.push(`${encoding.name};q=${q === 1 || q === 0 ? q.toFixed(0) : q.toFixed(digits)}`);
+			result.push(
+				`${encoding.name};q=${q === 1 || q === 0 ? q.toFixed(0) : q.toFixed(digits)}`,
+			);
 			q = q - diff;
 		}
-		return result.join(', ');
+		return result.join(", ");
 	}
 
 	export function parseEncodingHeaderValue(value: string): string[] {
@@ -95,7 +113,7 @@ export namespace Encodings {
 		const encodings = value.split(/\s*,\s*/);
 		for (const value of encodings) {
 			const [encoding, q] = parseEncoding(value);
-			if (encoding === '*') {
+			if (encoding === "*") {
 				continue;
 			}
 			let values = map.get(q);
@@ -117,7 +135,7 @@ export namespace Encodings {
 	function parseEncoding(value: string): [string, number] {
 		let q: number = 1;
 		let encoding: string;
-		const index = value.indexOf(';q=');
+		const index = value.indexOf(";q=");
 		if (index !== -1) {
 			const parsed = parseFloat(value.substr(index));
 			if (!Number.isNaN(parsed)) {

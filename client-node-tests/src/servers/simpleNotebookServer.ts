@@ -4,10 +4,15 @@
  *--------------------------------------------------------------------------------------------*/
 
 import {
-	createConnection, InitializeParams, ServerCapabilities, TextDocumentSyncKind, RequestType,
-	DidOpenTextDocumentNotification, DidChangeTextDocumentNotification,
-	DidCloseTextDocumentNotification
-} from 'vscode-languageserver/node';
+	createConnection,
+	DidChangeTextDocumentNotification,
+	DidCloseTextDocumentNotification,
+	DidOpenTextDocumentNotification,
+	InitializeParams,
+	RequestType,
+	ServerCapabilities,
+	TextDocumentSyncKind,
+} from "vscode-languageserver/node";
 
 const connection = createConnection();
 
@@ -16,13 +21,13 @@ console.error = connection.console.error.bind(connection.console);
 
 const receivedNotifications: Set<string> = new Set();
 namespace GotNotifiedRequest {
-	export const method: 'testing/gotNotified' = 'testing/gotNotified';
+	export const method: "testing/gotNotified" = "testing/gotNotified";
 	export const type = new RequestType<string, boolean, void>(method);
 }
 
 connection.onInitialize((_params: InitializeParams): any => {
 	const capabilities: ServerCapabilities = {
-		textDocumentSync: TextDocumentSyncKind.Incremental
+		textDocumentSync: TextDocumentSyncKind.Incremental,
 	};
 	return { capabilities };
 });

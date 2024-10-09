@@ -4,22 +4,51 @@
  * ------------------------------------------------------------------------------------------ */
 
 import {
-	NotificationHandler, DidOpenTextDocumentParams, DidChangeTextDocumentParams, DidCloseTextDocumentParams,
-	WillSaveTextDocumentParams, RequestHandler, TextEdit, DidSaveTextDocumentParams, DocumentUri,
-	TextDocumentContentChangeEvent, TextDocumentSaveReason, Emitter, Event, TextDocumentSyncKind,
-	CancellationToken, Disposable, LanguageKind
-} from 'vscode-languageserver-protocol';
+	CancellationToken,
+	DidChangeTextDocumentParams,
+	DidCloseTextDocumentParams,
+	DidOpenTextDocumentParams,
+	DidSaveTextDocumentParams,
+	Disposable,
+	DocumentUri,
+	Emitter,
+	Event,
+	LanguageKind,
+	NotificationHandler,
+	RequestHandler,
+	TextDocumentContentChangeEvent,
+	TextDocumentSaveReason,
+	TextDocumentSyncKind,
+	TextEdit,
+	WillSaveTextDocumentParams,
+} from "vscode-languageserver-protocol";
 
 /**
  * We should use a mapped type to create this from Connection.
  */
 export interface TextDocumentConnection {
-	onDidOpenTextDocument(handler: NotificationHandler<DidOpenTextDocumentParams>): Disposable;
-	onDidChangeTextDocument(handler: NotificationHandler<DidChangeTextDocumentParams>): Disposable;
-	onDidCloseTextDocument(handler: NotificationHandler<DidCloseTextDocumentParams>): Disposable;
-	onWillSaveTextDocument(handler: NotificationHandler<WillSaveTextDocumentParams>): Disposable;
-	onWillSaveTextDocumentWaitUntil(handler: RequestHandler<WillSaveTextDocumentParams, TextEdit[] | undefined | null, void>): Disposable;
-	onDidSaveTextDocument(handler: NotificationHandler<DidSaveTextDocumentParams>): Disposable;
+	onDidOpenTextDocument(
+		handler: NotificationHandler<DidOpenTextDocumentParams>,
+	): Disposable;
+	onDidChangeTextDocument(
+		handler: NotificationHandler<DidChangeTextDocumentParams>,
+	): Disposable;
+	onDidCloseTextDocument(
+		handler: NotificationHandler<DidCloseTextDocumentParams>,
+	): Disposable;
+	onWillSaveTextDocument(
+		handler: NotificationHandler<WillSaveTextDocumentParams>,
+	): Disposable;
+	onWillSaveTextDocumentWaitUntil(
+		handler: RequestHandler<
+			WillSaveTextDocumentParams,
+			TextEdit[] | undefined | null,
+			void
+		>,
+	): Disposable;
+	onDidSaveTextDocument(
+		handler: NotificationHandler<DidSaveTextDocumentParams>,
+	): Disposable;
 }
 
 export interface ConnectionState {
@@ -27,8 +56,17 @@ export interface ConnectionState {
 }
 
 export interface TextDocumentsConfiguration<T extends { uri: DocumentUri }> {
-	create(uri: DocumentUri, languageId: LanguageKind, version: number, content: string): T;
-	update(document: T, changes: TextDocumentContentChangeEvent[], version: number): T;
+	create(
+		uri: DocumentUri,
+		languageId: LanguageKind,
+		version: number,
+		content: string,
+	): T;
+	update(
+		document: T,
+		changes: TextDocumentContentChangeEvent[],
+		version: number,
+	): T;
 }
 
 /**
@@ -66,7 +104,6 @@ export interface TextDocumentWillSaveEvent<T> {
  * Registering for save and will save events is optional.
  */
 export class TextDocuments<T extends { uri: DocumentUri }> {
-
 	private readonly _configuration: TextDocumentsConfiguration<T>;
 
 	private readonly _syncedDocuments: Map<string, T>;
@@ -76,7 +113,9 @@ export class TextDocuments<T extends { uri: DocumentUri }> {
 	private readonly _onDidClose: Emitter<TextDocumentChangeEvent<T>>;
 	private readonly _onDidSave: Emitter<TextDocumentChangeEvent<T>>;
 	private readonly _onWillSave: Emitter<TextDocumentWillSaveEvent<T>>;
-	private _willSaveWaitUntil: RequestHandler<TextDocumentWillSaveEvent<T>, TextEdit[], void> | undefined;
+	private _willSaveWaitUntil:
+		| RequestHandler<TextDocumentWillSaveEvent<T>, TextEdit[], void>
+		| undefined;
 
 	/**
 	 * Create a new text document manager.
@@ -120,7 +159,9 @@ export class TextDocuments<T extends { uri: DocumentUri }> {
 	 * Sets a handler that will be called if a participant wants to provide
 	 * edits during a text document save.
 	 */
-	public onWillSaveWaitUntil(handler: RequestHandler<TextDocumentWillSaveEvent<T>, TextEdit[], void>) {
+	public onWillSaveWaitUntil(
+		handler: RequestHandler<TextDocumentWillSaveEvent<T>, TextEdit[], void>,
+	) {
 		this._willSaveWaitUntil = handler;
 	}
 
@@ -183,65 +224,133 @@ export class TextDocuments<T extends { uri: DocumentUri }> {
 	 * @param connection The connection to listen on.
 	 */
 	public listen(connection: TextDocumentConnection): Disposable {
-
-		(<ConnectionState><any>connection).__textDocumentSync = TextDocumentSyncKind.Incremental;
+		(<ConnectionState>(<any>connection)).__textDocumentSync =
+			TextDocumentSyncKind.Incremental;
 		const disposables: Disposable[] = [];
-		disposables.push(connection.onDidOpenTextDocument((event: DidOpenTextDocumentParams) => {
-			const td = event.textDocument;
+		disposables.push(
+			connection.onDidOpenTextDocument(
+				(event: DidOpenTextDocumentParams) => {
+					const td = event.textDocument;
 
-			const document = this._configuration.create(td.uri, td.languageId, td.version, td.text);
+					const document = this._configuration.create(
+						td.uri,
+						td.languageId,
+						td.version,
+						td.text,
+					);
 
-			this._syncedDocuments.set(td.uri, document);
-			const toFire = Object.freeze({ document });
-			this._onDidOpen.fire(toFire);
-			this._onDidChangeContent.fire(toFire);
-		}));
-		disposables.push(connection.onDidChangeTextDocument((event: DidChangeTextDocumentParams) => {
-			const td = event.textDocument;
-			const changes = event.contentChanges;
-			if (changes.length === 0) {
-				return;
-			}
+					this._syncedDocuments.set(td.uri, document);
+					const toFire = Object.freeze({ document });
+					this._onDidOpen.fire(toFire);
+					this._onDidChangeContent.fire(toFire);
+				},
+			),
+		);
+		disposables.push(
+			connection.onDidChangeTextDocument(
+				(event: DidChangeTextDocumentParams) => {
+					const td = event.textDocument;
+					const changes = event.contentChanges;
+					if (changes.length === 0) {
+						return;
+					}
 
-			const { version } = td;
-			if (version === null || version === undefined) {
-				throw new Error(`Received document change event for ${td.uri} without valid version identifier`);
-			}
+					const { version } = td;
+					if (version === null || version === undefined) {
+						throw new Error(
+							`Received document change event for ${td.uri} without valid version identifier`,
+						);
+					}
 
-			let syncedDocument = this._syncedDocuments.get(td.uri);
-			if (syncedDocument !== undefined) {
-				syncedDocument = this._configuration.update(syncedDocument, changes, version);
-				this._syncedDocuments.set(td.uri, syncedDocument);
-				this._onDidChangeContent.fire(Object.freeze({ document: syncedDocument }));
-			}
-		}));
-		disposables.push(connection.onDidCloseTextDocument((event: DidCloseTextDocumentParams) => {
-			const syncedDocument = this._syncedDocuments.get(event.textDocument.uri);
-			if (syncedDocument !== undefined) {
-				this._syncedDocuments.delete(event.textDocument.uri);
-				this._onDidClose.fire(Object.freeze({ document: syncedDocument }));
-			}
-		}));
-		disposables.push(connection.onWillSaveTextDocument((event: WillSaveTextDocumentParams) => {
-			const syncedDocument = this._syncedDocuments.get(event.textDocument.uri);
-			if (syncedDocument !== undefined) {
-				this._onWillSave.fire(Object.freeze({ document: syncedDocument, reason: event.reason }));
-			}
-		}));
-		disposables.push(connection.onWillSaveTextDocumentWaitUntil((event: WillSaveTextDocumentParams, token: CancellationToken) => {
-			const syncedDocument = this._syncedDocuments.get(event.textDocument.uri);
-			if (syncedDocument !== undefined && this._willSaveWaitUntil) {
-				return this._willSaveWaitUntil(Object.freeze({ document: syncedDocument, reason: event.reason }), token);
-			} else {
-				return [];
-			}
-		}));
-		disposables.push(connection.onDidSaveTextDocument((event: DidSaveTextDocumentParams) => {
-			const syncedDocument = this._syncedDocuments.get(event.textDocument.uri);
-			if (syncedDocument !== undefined) {
-				this._onDidSave.fire(Object.freeze({ document: syncedDocument }));
-			}
-		}));
-		return Disposable.create(() => { disposables.forEach(disposable => disposable.dispose()); });
+					let syncedDocument = this._syncedDocuments.get(td.uri);
+					if (syncedDocument !== undefined) {
+						syncedDocument = this._configuration.update(
+							syncedDocument,
+							changes,
+							version,
+						);
+						this._syncedDocuments.set(td.uri, syncedDocument);
+						this._onDidChangeContent.fire(
+							Object.freeze({ document: syncedDocument }),
+						);
+					}
+				},
+			),
+		);
+		disposables.push(
+			connection.onDidCloseTextDocument(
+				(event: DidCloseTextDocumentParams) => {
+					const syncedDocument = this._syncedDocuments.get(
+						event.textDocument.uri,
+					);
+					if (syncedDocument !== undefined) {
+						this._syncedDocuments.delete(event.textDocument.uri);
+						this._onDidClose.fire(
+							Object.freeze({ document: syncedDocument }),
+						);
+					}
+				},
+			),
+		);
+		disposables.push(
+			connection.onWillSaveTextDocument(
+				(event: WillSaveTextDocumentParams) => {
+					const syncedDocument = this._syncedDocuments.get(
+						event.textDocument.uri,
+					);
+					if (syncedDocument !== undefined) {
+						this._onWillSave.fire(
+							Object.freeze({
+								document: syncedDocument,
+								reason: event.reason,
+							}),
+						);
+					}
+				},
+			),
+		);
+		disposables.push(
+			connection.onWillSaveTextDocumentWaitUntil(
+				(
+					event: WillSaveTextDocumentParams,
+					token: CancellationToken,
+				) => {
+					const syncedDocument = this._syncedDocuments.get(
+						event.textDocument.uri,
+					);
+					if (
+						syncedDocument !== undefined &&
+						this._willSaveWaitUntil
+					) {
+						return this._willSaveWaitUntil(
+							Object.freeze({
+								document: syncedDocument,
+								reason: event.reason,
+							}),
+							token,
+						);
+					} else {
+						return [];
+					}
+				},
+			),
+		);
+		disposables.push(
+			connection.onDidSaveTextDocument(
+				(event: DidSaveTextDocumentParams) => {
+					const syncedDocument = this._syncedDocuments.get(
+						event.textDocument.uri,
+					);
+					if (syncedDocument !== undefined) {
+						this._onDidSave.fire(
+							Object.freeze({ document: syncedDocument }),
+						);
+					}
+				},
+			),
+		);
+		return Disposable.create(() => {
+			disposables.forEach((disposable) => disposable.dispose());
+		});
 	}
 }

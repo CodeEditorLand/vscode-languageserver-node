@@ -1,21 +1,17 @@
 {
 	"name": "vscode-languageclient",
-	"description": "VSCode Language client implementation",
 	"version": "10.0.0-next.12",
-	"author": "Microsoft Corporation",
-	"license": "MIT",
-	"engines": {
-		"vscode": "^1.91.0"
+	"description": "VSCode Language client implementation",
+	"bugs": {
+		"url": "https://github.com/Microsoft/vscode-languageserver-node/issues"
 	},
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/Microsoft/vscode-languageserver-node.git",
 		"directory": "client"
 	},
-	"bugs": {
-		"url": "https://github.com/Microsoft/vscode-languageserver-node/issues"
-	},
-	"enabledApiProposals": ["codeActionAI"],
+	"license": "MIT",
+	"author": "Microsoft Corporation",
 	"exports": {
 		".": {
 			"types": "./lib/common/api.d.ts",
@@ -34,31 +30,37 @@
 			"node": "./lib/common/*.js"
 		}
 	},
-	"devDependencies": {
-		"@types/minimatch": "^5.1.2",
-		"@types/semver": "^7.5.8",
-		"@types/vscode": "1.94.0",
-		"shx": "^0.3.4"
+	"scripts": {
+		"all": "npm run clean && npm run compile && npm run lint && npm test",
+		"all:publish": "git clean -xfd . && npm install && npm run updateVSCodeVersion && npm run compile:publish && npm run lint && cd ../client-node-tests && npm run all:publish && cd ..",
+		"clean": "rimraf lib",
+		"compile": "tsc -b ./tsconfig.json && shx cp src/node/terminateProcess.sh lib/node/terminateProcess.sh",
+		"compile:clean": "git clean -xfd . && npm install && npm run clean && npm run compile",
+		"compile:publish": "tsc -b ./tsconfig.publish.json && shx cp src/node/terminateProcess.sh lib/node/terminateProcess.sh",
+		"lint": "eslint --ext ts src",
+		"prepack": "npm run all:publish",
+		"prepublishOnly": "echo \"⛔ Can only publish from a secure pipeline ⛔\" && node ../build/npm/fail",
+		"test": "cd ../client-node-tests && npm test && cd ../client",
+		"update:vscode-version": "node ./bin/updateVSCode.js",
+		"updateVSCodeVersion": "node ./bin/updateVSCode.js",
+		"preversion": "npm test",
+		"watch": "tsc -b ./tsconfig.watch.json -w"
 	},
 	"dependencies": {
 		"minimatch": "^10.0.1",
 		"semver": "^7.6.3",
 		"vscode-languageserver-protocol": "3.17.6-next.10"
 	},
-	"scripts": {
-		"prepublishOnly": "echo \"⛔ Can only publish from a secure pipeline ⛔\" && node ../build/npm/fail",
-		"prepack": "npm run all:publish",
-		"compile": "tsc -b ./tsconfig.json && shx cp src/node/terminateProcess.sh lib/node/terminateProcess.sh",
-		"compile:clean": "git clean -xfd . && npm install && npm run clean && npm run compile",
-		"watch": "tsc -b ./tsconfig.watch.json -w",
-		"lint": "eslint --ext ts src",
-		"test": "cd ../client-node-tests && npm test && cd ../client",
-		"clean": "rimraf lib",
-		"all": "npm run clean && npm run compile && npm run lint && npm test",
-		"compile:publish": "tsc -b ./tsconfig.publish.json && shx cp src/node/terminateProcess.sh lib/node/terminateProcess.sh",
-		"all:publish": "git clean -xfd . && npm install && npm run updateVSCodeVersion && npm run compile:publish && npm run lint && cd ../client-node-tests && npm run all:publish && cd ..",
-		"preversion": "npm test",
-		"updateVSCodeVersion": "node ./bin/updateVSCode.js",
-		"update:vscode-version": "node ./bin/updateVSCode.js"
-	}
+	"devDependencies": {
+		"@types/minimatch": "^5.1.2",
+		"@types/semver": "^7.5.8",
+		"@types/vscode": "1.94.0",
+		"shx": "^0.3.4"
+	},
+	"engines": {
+		"vscode": "^1.91.0"
+	},
+	"enabledApiProposals": [
+		"codeActionAI"
+	]
 }

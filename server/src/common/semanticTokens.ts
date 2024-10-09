@@ -4,12 +4,22 @@
  * ------------------------------------------------------------------------------------------ */
 
 import {
-	SemanticTokens, SemanticTokensPartialResult, SemanticTokensDelta, SemanticTokensDeltaPartialResult, SemanticTokensParams,
-	SemanticTokensRequest, SemanticTokensDeltaParams, SemanticTokensDeltaRequest, SemanticTokensRangeParams, SemanticTokensRangeRequest,
-	SemanticTokensRefreshRequest, SemanticTokensEdit, Disposable
-} from 'vscode-languageserver-protocol';
+	Disposable,
+	SemanticTokens,
+	SemanticTokensDelta,
+	SemanticTokensDeltaParams,
+	SemanticTokensDeltaPartialResult,
+	SemanticTokensDeltaRequest,
+	SemanticTokensEdit,
+	SemanticTokensParams,
+	SemanticTokensPartialResult,
+	SemanticTokensRangeParams,
+	SemanticTokensRangeRequest,
+	SemanticTokensRefreshRequest,
+	SemanticTokensRequest,
+} from "vscode-languageserver-protocol";
 
-import type { Feature, _Languages, ServerRequestHandler } from './server';
+import type { _Languages, Feature, ServerRequestHandler } from "./server";
 
 /**
  * Shape of the semantic token feature
@@ -19,37 +29,100 @@ import type { Feature, _Languages, ServerRequestHandler } from './server';
 export interface SemanticTokensFeatureShape {
 	semanticTokens: {
 		refresh(): Promise<void>;
-		on(handler: ServerRequestHandler<SemanticTokensParams, SemanticTokens, SemanticTokensPartialResult, void>): Disposable;
-		onDelta(handler: ServerRequestHandler<SemanticTokensDeltaParams, SemanticTokensDelta | SemanticTokens, SemanticTokensDeltaPartialResult | SemanticTokensPartialResult, void>): Disposable;
-		onRange(handler: ServerRequestHandler<SemanticTokensRangeParams, SemanticTokens, SemanticTokensPartialResult, void>): Disposable;
+		on(
+			handler: ServerRequestHandler<
+				SemanticTokensParams,
+				SemanticTokens,
+				SemanticTokensPartialResult,
+				void
+			>,
+		): Disposable;
+		onDelta(
+			handler: ServerRequestHandler<
+				SemanticTokensDeltaParams,
+				SemanticTokensDelta | SemanticTokens,
+				SemanticTokensDeltaPartialResult | SemanticTokensPartialResult,
+				void
+			>,
+		): Disposable;
+		onRange(
+			handler: ServerRequestHandler<
+				SemanticTokensRangeParams,
+				SemanticTokens,
+				SemanticTokensPartialResult,
+				void
+			>,
+		): Disposable;
 	};
 }
 
-export const SemanticTokensFeature: Feature<_Languages, SemanticTokensFeatureShape> = (Base) => {
+export const SemanticTokensFeature: Feature<
+	_Languages,
+	SemanticTokensFeatureShape
+> = (Base) => {
 	return class extends Base {
 		public get semanticTokens() {
 			return {
 				refresh: (): Promise<void> => {
-					return this.connection.sendRequest(SemanticTokensRefreshRequest.type);
+					return this.connection.sendRequest(
+						SemanticTokensRefreshRequest.type,
+					);
 				},
-				on: (handler: ServerRequestHandler<SemanticTokensParams, SemanticTokens, SemanticTokensPartialResult, void>): Disposable => {
+				on: (
+					handler: ServerRequestHandler<
+						SemanticTokensParams,
+						SemanticTokens,
+						SemanticTokensPartialResult,
+						void
+					>,
+				): Disposable => {
 					const type = SemanticTokensRequest.type;
 					return this.connection.onRequest(type, (params, cancel) => {
-						return handler(params, cancel, this.attachWorkDoneProgress(params), this.attachPartialResultProgress(type, params));
+						return handler(
+							params,
+							cancel,
+							this.attachWorkDoneProgress(params),
+							this.attachPartialResultProgress(type, params),
+						);
 					});
 				},
-				onDelta: (handler: ServerRequestHandler<SemanticTokensDeltaParams, SemanticTokensDelta | SemanticTokens, SemanticTokensDeltaPartialResult | SemanticTokensDeltaPartialResult, void>): Disposable => {
+				onDelta: (
+					handler: ServerRequestHandler<
+						SemanticTokensDeltaParams,
+						SemanticTokensDelta | SemanticTokens,
+						| SemanticTokensDeltaPartialResult
+						| SemanticTokensDeltaPartialResult,
+						void
+					>,
+				): Disposable => {
 					const type = SemanticTokensDeltaRequest.type;
 					return this.connection.onRequest(type, (params, cancel) => {
-						return handler(params, cancel, this.attachWorkDoneProgress(params), this.attachPartialResultProgress(type, params));
+						return handler(
+							params,
+							cancel,
+							this.attachWorkDoneProgress(params),
+							this.attachPartialResultProgress(type, params),
+						);
 					});
 				},
-				onRange: (handler: ServerRequestHandler<SemanticTokensRangeParams, SemanticTokens, SemanticTokensPartialResult, void>): Disposable => {
+				onRange: (
+					handler: ServerRequestHandler<
+						SemanticTokensRangeParams,
+						SemanticTokens,
+						SemanticTokensPartialResult,
+						void
+					>,
+				): Disposable => {
 					const type = SemanticTokensRangeRequest.type;
 					return this.connection.onRequest(type, (params, cancel) => {
-						return handler(params, cancel, this.attachWorkDoneProgress(params), this.attachPartialResultProgress(type, params));
+						return handler(
+							params,
+							cancel,
+							this.attachWorkDoneProgress(params),
+							this.attachPartialResultProgress(type, params),
+						);
 					});
-				}
+				},
 			};
 		}
 	};
@@ -59,7 +132,7 @@ export class SemanticTokensDiff {
 	private readonly originalSequence: number[];
 	private readonly modifiedSequence: number[];
 
-	constructor (originalSequence: number[], modifiedSequence: number[]) {
+	constructor(originalSequence: number[], modifiedSequence: number[]) {
 		this.originalSequence = originalSequence;
 		this.modifiedSequence = modifiedSequence;
 	}
@@ -68,41 +141,60 @@ export class SemanticTokensDiff {
 		const originalLength = this.originalSequence.length;
 		const modifiedLength = this.modifiedSequence.length;
 		let startIndex = 0;
-		while(startIndex < modifiedLength && startIndex < originalLength && this.originalSequence[startIndex] === this.modifiedSequence[startIndex]) {
+		while (
+			startIndex < modifiedLength &&
+			startIndex < originalLength &&
+			this.originalSequence[startIndex] ===
+				this.modifiedSequence[startIndex]
+		) {
 			startIndex++;
 		}
 		if (startIndex < modifiedLength && startIndex < originalLength) {
 			let originalEndIndex = originalLength - 1;
 			let modifiedEndIndex = modifiedLength - 1;
-			while (originalEndIndex >= startIndex && modifiedEndIndex >= startIndex && this.originalSequence[originalEndIndex] === this.modifiedSequence[modifiedEndIndex]) {
+			while (
+				originalEndIndex >= startIndex &&
+				modifiedEndIndex >= startIndex &&
+				this.originalSequence[originalEndIndex] ===
+					this.modifiedSequence[modifiedEndIndex]
+			) {
 				originalEndIndex--;
 				modifiedEndIndex--;
 			}
 			// if one moved behind the start index move them forward again
-			if (originalEndIndex < startIndex || modifiedEndIndex < startIndex) {
+			if (
+				originalEndIndex < startIndex ||
+				modifiedEndIndex < startIndex
+			) {
 				originalEndIndex++;
 				modifiedEndIndex++;
 			}
 
 			const deleteCount = originalEndIndex - startIndex + 1;
-			const newData = this.modifiedSequence.slice(startIndex, modifiedEndIndex + 1);
+			const newData = this.modifiedSequence.slice(
+				startIndex,
+				modifiedEndIndex + 1,
+			);
 			// If we moved behind the start index we could have missed a simple delete.
-			if (newData.length === 1 && newData[0] === this.originalSequence[originalEndIndex]) {
-				return [
-					{ start: startIndex, deleteCount: deleteCount - 1 }
-				];
+			if (
+				newData.length === 1 &&
+				newData[0] === this.originalSequence[originalEndIndex]
+			) {
+				return [{ start: startIndex, deleteCount: deleteCount - 1 }];
 			} else {
-				return [
-					{ start: startIndex, deleteCount, data: newData }
-				];
+				return [{ start: startIndex, deleteCount, data: newData }];
 			}
 		} else if (startIndex < modifiedLength) {
 			return [
-				{ start: startIndex, deleteCount: 0, data: this.modifiedSequence.slice(startIndex) }
+				{
+					start: startIndex,
+					deleteCount: 0,
+					data: this.modifiedSequence.slice(startIndex),
+				},
 			];
 		} else if (startIndex < originalLength) {
 			return [
-				{ start: startIndex, deleteCount: originalLength - startIndex }
+				{ start: startIndex, deleteCount: originalLength - startIndex },
 			];
 		} else {
 			// The two arrays are the same.
@@ -112,7 +204,6 @@ export class SemanticTokensDiff {
 }
 
 export class SemanticTokensBuilder {
-
 	private _id!: number;
 
 	private _prevLine!: number;
@@ -139,8 +230,18 @@ export class SemanticTokensBuilder {
 		this._dataIsSortedAndDeltaEncoded = true;
 	}
 
-	public push(line: number, char: number, length: number, tokenType: number, tokenModifiers: number): void {
-		if (this._dataIsSortedAndDeltaEncoded && (line < this._prevLine || (line === this._prevLine && char < this._prevChar))) {
+	public push(
+		line: number,
+		char: number,
+		length: number,
+		tokenType: number,
+		tokenModifiers: number,
+	): void {
+		if (
+			this._dataIsSortedAndDeltaEncoded &&
+			(line < this._prevLine ||
+				(line === this._prevLine && char < this._prevChar))
+		) {
 			// push calls were ordered and are no longer ordered
 			this._dataIsSortedAndDeltaEncoded = false;
 
@@ -156,7 +257,9 @@ export class SemanticTokensBuilder {
 			}
 		}
 
-		const dataSource = this._dataIsSortedAndDeltaEncoded ? this._data : this._dataNonDelta;
+		const dataSource = this._dataIsSortedAndDeltaEncoded
+			? this._data
+			: this._dataNonDelta;
 
 		dataSource[this._dataLen++] = pushLine;
 		dataSource[this._dataLen++] = pushChar;
@@ -237,7 +340,7 @@ export class SemanticTokensBuilder {
 			const tokenModifiers = data[srcOffset + 4];
 
 			const pushLine = line - prevLine;
-			const pushChar = (pushLine === 0 ? char - prevChar : char);
+			const pushChar = pushLine === 0 ? char - prevChar : char;
 
 			const dstOffset = 5 * i;
 			result[dstOffset + 0] = pushLine;
@@ -257,7 +360,9 @@ export class SemanticTokensBuilder {
 		if (this._dataIsSortedAndDeltaEncoded) {
 			return this._data;
 		} else {
-			return SemanticTokensBuilder._sortAndDeltaEncode(this._dataNonDelta);
+			return SemanticTokensBuilder._sortAndDeltaEncode(
+				this._dataNonDelta,
+			);
 		}
 	}
 
@@ -273,7 +378,7 @@ export class SemanticTokensBuilder {
 
 		return {
 			resultId: this.id,
-			data: this.getFinalDataDelta()
+			data: this.getFinalDataDelta(),
 		};
 	}
 
@@ -285,7 +390,10 @@ export class SemanticTokensBuilder {
 		if (this._prevData !== undefined) {
 			return {
 				resultId: this.id,
-				edits: (new SemanticTokensDiff(this._prevData, this.getFinalDataDelta())).computeDiff()
+				edits: new SemanticTokensDiff(
+					this._prevData,
+					this.getFinalDataDelta(),
+				).computeDiff(),
 			};
 		} else {
 			return this.build();

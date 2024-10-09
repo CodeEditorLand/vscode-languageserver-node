@@ -2,7 +2,7 @@
  * Copyright (c) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
-'use strict';
+"use strict";
 
 /**
  * A tagging type for string properties that are actually URIs.
@@ -89,36 +89,37 @@ export interface TextEdit {
  * An event describing a change to a text document. If range and rangeLength are omitted
  * the new text is considered to be the full content of the document.
  */
-export type TextDocumentContentChangeEvent = {
-	/**
-	 * The range of the document that changed.
-	 */
-	range: Range;
+export type TextDocumentContentChangeEvent =
+	| {
+			/**
+			 * The range of the document that changed.
+			 */
+			range: Range;
 
-	/**
-	 * The optional length of the range that got replaced.
-	 *
-	 * @deprecated use range instead.
-	 */
-	rangeLength?: number;
+			/**
+			 * The optional length of the range that got replaced.
+			 *
+			 * @deprecated use range instead.
+			 */
+			rangeLength?: number;
 
-	/**
-	 * The new text for the provided range.
-	 */
-	text: string;
-} | {
-	/**
-	 * The new text of the whole document.
-	 */
-	text: string;
-};
+			/**
+			 * The new text for the provided range.
+			 */
+			text: string;
+	  }
+	| {
+			/**
+			 * The new text of the whole document.
+			 */
+			text: string;
+	  };
 
 /**
  * A simple text document. Not to be implemented. The document keeps the content
  * as string.
  */
 export interface TextDocument {
-
 	/**
 	 * The associated URI for this document. Most documents have the __file__-scheme, indicating that they
 	 * represent files on disk. However, some documents may have other schemes indicating that they are not
@@ -192,14 +193,18 @@ export interface TextDocument {
 }
 
 class FullTextDocument implements TextDocument {
-
 	private _uri: DocumentUri;
 	private _languageId: string;
 	private _version: number;
 	private _content: string;
 	private _lineOffsets: number[] | undefined;
 
-	public constructor(uri: DocumentUri, languageId: string, version: number, content: string) {
+	public constructor(
+		uri: DocumentUri,
+		languageId: string,
+		version: number,
+		content: string,
+	) {
 		this._uri = uri;
 		this._languageId = languageId;
 		this._version = version;
@@ -228,7 +233,10 @@ class FullTextDocument implements TextDocument {
 		return this._content;
 	}
 
-	public update(changes: TextDocumentContentChangeEvent[], version: number): void {
+	public update(
+		changes: TextDocumentContentChangeEvent[],
+		version: number,
+	): void {
 		for (const change of changes) {
 			if (FullTextDocument.isIncremental(change)) {
 				// makes sure start is before end
@@ -237,27 +245,53 @@ class FullTextDocument implements TextDocument {
 				// update content
 				const startOffset = this.offsetAt(range.start);
 				const endOffset = this.offsetAt(range.end);
-				this._content = this._content.substring(0, startOffset) + change.text + this._content.substring(endOffset, this._content.length);
+				this._content =
+					this._content.substring(0, startOffset) +
+					change.text +
+					this._content.substring(endOffset, this._content.length);
 
 				// update the offsets
 				const startLine = Math.max(range.start.line, 0);
 				const endLine = Math.max(range.end.line, 0);
 				let lineOffsets = this._lineOffsets!;
-				const addedLineOffsets = computeLineOffsets(change.text, false, startOffset);
+				const addedLineOffsets = computeLineOffsets(
+					change.text,
+					false,
+					startOffset,
+				);
 				if (endLine - startLine === addedLineOffsets.length) {
-					for (let i = 0, len = addedLineOffsets.length; i < len; i++) {
+					for (
+						let i = 0, len = addedLineOffsets.length;
+						i < len;
+						i++
+					) {
 						lineOffsets[i + startLine + 1] = addedLineOffsets[i];
 					}
 				} else {
 					if (addedLineOffsets.length < 10000) {
-						lineOffsets.splice(startLine + 1, endLine - startLine, ...addedLineOffsets);
-					} else { // avoid too many arguments for splice
-						this._lineOffsets = lineOffsets = lineOffsets.slice(0, startLine + 1).concat(addedLineOffsets, lineOffsets.slice(endLine + 1));
+						lineOffsets.splice(
+							startLine + 1,
+							endLine - startLine,
+							...addedLineOffsets,
+						);
+					} else {
+						// avoid too many arguments for splice
+						this._lineOffsets = lineOffsets = lineOffsets
+							.slice(0, startLine + 1)
+							.concat(
+								addedLineOffsets,
+								lineOffsets.slice(endLine + 1),
+							);
 					}
 				}
 				const diff = change.text.length - (endOffset - startOffset);
 				if (diff !== 0) {
-					for (let i = startLine + 1 + addedLineOffsets.length, len = lineOffsets.length; i < len; i++) {
+					for (
+						let i = startLine + 1 + addedLineOffsets.length,
+							len = lineOffsets.length;
+						i < len;
+						i++
+					) {
 						lineOffsets[i] = lineOffsets[i] + diff;
 					}
 				}
@@ -265,7 +299,7 @@ class FullTextDocument implements TextDocument {
 				this._content = change.text;
 				this._lineOffsets = undefined;
 			} else {
-				throw new Error('Unknown change event received');
+				throw new Error("Unknown change event received");
 			}
 		}
 		this._version = version;
@@ -282,7 +316,8 @@ class FullTextDocument implements TextDocument {
 		offset = Math.max(Math.min(offset, this._content.length), 0);
 
 		const lineOffsets = this.getLineOffsets();
-		let low = 0, high = lineOffsets.length;
+		let low = 0,
+			high = lineOffsets.length;
 		if (high === 0) {
 			return { line: 0, character: offset };
 		}
@@ -314,13 +349,22 @@ class FullTextDocument implements TextDocument {
 			return lineOffset;
 		}
 
-		const nextLineOffset = (position.line + 1 < lineOffsets.length) ? lineOffsets[position.line + 1] : this._content.length;
-		const offset = Math.min(lineOffset + position.character, nextLineOffset);
+		const nextLineOffset =
+			position.line + 1 < lineOffsets.length
+				? lineOffsets[position.line + 1]
+				: this._content.length;
+		const offset = Math.min(
+			lineOffset + position.character,
+			nextLineOffset,
+		);
 		return this.ensureBeforeEOL(offset, lineOffset);
 	}
 
 	private ensureBeforeEOL(offset: number, lineOffset: number): number {
-		while (offset > lineOffset && isEOL(this._content.charCodeAt(offset - 1))) {
+		while (
+			offset > lineOffset &&
+			isEOL(this._content.charCodeAt(offset - 1))
+		) {
 			offset--;
 		}
 		return offset;
@@ -330,17 +374,33 @@ class FullTextDocument implements TextDocument {
 		return this.getLineOffsets().length;
 	}
 
-	private static isIncremental(event: TextDocumentContentChangeEvent): event is { range: Range; rangeLength?: number; text: string } {
-		const candidate: { range: Range; rangeLength?: number; text: string } = event as any;
-		return candidate !== undefined && candidate !== null &&
-			typeof candidate.text === 'string' && candidate.range !== undefined &&
-			(candidate.rangeLength === undefined || typeof candidate.rangeLength === 'number');
+	private static isIncremental(
+		event: TextDocumentContentChangeEvent,
+	): event is { range: Range; rangeLength?: number; text: string } {
+		const candidate: { range: Range; rangeLength?: number; text: string } =
+			event as any;
+		return (
+			candidate !== undefined &&
+			candidate !== null &&
+			typeof candidate.text === "string" &&
+			candidate.range !== undefined &&
+			(candidate.rangeLength === undefined ||
+				typeof candidate.rangeLength === "number")
+		);
 	}
 
-	private static isFull(event: TextDocumentContentChangeEvent): event is { text: string } {
-		const candidate: { range?: Range; rangeLength?: number; text: string } = event as any;
-		return candidate !== undefined && candidate !== null &&
-			typeof candidate.text === 'string' && candidate.range === undefined && candidate.rangeLength === undefined;
+	private static isFull(
+		event: TextDocumentContentChangeEvent,
+	): event is { text: string } {
+		const candidate: { range?: Range; rangeLength?: number; text: string } =
+			event as any;
+		return (
+			candidate !== undefined &&
+			candidate !== null &&
+			typeof candidate.text === "string" &&
+			candidate.range === undefined &&
+			candidate.rangeLength === undefined
+		);
 	}
 }
 
@@ -353,7 +413,12 @@ export namespace TextDocument {
 	 * @param version The document's initial version number.
 	 * @param content The document's content.
 	 */
-	export function create(uri: DocumentUri, languageId: string, version: number, content: string): TextDocument {
+	export function create(
+		uri: DocumentUri,
+		languageId: string,
+		version: number,
+		content: string,
+	): TextDocument {
 		return new FullTextDocument(uri, languageId, version, content);
 	}
 
@@ -366,16 +431,25 @@ export namespace TextDocument {
 	 * @returns The updated TextDocument. Note: That's the same document instance passed in as first parameter.
 	 *
 	 */
-	export function update(document: TextDocument, changes: TextDocumentContentChangeEvent[], version: number): TextDocument {
+	export function update(
+		document: TextDocument,
+		changes: TextDocumentContentChangeEvent[],
+		version: number,
+	): TextDocument {
 		if (document instanceof FullTextDocument) {
 			document.update(changes, version);
 			return document;
 		} else {
-			throw new Error('TextDocument.update: document must be created by TextDocument.create');
+			throw new Error(
+				"TextDocument.update: document must be created by TextDocument.create",
+			);
 		}
 	}
 
-	export function applyEdits(document: TextDocument, edits: TextEdit[]): string {
+	export function applyEdits(
+		document: TextDocument,
+		edits: TextEdit[],
+	): string {
 		const text = document.getText();
 		const sortedEdits = mergeSort(edits.map(getWellformedEdit), (a, b) => {
 			const diff = a.range.start.line - b.range.start.line;
@@ -389,7 +463,7 @@ export namespace TextDocument {
 		for (const e of sortedEdits) {
 			const startOffset = document.offsetAt(e.range.start);
 			if (startOffset < lastModifiedOffset) {
-				throw new Error('Overlapping edit');
+				throw new Error("Overlapping edit");
 			} else if (startOffset > lastModifiedOffset) {
 				spans.push(text.substring(lastModifiedOffset, startOffset));
 			}
@@ -399,7 +473,7 @@ export namespace TextDocument {
 			lastModifiedOffset = document.offsetAt(e.range.end);
 		}
 		spans.push(text.substr(lastModifiedOffset));
-		return spans.join('');
+		return spans.join("");
 	}
 }
 
@@ -448,12 +522,20 @@ const enum CharCode {
 	CarriageReturn = 13,
 }
 
-function computeLineOffsets(text: string, isAtLineStart: boolean, textOffset = 0): number[] {
+function computeLineOffsets(
+	text: string,
+	isAtLineStart: boolean,
+	textOffset = 0,
+): number[] {
 	const result: number[] = isAtLineStart ? [textOffset] : [];
 	for (let i = 0; i < text.length; i++) {
 		const ch = text.charCodeAt(i);
 		if (isEOL(ch)) {
-			if (ch === CharCode.CarriageReturn && i + 1 < text.length && text.charCodeAt(i + 1) === CharCode.LineFeed) {
+			if (
+				ch === CharCode.CarriageReturn &&
+				i + 1 < text.length &&
+				text.charCodeAt(i + 1) === CharCode.LineFeed
+			) {
 				i++;
 			}
 			result.push(textOffset + i + 1);
@@ -469,7 +551,10 @@ function isEOL(char: number) {
 function getWellformedRange(range: Range): Range {
 	const start = range.start;
 	const end = range.end;
-	if (start.line > end.line || (start.line === end.line && start.character > end.character)) {
+	if (
+		start.line > end.line ||
+		(start.line === end.line && start.character > end.character)
+	) {
 		return { start: end, end: start };
 	}
 	return range;

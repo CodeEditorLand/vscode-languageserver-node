@@ -4,69 +4,145 @@
  * ------------------------------------------------------------------------------------------ */
 
 import {
-	languages as Languages, Disposable, TextDocument, ProviderResult, Position as VPosition, Definition as VDefinition, DefinitionLink as VDefinitionLink, TypeDefinitionProvider
-} from 'vscode';
-
+	Disposable,
+	languages as Languages,
+	ProviderResult,
+	TextDocument,
+	TypeDefinitionProvider,
+	Definition as VDefinition,
+	DefinitionLink as VDefinitionLink,
+	Position as VPosition,
+} from "vscode";
 import {
-	ClientCapabilities, CancellationToken, ServerCapabilities, DocumentSelector, TypeDefinitionRequest, TypeDefinitionRegistrationOptions, TypeDefinitionOptions
-} from 'vscode-languageserver-protocol';
+	CancellationToken,
+	ClientCapabilities,
+	DocumentSelector,
+	ServerCapabilities,
+	TypeDefinitionOptions,
+	TypeDefinitionRegistrationOptions,
+	TypeDefinitionRequest,
+} from "vscode-languageserver-protocol";
 
-import { TextDocumentLanguageFeature, FeatureClient, ensure } from './features';
+import { ensure, FeatureClient, TextDocumentLanguageFeature } from "./features";
 
 export interface ProvideTypeDefinitionSignature {
-	(this: void, document: TextDocument, position: VPosition, token: CancellationToken): ProviderResult<VDefinition | VDefinitionLink[]>;
+	(
+		this: void,
+		document: TextDocument,
+		position: VPosition,
+		token: CancellationToken,
+	): ProviderResult<VDefinition | VDefinitionLink[]>;
 }
 
 export interface TypeDefinitionMiddleware {
-	provideTypeDefinition?: (this: void, document: TextDocument, position: VPosition, token: CancellationToken, next: ProvideTypeDefinitionSignature) => ProviderResult<VDefinition | VDefinitionLink[]>;
+	provideTypeDefinition?: (
+		this: void,
+		document: TextDocument,
+		position: VPosition,
+		token: CancellationToken,
+		next: ProvideTypeDefinitionSignature,
+	) => ProviderResult<VDefinition | VDefinitionLink[]>;
 }
 
-export class TypeDefinitionFeature extends TextDocumentLanguageFeature<boolean | TypeDefinitionOptions, TypeDefinitionRegistrationOptions, TypeDefinitionProvider, TypeDefinitionMiddleware> {
-
+export class TypeDefinitionFeature extends TextDocumentLanguageFeature<
+	boolean | TypeDefinitionOptions,
+	TypeDefinitionRegistrationOptions,
+	TypeDefinitionProvider,
+	TypeDefinitionMiddleware
+> {
 	constructor(client: FeatureClient<TypeDefinitionMiddleware>) {
 		super(client, TypeDefinitionRequest.type);
 	}
 
 	public fillClientCapabilities(capabilities: ClientCapabilities): void {
-		ensure(ensure(capabilities, 'textDocument')!, 'typeDefinition')!.dynamicRegistration = true;
-		const typeDefinitionSupport = ensure(ensure(capabilities, 'textDocument')!, 'typeDefinition')!;
+		ensure(
+			ensure(capabilities, "textDocument")!,
+			"typeDefinition",
+		)!.dynamicRegistration = true;
+		const typeDefinitionSupport = ensure(
+			ensure(capabilities, "textDocument")!,
+			"typeDefinition",
+		)!;
 		typeDefinitionSupport.dynamicRegistration = true;
 		typeDefinitionSupport.linkSupport = true;
 	}
 
-	public initialize(capabilities: ServerCapabilities, documentSelector: DocumentSelector): void {
-		const [id, options] = this.getRegistration(documentSelector, capabilities.typeDefinitionProvider);
+	public initialize(
+		capabilities: ServerCapabilities,
+		documentSelector: DocumentSelector,
+	): void {
+		const [id, options] = this.getRegistration(
+			documentSelector,
+			capabilities.typeDefinitionProvider,
+		);
 		if (!id || !options) {
 			return;
 		}
 		this.register({ id: id, registerOptions: options });
 	}
 
-	protected registerLanguageProvider(options: TypeDefinitionRegistrationOptions): [Disposable, TypeDefinitionProvider] {
+	protected registerLanguageProvider(
+		options: TypeDefinitionRegistrationOptions,
+	): [Disposable, TypeDefinitionProvider] {
 		const selector = options.documentSelector!;
 		const provider: TypeDefinitionProvider = {
 			provideTypeDefinition: (document, position, token) => {
 				const client = this._client;
-				const provideTypeDefinition: ProvideTypeDefinitionSignature = (document, position, token) => {
-					return client.sendRequest(TypeDefinitionRequest.type, client.code2ProtocolConverter.asTextDocumentPositionParams(document, position), token).then((result) => {
-						if (token.isCancellationRequested) {
-							return null;
-						}
-						return client.protocol2CodeConverter.asDefinitionResult(result, token);
-					}, (error) => {
-						return client.handleFailedRequest(TypeDefinitionRequest.type, token, error, null);
-					});
+				const provideTypeDefinition: ProvideTypeDefinitionSignature = (
+					document,
+					position,
+					token,
+				) => {
+					return client
+						.sendRequest(
+							TypeDefinitionRequest.type,
+							client.code2ProtocolConverter.asTextDocumentPositionParams(
+								document,
+								position,
+							),
+							token,
+						)
+						.then(
+							(result) => {
+								if (token.isCancellationRequested) {
+									return null;
+								}
+								return client.protocol2CodeConverter.asDefinitionResult(
+									result,
+									token,
+								);
+							},
+							(error) => {
+								return client.handleFailedRequest(
+									TypeDefinitionRequest.type,
+									token,
+									error,
+									null,
+								);
+							},
+						);
 				};
 				const middleware = client.middleware;
 				return middleware.provideTypeDefinition
-					? middleware.provideTypeDefinition(document, position, token, provideTypeDefinition)
+					? middleware.provideTypeDefinition(
+							document,
+							position,
+							token,
+							provideTypeDefinition,
+						)
 					: provideTypeDefinition(document, position, token);
-			}
+			},
 		};
 		return [this.registerProvider(selector, provider), provider];
 	}
 
-	private registerProvider(selector: DocumentSelector, provider: TypeDefinitionProvider): Disposable {
-		return Languages.registerTypeDefinitionProvider(this._client.protocol2CodeConverter.asDocumentSelector(selector), provider);
+	private registerProvider(
+		selector: DocumentSelector,
+		provider: TypeDefinitionProvider,
+	): Disposable {
+		return Languages.registerTypeDefinitionProvider(
+			this._client.protocol2CodeConverter.asDocumentSelector(selector),
+			provider,
+		);
 	}
 }

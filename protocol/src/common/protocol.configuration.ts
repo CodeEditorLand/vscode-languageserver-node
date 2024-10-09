@@ -3,10 +3,14 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
 
-import { RequestHandler, HandlerResult, CancellationToken } from 'vscode-jsonrpc';
-import { LSPAny, URI } from 'vscode-languageserver-types';
+import {
+	CancellationToken,
+	HandlerResult,
+	RequestHandler,
+} from "vscode-jsonrpc";
+import { LSPAny, URI } from "vscode-languageserver-types";
 
-import { MessageDirection, ProtocolRequestType } from './messages';
+import { MessageDirection, ProtocolRequestType } from "./messages";
 
 //---- Get Configuration request ----
 
@@ -20,13 +24,27 @@ import { MessageDirection, ProtocolRequestType } from './messages';
  * change event and empty the cache if such an event is received.
  */
 export namespace ConfigurationRequest {
-	export const method: 'workspace/configuration' = 'workspace/configuration';
-	export const messageDirection: MessageDirection = MessageDirection.serverToClient;
-	export const type = new ProtocolRequestType<ConfigurationParams, LSPAny[], never, void, void>(method);
-	export type HandlerSignature = RequestHandler<ConfigurationParams, LSPAny[], void>;
-	export type MiddlewareSignature = (params: ConfigurationParams, token: CancellationToken, next: HandlerSignature) => HandlerResult<LSPAny[], void>;
+	export const method: "workspace/configuration" = "workspace/configuration";
+	export const messageDirection: MessageDirection =
+		MessageDirection.serverToClient;
+	export const type = new ProtocolRequestType<
+		ConfigurationParams,
+		LSPAny[],
+		never,
+		void,
+		void
+	>(method);
+	export type HandlerSignature = RequestHandler<
+		ConfigurationParams,
+		LSPAny[],
+		void
+	>;
+	export type MiddlewareSignature = (
+		params: ConfigurationParams,
+		token: CancellationToken,
+		next: HandlerSignature,
+	) => HandlerResult<LSPAny[], void>;
 }
-
 
 export interface ConfigurationItem {
 	/**

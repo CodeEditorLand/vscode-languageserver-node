@@ -10,15 +10,19 @@ interface Message {
 	result?: any;
 }
 
-process.on('message', (message: Message) => {
-	if (message.command === 'exit') {
+process.on("message", (message: Message) => {
+	if (message.command === "exit") {
 		process.exit(0);
-	} else if (message.command === 'resolve') {
+	} else if (message.command === "resolve") {
 		try {
 			const result = (<any>require).resolve(message.args);
-			process.send!({ command: 'resolve', success: true, result: result });
+			process.send!({
+				command: "resolve",
+				success: true,
+				result: result,
+			});
 		} catch (err) {
-			process.send!({ command: 'resolve', success: false });
+			process.send!({ command: "resolve", success: false });
 		}
 	}
 });

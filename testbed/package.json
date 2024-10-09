@@ -1,17 +1,15 @@
 {
 	"name": "testbed",
-	"description": "testbed",
 	"version": "0.1.0",
+	"description": "testbed",
 	"publisher": "vscode",
-	"engines": {
-		"vscode": "^1.33.0"
-	},
 	"main": "./client/out/extension.js",
-	"activationEvents": [
-		"*"
-	],
-	"enabledApiProposals": [
-	],
+	"scripts": {
+		"clean": "tsc -b --clean",
+		"compile": "tsc -b",
+		"postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
+		"watch": "tsc -b -w"
+	},
 	"contributes": {
 		"commands": [
 			{
@@ -44,10 +42,11 @@
 			}
 		}
 	},
-	"scripts": {
-		"postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
-		"compile": "tsc -b",
-		"clean": "tsc -b --clean",
-		"watch": "tsc -b -w"
-	}
+	"activationEvents": [
+		"*"
+	],
+	"engines": {
+		"vscode": "^1.33.0"
+	},
+	"enabledApiProposals": []
 }

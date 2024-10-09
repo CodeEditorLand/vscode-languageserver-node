@@ -4,24 +4,58 @@
  * ------------------------------------------------------------------------------------------ */
 
 import {
-	Disposable, languages as Languages, window as Window, workspace as Workspace, CancellationToken, ProviderResult, Diagnostic as VDiagnostic,
-	CancellationTokenSource, TextDocument, CancellationError, Event as VEvent, EventEmitter, DiagnosticCollection, Uri, workspace, NotebookCell
-} from 'vscode';
+	CancellationError,
+	CancellationToken,
+	CancellationTokenSource,
+	DiagnosticCollection,
+	Disposable,
+	EventEmitter,
+	languages as Languages,
+	NotebookCell,
+	ProviderResult,
+	TextDocument,
+	Uri,
+	Diagnostic as VDiagnostic,
+	Event as VEvent,
+	window as Window,
+	workspace as Workspace,
+	workspace,
+} from "vscode";
+import {
+	ClientCapabilities,
+	DiagnosticOptions,
+	DiagnosticRefreshRequest,
+	DiagnosticRegistrationOptions,
+	DiagnosticServerCancellationData,
+	DiagnosticTag,
+	DidChangeTextDocumentNotification,
+	DidCloseTextDocumentNotification,
+	DidOpenTextDocumentNotification,
+	DidSaveTextDocumentNotification,
+	DocumentDiagnosticParams,
+	DocumentDiagnosticReportKind,
+	DocumentDiagnosticRequest,
+	DocumentSelector,
+	LinkedMap,
+	NotebookDocumentSyncRegistrationType,
+	PreviousResultId,
+	RAL,
+	ServerCapabilities,
+	TextDocumentFilter,
+	Touch,
+	WorkspaceDiagnosticParams,
+	WorkspaceDiagnosticRequest,
+	WorkspaceDocumentDiagnosticReport,
+} from "vscode-languageserver-protocol";
 
 import {
-	ClientCapabilities, ServerCapabilities, DocumentSelector, DidOpenTextDocumentNotification, DidChangeTextDocumentNotification,
-	DidSaveTextDocumentNotification, DidCloseTextDocumentNotification, LinkedMap, Touch, RAL, TextDocumentFilter, PreviousResultId,
-	DiagnosticRegistrationOptions, DiagnosticServerCancellationData, DocumentDiagnosticParams, DocumentDiagnosticRequest, DocumentDiagnosticReportKind,
-	WorkspaceDocumentDiagnosticReport, WorkspaceDiagnosticRequest, WorkspaceDiagnosticParams, DiagnosticOptions, DiagnosticRefreshRequest, DiagnosticTag,
-	NotebookDocumentSyncRegistrationType
-} from 'vscode-languageserver-protocol';
-
-import { generateUuid } from './utils/uuid';
-import { matchGlobPattern } from './utils/globPattern';
-
-import {
-	TextDocumentLanguageFeature, FeatureClient, LSPCancellationError, type TabsModel
-} from './features';
+	FeatureClient,
+	LSPCancellationError,
+	TextDocumentLanguageFeature,
+	type TabsModel,
+} from "./features";
+import { matchGlobPattern } from "./utils/globPattern";
+import { generateUuid } from "./utils/uuid";
 
 function ensure<T, K extends keyof T>(target: T, key: K): T[K] {
 	if (target[key] === void 0) {
@@ -32,8 +66,8 @@ function ensure<T, K extends keyof T>(target: T, key: K): T[K] {
 
 export namespace vsdiag {
 	export enum DocumentDiagnosticReportKind {
-		full = 'full',
-		unChanged = 'unChanged'
+		full = "full",
+		unChanged = "unChanged",
 	}
 
 	export interface FullDocumentDiagnosticReport {
@@ -42,9 +76,12 @@ export namespace vsdiag {
 		items: VDiagnostic[];
 	}
 
-	export interface RelatedFullDocumentDiagnosticReport extends FullDocumentDiagnosticReport {
+	export interface RelatedFullDocumentDiagnosticReport
+		extends FullDocumentDiagnosticReport {
 		relatedDocuments?: {
-			[uri: string /** DocumentUri */]: FullDocumentDiagnosticReport | UnchangedDocumentDiagnosticReport;
+			[uri: string /** DocumentUri */]:
+				| FullDocumentDiagnosticReport
+				| UnchangedDocumentDiagnosticReport;
 		};
 	}
 
@@ -53,30 +90,38 @@ export namespace vsdiag {
 		resultId: string;
 	}
 
-	export interface RelatedUnchangedDocumentDiagnosticReport extends UnchangedDocumentDiagnosticReport {
+	export interface RelatedUnchangedDocumentDiagnosticReport
+		extends UnchangedDocumentDiagnosticReport {
 		relatedDocuments?: {
-			[uri: string /** DocumentUri */]: FullDocumentDiagnosticReport | UnchangedDocumentDiagnosticReport;
+			[uri: string /** DocumentUri */]:
+				| FullDocumentDiagnosticReport
+				| UnchangedDocumentDiagnosticReport;
 		};
 	}
-	export type DocumentDiagnosticReport = RelatedFullDocumentDiagnosticReport | RelatedUnchangedDocumentDiagnosticReport;
+	export type DocumentDiagnosticReport =
+		| RelatedFullDocumentDiagnosticReport
+		| RelatedUnchangedDocumentDiagnosticReport;
 
 	export type PreviousResultId = {
 		uri: Uri;
 		value: string;
 	};
 
-
-	export interface WorkspaceFullDocumentDiagnosticReport extends FullDocumentDiagnosticReport {
+	export interface WorkspaceFullDocumentDiagnosticReport
+		extends FullDocumentDiagnosticReport {
 		uri: Uri;
 		version: number | null;
 	}
 
-	export interface WorkspaceUnchangedDocumentDiagnosticReport extends UnchangedDocumentDiagnosticReport {
+	export interface WorkspaceUnchangedDocumentDiagnosticReport
+		extends UnchangedDocumentDiagnosticReport {
 		uri: Uri;
 		version: number | null;
 	}
 
-	export type WorkspaceDocumentDiagnosticReport = WorkspaceFullDocumentDiagnosticReport | WorkspaceUnchangedDocumentDiagnosticReport;
+	export type WorkspaceDocumentDiagnosticReport =
+		| WorkspaceFullDocumentDiagnosticReport
+		| WorkspaceUnchangedDocumentDiagnosticReport;
 
 	export interface WorkspaceDiagnosticReport {
 		items: WorkspaceDocumentDiagnosticReport[];
@@ -92,28 +137,57 @@ export namespace vsdiag {
 
 	export interface DiagnosticProvider {
 		onDidChangeDiagnostics: VEvent<void>;
-		provideDiagnostics(document: TextDocument | Uri, previousResultId: string | undefined, token: CancellationToken): ProviderResult<DocumentDiagnosticReport>;
-		provideWorkspaceDiagnostics?(resultIds: PreviousResultId[], token: CancellationToken, resultReporter: ResultReporter): ProviderResult<WorkspaceDiagnosticReport>;
+		provideDiagnostics(
+			document: TextDocument | Uri,
+			previousResultId: string | undefined,
+			token: CancellationToken,
+		): ProviderResult<DocumentDiagnosticReport>;
+		provideWorkspaceDiagnostics?(
+			resultIds: PreviousResultId[],
+			token: CancellationToken,
+			resultReporter: ResultReporter,
+		): ProviderResult<WorkspaceDiagnosticReport>;
 	}
 }
 
-export type ProvideDiagnosticSignature = (this: void, document: TextDocument | Uri, previousResultId: string | undefined, token: CancellationToken) => ProviderResult<vsdiag.DocumentDiagnosticReport>;
+export type ProvideDiagnosticSignature = (
+	this: void,
+	document: TextDocument | Uri,
+	previousResultId: string | undefined,
+	token: CancellationToken,
+) => ProviderResult<vsdiag.DocumentDiagnosticReport>;
 
-export type ProvideWorkspaceDiagnosticSignature = (this: void, resultIds: vsdiag.PreviousResultId[], token: CancellationToken, resultReporter: vsdiag.ResultReporter) => ProviderResult<vsdiag.WorkspaceDiagnosticReport>;
+export type ProvideWorkspaceDiagnosticSignature = (
+	this: void,
+	resultIds: vsdiag.PreviousResultId[],
+	token: CancellationToken,
+	resultReporter: vsdiag.ResultReporter,
+) => ProviderResult<vsdiag.WorkspaceDiagnosticReport>;
 
 export type DiagnosticProviderMiddleware = {
-	provideDiagnostics?: (this: void, document: TextDocument | Uri, previousResultId: string | undefined, token: CancellationToken, next: ProvideDiagnosticSignature) => ProviderResult<vsdiag.DocumentDiagnosticReport>;
-	provideWorkspaceDiagnostics?: (this: void, resultIds: vsdiag.PreviousResultId[], token: CancellationToken, resultReporter: vsdiag.ResultReporter, next: ProvideWorkspaceDiagnosticSignature) => ProviderResult<vsdiag.WorkspaceDiagnosticReport>;
+	provideDiagnostics?: (
+		this: void,
+		document: TextDocument | Uri,
+		previousResultId: string | undefined,
+		token: CancellationToken,
+		next: ProvideDiagnosticSignature,
+	) => ProviderResult<vsdiag.DocumentDiagnosticReport>;
+	provideWorkspaceDiagnostics?: (
+		this: void,
+		resultIds: vsdiag.PreviousResultId[],
+		token: CancellationToken,
+		resultReporter: vsdiag.ResultReporter,
+		next: ProvideWorkspaceDiagnosticSignature,
+	) => ProviderResult<vsdiag.WorkspaceDiagnosticReport>;
 };
 
 export enum DiagnosticPullMode {
-	onType = 'onType',
-	onSave = 'onSave',
-	onFocus = 'onFocus'
+	onType = "onType",
+	onSave = "onSave",
+	onFocus = "onFocus",
 }
 
 export type DiagnosticPullOptions = {
-
 	/**
 	 * Whether to pull for diagnostics on document change.
 	 */
@@ -169,25 +243,27 @@ export type $DiagnosticPullOptions = {
 	diagnosticPullOptions?: DiagnosticPullOptions;
 };
 
-
 enum RequestStateKind {
-	active = 'open',
-	reschedule = 'reschedule',
-	outDated = 'drop'
+	active = "open",
+	reschedule = "reschedule",
+	outDated = "drop",
 }
 
-type RequestState = {
-	state: RequestStateKind.active;
-	document: TextDocument | Uri;
-	version: number | undefined;
-	tokenSource: CancellationTokenSource;
-} | {
-	state: RequestStateKind.reschedule;
-	document: TextDocument | Uri;
-} | {
-	state: RequestStateKind.outDated;
-	document: TextDocument | Uri;
-};
+type RequestState =
+	| {
+			state: RequestStateKind.active;
+			document: TextDocument | Uri;
+			version: number | undefined;
+			tokenSource: CancellationTokenSource;
+	  }
+	| {
+			state: RequestStateKind.reschedule;
+			document: TextDocument | Uri;
+	  }
+	| {
+			state: RequestStateKind.outDated;
+			document: TextDocument | Uri;
+	  };
 
 type DocumentPullState = {
 	document: Uri;
@@ -197,17 +273,18 @@ type DocumentPullState = {
 
 enum PullState {
 	document = 1,
-	workspace = 2
+	workspace = 2,
 }
 
 namespace DocumentOrUri {
 	export function asKey(document: TextDocument | Uri): string {
-		return document instanceof Uri ? document.toString() : document.uri.toString();
+		return document instanceof Uri
+			? document.toString()
+			: document.uri.toString();
 	}
 }
 
 class DocumentPullStateTracker {
-
 	private readonly documentPullStates: Map<string, DocumentPullState>;
 	private readonly workspacePullStates: Map<string, DocumentPullState>;
 
@@ -216,29 +293,75 @@ class DocumentPullStateTracker {
 		this.workspacePullStates = new Map();
 	}
 
-	public track(kind: PullState, textDocument: TextDocument): DocumentPullState;
-	public track(kind: PullState, uri: Uri, version: number | undefined): DocumentPullState;
-	public track(kind: PullState, document: TextDocument | Uri, arg1?: number | undefined): DocumentPullState {
-		const states = kind === PullState.document ? this.documentPullStates : this.workspacePullStates;
-		const [key, uri, version] = document instanceof Uri
-			? [document.toString(), document, arg1 as number | undefined]
-			: [document.uri.toString(), document.uri, document.version];
+	public track(
+		kind: PullState,
+		textDocument: TextDocument,
+	): DocumentPullState;
+	public track(
+		kind: PullState,
+		uri: Uri,
+		version: number | undefined,
+	): DocumentPullState;
+	public track(
+		kind: PullState,
+		document: TextDocument | Uri,
+		arg1?: number | undefined,
+	): DocumentPullState {
+		const states =
+			kind === PullState.document
+				? this.documentPullStates
+				: this.workspacePullStates;
+		const [key, uri, version] =
+			document instanceof Uri
+				? [document.toString(), document, arg1 as number | undefined]
+				: [document.uri.toString(), document.uri, document.version];
 		let state = states.get(key);
 		if (state === undefined) {
-			state = { document: uri, pulledVersion: version, resultId: undefined };
+			state = {
+				document: uri,
+				pulledVersion: version,
+				resultId: undefined,
+			};
 			states.set(key, state);
 		}
 		return state;
 	}
 
-
-	public update(kind: PullState, textDocument: TextDocument, resultId: string | undefined): void;
-	public update(kind: PullState, uri: Uri, version: number | undefined, resultId: string | undefined): void;
-	public update(kind: PullState, document: TextDocument | Uri, arg1: string | number | undefined, arg2?: string | undefined): void {
-		const states = kind === PullState.document ? this.documentPullStates : this.workspacePullStates;
-		const [key, uri, version, resultId] = document instanceof Uri
-			? [document.toString(), document, arg1 as number | undefined, arg2]
-			: [document.uri.toString(), document.uri, document.version, arg1 as string | undefined];
+	public update(
+		kind: PullState,
+		textDocument: TextDocument,
+		resultId: string | undefined,
+	): void;
+	public update(
+		kind: PullState,
+		uri: Uri,
+		version: number | undefined,
+		resultId: string | undefined,
+	): void;
+	public update(
+		kind: PullState,
+		document: TextDocument | Uri,
+		arg1: string | number | undefined,
+		arg2?: string | undefined,
+	): void {
+		const states =
+			kind === PullState.document
+				? this.documentPullStates
+				: this.workspacePullStates;
+		const [key, uri, version, resultId] =
+			document instanceof Uri
+				? [
+						document.toString(),
+						document,
+						arg1 as number | undefined,
+						arg2,
+					]
+				: [
+						document.uri.toString(),
+						document.uri,
+						document.version,
+						arg1 as string | undefined,
+					];
 		let state = states.get(key);
 		if (state === undefined) {
 			state = { document: uri, pulledVersion: version, resultId };
@@ -251,19 +374,31 @@ class DocumentPullStateTracker {
 
 	public unTrack(kind: PullState, document: TextDocument | Uri): void {
 		const key = DocumentOrUri.asKey(document);
-		const states = kind === PullState.document ? this.documentPullStates : this.workspacePullStates;
+		const states =
+			kind === PullState.document
+				? this.documentPullStates
+				: this.workspacePullStates;
 		states.delete(key);
 	}
 
 	public tracks(kind: PullState, document: TextDocument | Uri): boolean {
 		const key = DocumentOrUri.asKey(document);
-		const states = kind === PullState.document ? this.documentPullStates : this.workspacePullStates;
+		const states =
+			kind === PullState.document
+				? this.documentPullStates
+				: this.workspacePullStates;
 		return states.has(key);
 	}
 
-	public getResultId(kind: PullState, document: TextDocument | Uri): string | undefined {
+	public getResultId(
+		kind: PullState,
+		document: TextDocument | Uri,
+	): string | undefined {
 		const key = DocumentOrUri.asKey(document);
-		const states = kind === PullState.document ? this.documentPullStates : this.workspacePullStates;
+		const states =
+			kind === PullState.document
+				? this.documentPullStates
+				: this.workspacePullStates;
 		return states.get(key)?.resultId;
 	}
 
@@ -282,9 +417,11 @@ class DocumentPullStateTracker {
 }
 
 class DiagnosticRequestor implements Disposable {
-
 	private isDisposed: boolean;
-	private readonly client: FeatureClient<DiagnosticProviderMiddleware, $DiagnosticPullOptions>;
+	private readonly client: FeatureClient<
+		DiagnosticProviderMiddleware,
+		$DiagnosticPullOptions
+	>;
 	private readonly tabs: TabsModel;
 	private readonly options: DiagnosticRegistrationOptions;
 
@@ -298,7 +435,14 @@ class DiagnosticRequestor implements Disposable {
 	private workspaceCancellation: CancellationTokenSource | undefined;
 	private workspaceTimeout: Disposable | undefined;
 
-	public constructor(client: FeatureClient<DiagnosticProviderMiddleware, $DiagnosticPullOptions>, tabs: TabsModel, options: DiagnosticRegistrationOptions) {
+	public constructor(
+		client: FeatureClient<
+			DiagnosticProviderMiddleware,
+			$DiagnosticPullOptions
+		>,
+		tabs: TabsModel,
+		options: DiagnosticRegistrationOptions,
+	) {
 		this.client = client;
 		this.tabs = tabs;
 		this.options = options;
@@ -307,7 +451,9 @@ class DiagnosticRequestor implements Disposable {
 		this.onDidChangeDiagnosticsEmitter = new EventEmitter<void>();
 		this.provider = this.createProvider();
 
-		this.diagnostics = Languages.createDiagnosticCollection(options.identifier);
+		this.diagnostics = Languages.createDiagnosticCollection(
+			options.identifier,
+		);
 		this.openRequests = new Map();
 		this.documentStates = new DocumentPullStateTracker();
 		this.workspaceErrorCounter = 0;
@@ -315,7 +461,10 @@ class DiagnosticRequestor implements Disposable {
 
 	public knows(kind: PullState, document: TextDocument | Uri): boolean {
 		const uri = document instanceof Uri ? document : document.uri;
-		return this.documentStates.tracks(kind, document) || this.openRequests.has(uri.toString());
+		return (
+			this.documentStates.tracks(kind, document) ||
+			this.openRequests.has(uri.toString())
+		);
 	}
 
 	private forget(kind: PullState, document: TextDocument | Uri): void {
@@ -327,16 +476,26 @@ class DiagnosticRequestor implements Disposable {
 			return;
 		}
 		const uri = document instanceof Uri ? document : document.uri;
-		this.pullAsync(document).then(() => {
-			if (cb) {
-				cb();
-			}
-		}, (error) => {
-			this.client.error(`Document pull failed for text document ${uri.toString()}`, error, false);
-		});
+		this.pullAsync(document).then(
+			() => {
+				if (cb) {
+					cb();
+				}
+			},
+			(error) => {
+				this.client.error(
+					`Document pull failed for text document ${uri.toString()}`,
+					error,
+					false,
+				);
+			},
+		);
 	}
 
-	public async pullAsync(document: TextDocument | Uri, version?: number | undefined): Promise<void> {
+	public async pullAsync(
+		document: TextDocument | Uri,
+		version?: number | undefined,
+	): Promise<void> {
 		if (this.isDisposed) {
 			return;
 		}
@@ -350,17 +509,39 @@ class DiagnosticRequestor implements Disposable {
 			: this.documentStates.track(PullState.document, document);
 		if (currentRequestState === undefined) {
 			const tokenSource = new CancellationTokenSource();
-			this.openRequests.set(key, { state: RequestStateKind.active, document: document, version: version, tokenSource });
+			this.openRequests.set(key, {
+				state: RequestStateKind.active,
+				document: document,
+				version: version,
+				tokenSource,
+			});
 			let report: vsdiag.DocumentDiagnosticReport | undefined;
 			let afterState: RequestState | undefined;
 			try {
-				report = await this.provider.provideDiagnostics(document, documentState.resultId, tokenSource.token) ?? { kind: vsdiag.DocumentDiagnosticReportKind.full, items: [] };
+				report = (await this.provider.provideDiagnostics(
+					document,
+					documentState.resultId,
+					tokenSource.token,
+				)) ?? {
+					kind: vsdiag.DocumentDiagnosticReportKind.full,
+					items: [],
+				};
 			} catch (error) {
-				if (error instanceof LSPCancellationError && DiagnosticServerCancellationData.is(error.data) && error.data.retriggerRequest === false) {
+				if (
+					error instanceof LSPCancellationError &&
+					DiagnosticServerCancellationData.is(error.data) &&
+					error.data.retriggerRequest === false
+				) {
 					afterState = { state: RequestStateKind.outDated, document };
 				}
-				if (afterState === undefined && error instanceof CancellationError) {
-					afterState = { state: RequestStateKind.reschedule, document };
+				if (
+					afterState === undefined &&
+					error instanceof CancellationError
+				) {
+					afterState = {
+						state: RequestStateKind.reschedule,
+						document,
+					};
 				} else {
 					throw error;
 				}
@@ -368,7 +549,9 @@ class DiagnosticRequestor implements Disposable {
 			afterState = afterState ?? this.openRequests.get(key);
 			if (afterState === undefined) {
 				// This shouldn't happen. Log it
-				this.client.error(`Lost request state in diagnostic pull model. Clearing diagnostics for ${key}`);
+				this.client.error(
+					`Lost request state in diagnostic pull model. Clearing diagnostics for ${key}`,
+				);
 				this.diagnostics.delete(uri);
 				return;
 			}
@@ -395,9 +578,17 @@ class DiagnosticRequestor implements Disposable {
 			if (currentRequestState.state === RequestStateKind.active) {
 				// Cancel the current request and reschedule a new one when the old one returned.
 				currentRequestState.tokenSource.cancel();
-				this.openRequests.set(key, { state: RequestStateKind.reschedule, document: currentRequestState.document });
-			} else if (currentRequestState.state === RequestStateKind.outDated) {
-				this.openRequests.set(key, { state: RequestStateKind.reschedule, document: currentRequestState.document });
+				this.openRequests.set(key, {
+					state: RequestStateKind.reschedule,
+					document: currentRequestState.document,
+				});
+			} else if (
+				currentRequestState.state === RequestStateKind.outDated
+			) {
+				this.openRequests.set(key, {
+					state: RequestStateKind.reschedule,
+					document: currentRequestState.document,
+				});
 			}
 		}
 	}
@@ -410,7 +601,10 @@ class DiagnosticRequestor implements Disposable {
 			// If we run workspace diagnostic pull a last time for the diagnostics
 			// and the rely on getting them from the workspace result.
 			if (request !== undefined) {
-				this.openRequests.set(key, { state: RequestStateKind.reschedule, document: document });
+				this.openRequests.set(key, {
+					state: RequestStateKind.reschedule,
+					document: document,
+				});
 			} else {
 				this.pull(document, () => {
 					this.forget(PullState.document, document);
@@ -424,7 +618,10 @@ class DiagnosticRequestor implements Disposable {
 				if (request.state === RequestStateKind.active) {
 					request.tokenSource.cancel();
 				}
-				this.openRequests.set(key, { state: RequestStateKind.outDated, document: document });
+				this.openRequests.set(key, {
+					state: RequestStateKind.outDated,
+					document: document,
+				});
 			}
 			this.diagnostics.delete(uri);
 			this.forget(PullState.document, document);
@@ -435,21 +632,31 @@ class DiagnosticRequestor implements Disposable {
 		if (this.isDisposed) {
 			return;
 		}
-		this.pullWorkspaceAsync().then(() => {
-			this.workspaceTimeout = RAL().timer.setTimeout(() => {
-				this.pullWorkspace();
-			}, 2000);
-		}, (error) => {
-			if (!(error instanceof LSPCancellationError) && !DiagnosticServerCancellationData.is(error.data)) {
-				this.client.error(`Workspace diagnostic pull failed.`, error, false);
-				this.workspaceErrorCounter++;
-			}
-			if (this.workspaceErrorCounter <= 5) {
+		this.pullWorkspaceAsync().then(
+			() => {
 				this.workspaceTimeout = RAL().timer.setTimeout(() => {
 					this.pullWorkspace();
 				}, 2000);
-			}
-		});
+			},
+			(error) => {
+				if (
+					!(error instanceof LSPCancellationError) &&
+					!DiagnosticServerCancellationData.is(error.data)
+				) {
+					this.client.error(
+						`Workspace diagnostic pull failed.`,
+						error,
+						false,
+					);
+					this.workspaceErrorCounter++;
+				}
+				if (this.workspaceErrorCounter <= 5) {
+					this.workspaceTimeout = RAL().timer.setTimeout(() => {
+						this.pullWorkspace();
+					}, 2000);
+				}
+			},
+		);
 	}
 
 	private async pullWorkspaceAsync(): Promise<void> {
@@ -461,136 +668,285 @@ class DiagnosticRequestor implements Disposable {
 			this.workspaceCancellation = undefined;
 		}
 		this.workspaceCancellation = new CancellationTokenSource();
-		const previousResultIds: vsdiag.PreviousResultId[] = this.documentStates.getAllResultIds().map((item) => {
-			return {
-				uri: this.client.protocol2CodeConverter.asUri(item.uri),
-				value: item.value
-			};
-		});
-		await this.provider.provideWorkspaceDiagnostics(previousResultIds, this.workspaceCancellation.token, (chunk) => {
-			if (!chunk || this.isDisposed) {
-				return;
-			}
-			for (const item of chunk.items) {
-				if (item.kind === vsdiag.DocumentDiagnosticReportKind.full) {
-					// Favour document pull result over workspace results. So skip if it is tracked
-					// as a document result.
-					if (!this.documentStates.tracks(PullState.document, item.uri)) {
-						this.diagnostics.set(item.uri, item.items);
-					}
+		const previousResultIds: vsdiag.PreviousResultId[] = this.documentStates
+			.getAllResultIds()
+			.map((item) => {
+				return {
+					uri: this.client.protocol2CodeConverter.asUri(item.uri),
+					value: item.value,
+				};
+			});
+		await this.provider.provideWorkspaceDiagnostics(
+			previousResultIds,
+			this.workspaceCancellation.token,
+			(chunk) => {
+				if (!chunk || this.isDisposed) {
+					return;
 				}
-				this.documentStates.update(PullState.workspace, item.uri, item.version ?? undefined, item.resultId);
-			}
-		});
+				for (const item of chunk.items) {
+					if (
+						item.kind === vsdiag.DocumentDiagnosticReportKind.full
+					) {
+						// Favour document pull result over workspace results. So skip if it is tracked
+						// as a document result.
+						if (
+							!this.documentStates.tracks(
+								PullState.document,
+								item.uri,
+							)
+						) {
+							this.diagnostics.set(item.uri, item.items);
+						}
+					}
+					this.documentStates.update(
+						PullState.workspace,
+						item.uri,
+						item.version ?? undefined,
+						item.resultId,
+					);
+				}
+			},
+		);
 	}
 
 	private createProvider(): vsdiag.DiagnosticProvider {
 		const result: vsdiag.DiagnosticProvider = {
 			onDidChangeDiagnostics: this.onDidChangeDiagnosticsEmitter.event,
 			provideDiagnostics: (document, previousResultId, token) => {
-				const provideDiagnostics: ProvideDiagnosticSignature = (document, previousResultId, token) => {
+				const provideDiagnostics: ProvideDiagnosticSignature = (
+					document,
+					previousResultId,
+					token,
+				) => {
 					const params: DocumentDiagnosticParams = {
 						identifier: this.options.identifier,
-						textDocument: { uri: this.client.code2ProtocolConverter.asUri(document instanceof Uri ? document : document.uri) },
-						previousResultId: previousResultId
+						textDocument: {
+							uri: this.client.code2ProtocolConverter.asUri(
+								document instanceof Uri
+									? document
+									: document.uri,
+							),
+						},
+						previousResultId: previousResultId,
 					};
 					if (this.isDisposed === true || !this.client.isRunning()) {
-						return { kind: vsdiag.DocumentDiagnosticReportKind.full, items: [] };
+						return {
+							kind: vsdiag.DocumentDiagnosticReportKind.full,
+							items: [],
+						};
 					}
-					return this.client.sendRequest(DocumentDiagnosticRequest.type, params, token).then(async (result) => {
-						if (result === undefined || result === null || this.isDisposed || token.isCancellationRequested) {
-							return { kind: vsdiag.DocumentDiagnosticReportKind.full, items: [] };
-						}
-						if (result.kind === DocumentDiagnosticReportKind.Full) {
-							return { kind: vsdiag.DocumentDiagnosticReportKind.full, resultId: result.resultId, items: await this.client.protocol2CodeConverter.asDiagnostics(result.items, token) };
-						} else {
-							return { kind: vsdiag.DocumentDiagnosticReportKind.unChanged, resultId: result.resultId };
-						}
-					}, (error) => {
-						return this.client.handleFailedRequest(DocumentDiagnosticRequest.type, token, error, { kind: vsdiag.DocumentDiagnosticReportKind.full, items: [] }, true, true);
-					});
+					return this.client
+						.sendRequest(
+							DocumentDiagnosticRequest.type,
+							params,
+							token,
+						)
+						.then(
+							async (result) => {
+								if (
+									result === undefined ||
+									result === null ||
+									this.isDisposed ||
+									token.isCancellationRequested
+								) {
+									return {
+										kind: vsdiag
+											.DocumentDiagnosticReportKind.full,
+										items: [],
+									};
+								}
+								if (
+									result.kind ===
+									DocumentDiagnosticReportKind.Full
+								) {
+									return {
+										kind: vsdiag
+											.DocumentDiagnosticReportKind.full,
+										resultId: result.resultId,
+										items: await this.client.protocol2CodeConverter.asDiagnostics(
+											result.items,
+											token,
+										),
+									};
+								} else {
+									return {
+										kind: vsdiag
+											.DocumentDiagnosticReportKind
+											.unChanged,
+										resultId: result.resultId,
+									};
+								}
+							},
+							(error) => {
+								return this.client.handleFailedRequest(
+									DocumentDiagnosticRequest.type,
+									token,
+									error,
+									{
+										kind: vsdiag
+											.DocumentDiagnosticReportKind.full,
+										items: [],
+									},
+									true,
+									true,
+								);
+							},
+						);
 				};
-				const middleware: DiagnosticProviderMiddleware = this.client.middleware;
+				const middleware: DiagnosticProviderMiddleware =
+					this.client.middleware;
 				return middleware.provideDiagnostics
-					? middleware.provideDiagnostics(document, previousResultId, token, provideDiagnostics)
+					? middleware.provideDiagnostics(
+							document,
+							previousResultId,
+							token,
+							provideDiagnostics,
+						)
 					: provideDiagnostics(document, previousResultId, token);
-			}
+			},
 		};
 		if (this.options.workspaceDiagnostics) {
-			result.provideWorkspaceDiagnostics = (resultIds, token, resultReporter): ProviderResult<vsdiag.WorkspaceDiagnosticReport> => {
-				const convertReport = async (report: WorkspaceDocumentDiagnosticReport): Promise<vsdiag.WorkspaceDocumentDiagnosticReport> => {
+			result.provideWorkspaceDiagnostics = (
+				resultIds,
+				token,
+				resultReporter,
+			): ProviderResult<vsdiag.WorkspaceDiagnosticReport> => {
+				const convertReport = async (
+					report: WorkspaceDocumentDiagnosticReport,
+				): Promise<vsdiag.WorkspaceDocumentDiagnosticReport> => {
 					if (report.kind === DocumentDiagnosticReportKind.Full) {
 						return {
 							kind: vsdiag.DocumentDiagnosticReportKind.full,
-							uri: this.client.protocol2CodeConverter.asUri(report.uri),
+							uri: this.client.protocol2CodeConverter.asUri(
+								report.uri,
+							),
 							resultId: report.resultId,
 							version: report.version,
-							items: await this.client.protocol2CodeConverter.asDiagnostics(report.items, token)
+							items: await this.client.protocol2CodeConverter.asDiagnostics(
+								report.items,
+								token,
+							),
 						};
 					} else {
 						return {
 							kind: vsdiag.DocumentDiagnosticReportKind.unChanged,
-							uri: this.client.protocol2CodeConverter.asUri(report.uri),
+							uri: this.client.protocol2CodeConverter.asUri(
+								report.uri,
+							),
 							resultId: report.resultId,
-							version: report.version
+							version: report.version,
 						};
 					}
 				};
-				const convertPreviousResultIds = (resultIds: vsdiag.PreviousResultId[]): PreviousResultId[] => {
+				const convertPreviousResultIds = (
+					resultIds: vsdiag.PreviousResultId[],
+				): PreviousResultId[] => {
 					const converted: PreviousResultId[] = [];
 					for (const item of resultIds) {
-						converted.push({ uri: this.client.code2ProtocolConverter.asUri(item.uri), value: item.value});
+						converted.push({
+							uri: this.client.code2ProtocolConverter.asUri(
+								item.uri,
+							),
+							value: item.value,
+						});
 					}
 					return converted;
 				};
-				const provideDiagnostics: ProvideWorkspaceDiagnosticSignature = (resultIds, token, resultReporter): ProviderResult<vsdiag.WorkspaceDiagnosticReport> => {
-					const partialResultToken: string = generateUuid();
-					const disposable = this.client.onProgress(WorkspaceDiagnosticRequest.partialResult, partialResultToken, async (partialResult) => {
-						if (partialResult === undefined || partialResult === null) {
-							resultReporter(null);
-							return;
-						}
-						const converted: vsdiag.WorkspaceDiagnosticReportPartialResult = {
-							items: []
+				const provideDiagnostics: ProvideWorkspaceDiagnosticSignature =
+					(
+						resultIds,
+						token,
+						resultReporter,
+					): ProviderResult<vsdiag.WorkspaceDiagnosticReport> => {
+						const partialResultToken: string = generateUuid();
+						const disposable = this.client.onProgress(
+							WorkspaceDiagnosticRequest.partialResult,
+							partialResultToken,
+							async (partialResult) => {
+								if (
+									partialResult === undefined ||
+									partialResult === null
+								) {
+									resultReporter(null);
+									return;
+								}
+								const converted: vsdiag.WorkspaceDiagnosticReportPartialResult =
+									{
+										items: [],
+									};
+								for (const item of partialResult.items) {
+									try {
+										converted.items.push(
+											await convertReport(item),
+										);
+									} catch (error) {
+										this.client.error(
+											`Converting workspace diagnostics failed.`,
+											error,
+										);
+									}
+								}
+								resultReporter(converted);
+							},
+						);
+						const params: WorkspaceDiagnosticParams = {
+							identifier: this.options.identifier,
+							previousResultIds:
+								convertPreviousResultIds(resultIds),
+							partialResultToken: partialResultToken,
 						};
-						for (const item of partialResult.items) {
-							try {
-								converted.items.push(await convertReport(item));
-							} catch (error) {
-								this.client.error(`Converting workspace diagnostics failed.`, error);
-							}
-						}
-						resultReporter(converted);
-					});
-					const params: WorkspaceDiagnosticParams = {
-						identifier: this.options.identifier,
-						previousResultIds: convertPreviousResultIds(resultIds),
-						partialResultToken: partialResultToken
-					};
-					if (this.isDisposed === true || !this.client.isRunning()) {
-						return { items: [] };
-					}
-					return this.client.sendRequest(WorkspaceDiagnosticRequest.type, params, token).then(async (result): Promise<vsdiag.WorkspaceDiagnosticReport> => {
-						if (token.isCancellationRequested) {
+						if (
+							this.isDisposed === true ||
+							!this.client.isRunning()
+						) {
 							return { items: [] };
 						}
-						const converted: vsdiag.WorkspaceDiagnosticReport = {
-							items: []
-						};
-						for (const item of result.items) {
-							converted.items.push(await convertReport(item));
-						}
-						disposable.dispose();
-						resultReporter(converted);
-						return { items: [] };
-					}, (error) => {
-						disposable.dispose();
-						return this.client.handleFailedRequest(DocumentDiagnosticRequest.type, token, error, { items: [] });
-					});
-				};
-				const middleware: DiagnosticProviderMiddleware = this.client.middleware;
+						return this.client
+							.sendRequest(
+								WorkspaceDiagnosticRequest.type,
+								params,
+								token,
+							)
+							.then(
+								async (
+									result,
+								): Promise<vsdiag.WorkspaceDiagnosticReport> => {
+									if (token.isCancellationRequested) {
+										return { items: [] };
+									}
+									const converted: vsdiag.WorkspaceDiagnosticReport =
+										{
+											items: [],
+										};
+									for (const item of result.items) {
+										converted.items.push(
+											await convertReport(item),
+										);
+									}
+									disposable.dispose();
+									resultReporter(converted);
+									return { items: [] };
+								},
+								(error) => {
+									disposable.dispose();
+									return this.client.handleFailedRequest(
+										DocumentDiagnosticRequest.type,
+										token,
+										error,
+										{ items: [] },
+									);
+								},
+							);
+					};
+				const middleware: DiagnosticProviderMiddleware =
+					this.client.middleware;
 				return middleware.provideWorkspaceDiagnostics
-					? middleware.provideWorkspaceDiagnostics(resultIds, token, resultReporter, provideDiagnostics)
+					? middleware.provideWorkspaceDiagnostics(
+							resultIds,
+							token,
+							resultReporter,
+							provideDiagnostics,
+						)
 					: provideDiagnostics(resultIds, token, resultReporter);
 			};
 		}
@@ -609,7 +965,10 @@ class DiagnosticRequestor implements Disposable {
 			if (request.state === RequestStateKind.active) {
 				request.tokenSource.cancel();
 			}
-			this.openRequests.set(key, { state: RequestStateKind.outDated, document: request.document });
+			this.openRequests.set(key, {
+				state: RequestStateKind.outDated,
+				document: request.document,
+			});
 		}
 
 		// cleanup old diagnostics
@@ -638,8 +997,10 @@ export type DiagnosticProviderShape = {
 };
 
 class BackgroundScheduler implements Disposable {
-
-	private readonly client: FeatureClient<DiagnosticProviderMiddleware, $DiagnosticPullOptions>;
+	private readonly client: FeatureClient<
+		DiagnosticProviderMiddleware,
+		$DiagnosticPullOptions
+	>;
 	private readonly diagnosticRequestor: DiagnosticRequestor;
 	private lastDocumentToPull: TextDocument | Uri | undefined;
 	private readonly documents: LinkedMap<string, TextDocument | Uri>;
@@ -650,7 +1011,13 @@ class BackgroundScheduler implements Disposable {
 	// and ignore those re-schedules
 	private isDisposed: boolean;
 
-	public constructor(client: FeatureClient<DiagnosticProviderMiddleware, $DiagnosticPullOptions>, diagnosticRequestor: DiagnosticRequestor) {
+	public constructor(
+		client: FeatureClient<
+			DiagnosticProviderMiddleware,
+			$DiagnosticPullOptions
+		>,
+		diagnosticRequestor: DiagnosticRequestor,
+	) {
 		this.client = client;
 		this.diagnosticRequestor = diagnosticRequestor;
 		this.documents = new LinkedMap();
@@ -725,15 +1092,22 @@ class BackgroundScheduler implements Disposable {
 				return;
 			}
 			const key = DocumentOrUri.asKey(document);
-			this.diagnosticRequestor.pullAsync(document).catch((error) => {
-				this.client.error(`Document pull failed for text document ${key}`, error, false);
-			}).finally(() => {
-				this.timeoutHandle = undefined;
-				this.documents.set(key, document, Touch.Last);
-				if (key !== this.lastDocumentToPullKey()) {
-					this.runLoop();
-				}
-			});
+			this.diagnosticRequestor
+				.pullAsync(document)
+				.catch((error) => {
+					this.client.error(
+						`Document pull failed for text document ${key}`,
+						error,
+						false,
+					);
+				})
+				.finally(() => {
+					this.timeoutHandle = undefined;
+					this.documents.set(key, document, Touch.Last);
+					if (key !== this.lastDocumentToPullKey()) {
+						this.runLoop();
+					}
+				});
 		}, 500);
 	}
 
@@ -751,36 +1125,56 @@ class BackgroundScheduler implements Disposable {
 	}
 
 	private lastDocumentToPullKey(): string | undefined {
-		return this.lastDocumentToPull !== undefined ? DocumentOrUri.asKey(this.lastDocumentToPull) : undefined;
+		return this.lastDocumentToPull !== undefined
+			? DocumentOrUri.asKey(this.lastDocumentToPull)
+			: undefined;
 	}
 }
 
 class DiagnosticFeatureProviderImpl implements DiagnosticProviderShape {
-
 	public readonly disposable: Disposable;
 	private readonly diagnosticRequestor: DiagnosticRequestor;
 	private activeTextDocument: TextDocument | undefined;
 	private readonly backgroundScheduler: BackgroundScheduler;
 
-	constructor(client: FeatureClient<DiagnosticProviderMiddleware, $DiagnosticPullOptions>, tabs: TabsModel, options: DiagnosticRegistrationOptions) {
-		const diagnosticPullOptions = Object.assign({ onChange: false, onSave: false, onFocus: false }, client.clientOptions.diagnosticPullOptions);
-		const documentSelector = client.protocol2CodeConverter.asDocumentSelector(options.documentSelector!);
+	constructor(
+		client: FeatureClient<
+			DiagnosticProviderMiddleware,
+			$DiagnosticPullOptions
+		>,
+		tabs: TabsModel,
+		options: DiagnosticRegistrationOptions,
+	) {
+		const diagnosticPullOptions = Object.assign(
+			{ onChange: false, onSave: false, onFocus: false },
+			client.clientOptions.diagnosticPullOptions,
+		);
+		const documentSelector =
+			client.protocol2CodeConverter.asDocumentSelector(
+				options.documentSelector!,
+			);
 		const disposables: Disposable[] = [];
-
 
 		const matchFilter = (filter: TextDocumentFilter, resource: Uri) => {
 			// The filter is a language id. We can't determine if it matches
 			// so we return false.
-			if (typeof filter === 'string') {
+			if (typeof filter === "string") {
 				return false;
 			}
-			if (filter.language !== undefined && filter.language !== '*') {
+			if (filter.language !== undefined && filter.language !== "*") {
 				return false;
 			}
-			if (filter.scheme !== undefined && filter.scheme !== '*' && filter.scheme !== resource.scheme) {
+			if (
+				filter.scheme !== undefined &&
+				filter.scheme !== "*" &&
+				filter.scheme !== resource.scheme
+			) {
 				return false;
 			}
-			if (filter.pattern !== undefined && !matchGlobPattern(filter.pattern, resource)) {
+			if (
+				filter.pattern !== undefined &&
+				!matchGlobPattern(filter.pattern, resource)
+			) {
 				return false;
 			}
 			return true;
@@ -805,48 +1199,83 @@ class DiagnosticFeatureProviderImpl implements DiagnosticProviderShape {
 		const matches = (document: TextDocument | Uri): boolean => {
 			return document instanceof Uri
 				? matchResource(document)
-				: Languages.match(documentSelector, document) > 0 && tabs.isVisible(document);
+				: Languages.match(documentSelector, document) > 0 &&
+						tabs.isVisible(document);
 		};
 
 		const matchesCell = (cell: NotebookCell): boolean => {
 			// Cells match if the language is allowed and if the containing notebook is visible.
-			return Languages.match(documentSelector, cell.document) > 0 && tabs.isVisible(cell.notebook.uri);
+			return (
+				Languages.match(documentSelector, cell.document) > 0 &&
+				tabs.isVisible(cell.notebook.uri)
+			);
 		};
 
 		const isActiveDocument = (document: TextDocument | Uri): boolean => {
 			return document instanceof Uri
-				? this.activeTextDocument?.uri.toString() === document.toString()
+				? this.activeTextDocument?.uri.toString() ===
+						document.toString()
 				: this.activeTextDocument === document;
 		};
 
-		this.diagnosticRequestor = new DiagnosticRequestor(client, tabs, options);
-		this.backgroundScheduler = new BackgroundScheduler(client, this.diagnosticRequestor);
+		this.diagnosticRequestor = new DiagnosticRequestor(
+			client,
+			tabs,
+			options,
+		);
+		this.backgroundScheduler = new BackgroundScheduler(
+			client,
+			this.diagnosticRequestor,
+		);
 
-		const addToBackgroundIfNeeded = (document: TextDocument | Uri): void => {
-			if (!matches(document) || !options.interFileDependencies || isActiveDocument(document) || diagnosticPullOptions.onChange === false) {
+		const addToBackgroundIfNeeded = (
+			document: TextDocument | Uri,
+		): void => {
+			if (
+				!matches(document) ||
+				!options.interFileDependencies ||
+				isActiveDocument(document) ||
+				diagnosticPullOptions.onChange === false
+			) {
 				return;
 			}
 			this.backgroundScheduler.add(document);
 		};
 
-		const considerDocument = (textDocument: TextDocument, mode: DiagnosticPullMode): boolean => {
-			return (diagnosticPullOptions.filter === undefined || !diagnosticPullOptions.filter(textDocument, mode)) && this.diagnosticRequestor.knows(PullState.document, textDocument);
+		const considerDocument = (
+			textDocument: TextDocument,
+			mode: DiagnosticPullMode,
+		): boolean => {
+			return (
+				(diagnosticPullOptions.filter === undefined ||
+					!diagnosticPullOptions.filter(textDocument, mode)) &&
+				this.diagnosticRequestor.knows(PullState.document, textDocument)
+			);
 		};
 
 		this.activeTextDocument = Window.activeTextEditor?.document;
-		disposables.push(Window.onDidChangeActiveTextEditor((editor) => {
-			const oldActive = this.activeTextDocument;
-			this.activeTextDocument = editor?.document;
-			if (oldActive !== undefined) {
-				addToBackgroundIfNeeded(oldActive);
-			}
-			if (this.activeTextDocument !== undefined) {
-				this.backgroundScheduler.remove(this.activeTextDocument);
-				if (diagnosticPullOptions.onFocus === true && matches(this.activeTextDocument) && considerDocument(this.activeTextDocument, DiagnosticPullMode.onFocus)) {
-					this.diagnosticRequestor.pull(this.activeTextDocument);
+		disposables.push(
+			Window.onDidChangeActiveTextEditor((editor) => {
+				const oldActive = this.activeTextDocument;
+				this.activeTextDocument = editor?.document;
+				if (oldActive !== undefined) {
+					addToBackgroundIfNeeded(oldActive);
 				}
-			}
-		}));
+				if (this.activeTextDocument !== undefined) {
+					this.backgroundScheduler.remove(this.activeTextDocument);
+					if (
+						diagnosticPullOptions.onFocus === true &&
+						matches(this.activeTextDocument) &&
+						considerDocument(
+							this.activeTextDocument,
+							DiagnosticPullMode.onFocus,
+						)
+					) {
+						this.diagnosticRequestor.pull(this.activeTextDocument);
+					}
+				}
+			}),
+		);
 
 		// For pull model diagnostics we pull for documents visible in the UI.
 		// From an eventing point of view we still rely on open document events
@@ -856,60 +1285,88 @@ class DiagnosticFeatureProviderImpl implements DiagnosticProviderShape {
 		// the server.
 
 		// We always pull on open.
-		const openFeature = client.getFeature(DidOpenTextDocumentNotification.method);
-		disposables.push(openFeature.onNotificationSent((event) => {
-			const textDocument = event.textDocument;
-			// We already know about this document. This can happen via a tab open.
-			if (this.diagnosticRequestor.knows(PullState.document, textDocument)) {
-				return;
-			}
-			if (matches(textDocument)) {
-				this.diagnosticRequestor.pull(textDocument, () => { addToBackgroundIfNeeded(textDocument); });
-			}
-		}));
-		const notebookFeature = client.getFeature(NotebookDocumentSyncRegistrationType.method);
-		disposables.push(notebookFeature.onOpenNotificationSent((event) => {
-			// Send a pull for all opened cells in the notebook.
-			for (const cell of event.getCells()) {
-				if (matchesCell(cell)) {
-					this.diagnosticRequestor.pull(cell.document, () => { addToBackgroundIfNeeded(cell.document); });
+		const openFeature = client.getFeature(
+			DidOpenTextDocumentNotification.method,
+		);
+		disposables.push(
+			openFeature.onNotificationSent((event) => {
+				const textDocument = event.textDocument;
+				// We already know about this document. This can happen via a tab open.
+				if (
+					this.diagnosticRequestor.knows(
+						PullState.document,
+						textDocument,
+					)
+				) {
+					return;
 				}
-			}
-		}));
-
-		disposables.push(tabs.onOpen((opened) => {
-			for (const resource of opened) {
-				// We already know about this document. This can happen via a document open.
-				if (this.diagnosticRequestor.knows(PullState.document, resource)) {
-					continue;
+				if (matches(textDocument)) {
+					this.diagnosticRequestor.pull(textDocument, () => {
+						addToBackgroundIfNeeded(textDocument);
+					});
 				}
-				const uriStr = resource.toString();
-				let textDocument: TextDocument | undefined;
-				for (const item of workspace.textDocuments) {
-					if (uriStr === item.uri.toString()) {
-						textDocument = item;
-						break;
+			}),
+		);
+		const notebookFeature = client.getFeature(
+			NotebookDocumentSyncRegistrationType.method,
+		);
+		disposables.push(
+			notebookFeature.onOpenNotificationSent((event) => {
+				// Send a pull for all opened cells in the notebook.
+				for (const cell of event.getCells()) {
+					if (matchesCell(cell)) {
+						this.diagnosticRequestor.pull(cell.document, () => {
+							addToBackgroundIfNeeded(cell.document);
+						});
 					}
 				}
-				// In VS Code the event timing is as follows:
-				// 1. tab events are fired.
-				// 2. open document events are fired and internal data structures like
-				//    workspace.textDocuments and Window.activeTextEditor are updated.
-				//
-				// This means: for newly created tab/editors we don't find the underlying
-				// document yet. So we do nothing an rely on the underlying open document event
-				// to be fired.
-				if (textDocument !== undefined && matches(textDocument)) {
-					this.diagnosticRequestor.pull(textDocument, () => { addToBackgroundIfNeeded(textDocument!); });
+			}),
+		);
+
+		disposables.push(
+			tabs.onOpen((opened) => {
+				for (const resource of opened) {
+					// We already know about this document. This can happen via a document open.
+					if (
+						this.diagnosticRequestor.knows(
+							PullState.document,
+							resource,
+						)
+					) {
+						continue;
+					}
+					const uriStr = resource.toString();
+					let textDocument: TextDocument | undefined;
+					for (const item of workspace.textDocuments) {
+						if (uriStr === item.uri.toString()) {
+							textDocument = item;
+							break;
+						}
+					}
+					// In VS Code the event timing is as follows:
+					// 1. tab events are fired.
+					// 2. open document events are fired and internal data structures like
+					//    workspace.textDocuments and Window.activeTextEditor are updated.
+					//
+					// This means: for newly created tab/editors we don't find the underlying
+					// document yet. So we do nothing an rely on the underlying open document event
+					// to be fired.
+					if (textDocument !== undefined && matches(textDocument)) {
+						this.diagnosticRequestor.pull(textDocument, () => {
+							addToBackgroundIfNeeded(textDocument!);
+						});
+					}
 				}
-			}
-		}));
+			}),
+		);
 
 		// Pull all diagnostics for documents that are already open
 		const pulledTextDocuments: Set<string> = new Set();
 		for (const textDocument of Workspace.textDocuments) {
 			if (matches(textDocument)) {
-				this.diagnosticRequestor.pull(textDocument, () => { addToBackgroundIfNeeded(textDocument); });
+				this.diagnosticRequestor.pull(textDocument, () => {
+					addToBackgroundIfNeeded(textDocument);
+				});
 				pulledTextDocuments.add(textDocument.uri.toString());
 			}
 		}
@@ -917,7 +1374,9 @@ class DiagnosticFeatureProviderImpl implements DiagnosticProviderShape {
 		for (const notebookDocument of Workspace.notebookDocuments) {
 			for (const cell of notebookDocument.getCells()) {
 				if (matchesCell(cell)) {
-					this.diagnosticRequestor.pull(cell.document, () => { addToBackgroundIfNeeded(cell.document); });
+					this.diagnosticRequestor.pull(cell.document, () => {
+						addToBackgroundIfNeeded(cell.document);
+					});
 					pulledTextDocuments.add(cell.document.uri.toString());
 				}
 			}
@@ -926,8 +1385,13 @@ class DiagnosticFeatureProviderImpl implements DiagnosticProviderShape {
 		// Pull all tabs if not already pulled as text document
 		if (diagnosticPullOptions.onTabs === true) {
 			for (const resource of tabs.getTabResources()) {
-				if (!pulledTextDocuments.has(resource.toString()) && matches(resource)) {
-					this.diagnosticRequestor.pull(resource, () => { addToBackgroundIfNeeded(resource); });
+				if (
+					!pulledTextDocuments.has(resource.toString()) &&
+					matches(resource)
+				) {
+					this.diagnosticRequestor.pull(resource, () => {
+						addToBackgroundIfNeeded(resource);
+					});
 				}
 			}
 		}
@@ -937,67 +1401,108 @@ class DiagnosticFeatureProviderImpl implements DiagnosticProviderShape {
 		// language id.
 
 		if (diagnosticPullOptions.onChange === true) {
-			const changeFeature = client.getFeature(DidChangeTextDocumentNotification.method);
-			disposables.push(changeFeature.onNotificationSent(async (event) => {
-				const textDocument = event.textDocument;
-				if (considerDocument(textDocument, DiagnosticPullMode.onType)) {
-					this.diagnosticRequestor.pull(textDocument, () => { this.backgroundScheduler.trigger(); });
-				}
-			}));
-			disposables.push(notebookFeature.onChangeNotificationSent(async (event) => {
-				// Send a pull for all changed cells in the notebook.
-				const textEvents = event.cells?.textContent || [];
-				const changedCells = textEvents.map(
-					(c) => event.notebook.getCells().find(cell => cell.document.uri.toString() === c.document.uri.toString()));
-				for (const cell of changedCells) {
-					if (cell && matchesCell(cell)) {
-						this.diagnosticRequestor.pull(cell.document, () => { this.backgroundScheduler.trigger(); });
+			const changeFeature = client.getFeature(
+				DidChangeTextDocumentNotification.method,
+			);
+			disposables.push(
+				changeFeature.onNotificationSent(async (event) => {
+					const textDocument = event.textDocument;
+					if (
+						considerDocument(
+							textDocument,
+							DiagnosticPullMode.onType,
+						)
+					) {
+						this.diagnosticRequestor.pull(textDocument, () => {
+							this.backgroundScheduler.trigger();
+						});
 					}
-				}
-
-				// Clear out any closed cells.
-				const closedCells = event.cells?.structure?.didClose || [];
-				for (const cell of closedCells) {
-					this.diagnosticRequestor.forgetDocument(cell.document);
-				}
-
-				// Send a pull for any new opened cells.
-				const openedCells = event.cells?.structure?.didOpen || [];
-				for (const cell of openedCells) {
-					if (matchesCell(cell)) {
-						this.diagnosticRequestor.pull(cell.document, () => { this.backgroundScheduler.trigger(); });
+				}),
+			);
+			disposables.push(
+				notebookFeature.onChangeNotificationSent(async (event) => {
+					// Send a pull for all changed cells in the notebook.
+					const textEvents = event.cells?.textContent || [];
+					const changedCells = textEvents.map((c) =>
+						event.notebook
+							.getCells()
+							.find(
+								(cell) =>
+									cell.document.uri.toString() ===
+									c.document.uri.toString(),
+							),
+					);
+					for (const cell of changedCells) {
+						if (cell && matchesCell(cell)) {
+							this.diagnosticRequestor.pull(cell.document, () => {
+								this.backgroundScheduler.trigger();
+							});
+						}
 					}
-				}
-			}));
+
+					// Clear out any closed cells.
+					const closedCells = event.cells?.structure?.didClose || [];
+					for (const cell of closedCells) {
+						this.diagnosticRequestor.forgetDocument(cell.document);
+					}
+
+					// Send a pull for any new opened cells.
+					const openedCells = event.cells?.structure?.didOpen || [];
+					for (const cell of openedCells) {
+						if (matchesCell(cell)) {
+							this.diagnosticRequestor.pull(cell.document, () => {
+								this.backgroundScheduler.trigger();
+							});
+						}
+					}
+				}),
+			);
 		}
 
 		if (diagnosticPullOptions.onSave === true) {
-			const saveFeature = client.getFeature(DidSaveTextDocumentNotification.method);
-			disposables.push(saveFeature.onNotificationSent((event) => {
-				const textDocument = event.textDocument;
-				if (considerDocument(textDocument, DiagnosticPullMode.onSave)) {
-					this.diagnosticRequestor.pull(event.textDocument);
-				}
-			}));
-			disposables.push(notebookFeature.onSaveNotificationSent((event) => {
-				for (const cell of event.getCells()) {
-					if (matchesCell(cell)) {
-						this.diagnosticRequestor.pull(cell.document);
+			const saveFeature = client.getFeature(
+				DidSaveTextDocumentNotification.method,
+			);
+			disposables.push(
+				saveFeature.onNotificationSent((event) => {
+					const textDocument = event.textDocument;
+					if (
+						considerDocument(
+							textDocument,
+							DiagnosticPullMode.onSave,
+						)
+					) {
+						this.diagnosticRequestor.pull(event.textDocument);
 					}
-				}
-			}));
+				}),
+			);
+			disposables.push(
+				notebookFeature.onSaveNotificationSent((event) => {
+					for (const cell of event.getCells()) {
+						if (matchesCell(cell)) {
+							this.diagnosticRequestor.pull(cell.document);
+						}
+					}
+				}),
+			);
 		}
 
 		// When the document closes clear things up
-		const closeFeature = client.getFeature(DidCloseTextDocumentNotification.method);
-		disposables.push(closeFeature.onNotificationSent((event) => {
-			this.cleanUpDocument(event.textDocument);
-		}));
-		disposables.push(notebookFeature.onCloseNotificationSent((event) => {
-			for (const cell of event.getCells()) {
-				this.cleanUpDocument(cell.document);
-			}
-		}));
+		const closeFeature = client.getFeature(
+			DidCloseTextDocumentNotification.method,
+		);
+		disposables.push(
+			closeFeature.onNotificationSent((event) => {
+				this.cleanUpDocument(event.textDocument);
+			}),
+		);
+		disposables.push(
+			notebookFeature.onCloseNotificationSent((event) => {
+				for (const cell of event.getCells()) {
+					this.cleanUpDocument(cell.document);
+				}
+			}),
+		);
 
 		// Same when a tabs closes.
 		tabs.onClose((closed) => {
@@ -1016,11 +1521,18 @@ class DiagnosticFeatureProviderImpl implements DiagnosticProviderShape {
 		});
 
 		// da348dc5-c30a-4515-9d98-31ff3be38d14 is the test UUID to test the middle ware. So don't auto trigger pulls.
-		if (options.workspaceDiagnostics === true && options.identifier !== 'da348dc5-c30a-4515-9d98-31ff3be38d14') {
+		if (
+			options.workspaceDiagnostics === true &&
+			options.identifier !== "da348dc5-c30a-4515-9d98-31ff3be38d14"
+		) {
 			this.diagnosticRequestor.pullWorkspace();
 		}
 
-		this.disposable = Disposable.from(...disposables, this.backgroundScheduler, this.diagnosticRequestor);
+		this.disposable = Disposable.from(
+			...disposables,
+			this.backgroundScheduler,
+			this.diagnosticRequestor,
+		);
 	}
 
 	public get onDidChangeDiagnosticsEmitter(): EventEmitter<void> {
@@ -1047,17 +1559,35 @@ export interface DiagnosticFeatureShape {
 	refresh(): void;
 }
 
-export class DiagnosticFeature extends TextDocumentLanguageFeature<DiagnosticOptions, DiagnosticRegistrationOptions, DiagnosticProviderShape, DiagnosticProviderMiddleware, $DiagnosticPullOptions> implements DiagnosticFeatureShape {
-
-	constructor(client: FeatureClient<DiagnosticProviderMiddleware, $DiagnosticPullOptions>) {
+export class DiagnosticFeature
+	extends TextDocumentLanguageFeature<
+		DiagnosticOptions,
+		DiagnosticRegistrationOptions,
+		DiagnosticProviderShape,
+		DiagnosticProviderMiddleware,
+		$DiagnosticPullOptions
+	>
+	implements DiagnosticFeatureShape
+{
+	constructor(
+		client: FeatureClient<
+			DiagnosticProviderMiddleware,
+			$DiagnosticPullOptions
+		>,
+	) {
 		super(client, DocumentDiagnosticRequest.type);
 	}
 
 	public fillClientCapabilities(capabilities: ClientCapabilities): void {
-		const capability = ensure(ensure(capabilities, 'textDocument')!, 'diagnostic')!;
+		const capability = ensure(
+			ensure(capabilities, "textDocument")!,
+			"diagnostic",
+		)!;
 
 		capability.relatedInformation = true;
-		capability.tagSupport = { valueSet: [ DiagnosticTag.Unnecessary, DiagnosticTag.Deprecated ] };
+		capability.tagSupport = {
+			valueSet: [DiagnosticTag.Unnecessary, DiagnosticTag.Deprecated],
+		};
 		capability.codeDescriptionSupport = true;
 		capability.dataSupport = true;
 		capability.dynamicRegistration = true;
@@ -1066,17 +1596,26 @@ export class DiagnosticFeature extends TextDocumentLanguageFeature<DiagnosticOpt
 		// the active editor.
 		capability.relatedDocumentSupport = false;
 
-		ensure(ensure(capabilities, 'workspace')!, 'diagnostics')!.refreshSupport = true;
+		ensure(
+			ensure(capabilities, "workspace")!,
+			"diagnostics",
+		)!.refreshSupport = true;
 	}
 
-	public initialize(capabilities: ServerCapabilities, documentSelector: DocumentSelector): void {
+	public initialize(
+		capabilities: ServerCapabilities,
+		documentSelector: DocumentSelector,
+	): void {
 		const client = this._client;
 		client.onRequest(DiagnosticRefreshRequest.type, async () => {
 			for (const provider of this.getAllProviders()) {
 				provider.onDidChangeDiagnosticsEmitter.fire();
 			}
 		});
-		const [id, options] = this.getRegistration(documentSelector, capabilities.diagnosticProvider);
+		const [id, options] = this.getRegistration(
+			documentSelector,
+			capabilities.diagnosticProvider,
+		);
 		if (!id || !options) {
 			return;
 		}
@@ -1093,8 +1632,14 @@ export class DiagnosticFeature extends TextDocumentLanguageFeature<DiagnosticOpt
 		}
 	}
 
-	protected registerLanguageProvider(options: DiagnosticRegistrationOptions): [Disposable, DiagnosticProviderShape] {
-		const provider = new DiagnosticFeatureProviderImpl(this._client, this._client.tabsModel, options);
+	protected registerLanguageProvider(
+		options: DiagnosticRegistrationOptions,
+	): [Disposable, DiagnosticProviderShape] {
+		const provider = new DiagnosticFeatureProviderImpl(
+			this._client,
+			this._client.tabsModel,
+			options,
+		);
 		return [provider.disposable, provider];
 	}
 }
