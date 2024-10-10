@@ -3,11 +3,11 @@
 		"tsconfig-gen": "./bin/tsconfig-gen"
 	},
 	"dependencies": {
-		"yargs": "^17.7.2"
+		"yargs": "17.7.2"
 	},
 	"description": "Tool to generate tsconfig files from a higher level description",
 	"devDependencies": {
-		"@types/yargs": "^17.0.33"
+		"@types/yargs": "17.0.33"
 	},
 	"exports": {
 		".": {
