@@ -1,51 +1,33 @@
 {
-	"name": "vscode-languageserver",
-	"version": "10.0.0-next.10",
-	"description": "Language server implementation for node",
-	"bugs": {
-		"url": "https://github.com/Microsoft/vscode-languageserver-node/issues"
-	},
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/Microsoft/vscode-languageserver-node.git",
-		"directory": "server"
-	},
-	"license": "MIT",
-	"author": "Microsoft Corporation",
-	"exports": {
-		".": {
-			"types": "./lib/common/api.d.ts",
-			"default": "./lib/common/api.js"
-		},
-		"./node": {
-			"types": "./lib/node/main.d.ts",
-			"node": "./lib/node/main.js"
-		},
-		"./browser": {
-			"types": "./lib/browser/main.d.ts",
-			"browser": "./lib/browser/main.js"
-		}
-	},
 	"bin": {
 		"installServerIntoExtension": "./bin/installServerIntoExtension"
 	},
+	"dependencies": {},
+	"description": "Language server implementation for node",
+	"devDependencies": {},
+	"exports": {
+		".": {
+			"default": "./lib/common/api.js",
+			"types": "./lib/common/api.d.ts"
+		},
+		"./browser": {
+			"browser": "./lib/browser/main.js",
+			"types": "./lib/browser/main.d.ts"
+		},
+		"./node": {
+			"node": "./lib/node/main.js",
+			"types": "./lib/node/main.d.ts"
+		}
+	},
+	"name": "vscode-languageserver",
 	"scripts": {
 		"all": "npm run clean && npm run compile && npm run lint && npm test",
 		"all:publish": "git clean -xfd . && npm install && npm run compile:publish && npm run lint && npm test",
 		"clean": "rimraf lib",
 		"compile": "tsc -b ./tsconfig.json",
 		"compile:publish": "tsc -b ./tsconfig.publish.json",
-		"lint": "eslint --ext ts src",
 		"prepack": "npm run all:publish",
 		"prepublishOnly": "echo \"⛔ Can only publish from a secure pipeline ⛔\" && node ../build/npm/fail",
-		"test": "node ../node_modules/mocha/bin/_mocha",
-		"preversion": "npm test",
-		"watch": "tsc -b ./tsconfig.watch.json -w"
-	},
-	"dependencies": {
-		"vscode-languageserver-protocol": "3.17.6-next.10"
-	},
-	"devDependencies": {
-		"vscode-languageserver-textdocument": "1.0.12"
+		"preversion": "npm test"
 	}
 }

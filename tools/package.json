@@ -1,22 +1,8 @@
 {
-	"name": "vscode-languageserver-tools",
-	"version": "0.1.0",
-	"private": true,
 	"description": "Tooling for the language server protocol",
-	"bugs": {
-		"url": "https://github.com/Microsoft/vscode-languageserver-node/issues"
-	},
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/Microsoft/vscode-languageserver-node.git",
-		"directory": "tools"
-	},
-	"license": "MIT",
-	"author": "Microsoft Corporation",
+	"name": "vscode-languageserver-tools",
 	"scripts": {
 		"clean": "rimraf lib && rimraf dist",
-		"compile": "tsc -b ./tsconfig.json",
-		"lint": "eslint --ext ts src",
-		"watch": "tsc -b ./tsconfig-watch.json -w"
+		"compile": "tsc -b ./tsconfig.json"
 	}
 }

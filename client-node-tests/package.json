@@ -1,49 +1,33 @@
 {
-	"name": "test-extension",
-	"displayName": "test-extension",
-	"version": "0.0.1",
-	"private": true,
-	"description": "",
-	"categories": [
-		"Other"
+	"activationEvents": [
+		"*"
 	],
-	"publisher": "ms-vscode",
+	"contributes": {},
+	"dependencies": {
+		"minimatch": "^10.0.1"
+	},
+	"description": "",
+	"devDependencies": {
+		"@types/glob": "^8.1.0",
+		"@types/minimatch": "^5.1.2",
+		"@types/sinon": "^17.0.3",
+		"@types/uuid": "^10.0.0",
+		"find-process": "^1.4.7",
+		"glob": "^11.0.0",
+		"sinon": "^19.0.2",
+		"uuid": "^10.0.0"
+	},
+	"displayName": "test-extension",
+	"enabledApiProposals": [],
 	"main": "./extension.js",
+	"name": "test-extension",
 	"scripts": {
 		"all": "npm run clean && npm run compile && npm run lint && npm run test",
 		"all:publish": "git clean -xfd . && npm install && npm run symlink:publish && npm run compile:publish && npm run test:publish",
 		"clean": "rimraf lib",
 		"compile": "tsc -b ./tsconfig.json",
 		"compile:publish": "tsc -b ./tsconfig.publish.json",
-		"lint": "eslint --ext ts src",
 		"symlink:publish": "node ../build/bin/symlink-client-tests-publish.js",
-		"test": "node ../build/bin/symlink-tests.js && node lib/runTests.js",
-		"test:publish": "node lib/runTests.js",
-		"watch": "tsc -b ./tsconfig.watch.json -w"
-	},
-	"contributes": {},
-	"activationEvents": [
-		"*"
-	],
-	"dependencies": {
-		"minimatch": "^10.0.1",
-		"vscode-languageserver": "10.0.0-next.10",
-		"vscode-uri": "3.0.8"
-	},
-	"devDependencies": {
-		"@types/glob": "^8.1.0",
-		"@types/minimatch": "^5.1.2",
-		"@types/sinon": "^17.0.3",
-		"@types/uuid": "^10.0.0",
-		"@types/vscode": "1.94.0",
-		"@vscode/test-electron": "^2.4.1",
-		"find-process": "^1.4.7",
-		"glob": "^11.0.0",
-		"sinon": "^19.0.2",
-		"uuid": "^10.0.0"
-	},
-	"engines": {
-		"vscode": "^1.91.0"
-	},
-	"enabledApiProposals": []
+		"test:publish": "node lib/runTests.js"
+	}
 }

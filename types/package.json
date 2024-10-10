@@ -1,27 +1,15 @@
 {
-	"name": "vscode-languageserver-types",
-	"version": "3.17.6-next.5",
 	"description": "Types used by the Language server for node",
-	"bugs": {
-		"url": "https://github.com/Microsoft/vscode-languageserver-node/issues"
-	},
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/Microsoft/vscode-languageserver-node.git",
-		"directory": "types"
-	},
-	"license": "MIT",
-	"author": "Microsoft Corporation",
 	"exports": {
 		".": {
 			"browser": "./lib/esm/main.js",
-			"module": "./lib/esm/main.js",
+			"default": "./lib/umd/main.js",
 			"import": "./lib/esm/main.js",
-			"default": "./lib/umd/main.js"
+			"module": "./lib/esm/main.js"
 		}
 	},
 	"main": "./lib/umd/main.js",
-	"typings": "./lib/umd/main",
+	"name": "vscode-languageserver-types",
 	"scripts": {
 		"all": "npm run clean && npm run compile && npm run lint && npm run test",
 		"all:publish": "git clean -xfd . && npm install && npm run compile:esm && npm run compile:umd && npm run lint && npm run test",
@@ -29,11 +17,9 @@
 		"compile": "tsc -b ./tsconfig.json",
 		"compile:esm": "tsc -b ./tsconfig.esm.publish.json && node ../build/bin/fix-esm",
 		"compile:umd": "tsc -b ./tsconfig.umd.publish.json",
-		"lint": "eslint --ext ts src",
 		"prepack": "npm run all:publish",
 		"prepublishOnly": "echo \"⛔ Can only publish from a secure pipeline ⛔\" && node ../build/npm/fail",
-		"test": "mocha",
-		"preversion": "npm test",
-		"watch": "tsc -b ./tsconfig.watch.json -w"
-	}
+		"preversion": "npm test"
+	},
+	"typings": "./lib/umd/main"
 }

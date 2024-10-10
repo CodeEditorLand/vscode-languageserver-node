@@ -1,35 +1,36 @@
 {
-	"name": "vscode-languageclient",
-	"version": "10.0.0-next.12",
+	"dependencies": {
+		"minimatch": "^10.0.1",
+		"semver": "^7.6.3"
+	},
 	"description": "VSCode Language client implementation",
-	"bugs": {
-		"url": "https://github.com/Microsoft/vscode-languageserver-node/issues"
+	"devDependencies": {
+		"@types/minimatch": "^5.1.2",
+		"@types/semver": "^7.5.8",
+		"shx": "^0.3.4"
 	},
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/Microsoft/vscode-languageserver-node.git",
-		"directory": "client"
-	},
-	"license": "MIT",
-	"author": "Microsoft Corporation",
+	"enabledApiProposals": [
+		"codeActionAI"
+	],
 	"exports": {
 		".": {
-			"types": "./lib/common/api.d.ts",
-			"default": "./lib/common/api.js"
-		},
-		"./node": {
-			"types": "./lib/node/main.d.ts",
-			"node": "./lib/node/main.js"
-		},
-		"./browser": {
-			"types": "./lib/browser/main.d.ts",
-			"browser": "./lib/browser/main.js"
+			"default": "./lib/common/api.js",
+			"types": "./lib/common/api.d.ts"
 		},
 		"./$test/common/*": {
-			"types": "./lib/common/*.d.ts",
-			"node": "./lib/common/*.js"
+			"node": "./lib/common/*.js",
+			"types": "./lib/common/*.d.ts"
+		},
+		"./browser": {
+			"browser": "./lib/browser/main.js",
+			"types": "./lib/browser/main.d.ts"
+		},
+		"./node": {
+			"node": "./lib/node/main.js",
+			"types": "./lib/node/main.d.ts"
 		}
 	},
+	"name": "vscode-languageclient",
 	"scripts": {
 		"all": "npm run clean && npm run compile && npm run lint && npm test",
 		"all:publish": "git clean -xfd . && npm install && npm run updateVSCodeVersion && npm run compile:publish && npm run lint && cd ../client-node-tests && npm run all:publish && cd ..",
@@ -37,30 +38,10 @@
 		"compile": "tsc -b ./tsconfig.json && shx cp src/node/terminateProcess.sh lib/node/terminateProcess.sh",
 		"compile:clean": "git clean -xfd . && npm install && npm run clean && npm run compile",
 		"compile:publish": "tsc -b ./tsconfig.publish.json && shx cp src/node/terminateProcess.sh lib/node/terminateProcess.sh",
-		"lint": "eslint --ext ts src",
 		"prepack": "npm run all:publish",
 		"prepublishOnly": "echo \"⛔ Can only publish from a secure pipeline ⛔\" && node ../build/npm/fail",
-		"test": "cd ../client-node-tests && npm test && cd ../client",
-		"update:vscode-version": "node ./bin/updateVSCode.js",
-		"updateVSCodeVersion": "node ./bin/updateVSCode.js",
 		"preversion": "npm test",
-		"watch": "tsc -b ./tsconfig.watch.json -w"
-	},
-	"dependencies": {
-		"minimatch": "^10.0.1",
-		"semver": "^7.6.3",
-		"vscode-languageserver-protocol": "3.17.6-next.10"
-	},
-	"devDependencies": {
-		"@types/minimatch": "^5.1.2",
-		"@types/semver": "^7.5.8",
-		"@types/vscode": "1.94.0",
-		"shx": "^0.3.4"
-	},
-	"engines": {
-		"vscode": "^1.91.0"
-	},
-	"enabledApiProposals": [
-		"codeActionAI"
-	]
+		"update:vscode-version": "node ./bin/updateVSCode.js",
+		"updateVSCodeVersion": "node ./bin/updateVSCode.js"
+	}
 }
