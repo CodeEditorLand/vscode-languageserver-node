@@ -7,7 +7,6 @@
  * Represents a UUID as defined by rfc4122.
  */
 export interface UUID {
-
 	/**
 	 * @returns the canonical representation in sets of hexadecimal numbers separated by dashes.
 	 */
@@ -17,7 +16,6 @@ export interface UUID {
 }
 
 class ValueUUID implements UUID {
-
 	constructor(public _value: string) {
 		// empty
 	}
@@ -32,10 +30,27 @@ class ValueUUID implements UUID {
 }
 
 class V4UUID extends ValueUUID {
+	private static _chars = [
+		"0",
+		"1",
+		"2",
+		"3",
+		"4",
+		"5",
+		"6",
+		"6",
+		"7",
+		"8",
+		"9",
+		"a",
+		"b",
+		"c",
+		"d",
+		"e",
+		"f",
+	];
 
-	private static _chars = ['0', '1', '2', '3', '4', '5', '6', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'];
-
-	private static _timeHighBits = ['8', '9', 'a', 'b'];
+	private static _timeHighBits = ["8", "9", "a", "b"];
 
 	private static _oneOf(array: string[]): string {
 		return array[Math.floor(array.length * Math.random())];
@@ -46,57 +61,62 @@ class V4UUID extends ValueUUID {
 	}
 
 	constructor() {
-		super([
-			V4UUID._randomHex(),
-			V4UUID._randomHex(),
-			V4UUID._randomHex(),
-			V4UUID._randomHex(),
-			V4UUID._randomHex(),
-			V4UUID._randomHex(),
-			V4UUID._randomHex(),
-			V4UUID._randomHex(),
-			'-',
-			V4UUID._randomHex(),
-			V4UUID._randomHex(),
-			V4UUID._randomHex(),
-			V4UUID._randomHex(),
-			'-',
-			'4',
-			V4UUID._randomHex(),
-			V4UUID._randomHex(),
-			V4UUID._randomHex(),
-			'-',
-			V4UUID._oneOf(V4UUID._timeHighBits),
-			V4UUID._randomHex(),
-			V4UUID._randomHex(),
-			V4UUID._randomHex(),
-			'-',
-			V4UUID._randomHex(),
-			V4UUID._randomHex(),
-			V4UUID._randomHex(),
-			V4UUID._randomHex(),
-			V4UUID._randomHex(),
-			V4UUID._randomHex(),
-			V4UUID._randomHex(),
-			V4UUID._randomHex(),
-			V4UUID._randomHex(),
-			V4UUID._randomHex(),
-			V4UUID._randomHex(),
-			V4UUID._randomHex(),
-		].join(''));
+		super(
+			[
+				V4UUID._randomHex(),
+				V4UUID._randomHex(),
+				V4UUID._randomHex(),
+				V4UUID._randomHex(),
+				V4UUID._randomHex(),
+				V4UUID._randomHex(),
+				V4UUID._randomHex(),
+				V4UUID._randomHex(),
+				"-",
+				V4UUID._randomHex(),
+				V4UUID._randomHex(),
+				V4UUID._randomHex(),
+				V4UUID._randomHex(),
+				"-",
+				"4",
+				V4UUID._randomHex(),
+				V4UUID._randomHex(),
+				V4UUID._randomHex(),
+				"-",
+				V4UUID._oneOf(V4UUID._timeHighBits),
+				V4UUID._randomHex(),
+				V4UUID._randomHex(),
+				V4UUID._randomHex(),
+				"-",
+				V4UUID._randomHex(),
+				V4UUID._randomHex(),
+				V4UUID._randomHex(),
+				V4UUID._randomHex(),
+				V4UUID._randomHex(),
+				V4UUID._randomHex(),
+				V4UUID._randomHex(),
+				V4UUID._randomHex(),
+				V4UUID._randomHex(),
+				V4UUID._randomHex(),
+				V4UUID._randomHex(),
+				V4UUID._randomHex(),
+			].join(""),
+		);
 	}
 }
 
 /**
  * An empty UUID that contains only zeros.
  */
-export const empty: UUID = new ValueUUID('00000000-0000-0000-0000-000000000000');
+export const empty: UUID = new ValueUUID(
+	"00000000-0000-0000-0000-000000000000",
+);
 
 export function v4(): UUID {
 	return new V4UUID();
 }
 
-const _UUIDPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const _UUIDPattern =
+	/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export function isUUID(value: string): boolean {
 	return _UUIDPattern.test(value);
@@ -108,7 +128,7 @@ export function isUUID(value: string): boolean {
  */
 export function parse(value: string): UUID {
 	if (!isUUID(value)) {
-		throw new Error('invalid uuid');
+		throw new Error("invalid uuid");
 	}
 
 	return new ValueUUID(value);
