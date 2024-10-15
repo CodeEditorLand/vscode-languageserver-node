@@ -3117,8 +3117,11 @@ export abstract class BaseLanguageClient
 		diagnostics.codeDescriptionSupport = true;
 		diagnostics.dataSupport = true;
 
-		const windowCapabilities = ensure(result, "window")!;
-		const showMessage = ensure(windowCapabilities, "showMessage")!;
+		const textDocumentFilter = ensure(ensure(result, 'textDocument')!, 'filters')!;
+		textDocumentFilter.relativePatternSupport = true;
+
+		const windowCapabilities = ensure(result, 'window')!;
+		const showMessage = ensure(windowCapabilities, 'showMessage')!;
 		showMessage.messageActionItem = { additionalPropertiesSupport: true };
 		const showDocument = ensure(windowCapabilities, "showDocument")!;
 		showDocument.support = true;
