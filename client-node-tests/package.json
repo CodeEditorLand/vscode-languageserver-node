@@ -15,7 +15,7 @@
 		"find-process": "1.4.7",
 		"glob": "11.0.0",
 		"sinon": "19.0.2",
-		"uuid": "10.0.0"
+		"uuid": "11.0.1"
 	},
 	"displayName": "test-extension",
 	"enabledApiProposals": [],
