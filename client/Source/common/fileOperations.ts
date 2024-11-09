@@ -207,42 +207,20 @@ abstract class FileOperationFeature<I, E extends Event<I>>
 						) {
 							continue;
 						}
-						if (filter.matcher.match(path)) {
-							// The pattern matches. If kind is undefined then everything is ok
-							if (filter.kind === undefined) {
-								return true;
-							}
-							const fileType = await this.getFileType(uri);
-							// If we can't determine the file type than we treat it as a match.
-							// Dropping it would be another alternative.
-							if (fileType === undefined) {
-								this._client.error(
-									`Failed to determine file type for ${uri.toString()}.`,
-								);
-								return true;
-							}
-							if (
-								(fileType === code.FileType.File &&
-									filter.kind ===
-										proto.FileOperationPatternKind.file) ||
-								(fileType === code.FileType.Directory &&
-									filter.kind ===
-										proto.FileOperationPatternKind.folder)
-							) {
-								return true;
-							}
-						} else if (
-							filter.kind ===
-							proto.FileOperationPatternKind.folder
-						) {
-							const fileType =
-								await FileOperationFeature.getFileType(uri);
-							if (
-								fileType === code.FileType.Directory &&
-								filter.matcher.match(`${path}/`)
-							) {
-								return true;
-							}
+						const fileType = await this.getFileType(uri);
+						// If we can't determine the file type than we treat it as a match.
+						// Dropping it would be another alternative.
+						if (fileType === undefined) {
+							this._client.info(`Unable to determine file type for ${uri.toString()}. Treating as a match.`);
+							return true;
+						}
+						if ((fileType === code.FileType.File && filter.kind === proto.FileOperationPatternKind.file) || (fileType === code.FileType.Directory && filter.kind === proto.FileOperationPatternKind.folder)) {
+							return true;
+						}
+					} else if (filter.kind === proto.FileOperationPatternKind.folder) {
+						const fileType = await FileOperationFeature.getFileType(uri);
+						if (fileType === code.FileType.Directory && filter.matcher.match(`${path}/`)) {
+							return true;
 						}
 					}
 				}
