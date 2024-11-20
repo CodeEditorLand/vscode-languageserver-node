@@ -1,24 +1,12 @@
 {
-	"name": "test-extension",
-	"displayName": "test-extension",
-	"description": "",
-	"main": "./extension.js",
-	"scripts": {
-		"all": "npm run clean && npm run compile && npm run lint && npm run test",
-		"all:publish": "git clean -xfd . && npm install && npm run symlink:publish && npm run compile:publish && npm run test:publish",
-		"clean": "rimraf lib",
-		"compile": "tsc -b ./tsconfig.json",
-		"compile:publish": "tsc -b ./tsconfig.publish.json",
-		"symlink:publish": "node ../build/bin/symlink-client-tests-publish.js",
-		"test:publish": "node lib/runTests.js"
-	},
-	"contributes": {},
 	"activationEvents": [
 		"*"
 	],
+	"contributes": {},
 	"dependencies": {
 		"minimatch": "10.0.1"
 	},
+	"description": "",
 	"devDependencies": {
 		"@types/glob": "8.1.0",
 		"@types/minimatch": "5.1.2",
@@ -29,5 +17,17 @@
 		"sinon": "19.0.2",
 		"uuid": "11.0.3"
 	},
-	"enabledApiProposals": []
+	"displayName": "test-extension",
+	"enabledApiProposals": [],
+	"main": "./extension.js",
+	"name": "test-extension",
+	"scripts": {
+		"all": "npm run clean && npm run compile && npm run lint && npm run test",
+		"all:publish": "git clean -xfd . && npm install && npm run symlink:publish && npm run compile:publish && npm run test:publish",
+		"clean": "rimraf lib",
+		"compile": "tsc -b ./tsconfig.json",
+		"compile:publish": "tsc -b ./tsconfig.publish.json",
+		"symlink:publish": "node ../build/bin/symlink-client-tests-publish.js",
+		"test:publish": "node lib/runTests.js"
+	}
 }
