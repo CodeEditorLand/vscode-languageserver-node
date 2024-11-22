@@ -61,8 +61,10 @@ export type TypeHierarchyPrepareParams = TextDocumentPositionParams &
 export namespace TypeHierarchyPrepareRequest {
 	export const method: "textDocument/prepareTypeHierarchy" =
 		"textDocument/prepareTypeHierarchy";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		TypeHierarchyPrepareParams,
 		TypeHierarchyItem[] | null,
@@ -70,6 +72,7 @@ export namespace TypeHierarchyPrepareRequest {
 		void,
 		TypeHierarchyRegistrationOptions
 	>(method);
+
 	export type HandlerSignature = RequestHandler<
 		TypeHierarchyPrepareParams,
 		TypeHierarchyItem[] | null,
@@ -95,8 +98,10 @@ export type TypeHierarchySupertypesParams = WorkDoneProgressParams &
 export namespace TypeHierarchySupertypesRequest {
 	export const method: "typeHierarchy/supertypes" =
 		"typeHierarchy/supertypes";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		TypeHierarchySupertypesParams,
 		TypeHierarchyItem[] | null,
@@ -104,6 +109,7 @@ export namespace TypeHierarchySupertypesRequest {
 		void,
 		void
 	>(method);
+
 	export type HandlerSignature = RequestHandler<
 		TypeHierarchySupertypesParams,
 		TypeHierarchyItem[] | null,
@@ -128,8 +134,10 @@ export type TypeHierarchySubtypesParams = WorkDoneProgressParams &
  */
 export namespace TypeHierarchySubtypesRequest {
 	export const method: "typeHierarchy/subtypes" = "typeHierarchy/subtypes";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		TypeHierarchySubtypesParams,
 		TypeHierarchyItem[] | null,
@@ -137,6 +145,7 @@ export namespace TypeHierarchySubtypesRequest {
 		void,
 		void
 	>(method);
+
 	export type HandlerSignature = RequestHandler<
 		TypeHierarchySubtypesParams,
 		TypeHierarchyItem[] | null,

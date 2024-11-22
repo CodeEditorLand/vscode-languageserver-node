@@ -64,6 +64,7 @@ export const FoldingRangeFeature: Feature<
 					>,
 				): Disposable => {
 					const type = FoldingRangeRequest.type;
+
 					return this.connection.onRequest(type, (params, cancel) => {
 						return handler(
 							params,

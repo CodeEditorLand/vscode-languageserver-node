@@ -11,6 +11,7 @@ import RAL from "./ral";
 import { Semaphore } from "./semaphore";
 
 const ContentLength: string = "Content-Length: ";
+
 const CRLF = "\r\n";
 
 /**
@@ -47,6 +48,7 @@ export interface MessageWriter {
 export namespace MessageWriter {
 	export function is(value: any): value is MessageWriter {
 		const candidate: MessageWriter = value;
+
 		return (
 			candidate &&
 			Is.func(candidate.dispose) &&
@@ -167,6 +169,7 @@ export class WriteableStreamMessageWriter
 						return buffer;
 					}
 				});
+
 			return payload.then(
 				(buffer) => {
 					const headers: string[] = [];
@@ -176,10 +179,12 @@ export class WriteableStreamMessageWriter
 						CRLF,
 					);
 					headers.push(CRLF);
+
 					return this.doWrite(msg, headers, buffer);
 				},
 				(error) => {
 					this.fireError(error);
+
 					throw error;
 				},
 			);
@@ -193,9 +198,11 @@ export class WriteableStreamMessageWriter
 	): Promise<void> {
 		try {
 			await this.writable.write(headers.join(""), "ascii");
+
 			return this.writable.write(data);
 		} catch (error) {
 			this.handleError(error, msg);
+
 			return Promise.reject(error);
 		}
 	}

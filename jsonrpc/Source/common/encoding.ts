@@ -88,17 +88,22 @@ export namespace Encodings {
 			return encodings[0].name;
 		}
 		const distribute = encodings.length - 1;
+
 		if (distribute > 1000) {
 			throw new Error(
 				`Quality value can only have three decimal digits but trying to distribute ${encodings.length} elements.`,
 			);
 		}
 		const digits = Math.ceil(Math.log10(distribute));
+
 		const factor = Math.pow(10, digits);
+
 		const diff = Math.floor((1 / distribute) * factor) / factor;
 
 		const result: string[] = [];
+
 		let q = 1;
+
 		for (const encoding of encodings) {
 			result.push(
 				`${encoding.name};q=${q === 1 || q === 0 ? q.toFixed(0) : q.toFixed(digits)}`,
@@ -110,13 +115,17 @@ export namespace Encodings {
 
 	export function parseEncodingHeaderValue(value: string): string[] {
 		const map: Map<number, string[]> = new Map();
+
 		const encodings = value.split(/\s*,\s*/);
+
 		for (const value of encodings) {
 			const [encoding, q] = parseEncoding(value);
+
 			if (encoding === "*") {
 				continue;
 			}
 			let values = map.get(q);
+
 			if (values === undefined) {
 				values = [];
 				map.set(q, values);
@@ -125,7 +134,9 @@ export namespace Encodings {
 		}
 		const keys = Array.from(map.keys());
 		keys.sort((a, b) => b - a);
+
 		const result: string[] = [];
+
 		for (const key of keys) {
 			result.push(...map.get(key)!);
 		}
@@ -134,10 +145,14 @@ export namespace Encodings {
 
 	function parseEncoding(value: string): [string, number] {
 		let q: number = 1;
+
 		let encoding: string;
+
 		const index = value.indexOf(";q=");
+
 		if (index !== -1) {
 			const parsed = parseFloat(value.substr(index));
+
 			if (!Number.isNaN(parsed)) {
 				q = parsed;
 			}

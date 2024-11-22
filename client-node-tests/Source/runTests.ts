@@ -14,6 +14,7 @@ import find = require("find-process");
 
 function rimraf(location: string) {
 	const stat = fs.lstatSync(location);
+
 	if (stat) {
 		if (stat.isDirectory() && !stat.isSymbolicLink()) {
 			for (const dir of fs.readdirSync(location)) {
@@ -30,14 +31,18 @@ function rimraf(location: string) {
 async function go() {
 	try {
 		const extensionDevelopmentPath = path.resolve(__dirname, "..");
+
 		const extensionTestsPath = __dirname;
 
 		const testDir = path.join(os.tmpdir(), uuid.v4());
 		fs.mkdirSync(testDir, { recursive: true });
+
 		const userDataDir = path.join(testDir, "userData");
 		fs.mkdirSync(userDataDir);
+
 		const extensionDir = path.join(testDir, "extensions");
 		fs.mkdirSync(extensionDir);
+
 		const workspaceFolder = path.join(testDir, "workspace");
 		fs.mkdirSync(workspaceFolder);
 
@@ -45,9 +50,12 @@ async function go() {
 		// In case we have no display set and Xvfb is running use
 		// the Xvfb display port as a DISPLAY setting
 		let extensionTestsEnv: NodeJS.ProcessEnv | undefined = undefined;
+
 		if (process.platform === "linux" && !process.env["DISPLAY"]) {
 			let display: string | undefined;
+
 			const processes = await find("name", "/usr/bin/Xvfb");
+
 			for (const item of processes) {
 				if (item.name !== "Xvfb") {
 					continue;

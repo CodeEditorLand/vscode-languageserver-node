@@ -22,6 +22,7 @@ console.error = connection.console.error.bind(connection.console);
 const receivedNotifications: Set<string> = new Set();
 namespace GotNotifiedRequest {
 	export const method: "testing/gotNotified" = "testing/gotNotified";
+
 	export const type = new RequestType<string, boolean, void>(method);
 }
 
@@ -29,6 +30,7 @@ connection.onInitialize((_params: InitializeParams): any => {
 	const capabilities: ServerCapabilities = {
 		textDocumentSync: TextDocumentSyncKind.Incremental,
 	};
+
 	return { capabilities };
 });
 
@@ -46,6 +48,7 @@ connection.onDidCloseTextDocument(() => {
 
 connection.onRequest(GotNotifiedRequest.type, (method: string) => {
 	const result = receivedNotifications.has(method);
+
 	if (result) {
 		receivedNotifications.delete(method);
 	}

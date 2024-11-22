@@ -30,8 +30,10 @@ import {
 // @ts-ignore 6196
 namespace SetTraceNotification {
 	export const method: "$/setTrace" = "$/setTrace";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolNotificationType<SetTraceParams, void>(
 		method,
 	);
@@ -40,8 +42,10 @@ namespace SetTraceNotification {
 // @ts-ignore 6196
 namespace LogTraceNotification {
 	export const method: "$/logTrace" = "$/logTrace";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.serverToClient;
+
 	export const type = new ProtocolNotificationType<LogTraceParams, void>(
 		method,
 	);
@@ -72,7 +76,9 @@ interface CancelParams {
 // @ts-ignore 6196
 namespace CancelNotification {
 	export const method: "$/cancelRequest" = "$/cancelRequest";
+
 	export const messageDirection: MessageDirection = MessageDirection.both;
+
 	export const type = new ProtocolNotificationType<CancelParams, void>(
 		method,
 	);
@@ -93,7 +99,9 @@ interface ProgressParams {
 // @ts-ignore 6196
 namespace ProgressNotification {
 	export const method: "$/progress" = "$/progress";
+
 	export const messageDirection: MessageDirection = MessageDirection.both;
+
 	export const type = new ProtocolNotificationType<ProgressParams, void>(
 		method,
 	);

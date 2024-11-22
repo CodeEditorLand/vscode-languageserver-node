@@ -87,6 +87,7 @@ export const TypeHierarchyFeature: Feature<
 					>,
 				): Disposable => {
 					const type = TypeHierarchySupertypesRequest.type;
+
 					return this.connection.onRequest(type, (params, cancel) => {
 						return handler(
 							params,
@@ -105,6 +106,7 @@ export const TypeHierarchyFeature: Feature<
 					>,
 				): Disposable => {
 					const type = TypeHierarchySubtypesRequest.type;
+
 					return this.connection.onRequest(type, (params, cancel) => {
 						return handler(
 							params,

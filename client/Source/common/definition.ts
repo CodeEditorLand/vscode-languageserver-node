@@ -72,6 +72,7 @@ export class DefinitionFeature extends TextDocumentLanguageFeature<
 			documentSelector,
 			capabilities.definitionProvider,
 		);
+
 		if (!options) {
 			return;
 		}
@@ -82,9 +83,11 @@ export class DefinitionFeature extends TextDocumentLanguageFeature<
 		options: DefinitionRegistrationOptions,
 	): [Disposable, DefinitionProvider] {
 		const selector = options.documentSelector!;
+
 		const provider: DefinitionProvider = {
 			provideDefinition: (document, position, token) => {
 				const client = this._client;
+
 				const provideDefinition: ProvideDefinitionSignature = (
 					document,
 					position,
@@ -119,7 +122,9 @@ export class DefinitionFeature extends TextDocumentLanguageFeature<
 							},
 						);
 				};
+
 				const middleware = client.middleware;
+
 				return middleware.provideDefinition
 					? middleware.provideDefinition(
 							document,
@@ -130,6 +135,7 @@ export class DefinitionFeature extends TextDocumentLanguageFeature<
 					: provideDefinition(document, position, token);
 			},
 		};
+
 		return [this.registerProvider(selector, provider), provider];
 	}
 

@@ -117,6 +117,7 @@ export type DiagnosticServerCancellationData = {
 export namespace DiagnosticServerCancellationData {
 	export function is(value: any): value is DiagnosticServerCancellationData {
 		const candidate = value as DiagnosticServerCancellationData;
+
 		return candidate && Is.boolean(candidate.retriggerRequest);
 	}
 }
@@ -290,8 +291,10 @@ export type DocumentDiagnosticReportPartialResult = {
  */
 export namespace DocumentDiagnosticRequest {
 	export const method: "textDocument/diagnostic" = "textDocument/diagnostic";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		DocumentDiagnosticParams,
 		DocumentDiagnosticReport,
@@ -299,8 +302,10 @@ export namespace DocumentDiagnosticRequest {
 		DiagnosticServerCancellationData,
 		DiagnosticRegistrationOptions
 	>(method);
+
 	export const partialResult =
 		new ProgressType<DocumentDiagnosticReportPartialResult>();
+
 	export type HandlerSignature = RequestHandler<
 		DocumentDiagnosticParams,
 		DocumentDiagnosticReport,
@@ -417,8 +422,10 @@ export type WorkspaceDiagnosticReportPartialResult = {
  */
 export namespace WorkspaceDiagnosticRequest {
 	export const method: "workspace/diagnostic" = "workspace/diagnostic";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		WorkspaceDiagnosticParams,
 		WorkspaceDiagnosticReport,
@@ -426,8 +433,10 @@ export namespace WorkspaceDiagnosticRequest {
 		DiagnosticServerCancellationData,
 		void
 	>(method);
+
 	export const partialResult =
 		new ProgressType<WorkspaceDiagnosticReportPartialResult>();
+
 	export type HandlerSignature = RequestHandler<
 		WorkspaceDiagnosticParams,
 		WorkspaceDiagnosticReport | null,
@@ -442,10 +451,13 @@ export namespace WorkspaceDiagnosticRequest {
  */
 export namespace DiagnosticRefreshRequest {
 	export const method: `workspace/diagnostic/refresh` = `workspace/diagnostic/refresh`;
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.serverToClient;
+
 	export const type = new ProtocolRequestType0<void, void, void, void>(
 		method,
 	);
+
 	export type HandlerSignature = RequestHandler0<void, void>;
 }

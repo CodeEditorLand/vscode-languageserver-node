@@ -38,6 +38,7 @@ export namespace CancellationToken {
 
 	export function is(value: any): value is CancellationToken {
 		const candidate = value as CancellationToken;
+
 		return (
 			candidate &&
 			(candidate === CancellationToken.None ||
@@ -53,6 +54,7 @@ const shortcutEvent: Event<any> = Object.freeze(function (
 	context?: any,
 ): any {
 	const handle = RAL().timer.setTimeout(callback.bind(context), 0);
+
 	return {
 		dispose() {
 			handle.dispose();
@@ -67,6 +69,7 @@ class MutableToken implements CancellationToken {
 	public cancel() {
 		if (!this._isCancelled) {
 			this._isCancelled = true;
+
 			if (this._emitter) {
 				this._emitter.fire(undefined);
 				this.dispose();

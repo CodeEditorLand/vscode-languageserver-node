@@ -121,6 +121,7 @@ export class CodeActionFeature extends TextDocumentLanguageFeature<
 			documentSelector,
 			capabilities.codeActionProvider,
 		);
+
 		if (!options) {
 			return;
 		}
@@ -131,9 +132,11 @@ export class CodeActionFeature extends TextDocumentLanguageFeature<
 		options: CodeActionRegistrationOptions,
 	): [Disposable, CodeActionProvider] {
 		const selector = options.documentSelector!;
+
 		const provider: CodeActionProvider = {
 			provideCodeActions: (document, range, context, token) => {
 				const client = this._client;
+
 				const _provideCodeActions: ProvideCodeActionsSignature = async (
 					document,
 					range,
@@ -151,6 +154,7 @@ export class CodeActionFeature extends TextDocumentLanguageFeature<
 								context,
 							),
 					};
+
 					return client
 						.sendRequest(CodeActionRequest.type, params, token)
 						.then(
@@ -177,7 +181,9 @@ export class CodeActionFeature extends TextDocumentLanguageFeature<
 							},
 						);
 				};
+
 				const middleware = client.middleware;
+
 				return middleware.provideCodeActions
 					? middleware.provideCodeActions(
 							document,
@@ -191,7 +197,9 @@ export class CodeActionFeature extends TextDocumentLanguageFeature<
 			resolveCodeAction: options.resolveProvider
 				? (item: VCodeAction, token: CancellationToken) => {
 						const client = this._client;
+
 						const middleware = this._client.middleware;
+
 						const resolveCodeAction: ResolveCodeActionSignature =
 							async (item, token) => {
 								return client
@@ -222,6 +230,7 @@ export class CodeActionFeature extends TextDocumentLanguageFeature<
 										},
 									);
 							};
+
 						return middleware.resolveCodeAction
 							? middleware.resolveCodeAction(
 									item,
@@ -232,6 +241,7 @@ export class CodeActionFeature extends TextDocumentLanguageFeature<
 					}
 				: undefined,
 		};
+
 		return [
 			Languages.registerCodeActionsProvider(
 				this._client.protocol2CodeConverter.asDocumentSelector(

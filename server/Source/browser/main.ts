@@ -24,6 +24,7 @@ export * from "vscode-languageserver-protocol/browser";
 export * from "../common/api";
 
 let _shutdownReceived: boolean = false;
+
 const watchDog: WatchDog = {
 	initialize: (_params: InitializeParams): void => {},
 	get shutdownReceived(): boolean {
@@ -93,8 +94,11 @@ export function createConnection(
 	arg4?: any,
 ): Connection {
 	let factories: Features | undefined;
+
 	let reader: MessageReader | undefined;
+
 	let writer: MessageWriter | undefined;
+
 	let options: ConnectionStrategy | ConnectionOptions | undefined;
 
 	if (arg1 !== void 0 && (arg1 as Features).__brand === "features") {
@@ -114,5 +118,6 @@ export function createConnection(
 	const connectionFactory = (logger: Logger): ProtocolConnection => {
 		return createProtocolConnection(reader!, writer!, logger, options);
 	};
+
 	return createCommonConnection(connectionFactory, watchDog, factories);
 }

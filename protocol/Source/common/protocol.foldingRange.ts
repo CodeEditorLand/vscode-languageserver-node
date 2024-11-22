@@ -140,8 +140,10 @@ export interface FoldingRangeParams
 export namespace FoldingRangeRequest {
 	export const method: "textDocument/foldingRange" =
 		"textDocument/foldingRange";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		FoldingRangeParams,
 		FoldingRange[] | null,
@@ -149,6 +151,7 @@ export namespace FoldingRangeRequest {
 		void,
 		FoldingRangeRegistrationOptions
 	>(method);
+
 	export type HandlerSignature = RequestHandler<
 		FoldingRangeParams,
 		FoldingRange[] | null,
@@ -162,10 +165,13 @@ export namespace FoldingRangeRequest {
  */
 export namespace FoldingRangeRefreshRequest {
 	export const method: `workspace/foldingRange/refresh` = `workspace/foldingRange/refresh`;
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.serverToClient;
+
 	export const type = new ProtocolRequestType0<void, void, void, void>(
 		method,
 	);
+
 	export type HandlerSignature = RequestHandler0<void, void>;
 }

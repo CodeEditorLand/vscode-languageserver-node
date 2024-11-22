@@ -280,8 +280,10 @@ export interface FileDelete {
 export namespace WillCreateFilesRequest {
 	export const method: "workspace/willCreateFiles" =
 		"workspace/willCreateFiles";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		CreateFilesParams,
 		WorkspaceEdit | null,
@@ -289,6 +291,7 @@ export namespace WillCreateFilesRequest {
 		void,
 		FileOperationRegistrationOptions
 	>(method);
+
 	export type HandlerSignature = RequestHandler<
 		CreateFilesParams,
 		WorkspaceEdit | undefined | null,
@@ -305,12 +308,15 @@ export namespace WillCreateFilesRequest {
 export namespace DidCreateFilesNotification {
 	export const method: "workspace/didCreateFiles" =
 		"workspace/didCreateFiles";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolNotificationType<
 		CreateFilesParams,
 		FileOperationRegistrationOptions
 	>(method);
+
 	export type HandlerSignature = NotificationHandler<CreateFilesParams>;
 }
 
@@ -323,8 +329,10 @@ export namespace DidCreateFilesNotification {
 export namespace WillRenameFilesRequest {
 	export const method: "workspace/willRenameFiles" =
 		"workspace/willRenameFiles";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		RenameFilesParams,
 		WorkspaceEdit | null,
@@ -332,6 +340,7 @@ export namespace WillRenameFilesRequest {
 		void,
 		FileOperationRegistrationOptions
 	>(method);
+
 	export type HandlerSignature = RequestHandler<
 		RenameFilesParams,
 		WorkspaceEdit | undefined | null,
@@ -348,12 +357,15 @@ export namespace WillRenameFilesRequest {
 export namespace DidRenameFilesNotification {
 	export const method: "workspace/didRenameFiles" =
 		"workspace/didRenameFiles";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolNotificationType<
 		RenameFilesParams,
 		FileOperationRegistrationOptions
 	>(method);
+
 	export type HandlerSignature = NotificationHandler<RenameFilesParams>;
 }
 
@@ -366,12 +378,15 @@ export namespace DidRenameFilesNotification {
 export namespace DidDeleteFilesNotification {
 	export const method: "workspace/didDeleteFiles" =
 		"workspace/didDeleteFiles";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolNotificationType<
 		DeleteFilesParams,
 		FileOperationRegistrationOptions
 	>(method);
+
 	export type HandlerSignature = NotificationHandler<DeleteFilesParams>;
 }
 
@@ -384,8 +399,10 @@ export namespace DidDeleteFilesNotification {
 export namespace WillDeleteFilesRequest {
 	export const method: "workspace/willDeleteFiles" =
 		"workspace/willDeleteFiles";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		DeleteFilesParams,
 		WorkspaceEdit | null,
@@ -393,6 +410,7 @@ export namespace WillDeleteFilesRequest {
 		void,
 		FileOperationRegistrationOptions
 	>(method);
+
 	export type HandlerSignature = RequestHandler<
 		DeleteFilesParams,
 		WorkspaceEdit | undefined | null,

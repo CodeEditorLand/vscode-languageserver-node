@@ -36,9 +36,13 @@ export * from "../common/api";
 
 export namespace Files {
 	export const uriToFilePath = fm.uriToFilePath;
+
 	export const resolveGlobalNodePath = fm.resolveGlobalNodePath;
+
 	export const resolveGlobalYarnPath = fm.resolveGlobalYarnPath;
+
 	export const resolve = fm.resolve;
+
 	export const resolveModulePath = fm.resolveModulePath;
 }
 
@@ -55,13 +59,16 @@ function endProtocolConnection(): void {
 	}
 }
 let _shutdownReceived: boolean = false;
+
 let exitTimer: NodeJS.Timer | undefined = undefined;
 
 function setupExitTimer(): void {
 	const argName = "--clientProcessId";
+
 	function runTimer(value: string): void {
 		try {
 			const processId = parseInt(value);
+
 			if (!isNaN(processId)) {
 				exitTimer = setInterval(() => {
 					try {
@@ -80,11 +87,14 @@ function setupExitTimer(): void {
 
 	for (let i = 2; i < process.argv.length; i++) {
 		const arg = process.argv[i];
+
 		if (arg === argName && i + 1 < process.argv.length) {
 			runTimer(process.argv[i + 1]);
+
 			return;
 		} else {
 			const args = arg.split("=");
+
 			if (args[0] === argName) {
 				runTimer(args[1]);
 			}
@@ -96,6 +106,7 @@ setupExitTimer();
 const watchDog: WatchDog = {
 	initialize: (params: InitializeParams): void => {
 		const processId = params.processId;
+
 		if (Is.number(processId) && exitTimer === undefined) {
 			// We received a parent process id. Set up a timer to periodically check
 			// if the parent is still alive.
@@ -285,9 +296,13 @@ export function createConnection(
 	arg4?: any,
 ): Connection {
 	let factories: Features | undefined;
+
 	let input: NodeJS.ReadableStream | MessageReader | undefined;
+
 	let output: NodeJS.WritableStream | MessageWriter | undefined;
+
 	let options: ConnectionStrategy | ConnectionOptions | undefined;
+
 	if (arg1 !== undefined && (arg1 as Features).__brand === "features") {
 		factories = arg1;
 		arg1 = arg2;
@@ -338,34 +353,46 @@ function _createConnection<
 	PNotebooks
 > {
 	let stdio = false;
+
 	if (!input && !output && process.argv.length > 2) {
 		let port: number | undefined = undefined;
+
 		let pipeName: string | undefined = undefined;
+
 		const argv = process.argv.slice(2);
+
 		for (let i = 0; i < argv.length; i++) {
 			const arg = argv[i];
+
 			if (arg === "--node-ipc") {
 				input = new IPCMessageReader(process);
 				output = new IPCMessageWriter(process);
+
 				break;
 			} else if (arg === "--stdio") {
 				stdio = true;
 				input = process.stdin;
 				output = process.stdout;
+
 				break;
 			} else if (arg === "--socket") {
 				port = parseInt(argv[i + 1]);
+
 				break;
 			} else if (arg === "--pipe") {
 				pipeName = argv[i + 1];
+
 				break;
 			} else {
 				const args = arg.split("=");
+
 				if (args[0] === "--socket") {
 					port = parseInt(args[1]);
+
 					break;
 				} else if (args[0] === "--pipe") {
 					pipeName = args[1];
+
 					break;
 				}
 			}
@@ -382,6 +409,7 @@ function _createConnection<
 	}
 	const commandLineMessage =
 		"Use arguments of createConnection or set command line parameters: '--node-ipc', '--stdio' or '--socket={number}'";
+
 	if (!input) {
 		throw new Error(
 			"Connection input stream is not set. " + commandLineMessage,
@@ -416,11 +444,13 @@ function _createConnection<
 			logger,
 			options,
 		);
+
 		if (stdio) {
 			patchConsole(logger);
 		}
 		return result;
 	};
+
 	return createCommonConnection(connectionFactory, watchDog, factories);
 }
 
@@ -447,6 +477,7 @@ function patchConsole(logger: Logger): undefined {
 
 	console.count = function count(label = "default") {
 		const message = String(label);
+
 		let counter = counters.get(message) ?? 0;
 		counter += 1;
 		counters.set(message, counter);
@@ -479,7 +510,9 @@ function patchConsole(logger: Logger): undefined {
 
 	console.trace = function trace(...args) {
 		const stack = new Error().stack!.replace(/(.+\n){2}/, "");
+
 		let message = "Trace";
+
 		if (args.length !== 0) {
 			message += `: ${serialize(args)}`;
 		}

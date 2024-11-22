@@ -63,8 +63,10 @@ export interface SelectionRangeParams
 export namespace SelectionRangeRequest {
 	export const method: "textDocument/selectionRange" =
 		"textDocument/selectionRange";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		SelectionRangeParams,
 		SelectionRange[] | null,
@@ -72,6 +74,7 @@ export namespace SelectionRangeRequest {
 		void,
 		SelectionRangeRegistrationOptions
 	>(method);
+
 	export type HandlerSignature = RequestHandler<
 		SelectionRangeParams,
 		SelectionRange[] | null,

@@ -252,16 +252,19 @@ enum RequestStateKind {
 type RequestState =
 	| {
 			state: RequestStateKind.active;
+
 			document: TextDocument | Uri;
 			version: number | undefined;
 			tokenSource: CancellationTokenSource;
 	  }
 	| {
 			state: RequestStateKind.reschedule;
+
 			document: TextDocument | Uri;
 	  }
 	| {
 			state: RequestStateKind.outDated;
+
 			document: TextDocument | Uri;
 	  };
 
@@ -311,11 +314,14 @@ class DocumentPullStateTracker {
 			kind === PullState.document
 				? this.documentPullStates
 				: this.workspacePullStates;
+
 		const [key, uri, version] =
 			document instanceof Uri
 				? [document.toString(), document, arg1 as number | undefined]
 				: [document.uri.toString(), document.uri, document.version];
+
 		let state = states.get(key);
+
 		if (state === undefined) {
 			state = {
 				document: uri,
@@ -348,6 +354,7 @@ class DocumentPullStateTracker {
 			kind === PullState.document
 				? this.documentPullStates
 				: this.workspacePullStates;
+
 		const [key, uri, version, resultId] =
 			document instanceof Uri
 				? [
@@ -362,7 +369,9 @@ class DocumentPullStateTracker {
 						document.version,
 						arg1 as string | undefined,
 					];
+
 		let state = states.get(key);
+
 		if (state === undefined) {
 			state = { document: uri, pulledVersion: version, resultId };
 			states.set(key, state);
@@ -374,6 +383,7 @@ class DocumentPullStateTracker {
 
 	public unTrack(kind: PullState, document: TextDocument | Uri): void {
 		const key = DocumentOrUri.asKey(document);
+
 		const states =
 			kind === PullState.document
 				? this.documentPullStates
@@ -383,10 +393,12 @@ class DocumentPullStateTracker {
 
 	public tracks(kind: PullState, document: TextDocument | Uri): boolean {
 		const key = DocumentOrUri.asKey(document);
+
 		const states =
 			kind === PullState.document
 				? this.documentPullStates
 				: this.workspacePullStates;
+
 		return states.has(key);
 	}
 
@@ -395,15 +407,18 @@ class DocumentPullStateTracker {
 		document: TextDocument | Uri,
 	): string | undefined {
 		const key = DocumentOrUri.asKey(document);
+
 		const states =
 			kind === PullState.document
 				? this.documentPullStates
 				: this.workspacePullStates;
+
 		return states.get(key)?.resultId;
 	}
 
 	public getAllResultIds(): PreviousResultId[] {
 		const result: PreviousResultId[] = [];
+
 		for (let [uri, value] of this.workspacePullStates) {
 			if (this.documentPullStates.has(uri)) {
 				value = this.documentPullStates.get(uri)!;
@@ -461,6 +476,7 @@ class DiagnosticRequestor implements Disposable {
 
 	public knows(kind: PullState, document: TextDocument | Uri): boolean {
 		const uri = document instanceof Uri ? document : document.uri;
+
 		return (
 			this.documentStates.tracks(kind, document) ||
 			this.openRequests.has(uri.toString())
@@ -500,13 +516,18 @@ class DiagnosticRequestor implements Disposable {
 			return;
 		}
 		const isUri = document instanceof Uri;
+
 		const uri = isUri ? document : document.uri;
+
 		const key = uri.toString();
 		version = isUri ? version : document.version;
+
 		const currentRequestState = this.openRequests.get(key);
+
 		const documentState = isUri
 			? this.documentStates.track(PullState.document, document, version)
 			: this.documentStates.track(PullState.document, document);
+
 		if (currentRequestState === undefined) {
 			const tokenSource = new CancellationTokenSource();
 			this.openRequests.set(key, {
@@ -515,8 +536,11 @@ class DiagnosticRequestor implements Disposable {
 				version: version,
 				tokenSource,
 			});
+
 			let report: vsdiag.DocumentDiagnosticReport | undefined;
+
 			let afterState: RequestState | undefined;
+
 			try {
 				report = (await this.provider.provideDiagnostics(
 					document,
@@ -547,17 +571,21 @@ class DiagnosticRequestor implements Disposable {
 				}
 			}
 			afterState = afterState ?? this.openRequests.get(key);
+
 			if (afterState === undefined) {
 				// This shouldn't happen. Log it
 				this.client.error(
 					`Lost request state in diagnostic pull model. Clearing diagnostics for ${key}`,
 				);
 				this.diagnostics.delete(uri);
+
 				return;
 			}
 			this.openRequests.delete(key);
+
 			if (!this.tabs.isVisible(document)) {
 				this.documentStates.unTrack(PullState.document, document);
+
 				return;
 			}
 			if (afterState.state === RequestStateKind.outDated) {
@@ -569,6 +597,7 @@ class DiagnosticRequestor implements Disposable {
 					this.diagnostics.set(uri, report.items);
 				}
 				documentState.pulledVersion = version;
+
 				documentState.resultId = report.resultId;
 			}
 			if (afterState.state === RequestStateKind.reschedule) {
@@ -595,8 +624,11 @@ class DiagnosticRequestor implements Disposable {
 
 	public forgetDocument(document: TextDocument | Uri): void {
 		const uri = document instanceof Uri ? document : document.uri;
+
 		const key = uri.toString();
+
 		const request = this.openRequests.get(key);
+
 		if (this.options.workspaceDiagnostics) {
 			// If we run workspace diagnostic pull a last time for the diagnostics
 			// and the rely on getting them from the workspace result.
@@ -668,6 +700,7 @@ class DiagnosticRequestor implements Disposable {
 			this.workspaceCancellation = undefined;
 		}
 		this.workspaceCancellation = new CancellationTokenSource();
+
 		const previousResultIds: vsdiag.PreviousResultId[] = this.documentStates
 			.getAllResultIds()
 			.map((item) => {
@@ -729,6 +762,7 @@ class DiagnosticRequestor implements Disposable {
 						},
 						previousResultId: previousResultId,
 					};
+
 					if (this.isDisposed === true || !this.client.isRunning()) {
 						return {
 							kind: vsdiag.DocumentDiagnosticReportKind.full,
@@ -793,8 +827,10 @@ class DiagnosticRequestor implements Disposable {
 							},
 						);
 				};
+
 				const middleware: DiagnosticProviderMiddleware =
 					this.client.middleware;
+
 				return middleware.provideDiagnostics
 					? middleware.provideDiagnostics(
 							document,
@@ -805,6 +841,7 @@ class DiagnosticRequestor implements Disposable {
 					: provideDiagnostics(document, previousResultId, token);
 			},
 		};
+
 		if (this.options.workspaceDiagnostics) {
 			result.provideWorkspaceDiagnostics = (
 				resultIds,
@@ -838,10 +875,12 @@ class DiagnosticRequestor implements Disposable {
 						};
 					}
 				};
+
 				const convertPreviousResultIds = (
 					resultIds: vsdiag.PreviousResultId[],
 				): PreviousResultId[] => {
 					const converted: PreviousResultId[] = [];
+
 					for (const item of resultIds) {
 						converted.push({
 							uri: this.client.code2ProtocolConverter.asUri(
@@ -852,6 +891,7 @@ class DiagnosticRequestor implements Disposable {
 					}
 					return converted;
 				};
+
 				const provideDiagnostics: ProvideWorkspaceDiagnosticSignature =
 					(
 						resultIds,
@@ -859,6 +899,7 @@ class DiagnosticRequestor implements Disposable {
 						resultReporter,
 					): ProviderResult<vsdiag.WorkspaceDiagnosticReport> => {
 						const partialResultToken: string = generateUuid();
+
 						const disposable = this.client.onProgress(
 							WorkspaceDiagnosticRequest.partialResult,
 							partialResultToken,
@@ -868,12 +909,14 @@ class DiagnosticRequestor implements Disposable {
 									partialResult === null
 								) {
 									resultReporter(null);
+
 									return;
 								}
 								const converted: vsdiag.WorkspaceDiagnosticReportPartialResult =
 									{
 										items: [],
 									};
+
 								for (const item of partialResult.items) {
 									try {
 										converted.items.push(
@@ -889,12 +932,14 @@ class DiagnosticRequestor implements Disposable {
 								resultReporter(converted);
 							},
 						);
+
 						const params: WorkspaceDiagnosticParams = {
 							identifier: this.options.identifier,
 							previousResultIds:
 								convertPreviousResultIds(resultIds),
 							partialResultToken: partialResultToken,
 						};
+
 						if (
 							this.isDisposed === true ||
 							!this.client.isRunning()
@@ -918,6 +963,7 @@ class DiagnosticRequestor implements Disposable {
 										{
 											items: [],
 										};
+
 									for (const item of result.items) {
 										converted.items.push(
 											await convertReport(item),
@@ -925,10 +971,12 @@ class DiagnosticRequestor implements Disposable {
 									}
 									disposable.dispose();
 									resultReporter(converted);
+
 									return { items: [] };
 								},
 								(error) => {
 									disposable.dispose();
+
 									return this.client.handleFailedRequest(
 										DocumentDiagnosticRequest.type,
 										token,
@@ -938,8 +986,10 @@ class DiagnosticRequestor implements Disposable {
 								},
 							);
 					};
+
 				const middleware: DiagnosticProviderMiddleware =
 					this.client.middleware;
+
 				return middleware.provideWorkspaceDiagnostics
 					? middleware.provideWorkspaceDiagnostics(
 							resultIds,
@@ -1029,6 +1079,7 @@ class BackgroundScheduler implements Disposable {
 			return;
 		}
 		const key = DocumentOrUri.asKey(document);
+
 		if (this.documents.has(key)) {
 			return;
 		}
@@ -1046,11 +1097,13 @@ class BackgroundScheduler implements Disposable {
 		// No more documents. Stop background activity.
 		if (this.documents.size === 0) {
 			this.stop();
+
 			return;
 		} else if (key === this.lastDocumentToPullKey()) {
 			// The remove document was the one we would run up to. So
 			// take the one before it.
 			const before = this.documents.before(key);
+
 			if (before === undefined) {
 				this.stop();
 			} else {
@@ -1073,6 +1126,7 @@ class BackgroundScheduler implements Disposable {
 		// background activity.
 		if (this.documents.size === 0) {
 			this.stop();
+
 			return;
 		}
 
@@ -1088,6 +1142,7 @@ class BackgroundScheduler implements Disposable {
 		}
 		this.timeoutHandle = RAL().timer.setTimeout(() => {
 			const document = this.documents.first;
+
 			if (document === undefined) {
 				return;
 			}
@@ -1104,6 +1159,7 @@ class BackgroundScheduler implements Disposable {
 				.finally(() => {
 					this.timeoutHandle = undefined;
 					this.documents.set(key, document, Touch.Last);
+
 					if (key !== this.lastDocumentToPullKey()) {
 						this.runLoop();
 					}
@@ -1149,10 +1205,12 @@ class DiagnosticFeatureProviderImpl implements DiagnosticProviderShape {
 			{ onChange: false, onSave: false, onFocus: false },
 			client.clientOptions.diagnosticPullOptions,
 		);
+
 		const documentSelector =
 			client.protocol2CodeConverter.asDocumentSelector(
 				options.documentSelector!,
 			);
+
 		const disposables: Disposable[] = [];
 
 		const matchFilter = (filter: TextDocumentFilter, resource: Uri) => {
@@ -1182,6 +1240,7 @@ class DiagnosticFeatureProviderImpl implements DiagnosticProviderShape {
 
 		const matchResource = (resource: Uri): boolean => {
 			const selector = options.documentSelector!;
+
 			if (diagnosticPullOptions.match !== undefined) {
 				return diagnosticPullOptions.match(selector!, resource);
 			}
@@ -1258,11 +1317,13 @@ class DiagnosticFeatureProviderImpl implements DiagnosticProviderShape {
 			Window.onDidChangeActiveTextEditor((editor) => {
 				const oldActive = this.activeTextDocument;
 				this.activeTextDocument = editor?.document;
+
 				if (oldActive !== undefined) {
 					addToBackgroundIfNeeded(oldActive);
 				}
 				if (this.activeTextDocument !== undefined) {
 					this.backgroundScheduler.remove(this.activeTextDocument);
+
 					if (
 						diagnosticPullOptions.onFocus === true &&
 						matches(this.activeTextDocument) &&
@@ -1307,6 +1368,7 @@ class DiagnosticFeatureProviderImpl implements DiagnosticProviderShape {
 				}
 			}),
 		);
+
 		const notebookFeature = client.getFeature(
 			NotebookDocumentSyncRegistrationType.method,
 		);
@@ -1336,10 +1398,13 @@ class DiagnosticFeatureProviderImpl implements DiagnosticProviderShape {
 						continue;
 					}
 					const uriStr = resource.toString();
+
 					let textDocument: TextDocument | undefined;
+
 					for (const item of workspace.textDocuments) {
 						if (uriStr === item.uri.toString()) {
 							textDocument = item;
+
 							break;
 						}
 					}
@@ -1362,6 +1427,7 @@ class DiagnosticFeatureProviderImpl implements DiagnosticProviderShape {
 
 		// Pull all diagnostics for documents that are already open
 		const pulledTextDocuments: Set<string> = new Set();
+
 		for (const textDocument of Workspace.textDocuments) {
 			if (matches(textDocument)) {
 				this.diagnosticRequestor.pull(textDocument, () => {
@@ -1407,6 +1473,7 @@ class DiagnosticFeatureProviderImpl implements DiagnosticProviderShape {
 			disposables.push(
 				changeFeature.onNotificationSent(async (event) => {
 					const textDocument = event.textDocument;
+
 					if (
 						considerDocument(
 							textDocument,
@@ -1423,6 +1490,7 @@ class DiagnosticFeatureProviderImpl implements DiagnosticProviderShape {
 				notebookFeature.onChangeNotificationSent(async (event) => {
 					// Send a pull for all changed cells in the notebook.
 					const textEvents = event.cells?.textContent || [];
+
 					const changedCells = textEvents.map((c) =>
 						event.notebook
 							.getCells()
@@ -1432,6 +1500,7 @@ class DiagnosticFeatureProviderImpl implements DiagnosticProviderShape {
 									c.document.uri.toString(),
 							),
 					);
+
 					for (const cell of changedCells) {
 						if (cell && matchesCell(cell)) {
 							this.diagnosticRequestor.pull(cell.document, () => {
@@ -1442,12 +1511,14 @@ class DiagnosticFeatureProviderImpl implements DiagnosticProviderShape {
 
 					// Clear out any closed cells.
 					const closedCells = event.cells?.structure?.didClose || [];
+
 					for (const cell of closedCells) {
 						this.diagnosticRequestor.forgetDocument(cell.document);
 					}
 
 					// Send a pull for any new opened cells.
 					const openedCells = event.cells?.structure?.didOpen || [];
+
 					for (const cell of openedCells) {
 						if (matchesCell(cell)) {
 							this.diagnosticRequestor.pull(cell.document, () => {
@@ -1466,6 +1537,7 @@ class DiagnosticFeatureProviderImpl implements DiagnosticProviderShape {
 			disposables.push(
 				saveFeature.onNotificationSent((event) => {
 					const textDocument = event.textDocument;
+
 					if (
 						considerDocument(
 							textDocument,
@@ -1549,6 +1621,7 @@ class DiagnosticFeatureProviderImpl implements DiagnosticProviderShape {
 
 	private cleanUpDocument(document: TextDocument | Uri): void {
 		this.backgroundScheduler.remove(document);
+
 		if (this.diagnosticRequestor.knows(PullState.document, document)) {
 			this.diagnosticRequestor.forgetDocument(document);
 		}
@@ -1612,10 +1685,12 @@ export class DiagnosticFeature
 				provider.onDidChangeDiagnosticsEmitter.fire();
 			}
 		});
+
 		const [id, options] = this.getRegistration(
 			documentSelector,
 			capabilities.diagnosticProvider,
 		);
+
 		if (!id || !options) {
 			return;
 		}
@@ -1640,6 +1715,7 @@ export class DiagnosticFeature
 			this._client.tabsModel,
 			options,
 		);
+
 		return [provider.disposable, provider];
 	}
 }

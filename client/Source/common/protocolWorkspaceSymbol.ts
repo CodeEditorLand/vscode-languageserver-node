@@ -18,6 +18,7 @@ export default class WorkspaceSymbol extends code.SymbolInformation {
 		data: LSPAny | undefined,
 	) {
 		const hasRange = !(locationOrUri instanceof code.Uri);
+
 		super(
 			name,
 			kind,
@@ -27,6 +28,7 @@ export default class WorkspaceSymbol extends code.SymbolInformation {
 				: new code.Location(locationOrUri, new code.Range(0, 0, 0, 0)),
 		);
 		this.hasRange = hasRange;
+
 		if (data !== undefined) {
 			this.data = data;
 		}

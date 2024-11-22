@@ -82,8 +82,10 @@ export interface ShowDocumentResult {
  */
 export namespace ShowDocumentRequest {
 	export const method: "window/showDocument" = "window/showDocument";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.serverToClient;
+
 	export const type = new ProtocolRequestType<
 		ShowDocumentParams,
 		ShowDocumentResult,
@@ -91,11 +93,13 @@ export namespace ShowDocumentRequest {
 		void,
 		void
 	>(method);
+
 	export type HandlerSignature = RequestHandler<
 		ShowDocumentParams,
 		ShowDocumentResult,
 		void
 	>;
+
 	export type MiddlewareSignature = (
 		params: ShowDocumentParams,
 		token: CancellationToken,

@@ -138,8 +138,10 @@ export interface MonikerParams
  */
 export namespace MonikerRequest {
 	export const method: "textDocument/moniker" = "textDocument/moniker";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		MonikerParams,
 		Moniker[] | null,

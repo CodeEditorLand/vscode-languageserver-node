@@ -87,6 +87,7 @@ export class InlineValueFeature extends TextDocumentLanguageFeature<
 			documentSelector,
 			capabilities.inlineValueProvider,
 		);
+
 		if (!id || !options) {
 			return;
 		}
@@ -97,11 +98,14 @@ export class InlineValueFeature extends TextDocumentLanguageFeature<
 		options: InlineValueRegistrationOptions,
 	): [Disposable, InlineValueProviderShape] {
 		const selector = options.documentSelector!;
+
 		const eventEmitter: EventEmitter<void> = new EventEmitter<void>();
+
 		const provider: InlineValuesProvider = {
 			onDidChangeInlineValues: eventEmitter.event,
 			provideInlineValues: (document, viewPort, context, token) => {
 				const client = this._client;
+
 				const provideInlineValues: ProvideInlineValuesSignature = (
 					document,
 					viewPort,
@@ -119,6 +123,7 @@ export class InlineValueFeature extends TextDocumentLanguageFeature<
 								context,
 							),
 					};
+
 					return client
 						.sendRequest(
 							InlineValueRequest.type,
@@ -145,7 +150,9 @@ export class InlineValueFeature extends TextDocumentLanguageFeature<
 							},
 						);
 				};
+
 				const middleware = client.middleware;
+
 				return middleware.provideInlineValues
 					? middleware.provideInlineValues(
 							document,
@@ -157,6 +164,7 @@ export class InlineValueFeature extends TextDocumentLanguageFeature<
 					: provideInlineValues(document, viewPort, context, token);
 			},
 		};
+
 		return [
 			this.registerProvider(selector, provider),
 			{ provider: provider, onDidChangeInlineValues: eventEmitter },

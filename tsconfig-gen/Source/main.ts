@@ -65,11 +65,15 @@ export function main(): number {
 	}
 	if (args.v) {
 		console.log(require("../package.json").version);
+
 		return 0;
 	}
 	const test = args.d;
+
 	const free = args._;
+
 	let file = args.f;
+
 	if (
 		file === undefined &&
 		free.length === 1 &&
@@ -80,21 +84,25 @@ export function main(): number {
 
 	if (file === undefined) {
 		console.error("No input file specified.");
+
 		return 1;
 	}
 
 	if (!fs.existsSync(file)) {
 		console.error(`Input file ${file} does not exist.`);
+
 		return 1;
 	}
 
 	const ext = path.extname(file);
+
 	if (ext.length > 0) {
 		file = file.substring(0, file.length - ext.length);
 	}
 
 	const variants: Set<string | number> | undefined =
 		args.t && new Set(args.t);
+
 	function match(variant: ProjectOptions): boolean {
 		if (variants === undefined) {
 			return true;
@@ -110,13 +118,16 @@ export function main(): number {
 	const projects: Projects = require(
 		path.isAbsolute(file) ? file : path.join(process.cwd(), file),
 	);
+
 	for (const project of projects) {
 		for (const variant of project[1]) {
 			if (!match(variant)) {
 				continue;
 			}
 			const generator = new ProjectGenerator(project[0], variant);
+
 			const result = generator.generate(path.dirname(file));
+
 			if (test) {
 				console.log(JSON.stringify(result, undefined, 4));
 			} else {

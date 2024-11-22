@@ -70,6 +70,7 @@ export class SelectionRangeFeature extends TextDocumentLanguageFeature<
 			documentSelector,
 			capabilities.selectionRangeProvider,
 		);
+
 		if (!id || !options) {
 			return;
 		}
@@ -80,9 +81,11 @@ export class SelectionRangeFeature extends TextDocumentLanguageFeature<
 		options: SelectionRangeRegistrationOptions,
 	): [Disposable, SelectionRangeProvider] {
 		const selector = options.documentSelector!;
+
 		const provider: SelectionRangeProvider = {
 			provideSelectionRanges: (document, positions, token) => {
 				const client = this._client;
+
 				const provideSelectionRanges: ProvideSelectionRangeSignature =
 					async (document, positions, token) => {
 						const requestParams: SelectionRangeParams = {
@@ -96,6 +99,7 @@ export class SelectionRangeFeature extends TextDocumentLanguageFeature<
 									token,
 								),
 						};
+
 						return client
 							.sendRequest(
 								SelectionRangeRequest.type,
@@ -122,7 +126,9 @@ export class SelectionRangeFeature extends TextDocumentLanguageFeature<
 								},
 							);
 					};
+
 				const middleware = client.middleware;
+
 				return middleware.provideSelectionRanges
 					? middleware.provideSelectionRanges(
 							document,
@@ -133,6 +139,7 @@ export class SelectionRangeFeature extends TextDocumentLanguageFeature<
 					: provideSelectionRanges(document, positions, token);
 			},
 		};
+
 		return [this.registerProvider(selector, provider), provider];
 	}
 

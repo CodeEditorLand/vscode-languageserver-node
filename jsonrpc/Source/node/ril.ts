@@ -62,21 +62,25 @@ class ReadableStreamWrapper implements RAL.ReadableStream {
 
 	public onClose(listener: () => void): Disposable {
 		this.stream.on("close", listener);
+
 		return Disposable.create(() => this.stream.off("close", listener));
 	}
 
 	public onError(listener: (error: any) => void): Disposable {
 		this.stream.on("error", listener);
+
 		return Disposable.create(() => this.stream.off("error", listener));
 	}
 
 	public onEnd(listener: () => void): Disposable {
 		this.stream.on("end", listener);
+
 		return Disposable.create(() => this.stream.off("end", listener));
 	}
 
 	public onData(listener: (data: Uint8Array) => void): Disposable {
 		this.stream.on("data", listener);
+
 		return Disposable.create(() => this.stream.off("data", listener));
 	}
 }
@@ -86,16 +90,19 @@ class WritableStreamWrapper implements RAL.WritableStream {
 
 	public onClose(listener: () => void): Disposable {
 		this.stream.on("close", listener);
+
 		return Disposable.create(() => this.stream.off("close", listener));
 	}
 
 	public onError(listener: (error: any) => void): Disposable {
 		this.stream.on("error", listener);
+
 		return Disposable.create(() => this.stream.off("error", listener));
 	}
 
 	public onEnd(listener: () => void): Disposable {
 		this.stream.on("end", listener);
+
 		return Disposable.create(() => this.stream.off("end", listener));
 	}
 
@@ -111,6 +118,7 @@ class WritableStreamWrapper implements RAL.WritableStream {
 					reject(error);
 				}
 			};
+
 			if (typeof data === "string") {
 				this.stream.write(data, encoding, callback);
 			} else {
@@ -197,6 +205,7 @@ const _ril: RIL = Object.freeze<RIL>({
 			...args: any[]
 		): Disposable {
 			const handle = setTimeout(callback, ms, ...args);
+
 			return { dispose: () => clearTimeout(handle) };
 		},
 		setImmediate(
@@ -204,6 +213,7 @@ const _ril: RIL = Object.freeze<RIL>({
 			...args: any[]
 		): Disposable {
 			const handle = setImmediate(callback, ...args);
+
 			return { dispose: () => clearImmediate(handle) };
 		},
 		setInterval(
@@ -212,6 +222,7 @@ const _ril: RIL = Object.freeze<RIL>({
 			...args: any[]
 		): Disposable {
 			const handle = setInterval(callback, ms, ...args);
+
 			return { dispose: () => clearInterval(handle) };
 		},
 	}),

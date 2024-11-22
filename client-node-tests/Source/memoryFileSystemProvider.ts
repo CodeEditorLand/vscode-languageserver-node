@@ -22,11 +22,14 @@ export class MemoryFileSystemProvider implements vscode.FileSystemProvider {
 
 	public stat(uri: vscode.Uri): vscode.FileStat | Thenable<vscode.FileStat> {
 		const [directoryUri, name] = this.splitUri(uri);
+
 		const directory = this.getDirectory(directoryUri);
+
 		if (!directory.children.has(name)) {
 			throw vscode.FileSystemError.FileNotFound(uri);
 		}
 		const child = directory.children.get(name);
+
 		return {
 			type:
 				child instanceof FakeFile
@@ -42,6 +45,7 @@ export class MemoryFileSystemProvider implements vscode.FileSystemProvider {
 		uri: vscode.Uri,
 	): [string, vscode.FileType][] | Thenable<[string, vscode.FileType][]> {
 		const directory = this.getDirectory(uri);
+
 		return Array.from(directory.children.values()).map((item) => [
 			item.name,
 			item.type,
@@ -54,11 +58,14 @@ export class MemoryFileSystemProvider implements vscode.FileSystemProvider {
 
 	public readFile(uri: vscode.Uri): Uint8Array | Thenable<Uint8Array> {
 		const [directoryUri, name] = this.splitUri(uri);
+
 		const directory = this.getDirectory(directoryUri);
+
 		if (!directory.children.has(name)) {
 			throw vscode.FileSystemError.FileNotFound(uri);
 		}
 		const child = directory.children.get(name);
+
 		if (child instanceof FakeFile) {
 			return child.content;
 		} else {
@@ -72,7 +79,9 @@ export class MemoryFileSystemProvider implements vscode.FileSystemProvider {
 		options: { create: boolean; overwrite: boolean },
 	): void | Thenable<void> {
 		const [directoryUri, name] = this.splitUri(uri);
+
 		const directory = this.getDirectory(directoryUri, options);
+
 		const file = new FakeFile(name, directory, content);
 		directory.children.set(name, file);
 	}
@@ -82,6 +91,7 @@ export class MemoryFileSystemProvider implements vscode.FileSystemProvider {
 		_: { recursive: boolean },
 	): void | Thenable<void> {
 		const [directoryUri, name] = this.splitUri(uri);
+
 		const directory = this.getDirectory(directoryUri);
 		directory.children.delete(name);
 	}
@@ -92,14 +102,18 @@ export class MemoryFileSystemProvider implements vscode.FileSystemProvider {
 		options: { overwrite: boolean },
 	): void | Thenable<void> {
 		const [oldDirectoryUri, oldName] = this.splitUri(oldUri);
+
 		const [newDirectoryUri, newName] = this.splitUri(newUri);
+
 		const oldDirectory = this.getDirectory(oldDirectoryUri);
+
 		if (!oldDirectory.children.has(oldName)) {
 			throw vscode.FileSystemError.FileNotFound(oldUri);
 		}
 		const newDirectory = this.getDirectory(newDirectoryUri, {
 			create: true,
 		});
+
 		if (newDirectory.children.has(newName) && !options.overwrite) {
 			throw vscode.FileSystemError.FileExists(newUri);
 		}
@@ -113,10 +127,13 @@ export class MemoryFileSystemProvider implements vscode.FileSystemProvider {
 
 	private splitUri(uri: vscode.Uri): [dirname: vscode.Uri, basename: string] {
 		const segments = this.splitSegments(uri);
+
 		const dirname = uri.with({
 			path: segments.slice(0, segments.length - 1).join("/"),
 		});
+
 		const basename = segments[segments.length - 1];
+
 		return [dirname, basename];
 	}
 
@@ -128,9 +145,12 @@ export class MemoryFileSystemProvider implements vscode.FileSystemProvider {
 			return this.root;
 		}
 		const [parentUri, name] = this.splitUri(uri);
+
 		const parentDirectory = this.getDirectory(parentUri, options);
+
 		if (parentDirectory.children.has(name)) {
 			const child = parentDirectory.children.get(name);
+
 			if (child instanceof FakeDirectory) {
 				return child;
 			} else {
@@ -139,6 +159,7 @@ export class MemoryFileSystemProvider implements vscode.FileSystemProvider {
 		} else if (options?.create === true) {
 			const newDirectory = new FakeDirectory(name, parentDirectory);
 			parentDirectory.children.set(name, newDirectory);
+
 			return newDirectory;
 		} else {
 			throw vscode.FileSystemError.FileNotFound(uri);

@@ -39,6 +39,7 @@ export class LanguageClient extends BaseLanguageClient {
 	): Promise<MessageTransports> {
 		if (typeof this.serverOptions === "function") {
 			const result = await this.serverOptions();
+
 			if (result instanceof Worker) {
 				return this.createMessageTransportsFromWorker(result);
 			} else {
@@ -53,7 +54,9 @@ export class LanguageClient extends BaseLanguageClient {
 		worker: Worker,
 	): Promise<MessageTransports> {
 		const reader = new BrowserMessageReader(worker);
+
 		const writer = new BrowserMessageWriter(worker);
+
 		return Promise.resolve({ reader, writer });
 	}
 }

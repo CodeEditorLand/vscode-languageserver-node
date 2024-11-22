@@ -174,6 +174,7 @@ class CellTextDocumentConnection implements TextDocumentConnection {
 		handler: NotificationHandler<DidOpenTextDocumentParams>,
 	): Disposable {
 		this.openHandler = handler;
+
 		return Disposable.create(() => {
 			this.openHandler = undefined;
 		});
@@ -189,6 +190,7 @@ class CellTextDocumentConnection implements TextDocumentConnection {
 		handler: NotificationHandler<DidChangeTextDocumentParams>,
 	): Disposable {
 		this.changeHandler = handler;
+
 		return Disposable.create(() => {
 			this.changeHandler = handler;
 		});
@@ -204,6 +206,7 @@ class CellTextDocumentConnection implements TextDocumentConnection {
 		handler: NotificationHandler<DidCloseTextDocumentParams>,
 	): Disposable {
 		this.closeHandler = handler;
+
 		return Disposable.create(() => {
 			this.closeHandler = undefined;
 		});
@@ -276,6 +279,7 @@ export class NotebookDocuments<T extends { uri: DocumentUri }> {
 
 	public getNotebookCell(uri: DocumentUri): NotebookCell | undefined {
 		const value = this.notebookCellMap.get(uri);
+
 		return value && value[0];
 	}
 
@@ -283,7 +287,9 @@ export class NotebookDocuments<T extends { uri: DocumentUri }> {
 		cell: DocumentUri | NotebookCell,
 	): NotebookDocument | undefined {
 		const key = typeof cell === "string" ? cell : cell.document;
+
 		const value = this.notebookCellMap.get(key);
+
 		return value && value[1];
 	}
 
@@ -316,6 +322,7 @@ export class NotebookDocuments<T extends { uri: DocumentUri }> {
 	 */
 	public listen(connection: Connection): Disposable {
 		const cellTextDocumentConnection = new CellTextDocumentConnection();
+
 		const disposables: Disposable[] = [];
 
 		disposables.push(
@@ -328,6 +335,7 @@ export class NotebookDocuments<T extends { uri: DocumentUri }> {
 						params.notebookDocument.uri,
 						params.notebookDocument,
 					);
+
 					for (const cellTextDocument of params.cellTextDocuments) {
 						await cellTextDocumentConnection.openTextDocument({
 							textDocument: cellTextDocument,
@@ -344,28 +352,38 @@ export class NotebookDocuments<T extends { uri: DocumentUri }> {
 					const notebookDocument = this.notebookDocuments.get(
 						params.notebookDocument.uri,
 					);
+
 					if (notebookDocument === undefined) {
 						return;
 					}
 					notebookDocument.version = params.notebookDocument.version;
+
 					const oldMetadata = notebookDocument.metadata;
+
 					let metadataChanged: boolean = false;
+
 					const change = params.change;
+
 					if (change.metadata !== undefined) {
 						metadataChanged = true;
 						notebookDocument.metadata = change.metadata;
 					}
 
 					const opened: DocumentUri[] = [];
+
 					const closed: DocumentUri[] = [];
+
 					const data: Required<
 						Required<
 							Required<NotebookDocumentChangeEvent>["cells"]
 						>["changed"]
 					>["data"] = [];
+
 					const text: DocumentUri[] = [];
+
 					if (change.cells !== undefined) {
 						const changedCells = change.cells;
+
 						if (changedCells.structure !== undefined) {
 							const array = changedCells.structure.array;
 							notebookDocument.cells.splice(
@@ -404,6 +422,7 @@ export class NotebookDocuments<T extends { uri: DocumentUri }> {
 										cell,
 									]),
 								);
+
 							for (
 								let i = 0;
 								i <= notebookDocument.cells.length;
@@ -412,6 +431,7 @@ export class NotebookDocuments<T extends { uri: DocumentUri }> {
 								const change = cellUpdates.get(
 									notebookDocument.cells[i].document,
 								);
+
 								if (change !== undefined) {
 									const old = notebookDocument.cells.splice(
 										i,
@@ -420,6 +440,7 @@ export class NotebookDocuments<T extends { uri: DocumentUri }> {
 									);
 									data.push({ old: old[0], new: change });
 									cellUpdates.delete(change.document);
+
 									if (cellUpdates.size === 0) {
 										break;
 									}
@@ -446,6 +467,7 @@ export class NotebookDocuments<T extends { uri: DocumentUri }> {
 					const changeEvent: NotebookDocumentChangeEvent = {
 						notebookDocument,
 					};
+
 					if (metadataChanged) {
 						changeEvent.metadata = {
 							old: oldMetadata,
@@ -454,14 +476,17 @@ export class NotebookDocuments<T extends { uri: DocumentUri }> {
 					}
 
 					const added: NotebookCell[] = [];
+
 					for (const open of opened) {
 						added.push(this.getNotebookCell(open)!);
 					}
 					const removed: NotebookCell[] = [];
+
 					for (const close of closed) {
 						removed.push(this.getNotebookCell(close)!);
 					}
 					const textContent: NotebookCell[] = [];
+
 					for (const change of text) {
 						textContent.push(this.getNotebookCell(change)!);
 					}
@@ -492,6 +517,7 @@ export class NotebookDocuments<T extends { uri: DocumentUri }> {
 					const notebookDocument = this.notebookDocuments.get(
 						params.notebookDocument.uri,
 					);
+
 					if (notebookDocument === undefined) {
 						return;
 					}
@@ -505,22 +531,26 @@ export class NotebookDocuments<T extends { uri: DocumentUri }> {
 					const notebookDocument = this.notebookDocuments.get(
 						params.notebookDocument.uri,
 					);
+
 					if (notebookDocument === undefined) {
 						return;
 					}
 					this._onDidClose.fire(notebookDocument);
+
 					for (const cellTextDocument of params.cellTextDocuments) {
 						await cellTextDocumentConnection.closeTextDocument({
 							textDocument: cellTextDocument,
 						});
 					}
 					this.notebookDocuments.delete(params.notebookDocument.uri);
+
 					for (const cell of notebookDocument.cells) {
 						this.notebookCellMap.delete(cell.document);
 					}
 				},
 			),
 		);
+
 		return Disposable.create(() => {
 			disposables.forEach((disposable) => disposable.dispose());
 		});

@@ -158,6 +158,7 @@ export class CompletionItemFeature extends TextDocumentLanguageFeature<
 			documentSelector,
 			capabilities.completionProvider,
 		);
+
 		if (!options) {
 			return;
 		}
@@ -176,9 +177,13 @@ export class CompletionItemFeature extends TextDocumentLanguageFeature<
 			id,
 			!!options.completionItem?.labelDetailsSupport,
 		);
+
 		const triggerCharacters = options.triggerCharacters ?? [];
+
 		const defaultCommitCharacters = options.allCommitCharacters;
+
 		const selector = options.documentSelector!;
+
 		const provider: CompletionItemProvider = {
 			provideCompletionItems: (
 				document: TextDocument,
@@ -187,7 +192,9 @@ export class CompletionItemFeature extends TextDocumentLanguageFeature<
 				context: VCompletionContext,
 			): ProviderResult<VCompletionList | VCompletionItem[]> => {
 				const client = this._client;
+
 				const middleware = this._client.middleware;
+
 				const provideCompletionItems: ProvideCompletionItemsSignature =
 					(document, position, context, token) => {
 						return client
@@ -221,6 +228,7 @@ export class CompletionItemFeature extends TextDocumentLanguageFeature<
 								},
 							);
 					};
+
 				return middleware.provideCompletionItem
 					? middleware.provideCompletionItem(
 							document,
@@ -242,7 +250,9 @@ export class CompletionItemFeature extends TextDocumentLanguageFeature<
 						token: CancellationToken,
 					): ProviderResult<VCompletionItem> => {
 						const client = this._client;
+
 						const middleware = this._client.middleware;
+
 						const resolveCompletionItem: ResolveCompletionItemSignature =
 							(item, token) => {
 								return client
@@ -273,6 +283,7 @@ export class CompletionItemFeature extends TextDocumentLanguageFeature<
 										},
 									);
 							};
+
 						return middleware.resolveCompletionItem
 							? middleware.resolveCompletionItem(
 									item,
@@ -283,6 +294,7 @@ export class CompletionItemFeature extends TextDocumentLanguageFeature<
 					}
 				: undefined,
 		};
+
 		return [
 			Languages.registerCompletionItemProvider(
 				this._client.protocol2CodeConverter.asDocumentSelector(

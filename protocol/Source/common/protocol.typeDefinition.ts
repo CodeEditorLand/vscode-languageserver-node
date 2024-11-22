@@ -68,8 +68,10 @@ export interface TypeDefinitionParams
 export namespace TypeDefinitionRequest {
 	export const method: "textDocument/typeDefinition" =
 		"textDocument/typeDefinition";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		TypeDefinitionParams,
 		Definition | DefinitionLink[] | null,
@@ -77,6 +79,7 @@ export namespace TypeDefinitionRequest {
 		void,
 		TypeDefinitionRegistrationOptions
 	>(method);
+
 	export type HandlerSignature = RequestHandler<
 		TypeDefinitionParams,
 		Definition | DefinitionLink[] | null,

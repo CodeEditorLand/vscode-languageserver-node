@@ -226,6 +226,7 @@ export class TextDocuments<T extends { uri: DocumentUri }> {
 	public listen(connection: TextDocumentConnection): Disposable {
 		(<ConnectionState>(<any>connection)).__textDocumentSync =
 			TextDocumentSyncKind.Incremental;
+
 		const disposables: Disposable[] = [];
 		disposables.push(
 			connection.onDidOpenTextDocument(
@@ -240,6 +241,7 @@ export class TextDocuments<T extends { uri: DocumentUri }> {
 					);
 
 					this._syncedDocuments.set(td.uri, document);
+
 					const toFire = Object.freeze({ document });
 					this._onDidOpen.fire(toFire);
 					this._onDidChangeContent.fire(toFire);
@@ -250,12 +252,15 @@ export class TextDocuments<T extends { uri: DocumentUri }> {
 			connection.onDidChangeTextDocument(
 				(event: DidChangeTextDocumentParams) => {
 					const td = event.textDocument;
+
 					const changes = event.contentChanges;
+
 					if (changes.length === 0) {
 						return;
 					}
 
 					const { version } = td;
+
 					if (version === null || version === undefined) {
 						throw new Error(
 							`Received document change event for ${td.uri} without valid version identifier`,
@@ -263,6 +268,7 @@ export class TextDocuments<T extends { uri: DocumentUri }> {
 					}
 
 					let syncedDocument = this._syncedDocuments.get(td.uri);
+
 					if (syncedDocument !== undefined) {
 						syncedDocument = this._configuration.update(
 							syncedDocument,
@@ -283,6 +289,7 @@ export class TextDocuments<T extends { uri: DocumentUri }> {
 					const syncedDocument = this._syncedDocuments.get(
 						event.textDocument.uri,
 					);
+
 					if (syncedDocument !== undefined) {
 						this._syncedDocuments.delete(event.textDocument.uri);
 						this._onDidClose.fire(
@@ -298,6 +305,7 @@ export class TextDocuments<T extends { uri: DocumentUri }> {
 					const syncedDocument = this._syncedDocuments.get(
 						event.textDocument.uri,
 					);
+
 					if (syncedDocument !== undefined) {
 						this._onWillSave.fire(
 							Object.freeze({
@@ -318,6 +326,7 @@ export class TextDocuments<T extends { uri: DocumentUri }> {
 					const syncedDocument = this._syncedDocuments.get(
 						event.textDocument.uri,
 					);
+
 					if (
 						syncedDocument !== undefined &&
 						this._willSaveWaitUntil
@@ -341,6 +350,7 @@ export class TextDocuments<T extends { uri: DocumentUri }> {
 					const syncedDocument = this._syncedDocuments.get(
 						event.textDocument.uri,
 					);
+
 					if (syncedDocument !== undefined) {
 						this._onDidSave.fire(
 							Object.freeze({ document: syncedDocument }),
@@ -349,6 +359,7 @@ export class TextDocuments<T extends { uri: DocumentUri }> {
 				},
 			),
 		);
+
 		return Disposable.create(() => {
 			disposables.forEach((disposable) => disposable.dispose());
 		});

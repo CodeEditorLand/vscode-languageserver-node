@@ -72,7 +72,9 @@ export class DocumentLinkFeature extends TextDocumentLanguageFeature<
 			ensure(capabilities, "textDocument")!,
 			"documentLink",
 		)!;
+
 		documentLinkCapabilities.dynamicRegistration = true;
+
 		documentLinkCapabilities.tooltipSupport = true;
 	}
 
@@ -84,6 +86,7 @@ export class DocumentLinkFeature extends TextDocumentLanguageFeature<
 			documentSelector,
 			capabilities.documentLinkProvider,
 		);
+
 		if (!options) {
 			return;
 		}
@@ -94,12 +97,14 @@ export class DocumentLinkFeature extends TextDocumentLanguageFeature<
 		options: DocumentLinkRegistrationOptions,
 	): [Disposable, DocumentLinkProvider] {
 		const selector = options.documentSelector!;
+
 		const provider: DocumentLinkProvider = {
 			provideDocumentLinks: (
 				document: TextDocument,
 				token: CancellationToken,
 			): ProviderResult<VDocumentLink[]> => {
 				const client = this._client;
+
 				const provideDocumentLinks: ProvideDocumentLinksSignature = (
 					document,
 					token,
@@ -132,7 +137,9 @@ export class DocumentLinkFeature extends TextDocumentLanguageFeature<
 							},
 						);
 				};
+
 				const middleware = client.middleware;
+
 				return middleware.provideDocumentLinks
 					? middleware.provideDocumentLinks(
 							document,
@@ -144,6 +151,7 @@ export class DocumentLinkFeature extends TextDocumentLanguageFeature<
 			resolveDocumentLink: options.resolveProvider
 				? (link, token) => {
 						const client = this._client;
+
 						const resolveDocumentLink: ResolveDocumentLinkSignature =
 							(link, token) => {
 								return client
@@ -173,7 +181,9 @@ export class DocumentLinkFeature extends TextDocumentLanguageFeature<
 										},
 									);
 							};
+
 						const middleware = client.middleware;
+
 						return middleware.resolveDocumentLink
 							? middleware.resolveDocumentLink(
 									link,
@@ -184,6 +194,7 @@ export class DocumentLinkFeature extends TextDocumentLanguageFeature<
 					}
 				: undefined,
 		};
+
 		return [
 			Languages.registerDocumentLinkProvider(
 				this._client.protocol2CodeConverter.asDocumentSelector(

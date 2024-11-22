@@ -19,15 +19,18 @@ import * as url from "url";
  */
 export function uriToFilePath(uri: string): string | undefined {
 	const parsed = url.parse(uri);
+
 	if (parsed.protocol !== "file:" || !parsed.path) {
 		return undefined;
 	}
 	const segments = parsed.path.split("/");
+
 	for (let i = 0, len = segments.length; i < len; i++) {
 		segments[i] = decodeURIComponent(segments[i]);
 	}
 	if (process.platform === "win32" && segments.length > 1) {
 		const first = segments[0];
+
 		const second = segments[1];
 		// Do we have a drive letter and we started with a / which is the
 		// case if the first segement is empty (see split above)
@@ -78,6 +81,7 @@ export function resolve(
 
 	return new Promise<any>((resolve, reject) => {
 		const env = process.env;
+
 		const newEnv = Object.create(null);
 		Object.keys(env).forEach((key) => (newEnv[key] = env[key]));
 
@@ -93,18 +97,21 @@ export function resolve(
 			}
 		}
 		newEnv["ELECTRON_RUN_AS_NODE"] = "1";
+
 		try {
 			const cp: ChildProcess = fork("", [], <any>{
 				cwd: cwd,
 				env: newEnv,
 				execArgv: ["-e", app],
 			});
+
 			if (cp.pid === void 0) {
 				reject(
 					new Error(
 						`Starting process to resolve node module  ${moduleName} failed`,
 					),
 				);
+
 				return;
 			}
 			cp.on("error", (error: any) => {
@@ -113,6 +120,7 @@ export function resolve(
 			cp.on("message", (message: Message) => {
 				if (message.c === "r") {
 					cp.send({ c: "e" });
+
 					if (message.s) {
 						resolve(message.r);
 					} else {
@@ -124,6 +132,7 @@ export function resolve(
 					}
 				}
 			});
+
 			const message: Message = {
 				c: "rs",
 				a: moduleName,
@@ -145,21 +154,26 @@ export function resolveGlobalNodePath(
 	tracer?: (message: string) => void,
 ): string | undefined {
 	let npmCommand = "npm";
+
 	const env: typeof process.env = Object.create(null);
 	Object.keys(process.env).forEach((key) => (env[key] = process.env[key]));
 	env["NO_UPDATE_NOTIFIER"] = "true";
+
 	const options: SpawnSyncOptionsWithStringEncoding = {
 		encoding: "utf8",
 		env,
 	};
+
 	if (isWindows()) {
 		npmCommand = "npm.cmd";
 		options.shell = true;
 	}
 
 	const handler = () => {};
+
 	try {
 		process.on("SIGPIPE", handler);
+
 		const stdout = spawnSync(
 			npmCommand,
 			["config", "get", "prefix"],
@@ -173,6 +187,7 @@ export function resolveGlobalNodePath(
 			return undefined;
 		}
 		const prefix = stdout.trim();
+
 		if (tracer) {
 			tracer(`'npm config get prefix' value is: ${prefix}`);
 		}
@@ -207,6 +222,7 @@ export function resolveGlobalYarnPath(
 	tracer?: (message: string) => void,
 ): string | undefined {
 	let yarnCommand = "yarn";
+
 	const options: SpawnSyncOptionsWithStringEncoding = {
 		encoding: "utf8",
 	};
@@ -217,8 +233,10 @@ export function resolveGlobalYarnPath(
 	}
 
 	const handler = () => {};
+
 	try {
 		process.on("SIGPIPE", handler);
+
 		const results = spawnSync(
 			yarnCommand,
 			["global", "dir", "--json"],
@@ -226,9 +244,11 @@ export function resolveGlobalYarnPath(
 		);
 
 		const stdout = results.stdout;
+
 		if (!stdout) {
 			if (tracer) {
 				tracer(`'yarn global dir' didn't return a value.`);
+
 				if (results.stderr) {
 					tracer(results.stderr);
 				}
@@ -236,9 +256,11 @@ export function resolveGlobalYarnPath(
 			return undefined;
 		}
 		const lines = stdout.trim().split(/\r?\n/);
+
 		for (const line of lines) {
 			try {
 				const yarn: YarnJsonFormat = JSON.parse(line);
+
 				if (yarn.type === "log") {
 					return path.join(yarn.data, "node_modules");
 				}
@@ -256,6 +278,7 @@ export function resolveGlobalYarnPath(
 
 export namespace FileSystem {
 	let _isCaseSensitive: boolean | undefined = undefined;
+
 	export function isCaseSensitive(): boolean {
 		if (_isCaseSensitive !== void 0) {
 			return _isCaseSensitive;

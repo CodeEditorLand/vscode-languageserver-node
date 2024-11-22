@@ -77,6 +77,7 @@ export const SemanticTokensFeature: Feature<
 					>,
 				): Disposable => {
 					const type = SemanticTokensRequest.type;
+
 					return this.connection.onRequest(type, (params, cancel) => {
 						return handler(
 							params,
@@ -96,6 +97,7 @@ export const SemanticTokensFeature: Feature<
 					>,
 				): Disposable => {
 					const type = SemanticTokensDeltaRequest.type;
+
 					return this.connection.onRequest(type, (params, cancel) => {
 						return handler(
 							params,
@@ -114,6 +116,7 @@ export const SemanticTokensFeature: Feature<
 					>,
 				): Disposable => {
 					const type = SemanticTokensRangeRequest.type;
+
 					return this.connection.onRequest(type, (params, cancel) => {
 						return handler(
 							params,
@@ -139,8 +142,11 @@ export class SemanticTokensDiff {
 
 	public computeDiff(): SemanticTokensEdit[] {
 		const originalLength = this.originalSequence.length;
+
 		const modifiedLength = this.modifiedSequence.length;
+
 		let startIndex = 0;
+
 		while (
 			startIndex < modifiedLength &&
 			startIndex < originalLength &&
@@ -151,7 +157,9 @@ export class SemanticTokensDiff {
 		}
 		if (startIndex < modifiedLength && startIndex < originalLength) {
 			let originalEndIndex = originalLength - 1;
+
 			let modifiedEndIndex = modifiedLength - 1;
+
 			while (
 				originalEndIndex >= startIndex &&
 				modifiedEndIndex >= startIndex &&
@@ -171,6 +179,7 @@ export class SemanticTokensDiff {
 			}
 
 			const deleteCount = originalEndIndex - startIndex + 1;
+
 			const newData = this.modifiedSequence.slice(
 				startIndex,
 				modifiedEndIndex + 1,
@@ -249,9 +258,12 @@ export class SemanticTokensBuilder {
 		}
 
 		let pushLine = line;
+
 		let pushChar = char;
+
 		if (this._dataIsSortedAndDeltaEncoded && this._dataLen > 0) {
 			pushLine -= this._prevLine;
+
 			if (pushLine === 0) {
 				pushChar -= this._prevChar;
 			}
@@ -278,12 +290,18 @@ export class SemanticTokensBuilder {
 	private static _deltaDecode(data: number[]): number[] {
 		// Remove delta encoding from data
 		const tokenCount = (data.length / 5) | 0;
+
 		let prevLine = 0;
+
 		let prevChar = 0;
+
 		const result: number[] = [];
+
 		for (let i = 0; i < tokenCount; i++) {
 			const dstOffset = 5 * i;
+
 			let line = data[dstOffset];
+
 			let char = data[dstOffset + 1];
 
 			if (line === 0) {
@@ -296,7 +314,9 @@ export class SemanticTokensBuilder {
 			}
 
 			const length = data[dstOffset + 2];
+
 			const tokenType = data[dstOffset + 3];
+
 			const tokenModifiers = data[dstOffset + 4];
 
 			result[dstOffset + 0] = line;
@@ -314,32 +334,48 @@ export class SemanticTokensBuilder {
 
 	private static _sortAndDeltaEncode(data: number[]): number[] {
 		const pos: number[] = [];
+
 		const tokenCount = (data.length / 5) | 0;
+
 		for (let i = 0; i < tokenCount; i++) {
 			pos[i] = i;
 		}
 		pos.sort((a, b) => {
 			const aLine = data[5 * a];
+
 			const bLine = data[5 * b];
+
 			if (aLine === bLine) {
 				const aChar = data[5 * a + 1];
+
 				const bChar = data[5 * b + 1];
+
 				return aChar - bChar;
 			}
 			return aLine - bLine;
 		});
+
 		const result = [];
+
 		let prevLine = 0;
+
 		let prevChar = 0;
+
 		for (let i = 0; i < tokenCount; i++) {
 			const srcOffset = 5 * pos[i];
+
 			const line = data[srcOffset + 0];
+
 			const char = data[srcOffset + 1];
+
 			const length = data[srcOffset + 2];
+
 			const tokenType = data[srcOffset + 3];
+
 			const tokenModifiers = data[srcOffset + 4];
 
 			const pushLine = line - prevLine;
+
 			const pushChar = pushLine === 0 ? char - prevChar : char;
 
 			const dstOffset = 5 * i;

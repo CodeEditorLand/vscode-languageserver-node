@@ -30,11 +30,16 @@ const patterns = [
 
 function computeDiagnostics(content: string): Diagnostic[] {
 	const result: Diagnostic[] = [];
+
 	const lines: string[] = content.match(/^.*(\n|\r\n|\r|$)/gm);
+
 	let lineNumber: number = 0;
+
 	for (const line of lines) {
 		const pattern = patterns[Math.floor(Math.random() * 3)];
+
 		let match: RegExpExecArray | null;
+
 		while ((match = pattern.exec(line))) {
 			result.push(
 				Diagnostic.create(
@@ -57,6 +62,7 @@ function computeDiagnostics(content: string): Diagnostic[] {
 const connection: ProposedFeatures.Connection = createConnection(
 	ProposedFeatures.all,
 );
+
 const documents = new TextDocuments(TextDocument);
 
 connection.onInitialize(
@@ -76,6 +82,7 @@ connection.onInitialize(
 				completionProvider: {},
 			},
 		};
+
 		return result;
 	},
 );
@@ -110,8 +117,10 @@ connection.onDeclaration((params, token) => {
 
 connection.onCompletion((params, token): CompletionItem[] => {
 	const result: CompletionItem[] = [];
+
 	const item = CompletionItem.create("foo");
 	result.push(item);
+
 	return result;
 });
 

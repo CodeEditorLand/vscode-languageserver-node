@@ -90,6 +90,7 @@ export namespace ExecutionSummary {
 		success?: boolean,
 	): ExecutionSummary {
 		const result: ExecutionSummary = { executionOrder };
+
 		if (success === true || success === false) {
 			result.success = success;
 		}
@@ -98,6 +99,7 @@ export namespace ExecutionSummary {
 
 	export function is(value: any): value is ExecutionSummary {
 		const candidate: ExecutionSummary = value;
+
 		return (
 			Is.objectLiteral(candidate) &&
 			uinteger.is(candidate.executionOrder) &&
@@ -172,6 +174,7 @@ export namespace NotebookCell {
 
 	export function is(value: any): value is NotebookCell {
 		const candidate: NotebookCell = value;
+
 		return (
 			Is.objectLiteral(candidate) &&
 			NotebookCellKind.is(candidate.kind) &&
@@ -186,6 +189,7 @@ export namespace NotebookCell {
 		two: NotebookCell,
 	): Set<keyof NotebookCell> {
 		const result: Set<keyof NotebookCell> = new Set();
+
 		if (one.document !== two.document) {
 			result.add("document");
 		}
@@ -216,6 +220,7 @@ export namespace NotebookCell {
 		other: LSPAny | undefined,
 	): boolean {
 		type LSPObject = { [key: string]: LSPAny };
+
 		if (one === other) {
 			return true;
 		}
@@ -234,7 +239,9 @@ export namespace NotebookCell {
 			return false;
 		}
 		const oneArray = Array.isArray(one);
+
 		const otherArray = Array.isArray(other);
+
 		if (oneArray !== otherArray) {
 			return false;
 		}
@@ -251,6 +258,7 @@ export namespace NotebookCell {
 		}
 		if (Is.objectLiteral(one) && Is.objectLiteral(other)) {
 			const oneKeys = Object.keys(one);
+
 			const otherKeys = Object.keys(other);
 
 			if (oneKeys.length !== otherKeys.length) {
@@ -259,11 +267,13 @@ export namespace NotebookCell {
 
 			oneKeys.sort();
 			otherKeys.sort();
+
 			if (!equalsMetadata(oneKeys, otherKeys)) {
 				return false;
 			}
 			for (let i = 0; i < oneKeys.length; i++) {
 				const prop = oneKeys[i];
+
 				if (
 					!equalsMetadata(
 						(one as LSPObject)[prop],
@@ -325,6 +335,7 @@ export namespace NotebookDocument {
 	}
 	export function is(value: any): value is NotebookDocument {
 		const candidate: NotebookDocument = value;
+
 		return (
 			Is.objectLiteral(candidate) &&
 			Is.string(candidate.uri) &&
@@ -445,8 +456,10 @@ export type NotebookDocumentSyncRegistrationOptions =
 
 export namespace NotebookDocumentSyncRegistrationType {
 	export const method: "notebookDocument/sync" = "notebookDocument/sync";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type =
 		new RegistrationType<NotebookDocumentSyncRegistrationOptions>(method);
 }
@@ -477,12 +490,15 @@ export type DidOpenNotebookDocumentParams = {
 export namespace DidOpenNotebookDocumentNotification {
 	export const method: "notebookDocument/didOpen" =
 		"notebookDocument/didOpen";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolNotificationType<
 		DidOpenNotebookDocumentParams,
 		NotebookDocumentSyncRegistrationOptions
 	>(method);
+
 	export const registrationMethod: typeof NotebookDocumentSyncRegistrationType.method =
 		NotebookDocumentSyncRegistrationType.method;
 }
@@ -513,6 +529,7 @@ export type NotebookCellArrayChange = {
 export namespace NotebookCellArrayChange {
 	export function is(value: any): value is NotebookCellArrayChange {
 		const candidate: NotebookCellArrayChange = value;
+
 		return (
 			Is.objectLiteral(candidate) &&
 			uinteger.is(candidate.start) &&
@@ -528,6 +545,7 @@ export namespace NotebookCellArrayChange {
 		cells?: NotebookCell[],
 	): NotebookCellArrayChange {
 		const result: NotebookCellArrayChange = { start, deleteCount };
+
 		if (cells !== undefined) {
 			result.cells = cells;
 		}
@@ -645,12 +663,15 @@ export type DidChangeNotebookDocumentParams = {
 export namespace DidChangeNotebookDocumentNotification {
 	export const method: "notebookDocument/didChange" =
 		"notebookDocument/didChange";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolNotificationType<
 		DidChangeNotebookDocumentParams,
 		NotebookDocumentSyncRegistrationOptions
 	>(method);
+
 	export const registrationMethod: typeof NotebookDocumentSyncRegistrationType.method =
 		NotebookDocumentSyncRegistrationType.method;
 }
@@ -675,12 +696,15 @@ export type DidSaveNotebookDocumentParams = {
 export namespace DidSaveNotebookDocumentNotification {
 	export const method: "notebookDocument/didSave" =
 		"notebookDocument/didSave";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolNotificationType<
 		DidSaveNotebookDocumentParams,
 		NotebookDocumentSyncRegistrationOptions
 	>(method);
+
 	export const registrationMethod: typeof NotebookDocumentSyncRegistrationType.method =
 		NotebookDocumentSyncRegistrationType.method;
 }
@@ -711,12 +735,15 @@ export type DidCloseNotebookDocumentParams = {
 export namespace DidCloseNotebookDocumentNotification {
 	export const method: "notebookDocument/didClose" =
 		"notebookDocument/didClose";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolNotificationType<
 		DidCloseNotebookDocumentParams,
 		NotebookDocumentSyncRegistrationOptions
 	>(method);
+
 	export const registrationMethod: typeof NotebookDocumentSyncRegistrationType.method =
 		NotebookDocumentSyncRegistrationType.method;
 }

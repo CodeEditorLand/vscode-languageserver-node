@@ -22,6 +22,7 @@ namespace SharableOptions {
 			return options;
 		}
 		let result: SharableOptions = {};
+
 		for (const option of options.extends) {
 			result = assign(flatten(option), result);
 		}
@@ -39,6 +40,7 @@ namespace SharableOptions {
 			opt1.compilerOptions,
 			opt2.compilerOptions,
 		);
+
 		return result;
 	}
 }
@@ -69,6 +71,7 @@ namespace TSConfigFile {
 		result.include = Arrays.assign(result.include, options.include);
 		result.exclude = Arrays.assign(result.exclude, options.exclude);
 		result.files = Arrays.assign(result.files, options.files);
+
 		return result;
 	}
 
@@ -94,6 +97,7 @@ namespace ProjectOptions {
 				return match;
 			}
 			const value = options.variables!.get(m2);
+
 			return value ?? match;
 		});
 	}
@@ -125,9 +129,13 @@ export class ProjectGenerator {
 
 	public generate(root: string): GeneratorResultEntry[] {
 		let tsconfig: TsConfigFile = {};
+
 		const description = this.description;
+
 		const sourceFolders: SourceFolderGenerator[] = [];
+
 		const options = SharableOptions.flatten(description);
+
 		const singleSource =
 			description.sourceFolders === undefined &&
 			description.out !== undefined;
@@ -139,6 +147,7 @@ export class ProjectGenerator {
 				this.options.compilerOptions,
 			);
 			tsconfig.compilerOptions.outDir = description.out!.dir;
+
 			if (description.out!.buildInfoFile !== undefined) {
 				tsconfig.compilerOptions.tsBuildInfoFile = path.join(
 					description.out!.dir,
@@ -163,9 +172,11 @@ export class ProjectGenerator {
 
 		if (description.references !== undefined) {
 			tsconfig.references = tsconfig.references ?? [];
+
 			for (const reference of description.references) {
 				if (typeof reference === "string") {
 					const basename = path.basename(reference);
+
 					if (basename.match(/tsconfig(\.[^\.]+)*\.json/)) {
 						tsconfig.references.push({ path: reference });
 					} else {
@@ -175,6 +186,7 @@ export class ProjectGenerator {
 					}
 				} else {
 					const parentLevels = this.parentLevels();
+
 					let referencePath =
 						parentLevels === undefined
 							? path.join(
@@ -188,6 +200,7 @@ export class ProjectGenerator {
 									reference.path,
 									this.options.tsconfig,
 								);
+
 					if (
 						!path.isAbsolute(referencePath) &&
 						!referencePath.startsWith("./")
@@ -205,8 +218,10 @@ export class ProjectGenerator {
 		if (description.sourceFolders !== undefined) {
 			tsconfig.compilerOptions = tsconfig.compilerOptions ?? {};
 			tsconfig.references = tsconfig.references ?? [];
+
 			for (const sourceFolder of description.sourceFolders) {
 				let sfp = path.join(sourceFolder.path, this.options.tsconfig);
+
 				if (!path.isAbsolute(sfp) && !sfp.startsWith("./")) {
 					sfp = `./${sfp}`;
 				}
@@ -227,9 +242,12 @@ export class ProjectGenerator {
 			path: _p.join(root, description.path, this.options.tsconfig),
 			tsconfig,
 		});
+
 		const compositeSourceFolders = new Set<string>();
+
 		const sourceFolderResults: Map<string, GeneratorResultEntry> =
 			new Map();
+
 		for (const sourceFolder of sourceFolders) {
 			const sfr = sourceFolder.generate(_p.join(root, description.path));
 			result.push(sfr.result);
@@ -237,6 +255,7 @@ export class ProjectGenerator {
 				path.normalize(sourceFolder.description.path),
 				sfr.result,
 			);
+
 			if (sfr.compositeTargets) {
 				for (const compositeTarget of sfr.compositeTargets) {
 					compositeSourceFolders.add(compositeTarget);
@@ -248,6 +267,7 @@ export class ProjectGenerator {
 				const sourceFolder = sourceFolderResults.get(
 					compositeSourceFolder,
 				);
+
 				if (sourceFolder !== undefined) {
 					sourceFolder.tsconfig.compilerOptions =
 						sourceFolder.tsconfig.compilerOptions ?? {};
@@ -260,10 +280,12 @@ export class ProjectGenerator {
 
 	private parentLevels(): string | undefined {
 		const normalized = path.normalize(this.description.path);
+
 		if (normalized === "." || normalized === "./") {
 			return undefined;
 		}
 		const split = normalized.split(path.sep);
+
 		for (let i = 0; i < split.length; i++) {
 			split[i] = "..";
 		}
@@ -291,13 +313,16 @@ class SourceFolderGenerator {
 		compositeTargets?: string[];
 	} {
 		let result: TsConfigFile = {};
+
 		const description = this.description;
+
 		const options = SharableOptions.flatten(description);
 		result = TSConfigFile.assign(result, options);
 		result.compilerOptions = CompilerOptions.assign(
 			result.compilerOptions,
 			this.options.compilerOptions,
 		);
+
 		if (description.out !== undefined) {
 			const out = description.out;
 			result.compilerOptions = result.compilerOptions ?? {};
@@ -305,6 +330,7 @@ class SourceFolderGenerator {
 				out.dir,
 				this.options,
 			);
+
 			if (out.buildInfoFile !== undefined) {
 				result.compilerOptions.tsBuildInfoFile =
 					ProjectOptions.resolveVariables(
@@ -315,15 +341,21 @@ class SourceFolderGenerator {
 			}
 		} else if (this.projectDescription.out !== undefined) {
 			const out = this.projectDescription.out;
+
 			const outAbsolute = path.isAbsolute(out.dir)
 				? out.dir
 				: path.join("/", out.dir);
+
 			const sourceAbsolute = path.isAbsolute(description.path)
 				? description.path
 				: path.join("/", description.path);
+
 			let outDir = path.relative(sourceAbsolute, outAbsolute);
+
 			const outSplit = outAbsolute.split(path.sep);
+
 			const sourceSplit = sourceAbsolute.split(path.sep);
+
 			if (sourceSplit.length > outSplit.length) {
 				for (let i = outSplit.length; i < sourceSplit.length; i++) {
 					outDir = path.join(outDir, sourceSplit[i]);
@@ -331,6 +363,7 @@ class SourceFolderGenerator {
 			}
 			result.compilerOptions = result.compilerOptions ?? {};
 			result.compilerOptions.outDir = outDir;
+
 			if (out.buildInfoFile !== undefined) {
 				result.compilerOptions.tsBuildInfoFile = path.join(
 					outDir,
@@ -343,12 +376,15 @@ class SourceFolderGenerator {
 			}
 		}
 		const compositeTargets: string[] = [];
+
 		if (description.references) {
 			result.references = [];
+
 			for (const reference of description.references) {
 				result.references.push({
 					path: path.join(reference, this.options.tsconfig),
 				});
+
 				if (!path.isAbsolute(reference)) {
 					compositeTargets.push(
 						path.normalize(path.join(description.path, reference)),

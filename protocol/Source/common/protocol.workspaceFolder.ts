@@ -54,18 +54,22 @@ export interface WorkspaceFoldersServerCapabilities {
 export namespace WorkspaceFoldersRequest {
 	export const method: "workspace/workspaceFolders" =
 		"workspace/workspaceFolders";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.serverToClient;
+
 	export const type = new ProtocolRequestType0<
 		WorkspaceFolder[] | null,
 		never,
 		void,
 		void
 	>(method);
+
 	export type HandlerSignature = RequestHandler0<
 		WorkspaceFolder[] | null,
 		void
 	>;
+
 	export type MiddlewareSignature = (
 		token: CancellationToken,
 		next: HandlerSignature,
@@ -79,14 +83,18 @@ export namespace WorkspaceFoldersRequest {
 export namespace DidChangeWorkspaceFoldersNotification {
 	export const method: "workspace/didChangeWorkspaceFolders" =
 		"workspace/didChangeWorkspaceFolders";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolNotificationType<
 		DidChangeWorkspaceFoldersParams,
 		void
 	>(method);
+
 	export type HandlerSignature =
 		NotificationHandler<DidChangeWorkspaceFoldersParams>;
+
 	export type MiddlewareSignature = (
 		params: DidChangeWorkspaceFoldersParams,
 		next: HandlerSignature,

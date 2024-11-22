@@ -127,10 +127,12 @@ abstract class FileOperationFeature<I, E extends Event<I>>
 
 	public initialize(capabilities: proto.ServerCapabilities): void {
 		const options = capabilities.workspace?.fileOperations;
+
 		const capability =
 			options !== undefined
 				? access(options, this._serverCapability)
 				: undefined;
+
 		if (capability?.filters !== undefined) {
 			try {
 				this.register({
@@ -156,6 +158,7 @@ abstract class FileOperationFeature<I, E extends Event<I>>
 				filter.pattern.glob,
 				FileOperationFeature.asMinimatchOptions(filter.pattern.options),
 			);
+
 			if (!matcher.makeRe()) {
 				throw new Error(`Invalid pattern ${filter.pattern.glob}!`);
 			}
@@ -172,6 +175,7 @@ abstract class FileOperationFeature<I, E extends Event<I>>
 
 	public unregister(id: string): void {
 		this._filters.delete(id);
+
 		if (this._filters.size === 0 && this._listener) {
 			this._listener.dispose();
 			this._listener = undefined;
@@ -180,6 +184,7 @@ abstract class FileOperationFeature<I, E extends Event<I>>
 
 	public clear(): void {
 		this._filters.clear();
+
 		if (this._listener) {
 			this._listener.dispose();
 			this._listener = undefined;
@@ -199,6 +204,7 @@ abstract class FileOperationFeature<I, E extends Event<I>>
 				// Use fsPath to make this consistent with file system watchers but help
 				// minimatch to use '/' instead of `\\` if present.
 				const path = uri.fsPath.replace(/\\/g, "/");
+
 				for (const filters of this._filters.values()) {
 					for (const filter of filters) {
 						if (
@@ -212,6 +218,7 @@ abstract class FileOperationFeature<I, E extends Event<I>>
 						// Dropping it would be another alternative.
 						if (fileType === undefined) {
 							this._client.info(`Unable to determine file type for ${uri.toString()}. Treating as a match.`);
+
 							return true;
 						}
 						if ((fileType === code.FileType.File && filter.kind === proto.FileOperationPatternKind.file) || (fileType === code.FileType.Directory && filter.kind === proto.FileOperationPatternKind.folder)) {
@@ -219,6 +226,7 @@ abstract class FileOperationFeature<I, E extends Event<I>>
 						}
 					} else if (filter.kind === proto.FileOperationPatternKind.folder) {
 						const fileType = await FileOperationFeature.getFileType(uri);
+
 						if (fileType === code.FileType.Directory && filter.matcher.match(`${path}/`)) {
 							return true;
 						}
@@ -250,6 +258,7 @@ abstract class FileOperationFeature<I, E extends Event<I>>
 		// The spec doesn't state that dot files don't match. So we make
 		// matching those the default.
 		const result: minimatch.MinimatchOptions = { dot: true };
+
 		if (options?.ignoreCase === true) {
 			result.nocase = true;
 		}
@@ -297,6 +306,7 @@ abstract class NotificationFileOperationFeature<
 		// Create a copy of the event that has the files filtered to match what the
 		// server wants.
 		const filteredEvent = await this.filter(originalEvent, this._accessUri);
+
 		if (filteredEvent.files.length) {
 			const next = async (event: E): Promise<void> => {
 				return this._client.sendNotification(
@@ -304,6 +314,7 @@ abstract class NotificationFileOperationFeature<
 					this._createParams(event),
 				);
 			};
+
 			return this.doSend(filteredEvent, next);
 		}
 	}
@@ -326,11 +337,13 @@ abstract class CachingNotificationFileOperationFeature<
 		uri: code.Uri,
 	): Promise<code.FileType | undefined> {
 		const fsPath = uri.fsPath;
+
 		if (this._fsPathFileTypes.has(fsPath)) {
 			return this._fsPathFileTypes.get(fsPath);
 		}
 
 		const type = await FileOperationFeature.getFileType(uri);
+
 		if (type) {
 			this._fsPathFileTypes.set(fsPath, type);
 		}
@@ -352,6 +365,7 @@ abstract class CachingNotificationFileOperationFeature<
 
 	public unregister(id: string): void {
 		super.unregister(id);
+
 		if (this.filterSize() === 0 && this._willListener) {
 			this._willListener.dispose();
 			this._willListener = undefined;
@@ -360,6 +374,7 @@ abstract class CachingNotificationFileOperationFeature<
 
 	public clear(): void {
 		super.clear();
+
 		if (this._willListener) {
 			this._willListener.dispose();
 			this._willListener = undefined;
@@ -389,6 +404,7 @@ export class DidCreateFilesFeature extends NotificationFileOperationFeature<
 		next: (event: code.FileCreateEvent) => Promise<void>,
 	): Promise<void> {
 		const middleware = this._client.middleware.workspace;
+
 		return middleware?.didCreateFiles
 			? middleware.didCreateFiles(event, next)
 			: next(event);
@@ -433,7 +449,9 @@ export class DidRenameFilesFeature extends CachingNotificationFileOperationFeatu
 		next: (event: code.FileRenameEvent) => Promise<void>,
 	): Promise<void> {
 		this.clearFileTypeCache();
+
 		const middleware = this._client.middleware.workspace;
+
 		return middleware?.didRenameFiles
 			? middleware.didRenameFiles(event, next)
 			: next(event);
@@ -478,7 +496,9 @@ export class DidDeleteFilesFeature extends CachingNotificationFileOperationFeatu
 		next: (event: code.FileCreateEvent) => Promise<void>,
 	): Promise<void> {
 		this.clearFileTypeCache();
+
 		const middleware = this._client.middleware.workspace;
+
 		return middleware?.didDeleteFiles
 			? middleware.didDeleteFiles(event, next)
 			: next(event);
@@ -552,6 +572,7 @@ abstract class RequestFileOperationFeature<
 					)
 					.then(this._client.protocol2CodeConverter.asWorkspaceEdit);
 			};
+
 			return this.doSend(filteredEvent, next);
 		} else {
 			return undefined;
@@ -590,6 +611,7 @@ export class WillCreateFilesFeature extends RequestFileOperationFeature<
 		) => Thenable<code.WorkspaceEdit> | Thenable<any>,
 	): Thenable<code.WorkspaceEdit> | Thenable<any> {
 		const middleware = this._client.middleware.workspace;
+
 		return middleware?.willCreateFiles
 			? middleware.willCreateFiles(event, next)
 			: next(event);
@@ -620,6 +642,7 @@ export class WillRenameFilesFeature extends RequestFileOperationFeature<
 		) => Thenable<code.WorkspaceEdit> | Thenable<any>,
 	): Thenable<code.WorkspaceEdit> | Thenable<any> {
 		const middleware = this._client.middleware.workspace;
+
 		return middleware?.willRenameFiles
 			? middleware.willRenameFiles(event, next)
 			: next(event);
@@ -650,6 +673,7 @@ export class WillDeleteFilesFeature extends RequestFileOperationFeature<
 		) => Thenable<code.WorkspaceEdit> | Thenable<any>,
 	): Thenable<code.WorkspaceEdit> | Thenable<any> {
 		const middleware = this._client.middleware.workspace;
+
 		return middleware?.willDeleteFiles
 			? middleware.willDeleteFiles(event, next)
 			: next(event);

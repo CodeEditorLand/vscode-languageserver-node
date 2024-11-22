@@ -131,6 +131,7 @@ export class DidOpenTextDocumentFeature
 				return;
 			}
 			const tabsModel = this._client.tabsModel;
+
 			if (tabsModel.isVisible(document)) {
 				return super.callback(document);
 			} else {
@@ -160,6 +161,7 @@ export class DidOpenTextDocumentFeature
 		const textDocumentSyncOptions = (
 			capabilities as ResolvedTextDocumentSyncCapabilities
 		).resolvedTextDocumentSync;
+
 		if (
 			documentSelector &&
 			textDocumentSyncOptions &&
@@ -180,6 +182,7 @@ export class DidOpenTextDocumentFeature
 		data: RegistrationData<TextDocumentRegistrationOptions>,
 	): void {
 		super.register(data);
+
 		if (!data.registerOptions.documentSelector) {
 			return;
 		}
@@ -189,6 +192,7 @@ export class DidOpenTextDocumentFeature
 			);
 		Workspace.textDocuments.forEach((textDocument) => {
 			const uri: string = textDocument.uri.toString();
+
 			if (this._syncedDocuments.has(uri)) {
 				return;
 			}
@@ -199,8 +203,10 @@ export class DidOpenTextDocumentFeature
 				)
 			) {
 				const tabsModel = this._client.tabsModel;
+
 				if (tabsModel.isVisible(textDocument)) {
 					const middleware = this._client.middleware;
+
 					const didOpen = (
 						textDocument: TextDocument,
 					): Promise<void> => {
@@ -224,8 +230,10 @@ export class DidOpenTextDocumentFeature
 				}
 			}
 		});
+
 		if (this._delayOpen && this._pendingOpenListeners === undefined) {
 			this._pendingOpenListeners = [];
+
 			const tabsModel = this._client.tabsModel;
 			this._pendingOpenListeners.push(
 				tabsModel.onClose((closed) => {
@@ -240,6 +248,7 @@ export class DidOpenTextDocumentFeature
 						const document = this._pendingOpenNotifications.get(
 							uri.toString(),
 						);
+
 						if (document !== undefined) {
 							super.callback(document).catch((error) => {
 								this._client.error(
@@ -271,6 +280,7 @@ export class DidOpenTextDocumentFeature
 			this._pendingOpenNotifications.values(),
 		);
 		this._pendingOpenNotifications.clear();
+
 		for (const notification of notifications) {
 			if (
 				closingDocument !== undefined &&
@@ -295,11 +305,13 @@ export class DidOpenTextDocumentFeature
 		params: DidOpenTextDocumentParams,
 	): void {
 		this._syncedDocuments.set(textDocument.uri.toString(), textDocument);
+
 		super.notificationSent(textDocument, type, params);
 	}
 
 	public clear(): void {
 		this._pendingOpenNotifications.clear();
+
 		if (this._pendingOpenListeners !== undefined) {
 			for (const listener of this._pendingOpenListeners) {
 				listener.dispose();
@@ -365,6 +377,7 @@ export class DidCloseTextDocumentFeature
 		const textDocumentSyncOptions = (
 			capabilities as ResolvedTextDocumentSyncCapabilities
 		).resolvedTextDocumentSync;
+
 		if (
 			documentSelector &&
 			textDocumentSyncOptions &&
@@ -395,17 +408,20 @@ export class DidCloseTextDocumentFeature
 		params: DidCloseTextDocumentParams,
 	): void {
 		this._syncedDocuments.delete(textDocument.uri.toString());
+
 		super.notificationSent(textDocument, type, params);
 	}
 
 	public unregister(id: string): void {
 		const selector = this._selectors.get(id);
+
 		if (selector === undefined) {
 			return;
 		}
 		// The super call removed the selector from the map
 		// of selectors.
 		super.unregister(id);
+
 		const selectors = this._selectors.values();
 		this._syncedDocuments.forEach((textDocument) => {
 			if (
@@ -416,6 +432,7 @@ export class DidCloseTextDocumentFeature
 				)
 			) {
 				const middleware = this._client.middleware;
+
 				const didClose = (
 					textDocument: TextDocument,
 				): Promise<void> => {
@@ -441,6 +458,7 @@ export class DidCloseTextDocumentFeature
 
 interface DidChangeTextDocumentData {
 	syncKind: 0 | 1 | 2;
+
 	documentSelector: VDocumentSelector;
 }
 
@@ -511,6 +529,7 @@ export class DidChangeTextDocumentFeature
 		const textDocumentSyncOptions = (
 			capabilities as ResolvedTextDocumentSyncCapabilities
 		).resolvedTextDocumentSync;
+
 		if (
 			documentSelector &&
 			textDocumentSyncOptions &&
@@ -567,9 +586,11 @@ export class DidChangeTextDocumentFeature
 		// We need to capture the URI and version here since they might change on the text document
 		// until we reach did `didChange` call since the middleware support async execution.
 		const uri = event.document.uri;
+
 		const version = event.document.version;
 
 		const promises: Promise<void>[] = [];
+
 		for (const changeData of this._changeData.values()) {
 			if (
 				Languages.match(changeData.documentSelector, event.document) >
@@ -579,6 +600,7 @@ export class DidChangeTextDocumentFeature
 				)
 			) {
 				const middleware = this._client.middleware;
+
 				if (changeData.syncKind === TextDocumentSyncKind.Incremental) {
 					const didChange = async (
 						event: TextDocumentChangeEvent,
@@ -632,6 +654,7 @@ export class DidChangeTextDocumentFeature
 				`Sending document notification ${DidChangeTextDocumentNotification.type.method} failed`,
 				error,
 			);
+
 			throw error;
 		});
 	}
@@ -649,6 +672,7 @@ export class DidChangeTextDocumentFeature
 
 	public unregister(id: string): void {
 		this._changeData.delete(id);
+
 		if (this._changeData.size === 0) {
 			if (this._listener) {
 				this._listener.dispose();
@@ -657,8 +681,10 @@ export class DidChangeTextDocumentFeature
 			this._syncKind = TextDocumentSyncKind.None;
 		} else {
 			this._syncKind = TextDocumentSyncKind.None as TextDocumentSyncKind;
+
 			for (const changeData of this._changeData.values()) {
 				this.updateSyncKind(changeData.syncKind);
+
 				if (this._syncKind === TextDocumentSyncKind.Full) {
 					break;
 				}
@@ -670,6 +696,7 @@ export class DidChangeTextDocumentFeature
 		this._pendingTextDocumentChanges.clear();
 		this._changeData.clear();
 		this._syncKind = TextDocumentSyncKind.None;
+
 		if (this._listener) {
 			this._listener.dispose();
 			this._listener = undefined;
@@ -681,11 +708,13 @@ export class DidChangeTextDocumentFeature
 			return [];
 		}
 		let result: TextDocument[];
+
 		if (excludes.size === 0) {
 			result = Array.from(this._pendingTextDocumentChanges.values());
 			this._pendingTextDocumentChanges.clear();
 		} else {
 			result = [];
+
 			for (const entry of this._pendingTextDocumentChanges) {
 				if (!excludes.has(entry[0])) {
 					result.push(entry[1]);
@@ -718,7 +747,9 @@ export class DidChangeTextDocumentFeature
 		switch (syncKind) {
 			case TextDocumentSyncKind.Full:
 				this._syncKind = syncKind;
+
 				break;
+
 			case TextDocumentSyncKind.Incremental:
 				if (this._syncKind === TextDocumentSyncKind.None) {
 					this._syncKind = TextDocumentSyncKind.Incremental;
@@ -771,6 +802,7 @@ export class WillSaveFeature extends TextDocumentEventFeature<
 		const textDocumentSyncOptions = (
 			capabilities as ResolvedTextDocumentSyncCapabilities
 		).resolvedTextDocumentSync;
+
 		if (
 			documentSelector &&
 			textDocumentSyncOptions &&
@@ -823,6 +855,7 @@ export class WillSaveWaitUntilFeature extends DynamicDocumentFeature<
 		const textDocumentSyncOptions = (
 			capabilities as ResolvedTextDocumentSyncCapabilities
 		).resolvedTextDocumentSync;
+
 		if (
 			documentSelector &&
 			textDocumentSyncOptions &&
@@ -864,6 +897,7 @@ export class WillSaveWaitUntilFeature extends DynamicDocumentFeature<
 			!this._client.hasDedicatedTextSynchronizationFeature(event.document)
 		) {
 			const middleware = this._client.middleware;
+
 			const willSaveWaitUntil = (
 				event: TextDocumentWillSaveEvent,
 			): Thenable<VTextEdit[]> => {
@@ -879,6 +913,7 @@ export class WillSaveWaitUntilFeature extends DynamicDocumentFeature<
 							await this._client.protocol2CodeConverter.asTextEdits(
 								edits,
 							);
+
 						return vEdits === undefined ? [] : vEdits;
 					});
 			};
@@ -892,6 +927,7 @@ export class WillSaveWaitUntilFeature extends DynamicDocumentFeature<
 
 	public unregister(id: string): void {
 		this._selectors.delete(id);
+
 		if (this._selectors.size === 0 && this._listener) {
 			this._listener.dispose();
 			this._listener = undefined;
@@ -900,6 +936,7 @@ export class WillSaveWaitUntilFeature extends DynamicDocumentFeature<
 
 	public clear(): void {
 		this._selectors.clear();
+
 		if (this._listener) {
 			this._listener.dispose();
 			this._listener = undefined;
@@ -957,6 +994,7 @@ export class DidSaveTextDocumentFeature
 		const textDocumentSyncOptions = (
 			capabilities as ResolvedTextDocumentSyncCapabilities
 		).resolvedTextDocumentSync;
+
 		if (
 			documentSelector &&
 			textDocumentSyncOptions &&
@@ -984,6 +1022,7 @@ export class DidSaveTextDocumentFeature
 		data: RegistrationData<TextDocumentSaveRegistrationOptions>,
 	): void {
 		this._includeText = !!data.registerOptions.includeText;
+
 		super.register(data);
 	}
 

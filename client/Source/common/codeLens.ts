@@ -91,10 +91,12 @@ export class CodeLensFeature extends TextDocumentLanguageFeature<
 				provider.onDidChangeCodeLensEmitter.fire();
 			}
 		});
+
 		const options = this.getRegistrationOptions(
 			documentSelector,
 			capabilities.codeLensProvider,
 		);
+
 		if (!options) {
 			return;
 		}
@@ -105,11 +107,14 @@ export class CodeLensFeature extends TextDocumentLanguageFeature<
 		options: CodeLensRegistrationOptions,
 	): [Disposable, CodeLensProviderShape] {
 		const selector = options.documentSelector!;
+
 		const eventEmitter: EventEmitter<void> = new EventEmitter<void>();
+
 		const provider: CodeLensProvider = {
 			onDidChangeCodeLenses: eventEmitter.event,
 			provideCodeLenses: (document, token) => {
 				const client = this._client;
+
 				const provideCodeLenses: ProvideCodeLensesSignature = (
 					document,
 					token,
@@ -142,7 +147,9 @@ export class CodeLensFeature extends TextDocumentLanguageFeature<
 							},
 						);
 				};
+
 				const middleware = client.middleware;
+
 				return middleware.provideCodeLenses
 					? middleware.provideCodeLenses(
 							document,
@@ -157,6 +164,7 @@ export class CodeLensFeature extends TextDocumentLanguageFeature<
 						token: CancellationToken,
 					): ProviderResult<VCodeLens> => {
 						const client = this._client;
+
 						const resolveCodeLens: ResolveCodeLensSignature = (
 							codeLens,
 							token,
@@ -188,7 +196,9 @@ export class CodeLensFeature extends TextDocumentLanguageFeature<
 									},
 								);
 						};
+
 						const middleware = client.middleware;
+
 						return middleware.resolveCodeLens
 							? middleware.resolveCodeLens(
 									codeLens,
@@ -199,6 +209,7 @@ export class CodeLensFeature extends TextDocumentLanguageFeature<
 					}
 				: undefined,
 		};
+
 		return [
 			Languages.registerCodeLensProvider(
 				this._client.protocol2CodeConverter.asDocumentSelector(

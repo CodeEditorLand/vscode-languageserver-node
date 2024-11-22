@@ -83,6 +83,7 @@ export class ColorProviderFeature extends TextDocumentLanguageFeature<
 			documentSelector,
 			capabilities.colorProvider,
 		);
+
 		if (!id || !options) {
 			return;
 		}
@@ -93,9 +94,11 @@ export class ColorProviderFeature extends TextDocumentLanguageFeature<
 		options: DocumentColorRegistrationOptions,
 	): [Disposable, DocumentColorProvider] {
 		const selector = options.documentSelector!;
+
 		const provider: DocumentColorProvider = {
 			provideColorPresentations: (color, context, token) => {
 				const client = this._client;
+
 				const provideColorPresentations: ProvideColorPresentationSignature =
 					(color, context, token) => {
 						const requestParams = {
@@ -108,6 +111,7 @@ export class ColorProviderFeature extends TextDocumentLanguageFeature<
 								context.range,
 							),
 						};
+
 						return client
 							.sendRequest(
 								ColorPresentationRequest.type,
@@ -134,7 +138,9 @@ export class ColorProviderFeature extends TextDocumentLanguageFeature<
 								},
 							);
 					};
+
 				const middleware = client.middleware;
+
 				return middleware.provideColorPresentations
 					? middleware.provideColorPresentations(
 							color,
@@ -146,6 +152,7 @@ export class ColorProviderFeature extends TextDocumentLanguageFeature<
 			},
 			provideDocumentColors: (document, token) => {
 				const client = this._client;
+
 				const provideDocumentColors: ProvideDocumentColorsSignature = (
 					document,
 					token,
@@ -156,6 +163,7 @@ export class ColorProviderFeature extends TextDocumentLanguageFeature<
 								document,
 							),
 					};
+
 					return client
 						.sendRequest(
 							DocumentColorRequest.type,
@@ -182,7 +190,9 @@ export class ColorProviderFeature extends TextDocumentLanguageFeature<
 							},
 						);
 				};
+
 				const middleware = client.middleware;
+
 				return middleware.provideDocumentColors
 					? middleware.provideDocumentColors(
 							document,
@@ -192,6 +202,7 @@ export class ColorProviderFeature extends TextDocumentLanguageFeature<
 					: provideDocumentColors(document, token);
 			},
 		};
+
 		return [
 			Languages.registerColorProvider(
 				this._client.protocol2CodeConverter.asDocumentSelector(

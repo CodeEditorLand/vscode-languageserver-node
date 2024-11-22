@@ -82,7 +82,9 @@ export class ExecuteCommandFeature
 		data: RegistrationData<ExecuteCommandRegistrationOptions>,
 	): void {
 		const client = this._client;
+
 		const middleware = client.middleware;
+
 		const executeCommand: ExecuteCommandSignature = (
 			command: string,
 			args: any[],
@@ -91,6 +93,7 @@ export class ExecuteCommandFeature
 				command,
 				arguments: args,
 			};
+
 			return client
 				.sendRequest(ExecuteCommandRequest.type, params)
 				.then(undefined, (error) => {
@@ -105,6 +108,7 @@ export class ExecuteCommandFeature
 
 		if (data.registerOptions.commands) {
 			const disposables: Disposable[] = [];
+
 			for (const command of data.registerOptions.commands) {
 				disposables.push(
 					Commands.registerCommand(command, (...args: any[]) => {
@@ -124,6 +128,7 @@ export class ExecuteCommandFeature
 
 	public unregister(id: string): void {
 		const disposables = this._commands.get(id);
+
 		if (disposables) {
 			this._commands.delete(id);
 			disposables.forEach((disposable) => disposable.dispose());

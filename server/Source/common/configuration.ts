@@ -14,8 +14,11 @@ import * as Is from "./utils/is";
 
 export interface Configuration {
 	getConfiguration(): Promise<any>;
+
 	getConfiguration(section: string): Promise<any>;
+
 	getConfiguration(item: ConfigurationItem): Promise<any>;
+
 	getConfiguration(items: ConfigurationItem[]): Promise<any[]>;
 }
 
@@ -41,6 +44,7 @@ export const ConfigurationFeature: Feature<_RemoteWorkspace, Configuration> = (
 			const params: ConfigurationParams = {
 				items: Array.isArray(arg) ? arg : [arg],
 			};
+
 			return this.connection
 				.sendRequest(ConfigurationRequest.type, params)
 				.then((result) => {

@@ -113,6 +113,7 @@ export class WorkspaceFoldersFeature implements DynamicFeature<void> {
 				const workspaceFolders: WorkspaceFoldersRequest.HandlerSignature =
 					() => {
 						const folders = workspace.workspaceFolders;
+
 						if (folders === undefined) {
 							return null;
 						}
@@ -121,19 +122,25 @@ export class WorkspaceFoldersFeature implements DynamicFeature<void> {
 								return this.asProtocol(folder);
 							},
 						);
+
 						return result;
 					};
+
 				const middleware = client.middleware.workspace;
+
 				return middleware && middleware.workspaceFolders
 					? middleware.workspaceFolders(token, workspaceFolders)
 					: workspaceFolders(token);
 			},
 		);
+
 		const value = access(
 			access(access(capabilities, "workspace"), "workspaceFolders"),
 			"changeNotifications",
 		);
+
 		let id: string | undefined;
+
 		if (typeof value === "string") {
 			id = value;
 		} else if (value === true) {
@@ -148,15 +155,18 @@ export class WorkspaceFoldersFeature implements DynamicFeature<void> {
 		currentWorkspaceFolders: ReadonlyArray<VWorkspaceFolder> | undefined,
 	) {
 		let promise: Promise<void> | undefined;
+
 		if (this._initialFolders && currentWorkspaceFolders) {
 			const removed: VWorkspaceFolder[] = arrayDiff(
 				this._initialFolders,
 				currentWorkspaceFolders,
 			);
+
 			const added: VWorkspaceFolder[] = arrayDiff(
 				currentWorkspaceFolders,
 				this._initialFolders,
 			);
+
 			if (added.length > 0 || removed.length > 0) {
 				promise = this.doSendEvent(added, removed);
 			}
@@ -187,6 +197,7 @@ export class WorkspaceFoldersFeature implements DynamicFeature<void> {
 				),
 			},
 		};
+
 		return this._client.sendNotification(
 			DidChangeWorkspaceFoldersNotification.type,
 			params,
@@ -195,14 +206,18 @@ export class WorkspaceFoldersFeature implements DynamicFeature<void> {
 
 	public register(data: RegistrationData<undefined>): void {
 		const id = data.id;
+
 		const client = this._client;
+
 		const disposable = workspace.onDidChangeWorkspaceFolders((event) => {
 			const didChangeWorkspaceFolders = (
 				event: VWorkspaceFoldersChangeEvent,
 			): Promise<void> => {
 				return this.doSendEvent(event.added, event.removed);
 			};
+
 			const middleware = client.middleware.workspace;
+
 			const promise =
 				middleware && middleware.didChangeWorkspaceFolders
 					? middleware.didChangeWorkspaceFolders(
@@ -223,6 +238,7 @@ export class WorkspaceFoldersFeature implements DynamicFeature<void> {
 
 	public unregister(id: string): void {
 		const disposable = this._listeners.get(id);
+
 		if (disposable === void 0) {
 			return;
 		}

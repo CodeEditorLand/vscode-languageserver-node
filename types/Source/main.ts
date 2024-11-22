@@ -35,7 +35,9 @@ export type integer = number;
 
 export namespace integer {
 	export const MIN_VALUE = -2147483648;
+
 	export const MAX_VALUE = 2147483647;
+
 	export function is(value: any): value is integer {
 		return (
 			typeof value === "number" &&
@@ -52,7 +54,9 @@ export type uinteger = number;
 
 export namespace uinteger {
 	export const MIN_VALUE = 0;
+
 	export const MAX_VALUE = 2147483647;
+
 	export function is(value: any): value is uinteger {
 		return (
 			typeof value === "number" &&
@@ -166,6 +170,7 @@ export namespace Position {
 	 */
 	export function is(value: any): value is Position {
 		const candidate = value as Position;
+
 		return (
 			Is.objectLiteral(candidate) &&
 			Is.uinteger(candidate.line) &&
@@ -223,6 +228,7 @@ export namespace Range {
 		endLine: uinteger,
 		endCharacter: uinteger,
 	): Range;
+
 	export function create(
 		one: Position | uinteger,
 		two: Position | uinteger,
@@ -252,6 +258,7 @@ export namespace Range {
 	 */
 	export function is(value: any): value is Range {
 		const candidate = value as Range;
+
 		return (
 			Is.objectLiteral(candidate) &&
 			Position.is(candidate.start) &&
@@ -287,6 +294,7 @@ export namespace Location {
 	 */
 	export function is(value: any): value is Location {
 		const candidate = value as Location;
+
 		return (
 			Is.objectLiteral(candidate) &&
 			Range.is(candidate.range) &&
@@ -358,6 +366,7 @@ export namespace LocationLink {
 	 */
 	export function is(value: any): value is LocationLink {
 		const candidate = value as LocationLink;
+
 		return (
 			Is.objectLiteral(candidate) &&
 			Range.is(candidate.targetRange) &&
@@ -421,6 +430,7 @@ export namespace Color {
 	 */
 	export function is(value: any): value is Color {
 		const candidate = value as Color;
+
 		return (
 			Is.objectLiteral(candidate) &&
 			Is.numberRange(candidate.red, 0, 1) &&
@@ -466,6 +476,7 @@ export namespace ColorInformation {
 	 */
 	export function is(value: any): value is ColorInformation {
 		const candidate = value as ColorInformation;
+
 		return (
 			Is.objectLiteral(candidate) &&
 			Range.is(candidate.range) &&
@@ -519,6 +530,7 @@ export namespace ColorPresentation {
 	 */
 	export function is(value: any): value is ColorPresentation {
 		const candidate = value as ColorPresentation;
+
 		return (
 			Is.objectLiteral(candidate) &&
 			Is.string(candidate.label) &&
@@ -620,6 +632,7 @@ export namespace FoldingRange {
 			startLine,
 			endLine,
 		};
+
 		if (Is.defined(startCharacter)) {
 			result.startCharacter = startCharacter;
 		}
@@ -640,6 +653,7 @@ export namespace FoldingRange {
 	 */
 	export function is(value: any): value is FoldingRange {
 		const candidate = value as FoldingRange;
+
 		return (
 			Is.objectLiteral(candidate) &&
 			Is.uinteger(candidate.startLine) &&
@@ -694,6 +708,7 @@ export namespace DiagnosticRelatedInformation {
 	export function is(value: any): value is DiagnosticRelatedInformation {
 		const candidate: DiagnosticRelatedInformation =
 			value as DiagnosticRelatedInformation;
+
 		return (
 			Is.defined(candidate) &&
 			Location.is(candidate.location) &&
@@ -770,6 +785,7 @@ export interface CodeDescription {
 export namespace CodeDescription {
 	export function is(value: any): value is CodeDescription {
 		const candidate: CodeDescription = value as CodeDescription;
+
 		return Is.objectLiteral(candidate) && Is.string(candidate.href);
 	}
 }
@@ -855,6 +871,7 @@ export namespace Diagnostic {
 		relatedInformation?: DiagnosticRelatedInformation[],
 	): Diagnostic {
 		const result: Diagnostic = { range, message };
+
 		if (Is.defined(severity)) {
 			result.severity = severity;
 		}
@@ -875,6 +892,7 @@ export namespace Diagnostic {
 	 */
 	export function is(value: any): value is Diagnostic {
 		const candidate = value as Diagnostic;
+
 		return (
 			Is.defined(candidate) &&
 			Range.is(candidate.range) &&
@@ -942,6 +960,7 @@ export namespace Command {
 		...args: any[]
 	): Command {
 		const result: Command = { title, command };
+
 		if (Is.defined(args) && args.length > 0) {
 			result.arguments = args;
 		}
@@ -952,6 +971,7 @@ export namespace Command {
 	 */
 	export function is(value: any): value is Command {
 		const candidate = value as Command;
+
 		return (
 			Is.defined(candidate) &&
 			Is.string(candidate.title) &&
@@ -1009,6 +1029,7 @@ export namespace TextEdit {
 
 	export function is(value: any): value is TextEdit {
 		const candidate = value as TextEdit;
+
 		return (
 			Is.objectLiteral(candidate) &&
 			Is.string(candidate.newText) &&
@@ -1049,6 +1070,7 @@ export namespace ChangeAnnotation {
 		description?: string,
 	): ChangeAnnotation {
 		const result: ChangeAnnotation = { label };
+
 		if (needsConfirmation !== undefined) {
 			result.needsConfirmation = needsConfirmation;
 		}
@@ -1059,6 +1081,7 @@ export namespace ChangeAnnotation {
 	}
 	export function is(value: any): value is ChangeAnnotation {
 		const candidate = value as ChangeAnnotation;
+
 		return (
 			Is.objectLiteral(candidate) &&
 			Is.string(candidate.label) &&
@@ -1073,6 +1096,7 @@ export namespace ChangeAnnotation {
 export namespace ChangeAnnotationIdentifier {
 	export function is(value: any): value is ChangeAnnotationIdentifier {
 		const candidate = value as ChangeAnnotationIdentifier;
+
 		return Is.string(candidate);
 	}
 }
@@ -1142,6 +1166,7 @@ export namespace AnnotatedTextEdit {
 
 	export function is(value: any): value is AnnotatedTextEdit {
 		const candidate: AnnotatedTextEdit = value as AnnotatedTextEdit;
+
 		return (
 			TextEdit.is(candidate) &&
 			(ChangeAnnotation.is(candidate.annotationId) ||
@@ -1191,6 +1216,7 @@ export namespace TextDocumentEdit {
 
 	export function is(value: any): value is TextDocumentEdit {
 		const candidate = value as TextDocumentEdit;
+
 		return (
 			Is.defined(candidate) &&
 			OptionalVersionedTextDocumentIdentifier.is(
@@ -1263,6 +1289,7 @@ export namespace CreateFile {
 			kind: "create",
 			uri,
 		};
+
 		if (
 			options !== undefined &&
 			(options.overwrite !== undefined ||
@@ -1278,6 +1305,7 @@ export namespace CreateFile {
 
 	export function is(value: any): value is CreateFile {
 		const candidate: CreateFile = value;
+
 		return (
 			candidate &&
 			candidate.kind === "create" &&
@@ -1345,6 +1373,7 @@ export namespace RenameFile {
 			oldUri,
 			newUri,
 		};
+
 		if (
 			options !== undefined &&
 			(options.overwrite !== undefined ||
@@ -1360,6 +1389,7 @@ export namespace RenameFile {
 
 	export function is(value: any): value is RenameFile {
 		const candidate: RenameFile = value;
+
 		return (
 			candidate &&
 			candidate.kind === "rename" &&
@@ -1421,6 +1451,7 @@ export namespace DeleteFile {
 			kind: "delete",
 			uri,
 		};
+
 		if (
 			options !== undefined &&
 			(options.recursive !== undefined ||
@@ -1436,6 +1467,7 @@ export namespace DeleteFile {
 
 	export function is(value: any): value is DeleteFile {
 		const candidate: DeleteFile = value;
+
 		return (
 			candidate &&
 			candidate.kind === "delete" &&
@@ -1506,6 +1538,7 @@ export interface WorkspaceEdit {
 export namespace WorkspaceEdit {
 	export function is(value: any): value is WorkspaceEdit {
 		const candidate: WorkspaceEdit = value;
+
 		return (
 			candidate &&
 			(candidate.changes !== undefined ||
@@ -1639,7 +1672,9 @@ class TextEditChangeImpl implements TextEditChange {
 		annotation?: ChangeAnnotation | ChangeAnnotationIdentifier,
 	): ChangeAnnotationIdentifier | void {
 		let edit: TextEdit;
+
 		let id: ChangeAnnotationIdentifier | undefined;
+
 		if (annotation === undefined) {
 			edit = TextEdit.insert(position, newText);
 		} else if (ChangeAnnotationIdentifier.is(annotation)) {
@@ -1651,6 +1686,7 @@ class TextEditChangeImpl implements TextEditChange {
 			edit = AnnotatedTextEdit.insert(position, newText, id);
 		}
 		this.edits.push(edit);
+
 		if (id !== undefined) {
 			return id;
 		}
@@ -1668,7 +1704,9 @@ class TextEditChangeImpl implements TextEditChange {
 		annotation?: ChangeAnnotation | ChangeAnnotationIdentifier,
 	): ChangeAnnotationIdentifier | void {
 		let edit: TextEdit;
+
 		let id: ChangeAnnotationIdentifier | undefined;
+
 		if (annotation === undefined) {
 			edit = TextEdit.replace(range, newText);
 		} else if (ChangeAnnotationIdentifier.is(annotation)) {
@@ -1680,6 +1718,7 @@ class TextEditChangeImpl implements TextEditChange {
 			edit = AnnotatedTextEdit.replace(range, newText, id);
 		}
 		this.edits.push(edit);
+
 		if (id !== undefined) {
 			return id;
 		}
@@ -1695,7 +1734,9 @@ class TextEditChangeImpl implements TextEditChange {
 		annotation?: ChangeAnnotation | ChangeAnnotationIdentifier,
 	): ChangeAnnotationIdentifier | void {
 		let edit: TextEdit;
+
 		let id: ChangeAnnotationIdentifier | undefined;
+
 		if (annotation === undefined) {
 			edit = TextEdit.del(range);
 		} else if (ChangeAnnotationIdentifier.is(annotation)) {
@@ -1707,6 +1748,7 @@ class TextEditChangeImpl implements TextEditChange {
 			edit = AnnotatedTextEdit.del(range, id);
 		}
 		this.edits.push(edit);
+
 		if (id !== undefined) {
 			return id;
 		}
@@ -1761,6 +1803,7 @@ export interface SnippetTextEdit {
 export namespace SnippetTextEdit {
 	export function is(value: any): value is SnippetTextEdit {
 		const candidate = value as SnippetTextEdit;
+
 		return (
 			Is.objectLiteral(candidate) &&
 			Range.is(candidate.range) &&
@@ -1807,6 +1850,7 @@ class ChangeAnnotations {
 		annotation?: ChangeAnnotation,
 	): ChangeAnnotationIdentifier {
 		let id: ChangeAnnotationIdentifier;
+
 		if (ChangeAnnotationIdentifier.is(idOrAnnotation)) {
 			id = idOrAnnotation;
 		} else {
@@ -1821,11 +1865,13 @@ class ChangeAnnotations {
 		}
 		this._annotations[id] = annotation;
 		this._size++;
+
 		return id;
 	}
 
 	private nextId(): ChangeAnnotationIdentifier {
 		this._counter++;
+
 		return this._counter.toString();
 	}
 }
@@ -1840,8 +1886,10 @@ export class WorkspaceChange {
 
 	constructor(workspaceEdit?: WorkspaceEdit) {
 		this._textEditChanges = Object.create(null);
+
 		if (workspaceEdit !== undefined) {
 			this._workspaceEdit = workspaceEdit;
+
 			if (workspaceEdit.documentChanges) {
 				this._changeAnnotations = new ChangeAnnotations(
 					workspaceEdit.changeAnnotations,
@@ -1876,6 +1924,7 @@ export class WorkspaceChange {
 	 */
 	public get edit(): WorkspaceEdit {
 		this.initDocumentChanges();
+
 		if (this._changeAnnotations !== undefined) {
 			if (this._changeAnnotations.size === 0) {
 				this._workspaceEdit.changeAnnotations = undefined;
@@ -1900,6 +1949,7 @@ export class WorkspaceChange {
 	): TextEditChange {
 		if (OptionalVersionedTextDocumentIdentifier.is(key)) {
 			this.initDocumentChanges();
+
 			if (this._workspaceEdit.documentChanges === undefined) {
 				throw new Error(
 					"Workspace edit is not configured for document changes.",
@@ -1909,10 +1959,13 @@ export class WorkspaceChange {
 				uri: key.uri,
 				version: key.version,
 			};
+
 			let result: TextEditChange =
 				this._textEditChanges[textDocument.uri];
+
 			if (!result) {
 				const edits: (TextEdit | AnnotatedTextEdit)[] = [];
+
 				const textDocumentEdit: TextDocumentEdit = {
 					textDocument,
 					edits,
@@ -1924,12 +1977,14 @@ export class WorkspaceChange {
 			return result;
 		} else {
 			this.initChanges();
+
 			if (this._workspaceEdit.changes === undefined) {
 				throw new Error(
 					"Workspace edit is not configured for normal text edit changes.",
 				);
 			}
 			let result: TextEditChange = this._textEditChanges[key];
+
 			if (!result) {
 				const edits: (TextEdit | AnnotatedTextEdit)[] = [];
 				this._workspaceEdit.changes[key] = edits;
@@ -1976,6 +2031,7 @@ export class WorkspaceChange {
 		options?: CreateFileOptions,
 	): ChangeAnnotationIdentifier | void {
 		this.initDocumentChanges();
+
 		if (this._workspaceEdit.documentChanges === undefined) {
 			throw new Error(
 				"Workspace edit is not configured for document changes.",
@@ -1985,6 +2041,7 @@ export class WorkspaceChange {
 			| ChangeAnnotation
 			| ChangeAnnotationIdentifier
 			| undefined;
+
 		if (
 			ChangeAnnotation.is(optionsOrAnnotation) ||
 			ChangeAnnotationIdentifier.is(optionsOrAnnotation)
@@ -1995,7 +2052,9 @@ export class WorkspaceChange {
 		}
 
 		let operation: CreateFile;
+
 		let id: ChangeAnnotationIdentifier | undefined;
+
 		if (annotation === undefined) {
 			operation = CreateFile.create(uri, options);
 		} else {
@@ -2005,6 +2064,7 @@ export class WorkspaceChange {
 			operation = CreateFile.create(uri, options, id);
 		}
 		this._workspaceEdit.documentChanges.push(operation);
+
 		if (id !== undefined) {
 			return id;
 		}
@@ -2031,6 +2091,7 @@ export class WorkspaceChange {
 		options?: RenameFileOptions,
 	): ChangeAnnotationIdentifier | void {
 		this.initDocumentChanges();
+
 		if (this._workspaceEdit.documentChanges === undefined) {
 			throw new Error(
 				"Workspace edit is not configured for document changes.",
@@ -2040,6 +2101,7 @@ export class WorkspaceChange {
 			| ChangeAnnotation
 			| ChangeAnnotationIdentifier
 			| undefined;
+
 		if (
 			ChangeAnnotation.is(optionsOrAnnotation) ||
 			ChangeAnnotationIdentifier.is(optionsOrAnnotation)
@@ -2050,7 +2112,9 @@ export class WorkspaceChange {
 		}
 
 		let operation: RenameFile;
+
 		let id: ChangeAnnotationIdentifier | undefined;
+
 		if (annotation === undefined) {
 			operation = RenameFile.create(oldUri, newUri, options);
 		} else {
@@ -2060,6 +2124,7 @@ export class WorkspaceChange {
 			operation = RenameFile.create(oldUri, newUri, options, id);
 		}
 		this._workspaceEdit.documentChanges.push(operation);
+
 		if (id !== undefined) {
 			return id;
 		}
@@ -2080,6 +2145,7 @@ export class WorkspaceChange {
 		options?: DeleteFileOptions,
 	): ChangeAnnotationIdentifier | void {
 		this.initDocumentChanges();
+
 		if (this._workspaceEdit.documentChanges === undefined) {
 			throw new Error(
 				"Workspace edit is not configured for document changes.",
@@ -2089,6 +2155,7 @@ export class WorkspaceChange {
 			| ChangeAnnotation
 			| ChangeAnnotationIdentifier
 			| undefined;
+
 		if (
 			ChangeAnnotation.is(optionsOrAnnotation) ||
 			ChangeAnnotationIdentifier.is(optionsOrAnnotation)
@@ -2099,7 +2166,9 @@ export class WorkspaceChange {
 		}
 
 		let operation: DeleteFile;
+
 		let id: ChangeAnnotationIdentifier | undefined;
+
 		if (annotation === undefined) {
 			operation = DeleteFile.create(uri, options);
 		} else {
@@ -2109,6 +2178,7 @@ export class WorkspaceChange {
 			operation = DeleteFile.create(uri, options, id);
 		}
 		this._workspaceEdit.documentChanges.push(operation);
+
 		if (id !== undefined) {
 			return id;
 		}
@@ -2142,6 +2212,7 @@ export namespace TextDocumentIdentifier {
 	 */
 	export function is(value: any): value is TextDocumentIdentifier {
 		const candidate = value as TextDocumentIdentifier;
+
 		return Is.defined(candidate) && Is.string(candidate.uri);
 	}
 }
@@ -2179,6 +2250,7 @@ export namespace VersionedTextDocumentIdentifier {
 	 */
 	export function is(value: any): value is VersionedTextDocumentIdentifier {
 		const candidate = value as VersionedTextDocumentIdentifier;
+
 		return (
 			Is.defined(candidate) &&
 			Is.string(candidate.uri) &&
@@ -2226,6 +2298,7 @@ export namespace OptionalVersionedTextDocumentIdentifier {
 		value: any,
 	): value is OptionalVersionedTextDocumentIdentifier {
 		const candidate = value as OptionalVersionedTextDocumentIdentifier;
+
 		return (
 			Is.defined(candidate) &&
 			Is.string(candidate.uri) &&
@@ -2268,13 +2341,21 @@ export interface TextDocumentItem {
  */
 export namespace LanguageKind {
 	export const ABAP = "abap" as const;
+
 	export const WindowsBat = "bat" as const;
+
 	export const BibTeX = "bibtex" as const;
+
 	export const Clojure = "clojure" as const;
+
 	export const Coffeescript = "coffeescript" as const;
+
 	export const C = "c" as const;
+
 	export const CPP = "cpp" as const;
+
 	export const CSharp = "csharp" as const;
+
 	export const CSS = "css" as const;
 	/**
 	 * @since 3.18.0
@@ -2286,59 +2367,108 @@ export namespace LanguageKind {
 	 * @proposed
 	 */
 	export const Delphi = "pascal" as const;
+
 	export const Diff = "diff" as const;
+
 	export const Dart = "dart" as const;
+
 	export const Dockerfile = "dockerfile" as const;
+
 	export const Elixir = "elixir" as const;
+
 	export const Erlang = "erlang" as const;
+
 	export const FSharp = "fsharp" as const;
+
 	export const GitCommit = "git-commit" as const;
+
 	export const GitRebase = "rebase" as const;
+
 	export const Go = "go" as const;
+
 	export const Groovy = "groovy" as const;
+
 	export const Handlebars = "handlebars" as const;
+
 	export const Haskell = "haskell" as const;
+
 	export const HTML = "html" as const;
+
 	export const Ini = "ini" as const;
+
 	export const Java = "java" as const;
+
 	export const JavaScript = "javascript" as const;
+
 	export const JavaScriptReact = "javascriptreact" as const;
+
 	export const JSON = "json" as const;
+
 	export const LaTeX = "latex" as const;
+
 	export const Less = "less" as const;
+
 	export const Lua = "lua" as const;
+
 	export const Makefile = "makefile" as const;
+
 	export const Markdown = "markdown" as const;
+
 	export const ObjectiveC = "objective-c" as const;
+
 	export const ObjectiveCPP = "objective-cpp" as const;
 	/**
 	 * @since 3.18.0
 	 * @proposed
 	 */
 	export const Pascal = "pascal" as const;
+
 	export const Perl = "perl" as const;
+
 	export const Perl6 = "perl6" as const;
+
 	export const PHP = "php" as const;
+
 	export const Powershell = "powershell" as const;
+
 	export const Pug = "jade" as const;
+
 	export const Python = "python" as const;
+
 	export const R = "r" as const;
+
 	export const Razor = "razor" as const;
+
 	export const Ruby = "ruby" as const;
+
 	export const Rust = "rust" as const;
+
 	export const SCSS = "scss" as const;
+
 	export const SASS = "sass" as const;
+
 	export const Scala = "scala" as const;
+
 	export const ShaderLab = "shaderlab" as const;
+
 	export const ShellScript = "shellscript" as const;
+
 	export const SQL = "sql" as const;
+
 	export const Swift = "swift" as const;
+
 	export const TypeScript = "typescript" as const;
+
 	export const TypeScriptReact = "typescriptreact" as const;
+
 	export const TeX = "tex" as const;
+
 	export const VisualBasic = "vb" as const;
+
 	export const XML = "xml" as const;
+
 	export const XSL = "xsl" as const;
+
 	export const YAML = "yaml" as const;
 }
 export type LanguageKind = string;
@@ -2369,6 +2499,7 @@ export namespace TextDocumentItem {
 	 */
 	export function is(value: any): value is TextDocumentItem {
 		const candidate = value as TextDocumentItem;
+
 		return (
 			Is.defined(candidate) &&
 			Is.string(candidate.uri) &&
@@ -2402,6 +2533,7 @@ export namespace MarkupKind {
 	 */
 	export function is(value: any): value is MarkupKind {
 		const candidate = value as MarkupKind;
+
 		return (
 			candidate === MarkupKind.PlainText ||
 			candidate === MarkupKind.Markdown
@@ -2452,6 +2584,7 @@ export namespace MarkupContent {
 	 */
 	export function is(value: any): value is MarkupContent {
 		const candidate = value as MarkupContent;
+
 		return (
 			Is.objectLiteral(value) &&
 			MarkupKind.is(candidate.kind) &&
@@ -2465,29 +2598,53 @@ export namespace MarkupContent {
  */
 export namespace CompletionItemKind {
 	export const Text: 1 = 1;
+
 	export const Method: 2 = 2;
+
 	export const Function: 3 = 3;
+
 	export const Constructor: 4 = 4;
+
 	export const Field: 5 = 5;
+
 	export const Variable: 6 = 6;
+
 	export const Class: 7 = 7;
+
 	export const Interface: 8 = 8;
+
 	export const Module: 9 = 9;
+
 	export const Property: 10 = 10;
+
 	export const Unit: 11 = 11;
+
 	export const Value: 12 = 12;
+
 	export const Enum: 13 = 13;
+
 	export const Keyword: 14 = 14;
+
 	export const Snippet: 15 = 15;
+
 	export const Color: 16 = 16;
+
 	export const File: 17 = 17;
+
 	export const Reference: 18 = 18;
+
 	export const Folder: 19 = 19;
+
 	export const EnumMember: 20 = 20;
+
 	export const Constant: 21 = 21;
+
 	export const Struct: 22 = 22;
+
 	export const Event: 23 = 23;
+
 	export const Operator: 24 = 24;
+
 	export const TypeParameter: 25 = 25;
 }
 
@@ -2604,6 +2761,7 @@ export namespace InsertReplaceEdit {
 		value: TextEdit | InsertReplaceEdit,
 	): value is InsertReplaceEdit {
 		const candidate: InsertReplaceEdit = value as InsertReplaceEdit;
+
 		return (
 			candidate &&
 			Is.string(candidate.newText) &&
@@ -2695,6 +2853,7 @@ export interface CompletionItemLabelDetails {
 export namespace CompletionItemLabelDetails {
 	export function is(value: any): value is CompletionItemLabelDetails {
 		const candidate = value as CompletionItemLabelDetails;
+
 		return (
 			candidate &&
 			(Is.string(candidate.detail) || candidate.detail === undefined) &&
@@ -3146,6 +3305,7 @@ export namespace MarkedString {
 	 */
 	export function is(value: any): value is MarkedString {
 		const candidate = value as MarkedString;
+
 		return (
 			Is.string(candidate) ||
 			(Is.objectLiteral(candidate) &&
@@ -3177,6 +3337,7 @@ export namespace Hover {
 	 */
 	export function is(value: any): value is Hover {
 		const candidate = value as Hover;
+
 		return (
 			!!candidate &&
 			Is.objectLiteral(candidate) &&
@@ -3285,6 +3446,7 @@ export namespace SignatureInformation {
 		...parameters: ParameterInformation[]
 	): SignatureInformation {
 		const result: SignatureInformation = { label };
+
 		if (Is.defined(documentation)) {
 			result.documentation = documentation;
 		}
@@ -3441,6 +3603,7 @@ export namespace DocumentHighlight {
 		kind?: DocumentHighlightKind,
 	): DocumentHighlight {
 		const result: DocumentHighlight = { range };
+
 		if (Is.number(kind)) {
 			result.kind = kind;
 		}
@@ -3453,30 +3616,55 @@ export namespace DocumentHighlight {
  */
 export namespace SymbolKind {
 	export const File: 1 = 1;
+
 	export const Module: 2 = 2;
+
 	export const Namespace: 3 = 3;
+
 	export const Package: 4 = 4;
+
 	export const Class: 5 = 5;
+
 	export const Method: 6 = 6;
+
 	export const Property: 7 = 7;
+
 	export const Field: 8 = 8;
+
 	export const Constructor: 9 = 9;
+
 	export const Enum: 10 = 10;
+
 	export const Interface: 11 = 11;
+
 	export const Function: 12 = 12;
+
 	export const Variable: 13 = 13;
+
 	export const Constant: 14 = 14;
+
 	export const String: 15 = 15;
+
 	export const Number: 16 = 16;
+
 	export const Boolean: 17 = 17;
+
 	export const Array: 18 = 18;
+
 	export const Object: 19 = 19;
+
 	export const Key: 20 = 20;
+
 	export const Null: 21 = 21;
+
 	export const EnumMember: 22 = 22;
+
 	export const Struct: 23 = 23;
+
 	export const Event: 24 = 24;
+
 	export const Operator: 25 = 25;
+
 	export const TypeParameter: 26 = 26;
 }
 
@@ -3600,6 +3788,7 @@ export namespace SymbolInformation {
 			kind,
 			location: { uri, range },
 		};
+
 		if (containerName) {
 			result.containerName = containerName;
 		}
@@ -3744,6 +3933,7 @@ export namespace DocumentSymbol {
 			range,
 			selectionRange,
 		};
+
 		if (children !== undefined) {
 			result.children = children;
 		}
@@ -3754,6 +3944,7 @@ export namespace DocumentSymbol {
 	 */
 	export function is(value: any): value is DocumentSymbol {
 		const candidate: DocumentSymbol = value;
+
 		return (
 			candidate &&
 			Is.string(candidate.name) &&
@@ -3951,6 +4142,7 @@ export namespace CodeActionContext {
 		triggerKind?: CodeActionTriggerKind,
 	): CodeActionContext {
 		const result: CodeActionContext = { diagnostics };
+
 		if (only !== undefined && only !== null) {
 			result.only = only;
 		}
@@ -3964,6 +4156,7 @@ export namespace CodeActionContext {
 	 */
 	export function is(value: any): value is CodeActionContext {
 		const candidate = value as CodeActionContext;
+
 		return (
 			Is.defined(candidate) &&
 			Is.typedArray<Diagnostic[]>(candidate.diagnostics, Diagnostic.is) &&
@@ -4133,7 +4326,9 @@ export namespace CodeAction {
 		kind?: CodeActionKind,
 	): CodeAction {
 		const result: CodeAction = { title };
+
 		let checkKind: boolean = true;
+
 		if (typeof kindOrCommandOrEdit === "string") {
 			checkKind = false;
 			result.kind = kindOrCommandOrEdit;
@@ -4149,6 +4344,7 @@ export namespace CodeAction {
 	}
 	export function is(value: any): value is CodeAction {
 		const candidate: CodeAction = value;
+
 		return (
 			candidate &&
 			Is.string(candidate.title) &&
@@ -4203,6 +4399,7 @@ export namespace CodeLens {
 	 */
 	export function create(range: Range, data?: LSPAny): CodeLens {
 		const result: CodeLens = { range };
+
 		if (Is.defined(data)) {
 			result.data = data;
 		}
@@ -4213,6 +4410,7 @@ export namespace CodeLens {
 	 */
 	export function is(value: any): value is CodeLens {
 		const candidate = value as CodeLens;
+
 		return (
 			Is.defined(candidate) &&
 			Range.is(candidate.range) &&
@@ -4281,6 +4479,7 @@ export namespace FormattingOptions {
 	 */
 	export function is(value: any): value is FormattingOptions {
 		const candidate = value as FormattingOptions;
+
 		return (
 			Is.defined(candidate) &&
 			Is.uinteger(candidate.tabSize) &&
@@ -4343,6 +4542,7 @@ export namespace DocumentLink {
 	 */
 	export function is(value: any): value is DocumentLink {
 		const candidate = value as DocumentLink;
+
 		return (
 			Is.defined(candidate) &&
 			Range.is(candidate.range) &&
@@ -4386,6 +4586,7 @@ export namespace SelectionRange {
 
 	export function is(value: any): value is SelectionRange {
 		const candidate = value as SelectionRange;
+
 		return (
 			Is.objectLiteral(candidate) &&
 			Range.is(candidate.range) &&
@@ -4585,6 +4786,7 @@ export interface SemanticTokens {
 export namespace SemanticTokens {
 	export function is(value: any): value is SemanticTokens {
 		const candidate = value as SemanticTokens;
+
 		return (
 			Is.objectLiteral(candidate) &&
 			(candidate.resultId === undefined ||
@@ -4712,6 +4914,7 @@ export namespace InlineValueText {
 		value: InlineValue | undefined | null,
 	): value is InlineValueText {
 		const candidate = value as InlineValueText;
+
 		return (
 			candidate !== undefined &&
 			candidate !== null &&
@@ -4767,6 +4970,7 @@ export namespace InlineValueVariableLookup {
 		value: InlineValue | undefined | null,
 	): value is InlineValueVariableLookup {
 		const candidate = value as InlineValueVariableLookup;
+
 		return (
 			candidate !== undefined &&
 			candidate !== null &&
@@ -4818,6 +5022,7 @@ export namespace InlineValueEvaluatableExpression {
 		value: InlineValue | undefined | null,
 	): value is InlineValueEvaluatableExpression {
 		const candidate = value as InlineValueEvaluatableExpression;
+
 		return (
 			candidate !== undefined &&
 			candidate !== null &&
@@ -4880,6 +5085,7 @@ export namespace InlineValueContext {
 	 */
 	export function is(value: any): value is InlineValueContext {
 		const candidate = value as InlineValueContext;
+
 		return Is.defined(candidate) && Range.is(value.stoppedLocation);
 	}
 }
@@ -4957,6 +5163,7 @@ export namespace InlayHintLabelPart {
 
 	export function is(value: any): value is InlayHintLabelPart {
 		const candidate: InlayHintLabelPart = value;
+
 		return (
 			Is.objectLiteral(candidate) &&
 			(candidate.tooltip === undefined ||
@@ -5043,6 +5250,7 @@ export namespace InlayHint {
 		kind?: InlayHintKind,
 	): InlayHint {
 		const result: InlayHint = { position, label };
+
 		if (kind !== undefined) {
 			result.kind = kind;
 		}
@@ -5051,6 +5259,7 @@ export namespace InlayHint {
 
 	export function is(value: any): value is InlayHint {
 		const candidate: InlayHint = value;
+
 		return (
 			(Is.objectLiteral(candidate) &&
 				Position.is(candidate.position) &&
@@ -5102,6 +5311,7 @@ export namespace StringValue {
 
 	export function isSnippet(value: any): value is StringValue {
 		const candidate = value as StringValue;
+
 		return (
 			Is.objectLiteral(candidate) &&
 			candidate.kind === "snippet" &&
@@ -5260,6 +5470,7 @@ export interface WorkspaceFolder {
 export namespace WorkspaceFolder {
 	export function is(value: any): value is WorkspaceFolder {
 		const candidate: WorkspaceFolder = value;
+
 		return (
 			Is.objectLiteral(candidate) &&
 			URI.is(candidate.uri) &&
@@ -5367,6 +5578,7 @@ export namespace TextDocument {
 	 */
 	export function is(value: any): value is TextDocument {
 		const candidate = value as TextDocument;
+
 		return Is.defined(candidate) &&
 			Is.string(candidate.uri) &&
 			(Is.undefined(candidate.languageId) ||
@@ -5384,18 +5596,25 @@ export namespace TextDocument {
 		edits: TextEdit[],
 	): string {
 		let text = document.getText();
+
 		const sortedEdits = mergeSort(edits, (a, b) => {
 			const diff = a.range.start.line - b.range.start.line;
+
 			if (diff === 0) {
 				return a.range.start.character - b.range.start.character;
 			}
 			return diff;
 		});
+
 		let lastModifiedOffset = text.length;
+
 		for (let i = sortedEdits.length - 1; i >= 0; i--) {
 			const e = sortedEdits[i];
+
 			const startOffset = document.offsetAt(e.range.start);
+
 			const endOffset = document.offsetAt(e.range.end);
+
 			if (endOffset <= lastModifiedOffset) {
 				text =
 					text.substring(0, startOffset) +
@@ -5415,17 +5634,23 @@ export namespace TextDocument {
 			return data;
 		}
 		const p = (data.length / 2) | 0;
+
 		const left = data.slice(0, p);
+
 		const right = data.slice(p);
 
 		mergeSort(left, compare);
 		mergeSort(right, compare);
 
 		let leftIdx = 0;
+
 		let rightIdx = 0;
+
 		let i = 0;
+
 		while (leftIdx < left.length && rightIdx < right.length) {
 			const ret = compare(left[leftIdx], right[rightIdx]);
+
 			if (ret <= 0) {
 				// smaller_equal -> take left to preserve order
 				data[i++] = left[leftIdx++];
@@ -5514,7 +5739,9 @@ class FullTextDocument implements TextDocument {
 	public getText(range?: Range): string {
 		if (range) {
 			const start = this.offsetAt(range.start);
+
 			const end = this.offsetAt(range.end);
+
 			return this._content.substring(start, end);
 		}
 		return this._content;
@@ -5532,8 +5759,11 @@ class FullTextDocument implements TextDocument {
 	private getLineOffsets(): uinteger[] {
 		if (this._lineOffsets === undefined) {
 			const lineOffsets: uinteger[] = [];
+
 			const text = this._content;
+
 			let isLineStart = true;
+
 			for (let i = 0; i < text.length; i++) {
 				if (isLineStart) {
 					lineOffsets.push(i);
@@ -5541,6 +5771,7 @@ class FullTextDocument implements TextDocument {
 				}
 				const ch = text.charAt(i);
 				isLineStart = ch === "\r" || ch === "\n";
+
 				if (
 					ch === "\r" &&
 					i + 1 < text.length &&
@@ -5561,13 +5792,16 @@ class FullTextDocument implements TextDocument {
 		offset = Math.max(Math.min(offset, this._content.length), 0);
 
 		const lineOffsets = this.getLineOffsets();
+
 		let low = 0,
 			high = lineOffsets.length;
+
 		if (high === 0) {
 			return Position.create(0, offset);
 		}
 		while (low < high) {
 			const mid = Math.floor((low + high) / 2);
+
 			if (lineOffsets[mid] > offset) {
 				high = mid;
 			} else {
@@ -5577,21 +5811,25 @@ class FullTextDocument implements TextDocument {
 		// low is the least x for which the line offset is larger than the current offset
 		// or array.length if no line offset is larger than the current offset
 		const line = low - 1;
+
 		return Position.create(line, offset - lineOffsets[line]);
 	}
 
 	public offsetAt(position: Position) {
 		const lineOffsets = this.getLineOffsets();
+
 		if (position.line >= lineOffsets.length) {
 			return this._content.length;
 		} else if (position.line < 0) {
 			return 0;
 		}
 		const lineOffset = lineOffsets[position.line];
+
 		const nextLineOffset =
 			position.line + 1 < lineOffsets.length
 				? lineOffsets[position.line + 1]
 				: this._content.length;
+
 		return Math.max(
 			Math.min(lineOffset + position.character, nextLineOffset),
 			lineOffset,

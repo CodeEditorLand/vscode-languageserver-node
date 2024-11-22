@@ -59,6 +59,7 @@ namespace Converter {
 				notebookDocument.version,
 				asNotebookCells(cells, base),
 			);
+
 			if (Object.keys(notebookDocument.metadata).length > 0) {
 				result.metadata = asMetadata(notebookDocument.metadata);
 			}
@@ -74,6 +75,7 @@ namespace Converter {
 			[key: string]: any;
 		}): $LSPObject {
 			const seen: Set<any> = new Set();
+
 			return deepCopy(seen, metadata);
 		}
 		export function asNotebookCell(
@@ -84,6 +86,7 @@ namespace Converter {
 				asNotebookCellKind(cell.kind),
 				base.asUri(cell.document.uri),
 			);
+
 			if (Object.keys(cell.metadata).length > 0) {
 				result.metadata = asMetadata(cell.metadata);
 			}
@@ -105,6 +108,7 @@ namespace Converter {
 			switch (kind) {
 				case vscode.NotebookCellKind.Markup:
 					return proto.NotebookCellKind.Markup;
+
 				case vscode.NotebookCellKind.Code:
 					return proto.NotebookCellKind.Code;
 			}
@@ -113,7 +117,9 @@ namespace Converter {
 			seen: Set<any>,
 			value: { [key: string]: any },
 		): $LSPObject;
+
 		function deepCopy(seen: Set<any>, value: any[]): $LSPArray;
+
 		function deepCopy(
 			seen: Set<any>,
 			value: { [key: string]: any } | any[],
@@ -123,6 +129,7 @@ namespace Converter {
 			}
 			if (Array.isArray(value)) {
 				const result: $LSPArray = [];
+
 				for (const elem of value) {
 					if (
 						(elem !== null && typeof elem === "object") ||
@@ -141,9 +148,12 @@ namespace Converter {
 				return result;
 			} else {
 				const props = Object.keys(value);
+
 				const result: $LSPObject = Object.create(null);
+
 				for (const prop of props) {
 					const elem = value[prop];
+
 					if (
 						(elem !== null && typeof elem === "object") ||
 						Array.isArray(elem)
@@ -166,6 +176,7 @@ namespace Converter {
 				Required<proto.NotebookDocumentChangeEvent>["cells"]
 			>["textContent"]
 		>[0];
+
 		export function asTextContentChange(
 			event: vscode.TextDocumentChangeEvent,
 			base: _c2p.Converter,
@@ -175,6 +186,7 @@ namespace Converter {
 				event.document.uri,
 				event.document.version,
 			);
+
 			return {
 				document: params.textDocument,
 				changes: params.contentChanges,
@@ -186,13 +198,16 @@ namespace Converter {
 		): proto.NotebookDocumentChangeEvent {
 			const result: proto.NotebookDocumentChangeEvent =
 				Object.create(null);
+
 			if (event.metadata) {
 				result.metadata = Converter.c2p.asMetadata(event.metadata);
 			}
 			if (event.cells !== undefined) {
 				const cells: Required<proto.NotebookDocumentChangeEvent>["cells"] =
 					Object.create(null);
+
 				const changedCells = event.cells;
+
 				if (changedCells.structure) {
 					cells.structure = {
 						array: {
@@ -255,14 +270,18 @@ namespace $NotebookCell {
 		deleteCount: number;
 		cells?: vscode.NotebookCell[];
 	};
+
 	export function computeDiff(
 		originalCells: vscode.NotebookCell[],
 		modifiedCells: vscode.NotebookCell[],
 		compareMetadata: boolean,
 	): ComputeDiffReturnType | undefined {
 		const originalLength = originalCells.length;
+
 		const modifiedLength = modifiedCells.length;
+
 		let startIndex = 0;
+
 		while (
 			startIndex < modifiedLength &&
 			startIndex < originalLength &&
@@ -276,7 +295,9 @@ namespace $NotebookCell {
 		}
 		if (startIndex < modifiedLength && startIndex < originalLength) {
 			let originalEndIndex = originalLength - 1;
+
 			let modifiedEndIndex = modifiedLength - 1;
+
 			while (
 				originalEndIndex >= 0 &&
 				modifiedEndIndex >= 0 &&
@@ -291,10 +312,12 @@ namespace $NotebookCell {
 			}
 
 			const deleteCount = originalEndIndex + 1 - startIndex;
+
 			const newCells =
 				startIndex === modifiedEndIndex + 1
 					? undefined
 					: modifiedCells.slice(startIndex, modifiedEndIndex + 1);
+
 			return newCells !== undefined
 				? { start: startIndex, deleteCount, cells: newCells }
 				: { start: startIndex, deleteCount };
@@ -388,7 +411,9 @@ namespace $NotebookCell {
 			return false;
 		}
 		const oneArray = Array.isArray(one);
+
 		const otherArray = Array.isArray(other);
+
 		if (oneArray !== otherArray) {
 			return false;
 		}
@@ -405,6 +430,7 @@ namespace $NotebookCell {
 		}
 		if (isObjectLiteral(one) && isObjectLiteral(other)) {
 			const oneKeys = Object.keys(one);
+
 			const otherKeys = Object.keys(other);
 
 			if (oneKeys.length !== otherKeys.length) {
@@ -413,11 +439,13 @@ namespace $NotebookCell {
 
 			oneKeys.sort();
 			otherKeys.sort();
+
 			if (!equalsMetadata(oneKeys, otherKeys)) {
 				return false;
 			}
 			for (let i = 0; i < oneKeys.length; i++) {
 				const prop = oneKeys[i];
+
 				if (
 					!equalsMetadata(
 						(one as $LSPObject)[prop],
@@ -453,6 +481,7 @@ namespace $NotebookDocumentFilter {
 			return false;
 		}
 		const uri = notebookDocument.uri;
+
 		if (
 			filter.scheme !== undefined &&
 			filter.scheme !== "*" &&
@@ -474,20 +503,25 @@ namespace $NotebookDocumentSyncOptions {
 		options: proto.NotebookDocumentSyncOptions,
 	): proto.DocumentSelector {
 		const selector = options.notebookSelector;
+
 		const result: proto.DocumentSelector = [];
+
 		for (const element of selector) {
 			const notebookType =
 				(typeof element.notebook === "string"
 					? element.notebook
 					: element.notebook?.notebookType) ?? "*";
+
 			const scheme =
 				typeof element.notebook === "string"
 					? undefined
 					: element.notebook?.scheme;
+
 			const pattern =
 				typeof element.notebook === "string"
 					? undefined
 					: element.notebook?.pattern;
+
 			if (element.cells !== undefined) {
 				for (const cell of element.cells) {
 					result.push(
@@ -660,6 +694,7 @@ export interface NotebookDocumentSyncFeatureShape {
 	sendDidCloseNotebookDocument(
 		notebookDocument: vscode.NotebookDocument,
 	): Promise<void>;
+
 	getSynchronizedCells(
 		notebookDocument: vscode.NotebookDocument,
 	): vscode.NotebookCell[] | undefined;
@@ -715,6 +750,7 @@ class NotebookDocumentSyncFeatureProvider
 			undefined,
 			this.disposables,
 		);
+
 		for (const notebookDocument of vscode.workspace.notebookDocuments) {
 			this.notebookDidOpen.add(notebookDocument.uri.toString());
 			this.didOpen(notebookDocument);
@@ -751,6 +787,7 @@ class NotebookDocumentSyncFeatureProvider
 		for (const notebook of vscode.workspace.notebookDocuments) {
 			const matchingCells =
 				this.getMatchingCellsConsideringSyncInfo(notebook);
+
 			if (matchingCells !== undefined) {
 				return {
 					kind: "document",
@@ -778,6 +815,7 @@ class NotebookDocumentSyncFeatureProvider
 		}
 		// Work around for https://github.com/microsoft/vscode/issues/202163
 		const key = textDocument.uri.toString();
+
 		for (const syncInfo of this.notebookSyncInfo.values()) {
 			if (syncInfo.uris.has(key)) {
 				return true;
@@ -803,10 +841,12 @@ class NotebookDocumentSyncFeatureProvider
 		// In VS Code we receive a notebook open before a cell document open.
 		// The document and the cell is synced.
 		const cellMatches = this.cellMatches(notebookDocument, cell);
+
 		if (syncInfo !== undefined) {
 			const cellIsSynced = syncInfo.uris.has(
 				cell.document.uri.toString(),
 			);
+
 			if (
 				(cellMatches && cellIsSynced) ||
 				(!cellMatches && !cellIsSynced)
@@ -826,6 +866,7 @@ class NotebookDocumentSyncFeatureProvider
 					syncInfo,
 					[cell],
 				);
+
 				if (matchingCells !== undefined) {
 					const event = this.asNotebookDocumentChangeEvent(
 						notebookDocument,
@@ -833,6 +874,7 @@ class NotebookDocumentSyncFeatureProvider
 						syncInfo,
 						matchingCells,
 					);
+
 					if (event !== undefined) {
 						this.doSendChange(event, matchingCells).catch(() => {
 							/* handled in send change */
@@ -885,15 +927,18 @@ class NotebookDocumentSyncFeatureProvider
 		cell: vscode.NotebookCell,
 	): void {
 		const syncInfo = this.getSyncInfo(notebookDocument);
+
 		if (syncInfo === undefined) {
 			// The notebook document got never synced. So it doesn't matter if a cell
 			// document closes.
 			return;
 		}
 		const cellUri = cell.document.uri;
+
 		const index = syncInfo.cells.findIndex(
 			(item) => item.document.uri.toString() === cellUri.toString(),
 		);
+
 		if (index === -1) {
 			// The cell never got synced or it got deleted and we now received the document
 			// close event.
@@ -906,6 +951,7 @@ class NotebookDocumentSyncFeatureProvider
 			});
 		} else {
 			const newCells = syncInfo.cells.slice();
+
 			const deleted = newCells.splice(index, 1);
 			this.doSendChange(
 				{
@@ -946,6 +992,7 @@ class NotebookDocumentSyncFeatureProvider
 					syncInfo,
 					matchingCells,
 				);
+
 				if (event !== undefined) {
 					this.doSendChange(event, matchingCells).catch(() => {
 						/* handled in send change */
@@ -973,7 +1020,9 @@ class NotebookDocumentSyncFeatureProvider
 		event: vscode.NotebookDocumentChangeEvent,
 	): void {
 		const notebookDocument = event.notebook;
+
 		const syncInfo = this.getSyncInfo(notebookDocument);
+
 		if (syncInfo === undefined) {
 			// We have no changes to the cells. Since the notebook wasn't synced
 			// it will not be synced now.
@@ -1001,8 +1050,10 @@ class NotebookDocumentSyncFeatureProvider
 				syncInfo,
 				event,
 			);
+
 			if (cells === undefined) {
 				this.didClose(notebookDocument, syncInfo);
+
 				return;
 			}
 			const newEvent = this.asNotebookDocumentChangeEvent(
@@ -1011,6 +1062,7 @@ class NotebookDocumentSyncFeatureProvider
 				syncInfo,
 				cells,
 			);
+
 			if (newEvent !== undefined) {
 				this.doSendChange(newEvent, cells).catch(() => {
 					/* error handled in doSendChange */
@@ -1021,6 +1073,7 @@ class NotebookDocumentSyncFeatureProvider
 
 	private didSave(notebookDocument: vscode.NotebookDocument): void {
 		const syncInfo = this.getSyncInfo(notebookDocument);
+
 		if (syncInfo === undefined) {
 			return;
 		}
@@ -1048,12 +1101,14 @@ class NotebookDocumentSyncFeatureProvider
 		notebookDocument: vscode.NotebookDocument,
 	): Promise<void> {
 		const syncInfo = this.getSyncInfo(notebookDocument);
+
 		if (syncInfo !== undefined) {
 			throw new Error(
 				`Notebook document ${notebookDocument.uri.toString()} is already open`,
 			);
 		}
 		const cells = this.getMatchingCells(notebookDocument);
+
 		if (cells === undefined) {
 			return;
 		}
@@ -1073,6 +1128,7 @@ class NotebookDocumentSyncFeatureProvider
 					cell.document,
 				),
 			);
+
 			try {
 				await this.client.sendNotification(
 					proto.DidOpenNotebookDocumentNotification.type,
@@ -1091,14 +1147,17 @@ class NotebookDocumentSyncFeatureProvider
 					"Sending DidOpenNotebookDocumentNotification failed",
 					error,
 				);
+
 				throw error;
 			}
 		};
+
 		const middleware = this.client.middleware?.notebooks;
 		this.notebookSyncInfo.set(
 			notebookDocument.uri.toString(),
 			SyncInfo.create(cells),
 		);
+
 		return middleware?.didOpen !== undefined
 			? middleware.didOpen(notebookDocument, cells, send)
 			: send(notebookDocument, cells);
@@ -1108,6 +1167,7 @@ class NotebookDocumentSyncFeatureProvider
 		event: VNotebookDocumentChangeEvent,
 	): Promise<void> {
 		const cells = this.getMatchingCellsFromSyncInfo(event.notebook);
+
 		if (cells === undefined) {
 			throw new Error(
 				`Received changed event for un-synced notebook ${event.notebook.uri.toString()}`,
@@ -1144,10 +1204,13 @@ class NotebookDocumentSyncFeatureProvider
 					"Sending DidChangeNotebookDocumentNotification failed",
 					error,
 				);
+
 				throw error;
 			}
 		};
+
 		const middleware = this.client.middleware?.notebooks;
+
 		if (event.cells?.structure !== undefined) {
 			this.notebookSyncInfo.set(
 				event.notebook.uri.toString(),
@@ -1188,10 +1251,13 @@ class NotebookDocumentSyncFeatureProvider
 					"Sending DidSaveNotebookDocumentNotification failed",
 					error,
 				);
+
 				throw error;
 			}
 		};
+
 		const middleware = this.client.middleware?.notebooks;
+
 		return middleware?.didSave !== undefined
 			? middleware.didSave(notebookDocument, send)
 			: send(notebookDocument);
@@ -1201,6 +1267,7 @@ class NotebookDocumentSyncFeatureProvider
 		notebookDocument: vscode.NotebookDocument,
 	): Promise<void> {
 		const cells = this.getMatchingCellsFromSyncInfo(notebookDocument);
+
 		if (cells === undefined) {
 			throw new Error(
 				`Received close event for un-synced notebook ${notebookDocument.uri.toString()}`,
@@ -1239,11 +1306,14 @@ class NotebookDocumentSyncFeatureProvider
 					"Sending DidCloseNotebookDocumentNotification failed",
 					error,
 				);
+
 				throw error;
 			}
 		};
+
 		const middleware = this.client.middleware?.notebooks;
 		this.notebookSyncInfo.delete(notebookDocument.uri.toString());
+
 		return middleware?.didClose !== undefined
 			? middleware.didClose(notebookDocument, cells, send)
 			: send(notebookDocument, cells);
@@ -1253,6 +1323,7 @@ class NotebookDocumentSyncFeatureProvider
 		notebookDocument: vscode.NotebookDocument,
 	): vscode.NotebookCell[] | undefined {
 		const syncInfo = this.getSyncInfo(notebookDocument);
+
 		return syncInfo?.cells;
 	}
 
@@ -1274,12 +1345,14 @@ class NotebookDocumentSyncFeatureProvider
 		}
 
 		let matchingCellsSet: Set<string> | undefined;
+
 		if (event?.cellChanges !== undefined && event.cellChanges.length > 0) {
 			const data: vscode.NotebookCell[] = [];
 			// Only consider the new matching cells.
 			matchingCellsSet = new Set(
 				matchingCells.map((cell) => cell.document.uri.toString()),
 			);
+
 			for (const cellChange of event.cellChanges) {
 				if (
 					matchingCellsSet.has(
@@ -1307,13 +1380,17 @@ class NotebookDocumentSyncFeatureProvider
 			// We still have matching cells. Check if the cell changes
 			// affect the notebook on the server side.
 			const oldCells = syncInfo.cells;
+
 			const newCells = matchingCells;
 
 			// meta data changes are reported using on the cell itself. So we can ignore comparing
 			// it which has a positive effect on performance.
 			const diff = $NotebookCell.computeDiff(oldCells, newCells, false);
+
 			let addedCells: Map<string, vscode.NotebookCell> | undefined;
+
 			let removedCells: Map<string, vscode.NotebookCell> | undefined;
+
 			if (diff !== undefined) {
 				addedCells =
 					diff.cells === undefined
@@ -1352,8 +1429,11 @@ class NotebookDocumentSyncFeatureProvider
 						Required<VNotebookDocumentChangeEvent>["cells"]
 					>["structure"]
 				>;
+
 				const didOpen: structure["didOpen"] = [];
+
 				const didClose: structure["didClose"] = [];
+
 				if (addedCells.size > 0 || removedCells.size > 0) {
 					for (const cell of addedCells.values()) {
 						didOpen.push(cell);
@@ -1393,6 +1473,7 @@ class NotebookDocumentSyncFeatureProvider
 					cells,
 					item.cells,
 				);
+
 				return filtered.length === 0 ? undefined : filtered;
 			}
 		}
@@ -1411,6 +1492,7 @@ class NotebookDocumentSyncFeatureProvider
 			| NotebookDocumentFilterWithNotebook
 			| NotebookDocumentFilterWithCells
 			| undefined;
+
 		for (const item of this.options.notebookSelector) {
 			if (
 				item.notebook === undefined ||
@@ -1420,6 +1502,7 @@ class NotebookDocumentSyncFeatureProvider
 				)
 			) {
 				selector = item;
+
 				break;
 			}
 		}
@@ -1436,15 +1519,19 @@ class NotebookDocumentSyncFeatureProvider
 			return syncInfo.cells;
 		}
 		let cells: Set<string> | undefined;
+
 		if (event.cellChanges !== undefined && event.cellChanges.length > 0) {
 			const changedCells = event.cellChanges.map((item) => item.cell);
+
 			const filtered = this.filterCells(
 				notebookDocument,
 				changedCells,
 				selector.cells,
 			);
+
 			if (filtered.length !== changedCells.length) {
 				cells = new Set(syncInfo.uris);
+
 				for (const cell of changedCells) {
 					cells.delete(cell.document.uri.toString());
 				}
@@ -1469,6 +1556,7 @@ class NotebookDocumentSyncFeatureProvider
 					new Array(...item.addedCells),
 					selector.cells,
 				);
+
 				for (const cell of filtered) {
 					cells.add(cell.document.uri.toString());
 				}
@@ -1481,7 +1569,9 @@ class NotebookDocumentSyncFeatureProvider
 		// Only return the cells that are still in the set, but keep the order
 		// as present in the current notebook.
 		const result: vscode.NotebookCell[] = [];
+
 		const current = notebookDocument.getCells();
+
 		for (const cell of current) {
 			if (cells.has(cell.document.uri.toString())) {
 				result.push(cell);
@@ -1494,6 +1584,7 @@ class NotebookDocumentSyncFeatureProvider
 		notebook: vscode.NotebookDocument,
 	): vscode.NotebookCell[] | undefined {
 		const syncInfo = this.getSyncInfo(notebook);
+
 		return syncInfo !== undefined ? syncInfo.cells : undefined;
 	}
 
@@ -1501,6 +1592,7 @@ class NotebookDocumentSyncFeatureProvider
 		notebook: vscode.NotebookDocument,
 	): vscode.NotebookCell[] | undefined {
 		const syncInfo = this.getSyncInfo(notebook);
+
 		return syncInfo !== undefined
 			? syncInfo.cells
 			: this.getMatchingCells(notebook);
@@ -1512,7 +1604,9 @@ class NotebookDocumentSyncFeatureProvider
 		cells: vscode.NotebookCell[],
 	): vscode.NotebookCell[] {
 		const result: vscode.NotebookCell[] = [];
+
 		const merged = new Set(syncInfo.uris);
+
 		for (const cell of cells) {
 			merged.add(cell.document.uri.toString());
 		}
@@ -1530,6 +1624,7 @@ class NotebookDocumentSyncFeatureProvider
 		cell: vscode.NotebookCell,
 	) {
 		const cells = this.getMatchingCells(notebookDocument, [cell]);
+
 		return cells !== undefined && cells[0] === cell;
 	}
 
@@ -1542,6 +1637,7 @@ class NotebookDocumentSyncFeatureProvider
 			cellSelector !== undefined
 				? cells.filter((cell) => {
 						const cellLanguage = cell.document.languageId;
+
 						return cellSelector.some(
 							(filter) =>
 								filter.language === "*" ||
@@ -1549,6 +1645,7 @@ class NotebookDocumentSyncFeatureProvider
 						);
 					})
 				: cells;
+
 		return typeof this.client.clientOptions.notebookDocumentOptions
 			?.filterCells === "function"
 			? this.client.clientOptions.notebookDocumentOptions.filterCells(
@@ -1574,6 +1671,7 @@ export type NotebookDocumentProviderShape = {
 	onChangeNotificationSent: vscode.Event<VNotebookDocumentChangeEvent>;
 	onCloseNotificationSent: vscode.Event<vscode.NotebookDocument>;
 	onSaveNotificationSent: vscode.Event<vscode.NotebookDocument>;
+
 	getProvider(
 		notebookCell: vscode.NotebookCell,
 	): NotebookDocumentSyncFeatureShape | undefined;
@@ -1629,6 +1727,7 @@ export class NotebookDocumentSyncFeature
 			}
 			const [notebookDocument, notebookCell] =
 				this.findNotebookDocumentAndCell(textDocument);
+
 			if (notebookDocument === undefined || notebookCell === undefined) {
 				return;
 			}
@@ -1646,6 +1745,7 @@ export class NotebookDocumentSyncFeature
 				return;
 			}
 			const textDocument = event.document;
+
 			if (
 				textDocument.uri.scheme !==
 				NotebookDocumentSyncFeature.CellScheme
@@ -1654,6 +1754,7 @@ export class NotebookDocumentSyncFeature
 			}
 			const [notebookDocument, cell] =
 				this.findNotebookDocumentAndCell(textDocument);
+
 			if (notebookDocument === undefined || cell === undefined) {
 				return;
 			}
@@ -1680,6 +1781,7 @@ export class NotebookDocumentSyncFeature
 			//    we will still find the cell and the notebook document.
 			const [notebookDocument, notebookCell] =
 				this.findNotebookDocumentAndCell(textDocument);
+
 			if (notebookDocument === undefined || notebookCell === undefined) {
 				return;
 			}
@@ -1705,6 +1807,7 @@ export class NotebookDocumentSyncFeature
 		}
 		for (const provider of this.registrations.values()) {
 			const state = provider.getState();
+
 			if (
 				state.kind === "document" &&
 				state.registrations === true &&
@@ -1757,6 +1860,7 @@ export class NotebookDocumentSyncFeature
 
 	public preInitialize(capabilities: proto.ServerCapabilities<any>): void {
 		const options = capabilities.notebookDocumentSync;
+
 		if (options === undefined) {
 			return;
 		}
@@ -1768,6 +1872,7 @@ export class NotebookDocumentSyncFeature
 
 	public initialize(capabilities: proto.ServerCapabilities<any>): void {
 		const options = capabilities.notebookDocumentSync;
+
 		if (options === undefined) {
 			return;
 		}
@@ -1792,6 +1897,7 @@ export class NotebookDocumentSyncFeature
 
 	public unregister(id: string): void {
 		const provider = this.registrations.get(id);
+
 		if (provider !== undefined) {
 			this.registrations.delete(id);
 			provider.dispose();
@@ -1852,6 +1958,7 @@ export class NotebookDocumentSyncFeature
 		textDocument: vscode.TextDocument,
 	): [vscode.NotebookDocument | undefined, vscode.NotebookCell | undefined] {
 		const uri = textDocument.uri.toString();
+
 		for (const notebookDocument of vscode.workspace.notebookDocuments) {
 			for (const cell of notebookDocument.getCells()) {
 				if (cell.document.uri.toString() === uri) {

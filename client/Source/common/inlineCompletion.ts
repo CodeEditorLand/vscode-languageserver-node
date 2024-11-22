@@ -78,6 +78,7 @@ export class InlineCompletionItemFeature extends TextDocumentLanguageFeature<
 			documentSelector,
 			capabilities.inlineCompletionProvider,
 		);
+
 		if (!options) {
 			return;
 		}
@@ -92,6 +93,7 @@ export class InlineCompletionItemFeature extends TextDocumentLanguageFeature<
 		options: InlineCompletionRegistrationOptions,
 	): [Disposable, InlineCompletionItemProvider] {
 		const selector = options.documentSelector!;
+
 		const provider: InlineCompletionItemProvider = {
 			provideInlineCompletionItems: (
 				document: TextDocument,
@@ -102,7 +104,9 @@ export class InlineCompletionItemFeature extends TextDocumentLanguageFeature<
 				VInlineCompletionList | VInlineCompletionItem[]
 			> => {
 				const client = this._client;
+
 				const middleware = this._client.middleware;
+
 				const provideInlineCompletionItems: ProvideInlineCompletionItemsSignature =
 					(document, position, context, token) => {
 						return client
@@ -135,6 +139,7 @@ export class InlineCompletionItemFeature extends TextDocumentLanguageFeature<
 								},
 							);
 					};
+
 				return middleware.provideInlineCompletionItems
 					? middleware.provideInlineCompletionItems(
 							document,
@@ -151,6 +156,7 @@ export class InlineCompletionItemFeature extends TextDocumentLanguageFeature<
 						);
 			},
 		};
+
 		return [
 			Languages.registerInlineCompletionItemProvider(
 				this._client.protocol2CodeConverter.asDocumentSelector(

@@ -70,6 +70,7 @@ export class DocumentHighlightFeature extends TextDocumentLanguageFeature<
 			documentSelector,
 			capabilities.documentHighlightProvider,
 		);
+
 		if (!options) {
 			return;
 		}
@@ -80,9 +81,11 @@ export class DocumentHighlightFeature extends TextDocumentLanguageFeature<
 		options: TextDocumentRegistrationOptions,
 	): [Disposable, DocumentHighlightProvider] {
 		const selector = options.documentSelector!;
+
 		const provider: DocumentHighlightProvider = {
 			provideDocumentHighlights: (document, position, token) => {
 				const client = this._client;
+
 				const _provideDocumentHighlights: ProvideDocumentHighlightsSignature =
 					(document, position, token) => {
 						return client
@@ -114,7 +117,9 @@ export class DocumentHighlightFeature extends TextDocumentLanguageFeature<
 								},
 							);
 					};
+
 				const middleware = client.middleware;
+
 				return middleware.provideDocumentHighlights
 					? middleware.provideDocumentHighlights(
 							document,
@@ -125,6 +130,7 @@ export class DocumentHighlightFeature extends TextDocumentLanguageFeature<
 					: _provideDocumentHighlights(document, position, token);
 			},
 		};
+
 		return [
 			Languages.registerDocumentHighlightProvider(
 				this._client.protocol2CodeConverter.asDocumentSelector(

@@ -112,6 +112,7 @@ export class DocumentSymbolFeature extends TextDocumentLanguageFeature<
 			documentSelector,
 			capabilities.documentSymbolProvider,
 		);
+
 		if (!options) {
 			return;
 		}
@@ -122,9 +123,11 @@ export class DocumentSymbolFeature extends TextDocumentLanguageFeature<
 		options: DocumentSymbolRegistrationOptions,
 	): [Disposable, DocumentSymbolProvider] {
 		const selector = options.documentSelector!;
+
 		const provider: DocumentSymbolProvider = {
 			provideDocumentSymbols: (document, token) => {
 				const client = this._client;
+
 				const _provideDocumentSymbols: ProvideDocumentSymbolsSignature =
 					async (document, token) => {
 						try {
@@ -135,6 +138,7 @@ export class DocumentSymbolFeature extends TextDocumentLanguageFeature<
 								),
 								token,
 							);
+
 							if (
 								token.isCancellationRequested ||
 								data === undefined ||
@@ -146,6 +150,7 @@ export class DocumentSymbolFeature extends TextDocumentLanguageFeature<
 								return [];
 							} else {
 								const first = data[0];
+
 								if (DocumentSymbol.is(first)) {
 									return await client.protocol2CodeConverter.asDocumentSymbols(
 										data as DocumentSymbol[],
@@ -167,7 +172,9 @@ export class DocumentSymbolFeature extends TextDocumentLanguageFeature<
 							);
 						}
 					};
+
 				const middleware = client.middleware;
+
 				return middleware.provideDocumentSymbols
 					? middleware.provideDocumentSymbols(
 							document,
@@ -177,8 +184,10 @@ export class DocumentSymbolFeature extends TextDocumentLanguageFeature<
 					: _provideDocumentSymbols(document, token);
 			},
 		};
+
 		const metaData: DocumentSymbolProviderMetadata | undefined =
 			options.label !== undefined ? { label: options.label } : undefined;
+
 		return [
 			Languages.registerDocumentSymbolProvider(
 				this._client.protocol2CodeConverter.asDocumentSelector(

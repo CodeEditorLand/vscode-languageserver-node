@@ -44,6 +44,7 @@ export class IPCMessageReader extends AbstractMessageReader {
 	public constructor(process: NodeJS.Process | ChildProcess) {
 		super();
 		this.process = process;
+
 		const eventEmitter: NodeJS.EventEmitter = this.process;
 		eventEmitter.on("error", (error: any) => this.fireError(error));
 		eventEmitter.on("close", () => this.fireClose());
@@ -51,6 +52,7 @@ export class IPCMessageReader extends AbstractMessageReader {
 
 	public listen(callback: DataCallback): Disposable {
 		(this.process as NodeJS.EventEmitter).on("message", callback);
+
 		return Disposable.create(() =>
 			(this.process as NodeJS.EventEmitter).off("message", callback),
 		);
@@ -68,6 +70,7 @@ export class IPCMessageWriter
 		super();
 		this.process = process;
 		this.errorCount = 0;
+
 		const eventEmitter: NodeJS.EventEmitter = this.process;
 		eventEmitter.on("error", (error: any) => this.fireError(error));
 		eventEmitter.on("close", () => this.fireClose);
@@ -93,6 +96,7 @@ export class IPCMessageWriter
 			return Promise.resolve();
 		} catch (error) {
 			this.handleError(error, msg);
+
 			return Promise.reject(error);
 		}
 	}
@@ -144,9 +148,11 @@ export class PortMessageWriter
 	public write(msg: Message): Promise<void> {
 		try {
 			this.port.postMessage(msg);
+
 			return Promise.resolve();
 		} catch (error) {
 			this.handleError(error, msg);
+
 			return Promise.reject(error);
 		}
 	}
@@ -204,6 +210,7 @@ export class StreamMessageWriter extends WriteableStreamMessageWriter {
 }
 
 const XDG_RUNTIME_DIR = process.env["XDG_RUNTIME_DIR"];
+
 const safeIpcPathLengths: Map<NodeJS.Platform, number> = new Map([
 	["linux", 107],
 	["darwin", 103],
@@ -215,9 +222,13 @@ export function generateRandomPipeName(): string {
 	}
 
 	let randomLength: number = 32;
+
 	const fixedLength = "lsp-.sock".length;
+
 	const tmpDir: string = fs.realpathSync(XDG_RUNTIME_DIR ?? os.tmpdir());
+
 	const limit = safeIpcPathLengths.get(process.platform);
+
 	if (limit !== undefined) {
 		randomLength = Math.min(
 			limit - tmpDir.length - fixedLength,
@@ -233,6 +244,7 @@ export function generateRandomPipeName(): string {
 	const randomSuffix = randomBytes(Math.floor(randomLength / 2)).toString(
 		"hex",
 	);
+
 	return path.join(tmpDir, `lsp-${randomSuffix}.sock`);
 }
 
@@ -245,11 +257,13 @@ export function createClientPipeTransport(
 	encoding: RAL.MessageBufferEncoding = "utf-8",
 ): Promise<PipeTransport> {
 	let connectResolve: (value: [MessageReader, MessageWriter]) => void;
+
 	const connected = new Promise<[MessageReader, MessageWriter]>(
 		(resolve, _reject) => {
 			connectResolve = resolve;
 		},
 	);
+
 	return new Promise<PipeTransport>((resolve, reject) => {
 		const server: Server = createServer((socket: Socket) => {
 			server.close();
@@ -275,6 +289,7 @@ export function createServerPipeTransport(
 	encoding: RAL.MessageBufferEncoding = "utf-8",
 ): [MessageReader, MessageWriter] {
 	const socket: Socket = createConnection(pipeName);
+
 	return [
 		new SocketMessageReader(socket, encoding),
 		new SocketMessageWriter(socket, encoding),
@@ -290,11 +305,13 @@ export function createClientSocketTransport(
 	encoding: RAL.MessageBufferEncoding = "utf-8",
 ): Promise<SocketTransport> {
 	let connectResolve: (value: [MessageReader, MessageWriter]) => void;
+
 	const connected = new Promise<[MessageReader, MessageWriter]>(
 		(resolve, _reject) => {
 			connectResolve = resolve;
 		},
 	);
+
 	return new Promise<SocketTransport>((resolve, reject) => {
 		const server: Server = createServer((socket: Socket) => {
 			server.close();
@@ -320,6 +337,7 @@ export function createServerSocketTransport(
 	encoding: RAL.MessageBufferEncoding = "utf-8",
 ): [MessageReader, MessageWriter] {
 	const socket: Socket = createConnection(port, "127.0.0.1");
+
 	return [
 		new SocketMessageReader(socket, encoding),
 		new SocketMessageWriter(socket, encoding),
@@ -328,11 +346,13 @@ export function createServerSocketTransport(
 
 function isReadableStream(value: any): value is NodeJS.ReadableStream {
 	const candidate: NodeJS.ReadableStream = value;
+
 	return candidate.read !== undefined && candidate.addListener !== undefined;
 }
 
 function isWritableStream(value: any): value is NodeJS.WritableStream {
 	const candidate: NodeJS.WritableStream = value;
+
 	return candidate.write !== undefined && candidate.addListener !== undefined;
 }
 
@@ -360,6 +380,7 @@ export function createMessageConnection(
 	const reader = isReadableStream(input)
 		? new StreamMessageReader(input)
 		: input;
+
 	const writer = isWritableStream(output)
 		? new StreamMessageWriter(output)
 		: output;

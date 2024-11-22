@@ -27,7 +27,9 @@ export async function activate(context: ExtensionContext) {
 		"out",
 		"server.js",
 	);
+
 	const debugOptions = { execArgv: ["--nolazy", "--inspect=6012"] };
+
 	const serverOptions: ServerOptions = {
 		run: { module, transport: TransportKind.ipc },
 		debug: {
@@ -70,6 +72,7 @@ export async function activate(context: ExtensionContext) {
 			onFocus: true,
 			match: (selector, resource) => {
 				const fsPath = resource.fsPath;
+
 				return path.extname(fsPath) === ".bat";
 			},
 		},
@@ -88,9 +91,11 @@ export async function activate(context: ExtensionContext) {
 	client.onTelemetry((data: any) => {
 		console.log(`Telemetry event received: ${JSON.stringify(data)}`);
 	});
+
 	const not: NotificationType<string[]> = new NotificationType<string[]>(
 		"testbed/notification",
 	);
+
 	try {
 		await client.start();
 	} catch (error) {

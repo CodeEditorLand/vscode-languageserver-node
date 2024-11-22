@@ -30,6 +30,7 @@ export class Delayer<T> {
 		delay: number = this.defaultDelay,
 	): Promise<T> {
 		this.task = task;
+
 		if (delay >= 0) {
 			this.cancelTimeout();
 		}
@@ -40,8 +41,10 @@ export class Delayer<T> {
 			}).then(() => {
 				this.completionPromise = undefined;
 				this.onSuccess = undefined;
+
 				const result = this.task!();
 				this.task = undefined;
+
 				return result;
 			});
 		}
@@ -64,10 +67,12 @@ export class Delayer<T> {
 			return undefined;
 		}
 		this.cancelTimeout();
+
 		const result: T = this.task!();
 		this.completionPromise = undefined;
 		this.onSuccess = undefined;
 		this.task = undefined;
+
 		return result;
 	}
 
@@ -134,11 +139,13 @@ export class Semaphore<T = void> {
 		}
 		const next = this._waiting.shift()!;
 		this._active++;
+
 		if (this._active > this._capacity) {
 			throw new Error(`To many thunks active`);
 		}
 		try {
 			const result = next.thunk();
+
 			if (result instanceof Promise) {
 				result.then(
 					(value) => {
@@ -204,9 +211,11 @@ class Timer {
 	public shouldYield(): boolean {
 		if (++this.counter >= this.counterInterval) {
 			const timeTaken = Date.now() - this.startTime;
+
 			const timeLeft = Math.max(0, this.yieldAfter - timeTaken);
 			this.total += this.counter;
 			this.counter = 0;
+
 			if (timeTaken >= this.yieldAfter || timeLeft <= 1) {
 				// Yield also if time left <= 1 since we compute the counter
 				// for max < 2 ms.
@@ -216,6 +225,7 @@ class Timer {
 				// affect the timing heavily since we have small timings (1 - 15ms).
 				this.counterInterval = 1;
 				this.total = 0;
+
 				return true;
 			} else {
 				// Only increase the counter until we have spent <= 2 ms. Increasing
@@ -226,6 +236,7 @@ class Timer {
 					case 0:
 					case 1:
 						this.counterInterval = this.total * 2;
+
 						break;
 				}
 			}
@@ -257,13 +268,18 @@ export async function map<P, C>(
 		return [];
 	}
 	const result: C[] = new Array(items.length);
+
 	const timer = new Timer(options?.yieldAfter);
+
 	function convertBatch(start: number): number {
 		timer.start();
+
 		for (let i = start; i < items.length; i++) {
 			result[i] = func(items[i]);
+
 			if (timer.shouldYield()) {
 				options?.yieldCallback && options.yieldCallback();
+
 				return i + 1;
 			}
 		}
@@ -271,6 +287,7 @@ export async function map<P, C>(
 	}
 	// Convert the first batch sync on the same frame.
 	let index = convertBatch(0);
+
 	while (index !== -1) {
 		if (token !== undefined && token.isCancellationRequested) {
 			break;
@@ -294,19 +311,25 @@ export async function mapAsync<P, C>(
 		return [];
 	}
 	const result: C[] = new Array(items.length);
+
 	const timer = new Timer(options?.yieldAfter);
+
 	async function convertBatch(start: number): Promise<number> {
 		timer.start();
+
 		for (let i = start; i < items.length; i++) {
 			result[i] = await func(items[i], token);
+
 			if (timer.shouldYield()) {
 				options?.yieldCallback && options.yieldCallback();
+
 				return i + 1;
 			}
 		}
 		return -1;
 	}
 	let index = await convertBatch(0);
+
 	while (index !== -1) {
 		if (token !== undefined && token.isCancellationRequested) {
 			break;
@@ -330,12 +353,16 @@ export async function forEach<P>(
 		return;
 	}
 	const timer = new Timer(options?.yieldAfter);
+
 	function runBatch(start: number): number {
 		timer.start();
+
 		for (let i = start; i < items.length; i++) {
 			func(items[i]);
+
 			if (timer.shouldYield()) {
 				options?.yieldCallback && options.yieldCallback();
+
 				return i + 1;
 			}
 		}
@@ -343,6 +370,7 @@ export async function forEach<P>(
 	}
 	// Convert the first batch sync on the same frame.
 	let index = runBatch(0);
+
 	while (index !== -1) {
 		if (token !== undefined && token.isCancellationRequested) {
 			break;

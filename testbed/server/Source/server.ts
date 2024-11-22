@@ -6,6 +6,7 @@
 
 import * as path from 'path';
 import * as _fs from 'fs';
+
 const fs = _fs.promises;
 
 import { URI } from 'vscode-uri';
@@ -26,6 +27,7 @@ import {
 } from 'vscode-languageserver-textdocument';
 
 const connection: ProposedFeatures.Connection = createConnection(ProposedFeatures.all);
+
 const documents = new TextDocuments(TextDocument);
 
 documents.listen(connection);
@@ -77,11 +79,14 @@ let semanticTokensLegend: SemanticTokensLegend | undefined;
 function computeLegend(capability: SemanticTokensClientCapabilities): SemanticTokensLegend {
 
 	const clientTokenTypes = new Set<string>(capability.tokenTypes);
+
 	const clientTokenModifiers = new Set<string>(capability.tokenModifiers);
 
 	const tokenTypes: string[] = [];
+
 	for (let i = 0; i < TokenTypes._; i++) {
 		const str = TokenTypes[i];
+
 		if (clientTokenTypes.has(str)) {
 			tokenTypes.push(str);
 		} else {
@@ -94,8 +99,10 @@ function computeLegend(capability: SemanticTokensClientCapabilities): SemanticTo
 	}
 
 	const tokenModifiers: string[] = [];
+
 	for (let i = 0; i < TokenModifiers._; i++) {
 		const str = TokenModifiers[i];
+
 		if (clientTokenModifiers.has(str)) {
 			tokenModifiers.push(str);
 		}
@@ -109,6 +116,7 @@ connection.onInitialize((params, cancel, progress): Thenable<InitializeResult> |
 	progress.begin('Initializing test server');
 
 	const workspaceFolders = params.workspaceFolders;
+
 	if (workspaceFolders !== undefined && workspaceFolders !== null) {
 		for (const folder of workspaceFolders) {
 			connection.console.log(`${folder.name} ${folder.uri}`);
@@ -119,6 +127,7 @@ connection.onInitialize((params, cancel, progress): Thenable<InitializeResult> |
 	}
 
 	semanticTokensLegend = computeLegend(params.capabilities.textDocument!.semanticTokens!);
+
 	return new Promise((resolve, reject) => {
 		const result: InitializeResult = {
 			capabilities: {
@@ -185,6 +194,7 @@ connection.onInitialize((params, cancel, progress): Thenable<InitializeResult> |
 
 			}
 		};
+
 		setTimeout(() => {
 			resolve(result);
 		}, 50);
@@ -201,6 +211,7 @@ connection.onInitialized((params) => {
 			connection.console.log(`Get workspace folders: ${folder.name} ${folder.uri}`);
 		}
 	});
+
 	const registrationOptions: SemanticTokensRegistrationOptions = {
 		documentSelector: ['bat'],
 		legend: semanticTokensLegend,
@@ -276,6 +287,7 @@ function validate(document: TextDocument): Diagnostic[] {
 	// 	],
 	// 	data: '11316630-392c-4227-a2c7-3b26cd68f241'
 	// }];
+
 	return [];
 }
 
@@ -312,11 +324,16 @@ const patterns = [
 
 function computeDiagnostics(content: string): Diagnostic[] {
 	const result: Diagnostic[] = [];
+
 	const lines: string[] = content.match(/^.*(\n|\r\n|\r|$)/gm);
+
 	let lineNumber: number = 0;
+
 	for (const line of lines) {
 		const pattern = patterns[Math.floor(Math.random() * 3)];
+
 		let match: RegExpExecArray | null;
+
 		while (match = pattern.exec(line)) {
 			result.push(
 				Diagnostic.create(Range.create(lineNumber, match.index, lineNumber, match.index + match[0].length), `${match[0]} is all uppercase.`, DiagnosticSeverity.Error)
@@ -328,15 +345,19 @@ function computeDiagnostics(content: string): Diagnostic[] {
 }
 
 let resultIdCounter: number = 1;
+
 let versionCounter: number = 1;
 connection.languages.diagnostics.on(async (param) => {
 	const uri = URI.parse(param.textDocument.uri);
+
 	const document = documents.get(param.textDocument.uri);
+
 	const content = document !== undefined
 		? document.getText()
 		: uri.scheme === 'file'
 			? await fs.readFile(uri.fsPath, { encoding: 'utf8'} )
 			: undefined;
+
 	if (content === undefined) {
 		return { kind: DocumentDiagnosticReportKind.Full, items: [], resultId: `${resultIdCounter++}` };
 	}
@@ -347,6 +368,7 @@ connection.languages.diagnostics.onWorkspace(async (params, token, _, resultProg
 	const fsPath = URI.parse(folder).fsPath;
 
 	const toValidate: string[] = [];
+
 	for (const child of await fs.readdir(fsPath)) {
 		if (path.extname(child) === '.bat') {
 			toValidate.push(path.join(fsPath, child));
@@ -371,17 +393,20 @@ connection.languages.diagnostics.onWorkspace(async (params, token, _, resultProg
 				resultId: `${resultIdCounter++}`
 			}
 		]});
+
 		setTimeout(() => { void doValidate(++index); }, 500);
 	};
 	void doValidate(0);
 	await new Promise((resolve) => {
 		setTimeout(resolve, 120000);
 	});
+
 	return { items: [] };
 });
 
 connection.onCompletion((params, token): CompletionList => {
 	const result: CompletionItem[] = [];
+
 	let item = CompletionItem.create('foo');
 	result.push(item);
 
@@ -417,6 +442,7 @@ connection.onCompletion((params, token): CompletionList => {
 
 	const list = CompletionList.create(result, true);
 	list.itemDefaults = { data: 'abc' };
+
 	return list;
 });
 
@@ -430,6 +456,7 @@ connection.onCompletionResolve((item): CompletionItem => {
 			'console.log("Hello World");',
 			'```'
 		].join('\n')};
+
 	return item;
 });
 
@@ -482,6 +509,7 @@ connection.onReferences((params): Location[] => {
 
 connection.onDocumentHighlight((textPosition) => {
 	const position = textPosition.position;
+
 	return [
 		DocumentHighlight.create({
 			start: { line: position.line + 1, character: position.character },
@@ -519,13 +547,16 @@ connection.onWorkspaceSymbol((params) => {
 
 connection.onCodeAction((params) => {
 	const document = documents.get(params.textDocument.uri);
+
 	if (document === undefined) {
 		return [];
 	}
 	const change: WorkspaceChange = new WorkspaceChange();
 	change.createFile(`${folder}/newFile.bat`, { overwrite: true });
+
 	const a = change.getTextEditChange(document);
 	a.insert({ line: 0, character: 0}, 'Code Action', ChangeAnnotation.create('Insert some text', true));
+
 	const b = change.getTextEditChange({ uri: `${folder}/newFile.bat`, version: null });
 	b.insert({ line: 0, character: 0 }, 'The initial content', ChangeAnnotation.create('Add additional content', true));
 
@@ -535,6 +566,7 @@ connection.onCodeAction((params) => {
 		data: params.textDocument.uri
 	};
 	codeAction.edit = change.edit;
+
 	return [
 		codeAction
 	];
@@ -550,6 +582,7 @@ connection.onCodeActionResolve((codeAction) => {
 	// b.insert({ line: 0, character: 0 }, 'The initial content', ChangeAnnotation.create('Add additional content', true));
 
 	// codeAction.edit = change.edit;
+
 	return codeAction;
 });
 
@@ -564,6 +597,7 @@ connection.onCodeLens((params) => {
 
 connection.onCodeLensResolve((codeLens) => {
 	codeLens.command = Command.create('My Code Lens', 'commandId');
+
 	return codeLens;
 });
 
@@ -575,19 +609,23 @@ connection.onDocumentFormatting((params) => {
 
 connection.onDocumentRangeFormatting((params) => {
 	connection.console.log(`Document Range Formatting: ${JSON.stringify(params.range)} ${JSON.stringify(params.options)}`);
+
 	return [];
 });
 
 connection.onDocumentOnTypeFormatting((params) => {
 	connection.console.log(`Document On Type Formatting: ${JSON.stringify(params.position)} ${params.ch} ${JSON.stringify(params.options)}`);
+
 	return [];
 });
 
 connection.onRenameRequest((params) => {
 	connection.console.log(`Rename: ${JSON.stringify(params.position)} ${params.newName}`);
 	// return new ResponseError(20, 'Element can\'t be renamed');
+
 	const change = new WorkspaceChange();
 	change.getTextEditChange(params.textDocument.uri).insert(Position.create(0,0), 'Rename inserted\n', ChangeAnnotation.create('Rename symbol', true));
+
 	return change.edit;
 });
 
@@ -651,23 +689,33 @@ documents.onDidClose((event) => {
 });
 function getTokenBuilder(document: TextDocument): SemanticTokensBuilder {
 	let result = tokenBuilders.get(document.uri);
+
 	if (result !== undefined) {
 		return result;
 	}
 	result = new SemanticTokensBuilder();
 	tokenBuilders.set(document.uri, result);
+
 	return result;
 }
 function buildTokens(builder: SemanticTokensBuilder, document: TextDocument) {
 	const text = document.getText();
+
 	const regexp = /\w+/g;
+
 	let match: RegExpMatchArray;
+
 	let tokenCounter: number = 0;
+
 	let modifierCounter: number = 0;
+
 	while ((match = regexp.exec(text)) !== null) {
 		const word = match[0];
+
 		const position = document.positionAt(match.index);
+
 		const tokenType = tokenCounter % TokenTypes._;
+
 		const tokenModifier = 1 << modifierCounter % TokenModifiers._;
 		builder.push(position.line, position.character, word.length, tokenType, tokenModifier);
 		tokenCounter++;
@@ -677,22 +725,26 @@ function buildTokens(builder: SemanticTokensBuilder, document: TextDocument) {
 
 connection.languages.semanticTokens.on((params) => {
 	const document = documents.get(params.textDocument.uri);
+
 	if (document === undefined) {
 		return { data: [] };
 	}
 	const builder = getTokenBuilder(document);
 	buildTokens(builder, document);
+
 	return builder.build();
 });
 
 connection.languages.semanticTokens.onDelta((params) => {
 	const document = documents.get(params.textDocument.uri);
+
 	if (document === undefined) {
 		return { edits: [] };
 	}
 	const builder = getTokenBuilder(document);
 	builder.previousResult(params.previousResultId);
 	buildTokens(builder, document);
+
 	return builder.buildEdits();
 });
 
@@ -724,3 +776,4 @@ notebooks.onDidClose(() => {
 notebooks.listen(connection);
 
 connection.listen();
+

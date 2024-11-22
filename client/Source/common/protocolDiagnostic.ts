@@ -20,6 +20,7 @@ export interface DiagnosticCode {
 export namespace DiagnosticCode {
 	export function is(value: any): value is DiagnosticCode {
 		const candidate: DiagnosticCode = value as DiagnosticCode;
+
 		return (
 			candidate !== undefined &&
 			candidate !== null &&

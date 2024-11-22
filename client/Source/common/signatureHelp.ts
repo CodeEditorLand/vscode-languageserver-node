@@ -89,6 +89,7 @@ export class SignatureHelpFeature extends TextDocumentLanguageFeature<
 			documentSelector,
 			capabilities.signatureHelpProvider,
 		);
+
 		if (!options) {
 			return;
 		}
@@ -104,6 +105,7 @@ export class SignatureHelpFeature extends TextDocumentLanguageFeature<
 		const provider: SignatureHelpProvider = {
 			provideSignatureHelp: (document, position, token, context) => {
 				const client = this._client;
+
 				const providerSignatureHelp: ProvideSignatureHelpSignature = (
 					document,
 					position,
@@ -140,7 +142,9 @@ export class SignatureHelpFeature extends TextDocumentLanguageFeature<
 							},
 						);
 				};
+
 				const middleware = client.middleware;
+
 				return middleware.provideSignatureHelp
 					? middleware.provideSignatureHelp(
 							document,
@@ -152,6 +156,7 @@ export class SignatureHelpFeature extends TextDocumentLanguageFeature<
 					: providerSignatureHelp(document, position, context, token);
 			},
 		};
+
 		return [this.registerProvider(options, provider), provider];
 	}
 
@@ -162,8 +167,10 @@ export class SignatureHelpFeature extends TextDocumentLanguageFeature<
 		const selector = this._client.protocol2CodeConverter.asDocumentSelector(
 			options.documentSelector,
 		);
+
 		if (options.retriggerCharacters === undefined) {
 			const triggerCharacters = options.triggerCharacters || [];
+
 			return Languages.registerSignatureHelpProvider(
 				selector,
 				provider,
@@ -174,6 +181,7 @@ export class SignatureHelpFeature extends TextDocumentLanguageFeature<
 				triggerCharacters: options.triggerCharacters || [],
 				retriggerCharacters: options.retriggerCharacters || [],
 			};
+
 			return Languages.registerSignatureHelpProvider(
 				selector,
 				provider,

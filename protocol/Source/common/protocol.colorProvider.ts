@@ -62,8 +62,10 @@ export interface DocumentColorParams
 export namespace DocumentColorRequest {
 	export const method: "textDocument/documentColor" =
 		"textDocument/documentColor";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		DocumentColorParams,
 		ColorInformation[],
@@ -71,6 +73,7 @@ export namespace DocumentColorRequest {
 		void,
 		DocumentColorRegistrationOptions
 	>(method);
+
 	export type HandlerSignature = RequestHandler<
 		DocumentColorParams,
 		ColorInformation[],
@@ -109,8 +112,10 @@ export interface ColorPresentationParams
 export namespace ColorPresentationRequest {
 	export const method: "textDocument/colorPresentation" =
 		"textDocument/colorPresentation";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		ColorPresentationParams,
 		ColorPresentation[],
@@ -118,6 +123,7 @@ export namespace ColorPresentationRequest {
 		void,
 		WorkDoneProgressOptions & TextDocumentRegistrationOptions
 	>(method);
+
 	export type HandlerSignature = RequestHandler<
 		ColorPresentationParams,
 		ColorPresentation[],

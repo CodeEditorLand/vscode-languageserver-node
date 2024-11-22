@@ -36,19 +36,24 @@ export namespace CompilerOptions {
 		opt1: CompilerOptions,
 		opt2: CompilerOptions,
 	): CompilerOptions;
+
 	export function assign(
 		opt1: CompilerOptions,
 		opt2: CompilerOptions | undefined,
 	): CompilerOptions;
+
 	export function assign(
 		opt1: CompilerOptions | undefined,
 		opt2: CompilerOptions,
 	): CompilerOptions;
+
 	export function assign(opt1: undefined, opt2: undefined): undefined;
+
 	export function assign(
 		opt1: CompilerOptions | undefined,
 		opt2: CompilerOptions | undefined,
 	): CompilerOptions | undefined;
+
 	export function assign(
 		opt1: CompilerOptions | undefined,
 		opt2: CompilerOptions | undefined,
@@ -60,9 +65,12 @@ export namespace CompilerOptions {
 			return opt1;
 		}
 		const result: CompilerOptions = Object.assign({}, opt1);
+
 		for (const prop of Object.keys(opt2)) {
 			const cv = result[prop];
+
 			const nv = opt2[prop];
+
 			if (cv === undefined) {
 				result[prop] = nv;
 			} else if (nv === undefined) {
@@ -125,6 +133,7 @@ export type ProjectDescription = {
 export type ProjectOptions = {
 	tags: string[];
 	tsconfig?: string;
+
 	variables?: Map<string, string>;
 	compilerOptions?: CompilerOptions;
 };

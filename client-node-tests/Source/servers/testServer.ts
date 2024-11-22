@@ -360,6 +360,7 @@ connection.onInitialize((params: InitializeParams): any => {
 			],
 		},
 	};
+
 	return { capabilities, customResults: { hello: "world" } };
 });
 
@@ -434,6 +435,7 @@ connection.onInitialized(() => {
 connection.onDeclaration((params) => {
 	assert.equal(params.position.line, 1);
 	assert.equal(params.position.character, 1);
+
 	return {
 		uri: params.textDocument.uri,
 		range: {
@@ -446,6 +448,7 @@ connection.onDeclaration((params) => {
 connection.onDefinition((params) => {
 	assert.equal(params.position.line, 1);
 	assert.equal(params.position.character, 1);
+
 	return {
 		uri: params.textDocument.uri,
 		range: {
@@ -470,6 +473,7 @@ connection.onCompletion((_params) => {
 
 connection.onCompletionResolve((item) => {
 	item.detail = "detail";
+
 	return item;
 });
 
@@ -485,6 +489,7 @@ connection.onSignatureHelp((_params) => {
 		activeSignature: 1,
 		activeParameter: 1,
 	};
+
 	return result;
 });
 
@@ -510,6 +515,7 @@ connection.onCodeAction((_params) => {
 
 connection.onCodeActionResolve((codeAction) => {
 	codeAction.title = "resolved";
+
 	return codeAction;
 });
 
@@ -539,6 +545,7 @@ connection.onDocumentLinks((_params) => {
 
 connection.onDocumentLinkResolve((link) => {
 	link.target = URI.file("/target.txt").toString();
+
 	return link;
 });
 
@@ -574,6 +581,7 @@ connection.onFoldingRanges((_params) => {
 connection.onImplementation((params) => {
 	assert.equal(params.position.line, 1);
 	assert.equal(params.position.character, 1);
+
 	return {
 		uri: params.textDocument.uri,
 		range: {
@@ -609,6 +617,7 @@ connection.onRequest(
 
 connection.workspace.onWillCreateFiles((params) => {
 	const createdFilenames = params.files.map((f) => `${f.uri}`).join("\n");
+
 	return {
 		documentChanges: [
 			{
@@ -628,6 +637,7 @@ connection.workspace.onWillRenameFiles((params) => {
 	const renamedFilenames = params.files
 		.map((f) => `${f.oldUri} -> ${f.newUri}`)
 		.join("\n");
+
 	return {
 		documentChanges: [
 			{
@@ -645,6 +655,7 @@ connection.workspace.onWillRenameFiles((params) => {
 
 connection.workspace.onWillDeleteFiles((params) => {
 	const deletedFilenames = params.files.map((f) => `${f.uri}`).join("\n");
+
 	return {
 		documentChanges: [
 			{
@@ -663,6 +674,7 @@ connection.workspace.onWillDeleteFiles((params) => {
 connection.onTypeDefinition((params) => {
 	assert.equal(params.position.line, 1);
 	assert.equal(params.position.character, 1);
+
 	return {
 		uri: params.textDocument.uri,
 		range: {
@@ -780,6 +792,7 @@ connection.languages.typeHierarchy.onPrepare((params) => {
 	typeHierarchySample.subTypes = [
 		{ ...currentItem, name: "classC", uri: "uri-for-C" },
 	];
+
 	return [currentItem];
 });
 
@@ -813,18 +826,21 @@ connection.languages.inlayHint.on(() => {
 		InlayHintKind.Type,
 	);
 	one.data = "1";
+
 	const two = InlayHint.create(
 		Position.create(2, 2),
 		[InlayHintLabelPart.create("parameter")],
 		InlayHintKind.Parameter,
 	);
 	two.data = "2";
+
 	return [one, two];
 });
 
 connection.languages.inlayHint.resolve((hint) => {
 	(hint.label as InlayHintLabelPart[])[0].tooltip = "tooltip";
 	hint.textEdits = [TextEdit.insert(Position.create(1, 1), "number")];
+
 	return hint;
 });
 
@@ -878,6 +894,7 @@ connection.onRequest(
 		await connection.sendRequest(WorkDoneProgressCreateRequest.type, {
 			token: progressToken2,
 		});
+
 		const progress =
 			connection.window.attachWorkDoneProgress(progressToken2);
 		progress.begin("Test Progress", 0.1);
@@ -901,6 +918,7 @@ connection.onWorkspaceSymbolResolve((symbol) => {
 		symbol.location.uri,
 		Range.create(1, 2, 3, 4),
 	);
+
 	return symbol;
 });
 

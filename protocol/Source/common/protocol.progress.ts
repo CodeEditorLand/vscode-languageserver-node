@@ -120,8 +120,10 @@ export interface WorkDoneProgressCreateParams {
 export namespace WorkDoneProgressCreateRequest {
 	export const method: "window/workDoneProgress/create" =
 		"window/workDoneProgress/create";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.serverToClient;
+
 	export const type = new ProtocolRequestType<
 		WorkDoneProgressCreateParams,
 		void,
@@ -129,6 +131,7 @@ export namespace WorkDoneProgressCreateRequest {
 		void,
 		void
 	>(method);
+
 	export type HandlerSignature = RequestHandler<
 		WorkDoneProgressCreateParams,
 		void,
@@ -150,12 +153,15 @@ export interface WorkDoneProgressCancelParams {
 export namespace WorkDoneProgressCancelNotification {
 	export const method: "window/workDoneProgress/cancel" =
 		"window/workDoneProgress/cancel";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolNotificationType<
 		WorkDoneProgressCancelParams,
 		void
 	>(method);
+
 	export type HandlerSignature =
 		NotificationHandler<WorkDoneProgressCancelParams>;
 }

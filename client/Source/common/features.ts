@@ -148,6 +148,7 @@ import * as UUID from "./utils/uuid";
 
 export class LSPCancellationError extends CancellationError {
 	public readonly data: object | Object;
+
 	constructor(data: object | Object) {
 		super();
 		this.data = data;
@@ -288,6 +289,7 @@ export interface StaticFeature {
 export namespace StaticFeature {
 	export function is(value: any): value is StaticFeature {
 		const candidate: StaticFeature = value;
+
 		return (
 			candidate !== undefined &&
 			candidate !== null &&
@@ -383,6 +385,7 @@ export interface DynamicFeature<RO> {
 export namespace DynamicFeature {
 	export function is<T>(value: any): value is DynamicFeature<T> {
 		const candidate: DynamicFeature<T> = value;
+
 		return (
 			candidate !== undefined &&
 			candidate !== null &&
@@ -450,8 +453,10 @@ export abstract class DynamicDocumentFeature<RO, MW, CO = object>
 		const selectors = this.getDocumentSelectors();
 
 		let count: number = 0;
+
 		for (const selector of selectors) {
 			count++;
+
 			for (const document of Workspace.textDocuments) {
 				if (Languages.match(selector, document) > 0) {
 					return {
@@ -464,6 +469,7 @@ export abstract class DynamicDocumentFeature<RO, MW, CO = object>
 			}
 		}
 		const registrations = count > 0;
+
 		return {
 			kind: "document",
 			id: this.registrationType.method,
@@ -596,8 +602,10 @@ export abstract class TextDocumentEventFeature<
 				params,
 			);
 		};
+
 		if (this.matches(data)) {
 			const middleware = this._middleware();
+
 			return middleware
 				? middleware(data, (data) => doSend(data))
 				: doSend(data);
@@ -634,6 +642,7 @@ export abstract class TextDocumentEventFeature<
 
 	public unregister(id: string): void {
 		this._selectors.delete(id);
+
 		if (this._selectors.size === 0 && this._listener) {
 			this._listener.dispose();
 			this._listener = undefined;
@@ -644,6 +653,7 @@ export abstract class TextDocumentEventFeature<
 		this._selectors.clear();
 		this._onNotificationSent.dispose();
 		this._onNotificationSent = new EventEmitter<NotificationSendEvent<P>>();
+
 		if (this._listener) {
 			this._listener.dispose();
 			this._listener = undefined;
@@ -716,6 +726,7 @@ export abstract class TextDocumentLanguageFeature<
 	protected *getDocumentSelectors(): IterableIterator<VDocumentSelector> {
 		for (const registration of this._registrations.values()) {
 			const selector = registration.data.registerOptions.documentSelector;
+
 			if (selector === null) {
 				continue;
 			}
@@ -760,6 +771,7 @@ export abstract class TextDocumentLanguageFeature<
 
 	public unregister(id: string): void {
 		const registration = this._registrations.get(id);
+
 		if (registration !== undefined) {
 			this._registrations.delete(id);
 			registration.disposable.dispose();
@@ -786,7 +798,9 @@ export abstract class TextDocumentLanguageFeature<
 			const id = StaticRegistrationOptions.hasId(capability)
 				? capability.id
 				: UUID.generateUuid();
+
 			const selector = capability.documentSelector ?? documentSelector;
+
 			if (selector) {
 				return [
 					id,
@@ -807,6 +821,7 @@ export abstract class TextDocumentLanguageFeature<
 					? { documentSelector }
 					: Object.assign({}, capability, { documentSelector })
 			) as any;
+
 			return [UUID.generateUuid(), options];
 		}
 		return [undefined, undefined];
@@ -829,6 +844,7 @@ export abstract class TextDocumentLanguageFeature<
 	public getProvider(textDocument: TextDocument): PR | undefined {
 		for (const registration of this._registrations.values()) {
 			const selector = registration.data.registerOptions.documentSelector;
+
 			if (
 				selector !== null &&
 				Languages.match(
@@ -846,6 +862,7 @@ export abstract class TextDocumentLanguageFeature<
 
 	protected getAllProviders(): Iterable<PR> {
 		const result: PR[] = [];
+
 		for (const item of this._registrations.values()) {
 			result.push(item.provider);
 		}
@@ -883,6 +900,7 @@ export abstract class WorkspaceFeature<RO, PR, M>
 
 	public getState(): FeatureState {
 		const registrations = this._registrations.size > 0;
+
 		return {
 			kind: "workspace",
 			id: this._registrationType.method,
@@ -917,6 +935,7 @@ export abstract class WorkspaceFeature<RO, PR, M>
 
 	public unregister(id: string): void {
 		const registration = this._registrations.get(id);
+
 		if (registration !== undefined) {
 			this._registrations.delete(id);
 			registration.disposable.dispose();
@@ -932,6 +951,7 @@ export abstract class WorkspaceFeature<RO, PR, M>
 
 	public getProviders(): PR[] {
 		const result: PR[] = [];
+
 		for (const registration of this._registrations.values()) {
 			result.push(registration.provider);
 		}
@@ -948,6 +968,7 @@ export interface TabsModel {
 	onOpen: Event<Set<Uri>>;
 	isActive(document: TextDocument | Uri): boolean;
 	isVisible(document: TextDocument | Uri): boolean;
+
 	getTabResources(): Set<Uri>;
 }
 
@@ -1069,178 +1090,220 @@ export interface FeatureClient<M, CO = object> {
 	getFeature(
 		request: typeof DidOpenTextDocumentNotification.method,
 	): DidOpenTextDocumentFeatureShape;
+
 	getFeature(
 		request: typeof DidChangeTextDocumentNotification.method,
 	): DidChangeTextDocumentFeatureShape;
+
 	getFeature(
 		request: typeof WillSaveTextDocumentNotification.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentSendFeature<(textDocument: TextDocument) => Promise<void>>;
+
 	getFeature(
 		request: typeof WillSaveTextDocumentWaitUntilRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentSendFeature<
 			(textDocument: TextDocument) => ProviderResult<VTextEdit[]>
 		>;
+
 	getFeature(
 		request: typeof DidSaveTextDocumentNotification.method,
 	): DidSaveTextDocumentFeatureShape;
+
 	getFeature(
 		request: typeof DidCloseTextDocumentNotification.method,
 	): DidCloseTextDocumentFeatureShape;
+
 	getFeature(
 		request: typeof DidCreateFilesNotification.method,
 	): DynamicFeature<FileOperationRegistrationOptions> & {
 		send: (event: FileCreateEvent) => Promise<void>;
 	};
+
 	getFeature(
 		request: typeof DidRenameFilesNotification.method,
 	): DynamicFeature<FileOperationRegistrationOptions> & {
 		send: (event: FileRenameEvent) => Promise<void>;
 	};
+
 	getFeature(
 		request: typeof DidDeleteFilesNotification.method,
 	): DynamicFeature<FileOperationRegistrationOptions> & {
 		send: (event: FileDeleteEvent) => Promise<void>;
 	};
+
 	getFeature(
 		request: typeof WillCreateFilesRequest.method,
 	): DynamicFeature<FileOperationRegistrationOptions> & {
 		send: (event: FileWillCreateEvent) => Promise<void>;
 	};
+
 	getFeature(
 		request: typeof WillRenameFilesRequest.method,
 	): DynamicFeature<FileOperationRegistrationOptions> & {
 		send: (event: FileWillRenameEvent) => Promise<void>;
 	};
+
 	getFeature(
 		request: typeof WillDeleteFilesRequest.method,
 	): DynamicFeature<FileOperationRegistrationOptions> & {
 		send: (event: FileWillDeleteEvent) => Promise<void>;
 	};
+
 	getFeature(
 		request: typeof CompletionRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<CompletionItemProvider>;
+
 	getFeature(
 		request: typeof HoverRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<HoverProvider>;
+
 	getFeature(
 		request: typeof SignatureHelpRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<SignatureHelpProvider>;
+
 	getFeature(
 		request: typeof DefinitionRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<DefinitionProvider>;
+
 	getFeature(
 		request: typeof ReferencesRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<ReferenceProvider>;
+
 	getFeature(
 		request: typeof DocumentHighlightRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<DocumentHighlightProvider>;
+
 	getFeature(
 		request: typeof CodeActionRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<CodeActionProvider>;
+
 	getFeature(
 		request: typeof CodeLensRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<CodeLensProviderShape>;
+
 	getFeature(
 		request: typeof DocumentFormattingRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<DocumentFormattingEditProvider>;
+
 	getFeature(
 		request: typeof DocumentRangeFormattingRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<DocumentRangeFormattingEditProvider>;
+
 	getFeature(
 		request: typeof DocumentOnTypeFormattingRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<OnTypeFormattingEditProvider>;
+
 	getFeature(
 		request: typeof RenameRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<RenameProvider>;
+
 	getFeature(
 		request: typeof DocumentSymbolRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<DocumentSymbolProvider>;
+
 	getFeature(
 		request: typeof DocumentLinkRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<DocumentLinkProvider>;
+
 	getFeature(
 		request: typeof DocumentColorRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<DocumentColorProvider>;
+
 	getFeature(
 		request: typeof DeclarationRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<DeclarationProvider>;
+
 	getFeature(
 		request: typeof FoldingRangeRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<FoldingRangeProviderShape>;
+
 	getFeature(
 		request: typeof ImplementationRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<ImplementationProvider>;
+
 	getFeature(
 		request: typeof SelectionRangeRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<SelectionRangeProvider>;
+
 	getFeature(
 		request: typeof TypeDefinitionRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<TypeDefinitionProvider>;
+
 	getFeature(
 		request: typeof CallHierarchyPrepareRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<CallHierarchyProvider>;
+
 	getFeature(
 		request: typeof SemanticTokensRegistrationType.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<SemanticTokensProviderShape>;
+
 	getFeature(
 		request: typeof LinkedEditingRangeRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<LinkedEditingRangeProvider>;
+
 	getFeature(
 		request: typeof TypeHierarchyPrepareRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<TypeHierarchyProvider>;
+
 	getFeature(
 		request: typeof InlineValueRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<InlineValueProviderShape>;
+
 	getFeature(
 		request: typeof InlayHintRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<InlayHintsProviderShape>;
+
 	getFeature(
 		request: typeof WorkspaceSymbolRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		WorkspaceProviderFeature<WorkspaceSymbolProvider>;
+
 	getFeature(
 		request: typeof DocumentDiagnosticRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<DiagnosticProviderShape> &
 		DiagnosticFeatureShape;
+
 	getFeature(
 		request: typeof NotebookDocumentSyncRegistrationType.method,
 	): DynamicFeature<NotebookDocumentSyncRegistrationOptions> &
 		NotebookDocumentProviderShape;
+
 	getFeature(
 		request: typeof InlineCompletionRequest.method,
 	):
 		| (DynamicFeature<InlineCompletionRegistrationOptions> &
 				TextDocumentProviderFeature<InlineCompletionItemProvider>)
 		| undefined;
+
 	getFeature(
 		request: typeof ExecuteCommandRequest.method,
 	): DynamicFeature<ExecuteCommandOptions>;

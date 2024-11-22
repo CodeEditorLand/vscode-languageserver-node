@@ -64,6 +64,7 @@ export class ConfigurationFeature implements StaticFeature {
 				params,
 			) => {
 				const result: any[] = [];
+
 				for (const item of params.items) {
 					const resource =
 						item.scopeUri !== void 0 && item.scopeUri !== null
@@ -80,7 +81,9 @@ export class ConfigurationFeature implements StaticFeature {
 				}
 				return result;
 			};
+
 			const middleware = client.middleware.workspace;
+
 			return middleware && middleware.configuration
 				? middleware.configuration(params, token, configuration)
 				: configuration(params, token);
@@ -92,8 +95,10 @@ export class ConfigurationFeature implements StaticFeature {
 		section: string | undefined,
 	): any {
 		let result: any = null;
+
 		if (section) {
 			const index = section.lastIndexOf(".");
+
 			if (index === -1) {
 				result = toJSONObject(
 					workspace
@@ -105,6 +110,7 @@ export class ConfigurationFeature implements StaticFeature {
 					section.substr(0, index),
 					resource,
 				);
+
 				if (config) {
 					result = toJSONObject(
 						config.get(section.substr(index + 1)),
@@ -114,6 +120,7 @@ export class ConfigurationFeature implements StaticFeature {
 		} else {
 			const config = workspace.getConfiguration(undefined, resource);
 			result = {};
+
 			for (const key of Object.keys(config)) {
 				if (config.has(key)) {
 					result[key] = toJSONObject(config.get(key));
@@ -135,6 +142,7 @@ export function toJSONObject(obj: any): any {
 			return obj.map(toJSONObject);
 		} else if (typeof obj === "object") {
 			const res = Object.create(null);
+
 			for (const key in obj) {
 				if (Object.prototype.hasOwnProperty.call(obj, key)) {
 					res[key] = toJSONObject(obj[key]);
@@ -224,8 +232,10 @@ export class SyncConfigurationFeature
 
 	public initialize(): void {
 		this.isCleared = false;
+
 		const section =
 			this._client.clientOptions.synchronize?.configurationSection;
+
 		if (section !== undefined) {
 			this.register({
 				id: UUID.generateUuid(),
@@ -243,6 +253,7 @@ export class SyncConfigurationFeature
 			this.onDidChangeConfiguration(data.registerOptions.section, event);
 		});
 		this._listeners.set(data.id, disposable);
+
 		if (data.registerOptions.section !== undefined) {
 			this.onDidChangeConfiguration(
 				data.registerOptions.section,
@@ -253,6 +264,7 @@ export class SyncConfigurationFeature
 
 	public unregister(id: string): void {
 		const disposable = this._listeners.get(id);
+
 		if (disposable) {
 			this._listeners.delete(id);
 			disposable.dispose();
@@ -275,6 +287,7 @@ export class SyncConfigurationFeature
 			return;
 		}
 		let sections: string[] | undefined;
+
 		if (Is.string(configurationSection)) {
 			sections = [configurationSection];
 		} else {
@@ -284,6 +297,7 @@ export class SyncConfigurationFeature
 			const affected = sections.some((section) =>
 				event.affectsConfiguration(section),
 			);
+
 			if (!affected) {
 				return;
 			}
@@ -303,6 +317,7 @@ export class SyncConfigurationFeature
 				);
 			}
 		};
+
 		const middleware =
 			this._client.middleware.workspace?.didChangeConfiguration;
 		(middleware
@@ -319,8 +334,10 @@ export class SyncConfigurationFeature
 	private extractSettingsInformation(keys: string[]): any {
 		function ensurePath(config: any, path: string[]): any {
 			let current = config;
+
 			for (let i = 0; i < path.length - 1; i++) {
 				let obj = current[path[i]];
+
 				if (!obj) {
 					obj = Object.create(null);
 					current[path[i]] = obj;
@@ -333,11 +350,16 @@ export class SyncConfigurationFeature
 			.workspaceFolder
 			? this._client.clientOptions.workspaceFolder.uri
 			: undefined;
+
 		const result = Object.create(null);
+
 		for (let i = 0; i < keys.length; i++) {
 			const key = keys[i];
+
 			const index: number = key.indexOf(".");
+
 			let config: any = null;
+
 			if (index >= 0) {
 				config = workspace
 					.getConfiguration(key.substr(0, index), resource)

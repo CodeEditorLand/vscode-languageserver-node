@@ -57,7 +57,9 @@ export function activate(context: vscode.ExtensionContext) {
 			JSON.parse(message, (_key, value) => {
 				if (value.start !== undefined && value.end !== undefined) {
 					const start = (value as proto.Range).start;
+
 					const end = (value as proto.Range).end;
+
 					return new vscode.Range(
 						start.line,
 						start.character,
@@ -70,6 +72,7 @@ export function activate(context: vscode.ExtensionContext) {
 			console.timeEnd("reviver");
 
 			console.time("without reviver");
+
 			const trad: vscode.Range[] = (
 				JSON.parse(message) as proto.Range[]
 			).map((range) => converter.asRange(range));

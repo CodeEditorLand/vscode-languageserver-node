@@ -227,7 +227,9 @@ class FullTextDocument implements TextDocument {
 	public getText(range?: Range): string {
 		if (range) {
 			const start = this.offsetAt(range.start);
+
 			const end = this.offsetAt(range.end);
+
 			return this._content.substring(start, end);
 		}
 		return this._content;
@@ -244,6 +246,7 @@ class FullTextDocument implements TextDocument {
 
 				// update content
 				const startOffset = this.offsetAt(range.start);
+
 				const endOffset = this.offsetAt(range.end);
 				this._content =
 					this._content.substring(0, startOffset) +
@@ -252,13 +255,17 @@ class FullTextDocument implements TextDocument {
 
 				// update the offsets
 				const startLine = Math.max(range.start.line, 0);
+
 				const endLine = Math.max(range.end.line, 0);
+
 				let lineOffsets = this._lineOffsets!;
+
 				const addedLineOffsets = computeLineOffsets(
 					change.text,
 					false,
 					startOffset,
 				);
+
 				if (endLine - startLine === addedLineOffsets.length) {
 					for (
 						let i = 0, len = addedLineOffsets.length;
@@ -285,6 +292,7 @@ class FullTextDocument implements TextDocument {
 					}
 				}
 				const diff = change.text.length - (endOffset - startOffset);
+
 				if (diff !== 0) {
 					for (
 						let i = startLine + 1 + addedLineOffsets.length,
@@ -316,13 +324,16 @@ class FullTextDocument implements TextDocument {
 		offset = Math.max(Math.min(offset, this._content.length), 0);
 
 		const lineOffsets = this.getLineOffsets();
+
 		let low = 0,
 			high = lineOffsets.length;
+
 		if (high === 0) {
 			return { line: 0, character: offset };
 		}
 		while (low < high) {
 			const mid = Math.floor((low + high) / 2);
+
 			if (lineOffsets[mid] > offset) {
 				high = mid;
 			} else {
@@ -334,17 +345,20 @@ class FullTextDocument implements TextDocument {
 		const line = low - 1;
 
 		offset = this.ensureBeforeEOL(offset, lineOffsets[line]);
+
 		return { line, character: offset - lineOffsets[line] };
 	}
 
 	public offsetAt(position: Position) {
 		const lineOffsets = this.getLineOffsets();
+
 		if (position.line >= lineOffsets.length) {
 			return this._content.length;
 		} else if (position.line < 0) {
 			return 0;
 		}
 		const lineOffset = lineOffsets[position.line];
+
 		if (position.character <= 0) {
 			return lineOffset;
 		}
@@ -353,10 +367,12 @@ class FullTextDocument implements TextDocument {
 			position.line + 1 < lineOffsets.length
 				? lineOffsets[position.line + 1]
 				: this._content.length;
+
 		const offset = Math.min(
 			lineOffset + position.character,
 			nextLineOffset,
 		);
+
 		return this.ensureBeforeEOL(offset, lineOffset);
 	}
 
@@ -379,6 +395,7 @@ class FullTextDocument implements TextDocument {
 	): event is { range: Range; rangeLength?: number; text: string } {
 		const candidate: { range: Range; rangeLength?: number; text: string } =
 			event as any;
+
 		return (
 			candidate !== undefined &&
 			candidate !== null &&
@@ -394,6 +411,7 @@ class FullTextDocument implements TextDocument {
 	): event is { text: string } {
 		const candidate: { range?: Range; rangeLength?: number; text: string } =
 			event as any;
+
 		return (
 			candidate !== undefined &&
 			candidate !== null &&
@@ -438,6 +456,7 @@ export namespace TextDocument {
 	): TextDocument {
 		if (document instanceof FullTextDocument) {
 			document.update(changes, version);
+
 			return document;
 		} else {
 			throw new Error(
@@ -451,17 +470,23 @@ export namespace TextDocument {
 		edits: TextEdit[],
 	): string {
 		const text = document.getText();
+
 		const sortedEdits = mergeSort(edits.map(getWellformedEdit), (a, b) => {
 			const diff = a.range.start.line - b.range.start.line;
+
 			if (diff === 0) {
 				return a.range.start.character - b.range.start.character;
 			}
 			return diff;
 		});
+
 		let lastModifiedOffset = 0;
+
 		const spans = [];
+
 		for (const e of sortedEdits) {
 			const startOffset = document.offsetAt(e.range.start);
+
 			if (startOffset < lastModifiedOffset) {
 				throw new Error("Overlapping edit");
 			} else if (startOffset > lastModifiedOffset) {
@@ -473,6 +498,7 @@ export namespace TextDocument {
 			lastModifiedOffset = document.offsetAt(e.range.end);
 		}
 		spans.push(text.substr(lastModifiedOffset));
+
 		return spans.join("");
 	}
 }
@@ -483,17 +509,23 @@ function mergeSort<T>(data: T[], compare: (a: T, b: T) => number): T[] {
 		return data;
 	}
 	const p = (data.length / 2) | 0;
+
 	const left = data.slice(0, p);
+
 	const right = data.slice(p);
 
 	mergeSort(left, compare);
 	mergeSort(right, compare);
 
 	let leftIdx = 0;
+
 	let rightIdx = 0;
+
 	let i = 0;
+
 	while (leftIdx < left.length && rightIdx < right.length) {
 		const ret = compare(left[leftIdx], right[rightIdx]);
+
 		if (ret <= 0) {
 			// smaller_equal -> take left to preserve order
 			data[i++] = left[leftIdx++];
@@ -528,8 +560,10 @@ function computeLineOffsets(
 	textOffset = 0,
 ): number[] {
 	const result: number[] = isAtLineStart ? [textOffset] : [];
+
 	for (let i = 0; i < text.length; i++) {
 		const ch = text.charCodeAt(i);
+
 		if (isEOL(ch)) {
 			if (
 				ch === CharCode.CarriageReturn &&
@@ -550,7 +584,9 @@ function isEOL(char: number) {
 
 function getWellformedRange(range: Range): Range {
 	const start = range.start;
+
 	const end = range.end;
+
 	if (
 		start.line > end.line ||
 		(start.line === end.line && start.character > end.character)
@@ -562,6 +598,7 @@ function getWellformedRange(range: Range): Range {
 
 function getWellformedEdit(textEdit: TextEdit): TextEdit {
 	const range = getWellformedRange(textEdit.range);
+
 	if (range !== textEdit.range) {
 		return { newText: textEdit.newText, range };
 	}

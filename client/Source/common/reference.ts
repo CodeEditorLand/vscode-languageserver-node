@@ -72,6 +72,7 @@ export class ReferencesFeature extends TextDocumentLanguageFeature<
 			documentSelector,
 			capabilities.referencesProvider,
 		);
+
 		if (!options) {
 			return;
 		}
@@ -82,9 +83,11 @@ export class ReferencesFeature extends TextDocumentLanguageFeature<
 		options: TextDocumentRegistrationOptions,
 	): [Disposable, ReferenceProvider] {
 		const selector = options.documentSelector!;
+
 		const provider: ReferenceProvider = {
 			provideReferences: (document, position, options, token) => {
 				const client = this._client;
+
 				const _providerReferences: ProvideReferencesSignature = (
 					document,
 					position,
@@ -121,7 +124,9 @@ export class ReferencesFeature extends TextDocumentLanguageFeature<
 							},
 						);
 				};
+
 				const middleware = client.middleware;
+
 				return middleware.provideReferences
 					? middleware.provideReferences(
 							document,
@@ -133,6 +138,7 @@ export class ReferencesFeature extends TextDocumentLanguageFeature<
 					: _providerReferences(document, position, options, token);
 			},
 		};
+
 		return [this.registerProvider(selector, provider), provider];
 	}
 

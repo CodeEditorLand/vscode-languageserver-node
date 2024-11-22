@@ -225,6 +225,7 @@ export class ErrorMessageTracker {
 	 */
 	public add(message: string): void {
 		let count: number = this._messages[message];
+
 		if (!count) {
 			count = 0;
 		}
@@ -469,6 +470,7 @@ class _RemoteWindowImpl implements _RemoteWindow, Remote {
 			message,
 			actions,
 		};
+
 		return this.connection
 			.sendRequest(ShowMessageRequest.type, params)
 			.then(null2Undefined);
@@ -483,6 +485,7 @@ class _RemoteWindowImpl implements _RemoteWindow, Remote {
 			message,
 			actions,
 		};
+
 		return this.connection
 			.sendRequest(ShowMessageRequest.type, params)
 			.then(null2Undefined);
@@ -497,6 +500,7 @@ class _RemoteWindowImpl implements _RemoteWindow, Remote {
 			message,
 			actions,
 		};
+
 		return this.connection
 			.sendRequest(ShowMessageRequest.type, params)
 			.then(null2Undefined);
@@ -562,6 +566,7 @@ class BulkRegistrationImpl {
 
 	public add<RO>(type: string | MethodType, registerOptions?: RO): void {
 		const method = Is.string(type) ? type : type.method;
+
 		if (this._registered.has(method)) {
 			throw new Error(`${method} is already added to this registration`);
 		}
@@ -627,6 +632,7 @@ class BulkUnregistrationImpl implements BulkUnregistration {
 
 	public dispose(): any {
 		const unregistrations: Unregistration[] = [];
+
 		for (const unregistration of this._unregistrations.values()) {
 			unregistrations.push(unregistration);
 		}
@@ -644,6 +650,7 @@ class BulkUnregistrationImpl implements BulkUnregistration {
 		const method = Is.string(arg) ? arg : arg.method;
 
 		const unregistration = this._unregistrations.get(method);
+
 		if (!unregistration) {
 			return false;
 		}
@@ -661,6 +668,7 @@ class BulkUnregistrationImpl implements BulkUnregistration {
 				);
 			},
 		);
+
 		return true;
 	}
 }
@@ -827,12 +835,15 @@ class RemoteClientImpl implements RemoteClient, Remote {
 		registerOptions: any,
 	): Promise<Disposable> {
 		const method = Is.string(type) ? type : type.method;
+
 		const id = UUID.generateUuid();
+
 		const params: RegistrationParams = {
 			registrations: [
 				{ id, method, registerOptions: registerOptions || {} },
 			],
 		};
+
 		if (!unregistration.isAttached) {
 			unregistration.attach(this.connection);
 		}
@@ -841,12 +852,14 @@ class RemoteClientImpl implements RemoteClient, Remote {
 			.then(
 				(_result) => {
 					unregistration.add({ id: id, method: method });
+
 					return unregistration;
 				},
 				(_error) => {
 					this.connection.console.info(
 						`Registering request handler for ${method} failed.`,
 					);
+
 					return Promise.reject(_error);
 				},
 			);
@@ -857,12 +870,15 @@ class RemoteClientImpl implements RemoteClient, Remote {
 		registerOptions: any,
 	): Promise<Disposable> {
 		const method = Is.string(type) ? type : type.method;
+
 		const id = UUID.generateUuid();
+
 		const params: RegistrationParams = {
 			registrations: [
 				{ id, method, registerOptions: registerOptions || {} },
 			],
 		};
+
 		return this.connection
 			.sendRequest(RegistrationRequest.type, params)
 			.then(
@@ -879,6 +895,7 @@ class RemoteClientImpl implements RemoteClient, Remote {
 					this.connection.console.info(
 						`Registering request handler for ${method} failed.`,
 					);
+
 					return Promise.reject(_error);
 				},
 			);
@@ -902,6 +919,7 @@ class RemoteClientImpl implements RemoteClient, Remote {
 		registrations: BulkRegistrationImpl,
 	): Promise<BulkUnregistration> {
 		const params = registrations.asRegistrationParams();
+
 		return this.connection
 			.sendRequest(RegistrationRequest.type, params)
 			.then(
@@ -918,6 +936,7 @@ class RemoteClientImpl implements RemoteClient, Remote {
 				},
 				(_error) => {
 					this.connection.console.info(`Bulk registration failed.`);
+
 					return Promise.reject(_error);
 				},
 			);
@@ -982,6 +1001,7 @@ class _RemoteWorkspaceImpl implements _RemoteWorkspace, Remote {
 		)
 			? paramOrEdit
 			: { edit: paramOrEdit };
+
 		return this.connection.sendRequest(
 			ApplyWorkspaceEditRequest.type,
 			params,
@@ -1156,6 +1176,7 @@ export type Languages = _Languages &
 	DiagnosticFeatureShape &
 	MonikerFeatureShape &
 	FoldingRangeFeatureShape;
+
 const LanguagesImpl: new () => Languages = FoldingRangeFeature(
 	MonikerFeature(
 		DiagnosticFeature(
@@ -1220,6 +1241,7 @@ export class _NotebooksImpl implements Remote, _Notebooks {
 }
 
 export type Notebooks = _Notebooks & NotebookSyncFeatureShape;
+
 const NotebooksImpl: new () => Notebooks = NotebookSyncFeature(_NotebooksImpl);
 
 /**
@@ -2195,6 +2217,7 @@ export function combineFeatures<
 			combineNotebooksFeatures,
 		),
 	};
+
 	return result;
 }
 
@@ -2241,43 +2264,52 @@ export function createConnection<
 			? new (factories.console(RemoteConsoleImpl))()
 			: new RemoteConsoleImpl()
 	) as RemoteConsoleImpl & PConsole;
+
 	const connection = connectionFactory(logger);
 	logger.rawAttach(connection);
+
 	const tracer = (
 		factories && factories.tracer
 			? new (factories.tracer(TracerImpl))()
 			: new TracerImpl()
 	) as TracerImpl & PTracer;
+
 	const telemetry = (
 		factories && factories.telemetry
 			? new (factories.telemetry(TelemetryImpl))()
 			: new TelemetryImpl()
 	) as TelemetryImpl & PTelemetry;
+
 	const client = (
 		factories && factories.client
 			? new (factories.client(RemoteClientImpl))()
 			: new RemoteClientImpl()
 	) as RemoteClientImpl & PClient;
+
 	const remoteWindow = (
 		factories && factories.window
 			? new (factories.window(RemoteWindowImpl))()
 			: new RemoteWindowImpl()
 	) as Remote & RemoteWindow & PWindow;
+
 	const workspace = (
 		factories && factories.workspace
 			? new (factories.workspace(RemoteWorkspaceImpl))()
 			: new RemoteWorkspaceImpl()
 	) as Remote & RemoteWorkspace & PWorkspace;
+
 	const languages = (
 		factories && factories.languages
 			? new (factories.languages(LanguagesImpl))()
 			: new LanguagesImpl()
 	) as Remote & Languages & PLanguages;
+
 	const notebooks = (
 		factories && factories.notebooks
 			? new (factories.notebooks(NotebooksImpl))()
 			: new NotebooksImpl()
 	) as Remote & Notebooks & PNotebooks;
+
 	const allRemotes: Remote[] = [
 		logger,
 		tracer,
@@ -2290,8 +2322,11 @@ export function createConnection<
 	];
 
 	function asPromise<T>(value: Promise<T>): Promise<T>;
+
 	function asPromise<T>(value: Thenable<T>): Promise<T>;
+
 	function asPromise<T>(value: T): Promise<T>;
+
 	function asPromise(value: any): Promise<any> {
 		if (value instanceof Promise) {
 			return value;
@@ -2308,6 +2343,7 @@ export function createConnection<
 	}
 
 	let shutdownHandler: RequestHandler0<void, void> | undefined = undefined;
+
 	let initializeHandler:
 		| ServerRequestHandler<
 				InitializeParams,
@@ -2316,7 +2352,9 @@ export function createConnection<
 				InitializeError
 		  >
 		| undefined = undefined;
+
 	let exitHandler: NotificationHandler0 | undefined = undefined;
+
 	const protocolConnection: _Connection<
 		PConsole,
 		PTracer,
@@ -2348,6 +2386,7 @@ export function createConnection<
 			param?: any,
 		): Promise<void> => {
 			const method = Is.string(type) ? type : type.method;
+
 			return connection.sendNotification(method, param);
 		},
 		onNotification: (
@@ -2360,6 +2399,7 @@ export function createConnection<
 
 		onInitialize: (handler) => {
 			initializeHandler = handler;
+
 			return {
 				dispose: () => {
 					initializeHandler = undefined;
@@ -2370,6 +2410,7 @@ export function createConnection<
 			connection.onNotification(InitializedNotification.type, handler),
 		onShutdown: (handler) => {
 			shutdownHandler = handler;
+
 			return {
 				dispose: () => {
 					shutdownHandler = undefined;
@@ -2378,6 +2419,7 @@ export function createConnection<
 		},
 		onExit: (handler) => {
 			exitHandler = handler;
+
 			return {
 				dispose: () => {
 					exitHandler = undefined;
@@ -2735,12 +2777,14 @@ export function createConnection<
 
 		dispose: () => connection.dispose(),
 	};
+
 	for (const remote of allRemotes) {
 		remote.attach(protocolConnection);
 	}
 
 	connection.onRequest(InitializeRequest.type, (params) => {
 		watchDog.initialize(params);
+
 		if (Is.string(params.trace)) {
 			tracer.trace = Trace.fromString(params.trace);
 		}
@@ -2754,15 +2798,18 @@ export function createConnection<
 				attachWorkDone(connection, params),
 				undefined,
 			);
+
 			return asPromise(result).then((value) => {
 				if (value instanceof ResponseError) {
 					return value;
 				}
 				let result = <InitializeResult>value;
+
 				if (!result) {
 					result = { capabilities: {} };
 				}
 				let capabilities = result.capabilities;
+
 				if (!capabilities) {
 					capabilities = {};
 					result.capabilities = capabilities;
@@ -2795,6 +2842,7 @@ export function createConnection<
 			const result: InitializeResult = {
 				capabilities: { textDocumentSync: TextDocumentSyncKind.None },
 			};
+
 			for (const remote of allRemotes) {
 				remote.fillServerCapabilities(result.capabilities);
 			}
@@ -2806,6 +2854,7 @@ export function createConnection<
 		ShutdownRequest.type,
 		() => {
 			watchDog.shutdownReceived = true;
+
 			if (shutdownHandler) {
 				return shutdownHandler(new CancellationTokenSource().token);
 			} else {

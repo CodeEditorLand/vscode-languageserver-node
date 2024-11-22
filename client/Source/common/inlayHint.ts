@@ -106,6 +106,7 @@ export class InlayHintsFeature extends TextDocumentLanguageFeature<
 			documentSelector,
 			capabilities.inlayHintProvider,
 		);
+
 		if (!id || !options) {
 			return;
 		}
@@ -116,11 +117,14 @@ export class InlayHintsFeature extends TextDocumentLanguageFeature<
 		options: InlayHintRegistrationOptions,
 	): [Disposable, InlayHintsProviderShape] {
 		const selector = options.documentSelector!;
+
 		const eventEmitter: EventEmitter<void> = new EventEmitter<void>();
+
 		const provider: InlayHintsProvider = {
 			onDidChangeInlayHints: eventEmitter.event,
 			provideInlayHints: (document, viewPort, token) => {
 				const client = this._client;
+
 				const provideInlayHints: ProvideInlayHintsSignature = async (
 					document,
 					viewPort,
@@ -133,12 +137,14 @@ export class InlayHintsFeature extends TextDocumentLanguageFeature<
 							),
 						range: client.code2ProtocolConverter.asRange(viewPort),
 					};
+
 					try {
 						const values = await client.sendRequest(
 							InlayHintRequest.type,
 							requestParams,
 							token,
 						);
+
 						if (token.isCancellationRequested) {
 							return null;
 						}
@@ -155,7 +161,9 @@ export class InlayHintsFeature extends TextDocumentLanguageFeature<
 						);
 					}
 				};
+
 				const middleware = client.middleware;
+
 				return middleware.provideInlayHints
 					? middleware.provideInlayHints(
 							document,
@@ -170,6 +178,7 @@ export class InlayHintsFeature extends TextDocumentLanguageFeature<
 			options.resolveProvider === true
 				? (hint, token) => {
 						const client = this._client;
+
 						const resolveInlayHint: ResolveInlayHintSignature =
 							async (item, token) => {
 								try {
@@ -180,6 +189,7 @@ export class InlayHintsFeature extends TextDocumentLanguageFeature<
 										),
 										token,
 									);
+
 									if (token.isCancellationRequested) {
 										return null;
 									}
@@ -188,6 +198,7 @@ export class InlayHintsFeature extends TextDocumentLanguageFeature<
 											value,
 											token,
 										);
+
 									return token.isCancellationRequested
 										? null
 										: result;
@@ -200,7 +211,9 @@ export class InlayHintsFeature extends TextDocumentLanguageFeature<
 									);
 								}
 							};
+
 						const middleware = client.middleware;
+
 						return middleware.resolveInlayHint
 							? middleware.resolveInlayHint(
 									hint,
@@ -210,6 +223,7 @@ export class InlayHintsFeature extends TextDocumentLanguageFeature<
 							: resolveInlayHint(hint, token);
 					}
 				: undefined;
+
 		return [
 			this.registerProvider(selector, provider),
 			{ provider: provider, onDidChangeInlayHints: eventEmitter },

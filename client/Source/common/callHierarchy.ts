@@ -96,7 +96,9 @@ class CallHierarchyProvider implements VCallHierarchyProvider {
 		token: CancellationToken,
 	): ProviderResult<VCallHierarchyItem | VCallHierarchyItem[]> {
 		const client = this.client;
+
 		const middleware = this.middleware;
+
 		const prepareCallHierarchy: PrepareCallHierarchySignature = (
 			document,
 			position,
@@ -107,6 +109,7 @@ class CallHierarchyProvider implements VCallHierarchyProvider {
 					document,
 					position,
 				);
+
 			return client
 				.sendRequest(CallHierarchyPrepareRequest.type, params, token)
 				.then(
@@ -129,6 +132,7 @@ class CallHierarchyProvider implements VCallHierarchyProvider {
 					},
 				);
 		};
+
 		return middleware.prepareCallHierarchy
 			? middleware.prepareCallHierarchy(
 					document,
@@ -144,7 +148,9 @@ class CallHierarchyProvider implements VCallHierarchyProvider {
 		token: CancellationToken,
 	): ProviderResult<VCallHierarchyIncomingCall[]> {
 		const client = this.client;
+
 		const middleware = this.middleware;
+
 		const provideCallHierarchyIncomingCalls: CallHierarchyIncomingCallsSignature =
 			(item, token) => {
 				const params: CallHierarchyIncomingCallsParams = {
@@ -152,6 +158,7 @@ class CallHierarchyProvider implements VCallHierarchyProvider {
 						item,
 					),
 				};
+
 				return client
 					.sendRequest(
 						CallHierarchyIncomingCallsRequest.type,
@@ -178,6 +185,7 @@ class CallHierarchyProvider implements VCallHierarchyProvider {
 						},
 					);
 			};
+
 		return middleware.provideCallHierarchyIncomingCalls
 			? middleware.provideCallHierarchyIncomingCalls(
 					item,
@@ -192,7 +200,9 @@ class CallHierarchyProvider implements VCallHierarchyProvider {
 		token: CancellationToken,
 	): ProviderResult<VCallHierarchyOutgoingCall[]> {
 		const client = this.client;
+
 		const middleware = this.middleware;
+
 		const provideCallHierarchyOutgoingCalls: CallHierarchyOutgoingCallsSignature =
 			(item, token) => {
 				const params: CallHierarchyOutgoingCallsParams = {
@@ -200,6 +210,7 @@ class CallHierarchyProvider implements VCallHierarchyProvider {
 						item,
 					),
 				};
+
 				return client
 					.sendRequest(
 						CallHierarchyOutgoingCallsRequest.type,
@@ -226,6 +237,7 @@ class CallHierarchyProvider implements VCallHierarchyProvider {
 						},
 					);
 			};
+
 		return middleware.provideCallHierarchyOutgoingCalls
 			? middleware.provideCallHierarchyOutgoingCalls(
 					item,
@@ -250,6 +262,7 @@ export class CallHierarchyFeature extends TextDocumentLanguageFeature<
 		const capabilities: ClientCapabilities &
 			CallHierarchyClientCapabilities = cap as ClientCapabilities &
 			CallHierarchyClientCapabilities;
+
 		const capability = ensure(
 			ensure(capabilities, "textDocument")!,
 			"callHierarchy",
@@ -265,6 +278,7 @@ export class CallHierarchyFeature extends TextDocumentLanguageFeature<
 			documentSelector,
 			capabilities.callHierarchyProvider,
 		);
+
 		if (!id || !options) {
 			return;
 		}
@@ -275,7 +289,9 @@ export class CallHierarchyFeature extends TextDocumentLanguageFeature<
 		options: CallHierarchyRegistrationOptions,
 	): [Disposable, CallHierarchyProvider] {
 		const client = this._client;
+
 		const provider = new CallHierarchyProvider(client);
+
 		return [
 			Languages.registerCallHierarchyProvider(
 				this._client.protocol2CodeConverter.asDocumentSelector(

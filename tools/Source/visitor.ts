@@ -78,6 +78,7 @@ namespace MapKeyType {
 type LiteralInfo = {
 	type: TypeInfo;
 	optional: boolean;
+
 	documentation?: string;
 	since?: string;
 	sinceTags?: string[];
@@ -164,8 +165,10 @@ namespace TypeInfo {
 		"uinteger",
 		"decimal",
 	]);
+
 	export function asJsonType(info: TypeInfo): JsonType {
 		const literal: StructureLiteral = { properties: [] };
+
 		switch (info.kind) {
 			case "base":
 				if (baseSet.has(info.name)) {
@@ -175,38 +178,47 @@ namespace TypeInfo {
 					return { kind: "reference", name: "LSPAny" };
 				}
 				break;
+
 			case "reference":
 				return { kind: "reference", name: info.name };
+
 			case "array":
 				return { kind: "array", element: asJsonType(info.elementType) };
+
 			case "map":
 				return {
 					kind: "map",
 					key: asJsonType(info.key) as MapKeyType,
 					value: asJsonType(info.value),
 				};
+
 			case "union":
 				return {
 					kind: "or",
 					items: info.items.map((info) => asJsonType(info)),
 				};
+
 			case "intersection":
 				return {
 					kind: "and",
 					items: info.items.map((info) => asJsonType(info)),
 				};
+
 			case "tuple":
 				return {
 					kind: "tuple",
 					items: info.items.map((info) => asJsonType(info)),
 				};
+
 			case "literal":
 				for (const entry of info.items) {
 					const property: Property = {
 						name: entry[0],
 						type: asJsonType(entry[1].type),
 					};
+
 					const value = entry[1];
+
 					if (value.optional === true) {
 						property.optional = true;
 					}
@@ -222,10 +234,13 @@ namespace TypeInfo {
 					literal.properties.push(property);
 				}
 				return { kind: "literal", value: literal };
+
 			case "stringLiteral":
 				return { kind: "stringLiteral", value: info.value };
+
 			case "integerLiteral":
 				return { kind: "integerLiteral", value: info.value };
+
 			case "booleanLiteral":
 				return { kind: "booleanLiteral", value: info.value };
 		}
@@ -250,7 +265,9 @@ type NotificationTypes = {
 
 namespace MessageDirection {
 	export const clientToServer: "clientToServer" = "clientToServer";
+
 	export const serverToClient: "serverToClient" = "serverToClient";
+
 	export const both: "both" = "both";
 
 	export function is(value: string): value is MessageDirection {
@@ -308,11 +325,13 @@ export default class Visitor {
 	public async endVisitProgram(): Promise<void> {
 		while (this.symbolQueue.size > 0) {
 			const toProcess = new Map(this.symbolQueue);
+
 			for (const [name, symbol] of toProcess) {
 				if (
 					!(this.filter.has(name) && this.filter.get(name)!(symbol))
 				) {
 					const element = this.processSymbol(name, symbol);
+
 					if (element === undefined) {
 						throw new Error(
 							`Can't create structure for type ${name}`,
@@ -352,16 +371,21 @@ export default class Visitor {
 					this.endVisitSourceFile,
 					node as ts.SourceFile,
 				);
+
 				break;
+
 			case ts.SyntaxKind.ModuleDeclaration:
 				this.doVisit(
 					this.visitModuleDeclaration,
 					this.endVisitModuleDeclaration,
 					node as ts.ModuleDeclaration,
 				);
+
 				break;
+
 			default:
 				this.doVisit(this.visitGeneric, this.endVisitGeneric, node);
+
 				break;
 		}
 	}
@@ -409,6 +433,7 @@ export default class Visitor {
 						const symbol = this.typeChecker.getSymbolAtLocation(
 							declaration.initializer,
 						);
+
 						if (symbol === undefined) {
 							continue;
 						}
@@ -429,6 +454,7 @@ export default class Visitor {
 		// We have a request or notification definition.
 		if (identifier.endsWith("Request")) {
 			const request = this.visitRequest(node);
+
 			if (request === undefined) {
 				throw new Error(
 					`Creating meta data for request ${identifier} failed.`,
@@ -438,6 +464,7 @@ export default class Visitor {
 			}
 		} else if (identifier.endsWith("Notification")) {
 			const notification = this.visitNotification(node);
+
 			if (notification === undefined) {
 				throw new Error(
 					`Creating meta data for notification ${identifier} failed.`,
@@ -451,18 +478,22 @@ export default class Visitor {
 
 	private visitRequest(node: ts.ModuleDeclaration): JsonRequest | undefined {
 		const symbol = this.typeChecker.getSymbolAtLocation(node.name);
+
 		if (symbol === undefined) {
 			return;
 		}
 		const type = symbol.exports?.get("type" as ts.__String);
+
 		if (type === undefined) {
 			return;
 		}
 		const methodName = this.getMethodName(symbol, type);
+
 		if (methodName === undefined) {
 			return;
 		}
 		const requestTypes = this.getRequestTypes(type);
+
 		if (requestTypes === undefined) {
 			return;
 		}
@@ -471,12 +502,14 @@ export default class Visitor {
 		this.queueTypeInfo(requestTypes.partialResult);
 		this.queueTypeInfo(requestTypes.errorData);
 		this.queueTypeInfo(requestTypes.registrationOptions);
+
 		const asJsonType = (info: TypeInfo) => {
 			if (TypeInfo.isNonLSPType(info)) {
 				return undefined;
 			}
 			return TypeInfo.asJsonType(info);
 		};
+
 		const result: JsonRequest = {
 			method: methodName,
 			typeName: symbol.name,
@@ -496,6 +529,7 @@ export default class Visitor {
 			requestTypes.registrationOptions,
 		);
 		this.fillDocProperties(node, result);
+
 		return result;
 	}
 
@@ -503,29 +537,35 @@ export default class Visitor {
 		node: ts.ModuleDeclaration,
 	): JsonNotification | undefined {
 		const symbol = this.typeChecker.getSymbolAtLocation(node.name);
+
 		if (symbol === undefined) {
 			return;
 		}
 		const type = symbol.exports?.get("type" as ts.__String);
+
 		if (type === undefined) {
 			return;
 		}
 		const methodName = this.getMethodName(symbol, type);
+
 		if (methodName === undefined) {
 			return;
 		}
 		const notificationTypes = this.getNotificationTypes(type);
+
 		if (notificationTypes === undefined) {
 			return undefined;
 		}
 		notificationTypes.param && this.queueTypeInfo(notificationTypes.param);
 		this.queueTypeInfo(notificationTypes.registrationOptions);
+
 		const asJsonType = (info: TypeInfo) => {
 			if (TypeInfo.isNonLSPType(info)) {
 				return undefined;
 			}
 			return TypeInfo.asJsonType(info);
 		};
+
 		const result: JsonNotification = {
 			method: methodName,
 			typeName: symbol.name,
@@ -540,15 +580,18 @@ export default class Visitor {
 			notificationTypes.registrationOptions,
 		);
 		this.fillDocProperties(node, result);
+
 		return result;
 	}
 
 	private visitTypeReference(node: ts.TypeAliasDeclaration): void {
 		const type = node.type;
+
 		if (!ts.isTypeReferenceNode(type)) {
 			return;
 		}
 		const symbol = this.typeChecker.getSymbolAtLocation(type.typeName);
+
 		if (symbol === undefined) {
 			return;
 		}
@@ -582,10 +625,12 @@ export default class Visitor {
 		}
 		const existing =
 			this.symbolQueue.get(name) ?? this.processedStructures.get(name);
+
 		if (existing === undefined) {
 			const aliased = Symbols.isAliasSymbol(symbol)
 				? this.typeChecker.getAliasedSymbol(symbol)
 				: undefined;
+
 			if (
 				aliased !== undefined &&
 				aliased.getName() !== symbol.getName()
@@ -599,9 +644,11 @@ export default class Visitor {
 			const left = Symbols.isAliasSymbol(symbol)
 				? this.typeChecker.getAliasedSymbol(symbol)
 				: symbol;
+
 			const right = Symbols.isAliasSymbol(existing)
 				? this.typeChecker.getAliasedSymbol(existing)
 				: existing;
+
 			if (
 				this.symbols.createKey(left) !== this.symbols.createKey(right)
 			) {
@@ -616,6 +663,7 @@ export default class Visitor {
 
 	private getSourceFilesToIndex(): ReadonlyArray<ts.SourceFile> {
 		const result: ts.SourceFile[] = [];
+
 		for (const sourceFile of this.program.getSourceFiles()) {
 			if (
 				this.program.isSourceFileFromExternalLibrary(sourceFile) ||
@@ -633,9 +681,12 @@ export default class Visitor {
 		type: ts.Symbol,
 	): string | undefined {
 		const method = namespace.exports?.get("method" as ts.__String);
+
 		let text: string;
+
 		if (method !== undefined) {
 			const declaration = this.getFirstDeclaration(method);
+
 			if (declaration === undefined) {
 				return undefined;
 			}
@@ -643,6 +694,7 @@ export default class Visitor {
 				return undefined;
 			}
 			const initializer = declaration.initializer;
+
 			if (
 				initializer === undefined ||
 				(!ts.isStringLiteral(initializer) &&
@@ -653,6 +705,7 @@ export default class Visitor {
 			text = initializer.getText();
 		} else {
 			const declaration = this.getFirstDeclaration(type);
+
 			if (declaration === undefined) {
 				return undefined;
 			}
@@ -660,10 +713,12 @@ export default class Visitor {
 				return undefined;
 			}
 			const initializer = declaration.initializer;
+
 			if (initializer === undefined || !ts.isNewExpression(initializer)) {
 				return undefined;
 			}
 			const args = initializer.arguments;
+
 			if (args === undefined || args.length < 1) {
 				return undefined;
 			}
@@ -678,10 +733,12 @@ export default class Visitor {
 		const registrationMethod = namespace.exports?.get(
 			"registrationMethod" as ts.__String,
 		);
+
 		if (registrationMethod === undefined) {
 			return undefined;
 		}
 		const declaration = this.getFirstDeclaration(registrationMethod);
+
 		if (
 			declaration === undefined ||
 			!ts.isVariableDeclaration(declaration) ||
@@ -693,6 +750,7 @@ export default class Visitor {
 		const initializerSymbol = this.typeChecker.getSymbolAtLocation(
 			declaration.initializer.name,
 		);
+
 		if (
 			initializerSymbol === undefined ||
 			initializerSymbol.valueDeclaration === undefined
@@ -700,6 +758,7 @@ export default class Visitor {
 			return undefined;
 		}
 		const valueDeclaration = initializerSymbol.valueDeclaration;
+
 		if (!ts.isVariableDeclaration(valueDeclaration)) {
 			return undefined;
 		}
@@ -718,13 +777,16 @@ export default class Visitor {
 
 	private getMessageDirection(namespace: ts.Symbol): MessageDirection {
 		const errorMessage = `No message direction specified for request ${namespace.getName()}`;
+
 		const messageDirection = namespace.exports?.get(
 			"messageDirection" as ts.__String,
 		);
+
 		if (messageDirection === undefined) {
 			throw new Error(errorMessage);
 		}
 		const declaration = this.getFirstDeclaration(messageDirection);
+
 		if (
 			declaration === undefined ||
 			!ts.isVariableDeclaration(declaration) ||
@@ -736,6 +798,7 @@ export default class Visitor {
 		const initializerSymbol = this.typeChecker.getSymbolAtLocation(
 			declaration.initializer.name,
 		);
+
 		if (
 			initializerSymbol === undefined ||
 			initializerSymbol.valueDeclaration === undefined
@@ -743,6 +806,7 @@ export default class Visitor {
 			throw new Error(errorMessage);
 		}
 		const valueDeclaration = initializerSymbol.valueDeclaration;
+
 		if (!ts.isEnumMember(valueDeclaration)) {
 			throw new Error(errorMessage);
 		}
@@ -753,6 +817,7 @@ export default class Visitor {
 			throw new Error(errorMessage);
 		}
 		const value = this.removeQuotes(valueDeclaration.initializer.getText());
+
 		if (!MessageDirection.is(value)) {
 			throw new Error(errorMessage);
 		}
@@ -761,6 +826,7 @@ export default class Visitor {
 
 	private getRequestTypes(symbol: ts.Symbol): RequestTypes | undefined {
 		const declaration = this.getFirstDeclaration(symbol);
+
 		if (declaration === undefined) {
 			return undefined;
 		}
@@ -768,6 +834,7 @@ export default class Visitor {
 			return;
 		}
 		const initializer = declaration.initializer;
+
 		if (initializer === undefined || !ts.isNewExpression(initializer)) {
 			return undefined;
 		}
@@ -775,8 +842,10 @@ export default class Visitor {
 			return undefined;
 		}
 		const typeInfos: TypeInfo[] = [];
+
 		for (const typeNode of initializer.typeArguments) {
 			const info = this.getTypeInfo(typeNode);
+
 			if (info === undefined) {
 				return undefined;
 			}
@@ -793,6 +862,7 @@ export default class Visitor {
 					errorData: typeInfos[2],
 					registrationOptions: typeInfos[3],
 				};
+
 			case 5:
 				return {
 					param: typeInfos[0],
@@ -809,6 +879,7 @@ export default class Visitor {
 		symbol: ts.Symbol,
 	): NotificationTypes | undefined {
 		const declaration = this.getFirstDeclaration(symbol);
+
 		if (declaration === undefined) {
 			return undefined;
 		}
@@ -816,6 +887,7 @@ export default class Visitor {
 			return;
 		}
 		const initializer = declaration.initializer;
+
 		if (initializer === undefined || !ts.isNewExpression(initializer)) {
 			return undefined;
 		}
@@ -823,8 +895,10 @@ export default class Visitor {
 			return undefined;
 		}
 		const typeInfos: TypeInfo[] = [];
+
 		for (const typeNode of initializer.typeArguments) {
 			const info = this.getTypeInfo(typeNode);
+
 			if (info === undefined) {
 				return undefined;
 			}
@@ -836,6 +910,7 @@ export default class Visitor {
 		switch (initializer.typeArguments.length) {
 			case 1:
 				return { registrationOptions: typeInfos[0] };
+
 			case 2:
 				return {
 					param: typeInfos[0],
@@ -851,10 +926,12 @@ export default class Visitor {
 	): TypeInfo | undefined {
 		if (ts.isIdentifier(typeNode)) {
 			const typeName = typeNode.text;
+
 			if (LSPBaseTypes.has(typeName)) {
 				return { kind: "base", name: typeName as BaseTypeInfoKind };
 			}
 			const symbol = this.typeChecker.getSymbolAtLocation(typeNode);
+
 			if (symbol === undefined) {
 				return undefined;
 			}
@@ -863,26 +940,31 @@ export default class Visitor {
 			const typeName = ts.isIdentifier(typeNode.typeName)
 				? typeNode.typeName.text
 				: typeNode.typeName.right.text;
+
 			if (LSPBaseTypes.has(typeName)) {
 				return { kind: "base", name: typeName as BaseTypeInfoKind };
 			}
 			const symbol = this.typeChecker.getSymbolAtLocation(
 				typeNode.typeName,
 			);
+
 			if (symbol === undefined) {
 				return undefined;
 			}
 			return { kind: "reference", name: typeName, symbol };
 		} else if (ts.isArrayTypeNode(typeNode)) {
 			const elementType = this.getTypeInfo(typeNode.elementType);
+
 			if (elementType === undefined) {
 				return undefined;
 			}
 			return { kind: "array", elementType: elementType };
 		} else if (ts.isUnionTypeNode(typeNode)) {
 			const items: TypeInfo[] = [];
+
 			for (const item of typeNode.types) {
 				const typeInfo = this.getTypeInfo(item);
+
 				if (typeInfo === undefined) {
 					return undefined;
 				}
@@ -900,8 +982,10 @@ export default class Visitor {
 			return { kind: "union", items };
 		} else if (ts.isIntersectionTypeNode(typeNode)) {
 			const items: TypeInfo[] = [];
+
 			for (const item of typeNode.types) {
 				const typeInfo = this.getTypeInfo(item);
+
 				if (typeInfo === undefined) {
 					return undefined;
 				}
@@ -910,12 +994,15 @@ export default class Visitor {
 			return { kind: "intersection", items };
 		} else if (ts.isTypeLiteralNode(typeNode)) {
 			const type = this.typeChecker.getTypeAtLocation(typeNode);
+
 			const info = this.typeChecker.getIndexInfoOfType(
 				type,
 				ts.IndexKind.String,
 			);
+
 			if (info !== undefined) {
 				const declaration = info.declaration;
+
 				if (
 					declaration === undefined ||
 					declaration.parameters.length < 1
@@ -923,11 +1010,14 @@ export default class Visitor {
 					return undefined;
 				}
 				const keyTypeNode = declaration.parameters[0].type;
+
 				if (keyTypeNode === undefined) {
 					return undefined;
 				}
 				const key = this.getTypeInfo(keyTypeNode);
+
 				const value = this.getTypeInfo(declaration.type);
+
 				if (key === undefined || value === undefined) {
 					return undefined;
 				}
@@ -938,7 +1028,9 @@ export default class Visitor {
 			} else {
 				// We can't directly ask for the symbol since the literal has no name.
 				const type = this.typeChecker.getTypeAtLocation(typeNode);
+
 				const symbol = type.symbol;
+
 				if (symbol === undefined) {
 					return undefined;
 				}
@@ -957,6 +1049,7 @@ export default class Visitor {
 						member,
 						ts.SyntaxKind.PropertySignature,
 					);
+
 					if (
 						declaration === undefined ||
 						!ts.isPropertySignature(declaration) ||
@@ -967,6 +1060,7 @@ export default class Visitor {
 						);
 					}
 					const propertyType = this.getTypeInfo(declaration.type);
+
 					if (propertyType === undefined) {
 						throw new Error(
 							`Can't parse property ${member.getName()} of structure ${symbol.getName()}`,
@@ -979,12 +1073,15 @@ export default class Visitor {
 					this.fillDocProperties(declaration, literalInfo);
 					items.set(member.getName(), literalInfo);
 				});
+
 				return { kind: "literal", items };
 			}
 		} else if (ts.isTupleTypeNode(typeNode)) {
 			const items: TypeInfo[] = [];
+
 			for (const item of typeNode.elements) {
 				const typeInfo = this.getTypeInfo(item);
+
 				if (typeInfo === undefined) {
 					return undefined;
 				}
@@ -1001,6 +1098,7 @@ export default class Visitor {
 			const typeNodeSymbol = this.typeChecker.getSymbolAtLocation(
 				typeNode.exprName,
 			);
+
 			if (typeNodeSymbol === undefined) {
 				throw new Error(
 					`Can't resolve symbol for right hand side of enum declaration`,
@@ -1010,6 +1108,7 @@ export default class Visitor {
 				typeNodeSymbol,
 				ts.SyntaxKind.VariableDeclaration,
 			);
+
 			if (
 				declaration === undefined ||
 				!ts.isVariableDeclaration(declaration) ||
@@ -1046,32 +1145,43 @@ export default class Visitor {
 		switch (node.kind) {
 			case ts.SyntaxKind.NullKeyword:
 				return { kind: "base", name: "null" };
+
 			case ts.SyntaxKind.UnknownKeyword:
 				return { kind: "base", name: "unknown" };
+
 			case ts.SyntaxKind.NeverKeyword:
 				return { kind: "base", name: "never" };
+
 			case ts.SyntaxKind.VoidKeyword:
 				return { kind: "base", name: "void" };
+
 			case ts.SyntaxKind.UndefinedKeyword:
 				return { kind: "base", name: "undefined" };
+
 			case ts.SyntaxKind.AnyKeyword:
 				return { kind: "base", name: "any" };
+
 			case ts.SyntaxKind.StringKeyword:
 				return { kind: "base", name: "string" };
+
 			case ts.SyntaxKind.NumberKeyword:
 				return { kind: "base", name: "integer" };
+
 			case ts.SyntaxKind.BooleanKeyword:
 				return { kind: "base", name: "boolean" };
+
 			case ts.SyntaxKind.StringLiteral:
 				return {
 					kind: "stringLiteral",
 					value: this.removeQuotes(node.getText()),
 				};
+
 			case ts.SyntaxKind.NumericLiteral:
 				return {
 					kind: "integerLiteral",
 					value: Number.parseInt(node.getText()),
 				};
+
 			case ts.SyntaxKind.ObjectKeyword:
 				return { kind: "base", name: "object" };
 		}
@@ -1127,6 +1237,7 @@ export default class Visitor {
 		// So we predefine it and emit it.
 		if (name === "LSPAny") {
 			this.typeAliases.push(PreDefined.LSPArray);
+
 			return PreDefined.LSPAny;
 		}
 		if (name === "LSPArray") {
@@ -1139,21 +1250,26 @@ export default class Visitor {
 		}
 		if (Symbols.isInterface(symbol)) {
 			const result: Structure = { name: name, properties: [] };
+
 			const declaration = this.getDeclaration(
 				symbol,
 				ts.SyntaxKind.InterfaceDeclaration,
 			);
+
 			if (
 				declaration !== undefined &&
 				ts.isInterfaceDeclaration(declaration) &&
 				declaration.heritageClauses !== undefined
 			) {
 				const mixins: JsonType[] = [];
+
 				const extend: JsonType[] = [];
+
 				for (const clause of declaration.heritageClauses) {
 					for (const type of clause.types) {
 						if (ts.isIdentifier(type.expression)) {
 							const typeInfo = this.getTypeInfo(type.expression);
+
 							if (
 								typeInfo === undefined ||
 								typeInfo.kind !== "reference"
@@ -1182,12 +1298,14 @@ export default class Visitor {
 				this.fillDocProperties(declaration, result);
 			}
 			this.fillProperties(result, symbol);
+
 			return result;
 		} else if (Symbols.isTypeAlias(symbol)) {
 			const declaration = this.getDeclaration(
 				symbol,
 				ts.SyntaxKind.TypeAliasDeclaration,
 			);
+
 			if (
 				declaration === undefined ||
 				!ts.isTypeAliasDeclaration(declaration)
@@ -1204,15 +1322,21 @@ export default class Visitor {
 					this.typeChecker.getTypeAtLocation(declaration.type).symbol,
 				);
 				this.fillDocProperties(declaration, result);
+
 				return result;
 			} else if (ts.isIntersectionTypeNode(declaration.type)) {
 				const split = this.splitIntersectionType(declaration.type);
+
 				if (split.rest.length === 0) {
 					const result: Structure = { name: name, properties: [] };
+
 					const mixins: JsonType[] = [];
+
 					const extend: JsonType[] = [];
+
 					for (const reference of split.references) {
 						const typeInfo = this.getTypeInfo(reference);
+
 						if (
 							typeInfo === undefined ||
 							typeInfo.kind !== "reference"
@@ -1242,6 +1366,7 @@ export default class Visitor {
 						);
 					}
 					this.fillDocProperties(declaration, result);
+
 					return result;
 				}
 			}
@@ -1249,6 +1374,7 @@ export default class Visitor {
 				declaration.type,
 				name === "LSPAny",
 			);
+
 			if (target === undefined) {
 				throw new Error(
 					`Can't resolve target type for type alias ${symbol.getName()}`,
@@ -1258,6 +1384,7 @@ export default class Visitor {
 				symbol,
 				ts.SyntaxKind.ModuleDeclaration,
 			);
+
 			if (
 				namespace !== undefined &&
 				symbol.declarations !== undefined &&
@@ -1267,11 +1394,13 @@ export default class Visitor {
 					target.kind === "union" ||
 					target.kind === "stringLiteral" ||
 					target.kind === "integerLiteral";
+
 				const openSet =
 					target.kind === "base" &&
 					(target.name === "string" ||
 						target.name === "integer" ||
 						target.name === "uinteger");
+
 				if (openSet || fixedSet) {
 					// Check if we have a enum declaration.
 					const body = namespace
@@ -1279,11 +1408,14 @@ export default class Visitor {
 						.find(
 							(node) => node.kind === ts.SyntaxKind.ModuleBlock,
 						);
+
 					if (body !== undefined && ts.isModuleBlock(body)) {
 						const enumValues = this.getEnumValues(target);
+
 						const variableStatements = body.statements.filter(
 							(statement) => ts.isVariableStatement(statement),
 						);
+
 						if (
 							(fixedSet &&
 								enumValues !== undefined &&
@@ -1298,8 +1430,11 @@ export default class Visitor {
 								| undefined = enumValues
 								? new Set<any>(enumValues as any)
 								: undefined;
+
 							let isEnum = true;
+
 							const enumerations: EnumerationEntry[] = [];
+
 							for (const variable of variableStatements) {
 								if (
 									!ts.isVariableStatement(variable) ||
@@ -1307,18 +1442,23 @@ export default class Visitor {
 										.length !== 1
 								) {
 									isEnum = false;
+
 									break;
 								}
 								const declaration =
 									variable.declarationList.declarations[0];
+
 								if (!ts.isVariableDeclaration(declaration)) {
 									isEnum = false;
+
 									break;
 								}
 								const value: number | string | undefined =
 									this.getEnumValue(declaration);
+
 								if (value === undefined) {
 									isEnum = false;
+
 									break;
 								}
 								if (
@@ -1326,9 +1466,11 @@ export default class Visitor {
 									!enumValuesSet.has(value)
 								) {
 									isEnum = false;
+
 									break;
 								}
 								let propertyName = declaration.name.getText();
+
 								if (
 									Visitor.PropertyRenames.has(name) &&
 									Visitor.PropertyRenames.get(name)?.has(
@@ -1362,12 +1504,14 @@ export default class Visitor {
 										: openSet
 											? (target as EnumerationType)
 											: undefined;
+
 								if (type !== undefined) {
 									const enumeration: Enumeration = {
 										name: name,
 										type: type,
 										values: enumerations,
 									};
+
 									if (openSet && !fixedSet) {
 										enumeration.supportsCustomValues = true;
 									}
@@ -1377,6 +1521,7 @@ export default class Visitor {
 										namespace,
 										enumeration,
 									);
+
 									if (
 										enumeration.documentation === undefined
 									) {
@@ -1399,12 +1544,14 @@ export default class Visitor {
 				Visitor.Mixins.has(target.name)
 			) {
 				this.queueTypeInfo(target);
+
 				const result: Structure = {
 					name: name,
 					mixins: [TypeInfo.asJsonType(target)],
 					properties: [],
 				};
 				this.fillDocProperties(declaration, result);
+
 				return result;
 			} else {
 				this.queueTypeInfo(target);
@@ -1418,18 +1565,23 @@ export default class Visitor {
 					type: TypeInfo.asJsonType(target),
 				};
 				this.fillDocProperties(declaration, result);
+
 				return result;
 			}
 		} else if (Symbols.isRegularEnum(symbol)) {
 			const entries: EnumerationEntry[] = [];
+
 			const exports = this.typeChecker.getExportsOfModule(symbol);
+
 			let enumBaseType: "string" | "integer" | "uinteger" | undefined =
 				undefined;
+
 			for (const item of exports) {
 				const declaration = this.getDeclaration(
 					item,
 					ts.SyntaxKind.EnumMember,
 				);
+
 				if (
 					declaration === undefined ||
 					!ts.isEnumMember(declaration) ||
@@ -1438,8 +1590,10 @@ export default class Visitor {
 					continue;
 				}
 				let value: string | number | undefined;
+
 				if (ts.isNumericLiteral(declaration.initializer)) {
 					value = Number.parseInt(declaration.initializer.getText());
+
 					if (value >= 0 && enumBaseType === undefined) {
 						enumBaseType = "uinteger";
 					} else {
@@ -1458,6 +1612,7 @@ export default class Visitor {
 					name: item.getName(),
 					value: value,
 				};
+
 				if (
 					Visitor.PropertyFilters.has(name) &&
 					Visitor.PropertyFilters.get(name)?.has(entry.name)
@@ -1471,11 +1626,13 @@ export default class Visitor {
 				enumBaseType === undefined
 					? { kind: "base", name: "uinteger" }
 					: { kind: "base", name: enumBaseType };
+
 			const result: Enumeration = {
 				name: name,
 				type: type,
 				values: entries,
 			};
+
 			if (
 				name === "SemanticTokenTypes" ||
 				name === "SemanticTokenModifiers"
@@ -1486,6 +1643,7 @@ export default class Visitor {
 				symbol,
 				ts.SyntaxKind.EnumDeclaration,
 			);
+
 			if (declaration !== undefined) {
 				this.fillDocProperties(declaration, result);
 			}
@@ -1493,9 +1651,11 @@ export default class Visitor {
 		} else {
 			const result: Structure = { name: name, properties: [] };
 			this.fillProperties(result, symbol);
+
 			const declaration = this.getFirstDeclaration(symbol);
 			declaration !== undefined &&
 				this.fillDocProperties(declaration, result);
+
 			return result;
 		}
 	}
@@ -1515,6 +1675,7 @@ export default class Visitor {
 				member,
 				ts.SyntaxKind.PropertySignature,
 			);
+
 			if (
 				declaration === undefined ||
 				!ts.isPropertySignature(declaration) ||
@@ -1525,6 +1686,7 @@ export default class Visitor {
 				);
 			}
 			const typeInfo = this.getTypeInfo(declaration.type);
+
 			if (typeInfo === undefined) {
 				throw new Error(
 					`Can't parse property ${member.getName()} of structure ${symbol.getName()}`,
@@ -1536,6 +1698,7 @@ export default class Visitor {
 				member.getName() === "experimental" &&
 				typeInfo.kind === "reference" &&
 				typeInfo.name === "T";
+
 			const property: Property = isExperimentalProperty
 				? {
 						name: member.getName(),
@@ -1549,11 +1712,13 @@ export default class Visitor {
 						name: member.getName(),
 						type: TypeInfo.asJsonType(typeInfo),
 					};
+
 			if (Symbols.isOptional(member)) {
 				property.optional = true;
 			}
 			this.fillDocProperties(declaration, property);
 			result.properties.push(property);
+
 			if (!isExperimentalProperty) {
 				this.queueTypeInfo(typeInfo);
 			}
@@ -1566,8 +1731,11 @@ export default class Visitor {
 		rest: ts.TypeNode[];
 	} {
 		let literal: ts.TypeLiteralNode | undefined;
+
 		const rest: ts.TypeNode[] = [];
+
 		const references: ts.TypeReferenceNode[] = [];
+
 		for (const element of node.types) {
 			if (ts.isTypeLiteralNode(element)) {
 				if (literal === undefined) {
@@ -1586,6 +1754,7 @@ export default class Visitor {
 
 	private getFirstDeclaration(symbol: ts.Symbol): ts.Node | undefined {
 		const declarations = symbol.getDeclarations();
+
 		return declarations !== undefined && declarations.length > 0
 			? declarations[0]
 			: undefined;
@@ -1596,6 +1765,7 @@ export default class Visitor {
 		kind: ts.SyntaxKind,
 	): ts.Node | undefined {
 		const declarations = symbol.getDeclarations();
+
 		if (declarations === undefined) {
 			return undefined;
 		}
@@ -1618,20 +1788,25 @@ export default class Visitor {
 			return undefined;
 		}
 		const first = typeInfo.items[0];
+
 		const item: [string, string] | [string, number] | undefined =
 			first.kind === "stringLiteral"
 				? [first.kind, first.value]
 				: first.kind === "integerLiteral"
 					? [first.kind, first.value]
 					: undefined;
+
 		if (item === undefined) {
 			return undefined;
 		}
 		const kind = item[0];
+
 		const result: (string | number)[] = [];
 		result.push(item[1]);
+
 		for (let i = 1; i < typeInfo.items.length; i++) {
 			const info = typeInfo.items[i];
+
 			if (info.kind !== kind) {
 				return undefined;
 			}
@@ -1650,6 +1825,7 @@ export default class Visitor {
 		declaration: ts.VariableDeclaration,
 	): number | string | undefined {
 		let enumValueNode: ts.Node | undefined;
+
 		if (declaration.initializer !== undefined) {
 			enumValueNode = declaration.initializer;
 		} else if (
@@ -1678,6 +1854,7 @@ export default class Visitor {
 			return undefined;
 		}
 		const first = values[0];
+
 		if (typeof first === "string") {
 			return { kind: "base", name: "string" };
 		}
@@ -1691,6 +1868,7 @@ export default class Visitor {
 
 	private removeQuotes(text: string): string {
 		const first = text[0];
+
 		if (
 			(first !== "'" && first !== '"' && first !== "`") ||
 			first !== text[text.length - 1]
@@ -1714,9 +1892,13 @@ export default class Visitor {
 			| LiteralInfo,
 	): void {
 		const filePath = node.getSourceFile().fileName;
+
 		const fileName = path.basename(filePath);
+
 		const tags = ts.getJSDocTags(node);
+
 		const { since, sinceTags, deprecated } = this.getTags(tags);
+
 		const proposed =
 			fileName.startsWith("proposed.") ||
 			tags.some((tag) => {
@@ -1735,14 +1917,21 @@ export default class Visitor {
 
 	private getDocumentation(node: ts.Node): string | undefined {
 		const fullText = node.getFullText();
+
 		const ranges = ts.getLeadingCommentRanges(fullText, 0);
+
 		if (ranges !== undefined && ranges.length > 0) {
 			const start = ranges[ranges.length - 1].pos;
+
 			const end = ranges[ranges.length - 1].end;
+
 			const text = fullText.substring(start, end).trim();
+
 			if (text.startsWith("/**")) {
 				const buffer: string[] = [];
+
 				const lines = text.split(/\r?\n/);
+
 				for (let i = 0; i < lines.length; i++) {
 					let noComment = lines[i].replace(
 						/^\s*\/\*\*(.*)\s*\*\/\s*$|^(\s*\/\*\*)|^(\s*\*\/\s*)$|^(\s*\*)/,
@@ -1757,6 +1946,7 @@ export default class Visitor {
 					// First line
 					if (i === 0 || i === lines.length - 1) {
 						noComment = noComment.trim();
+
 						if (noComment.length === 0) {
 							continue;
 						}
@@ -1782,6 +1972,7 @@ export default class Visitor {
 			sinceTags?: string[];
 			deprecated?: string;
 		} = {};
+
 		for (const tag of tags) {
 			if (
 				tag.tagName.text === "since" &&
@@ -1789,6 +1980,7 @@ export default class Visitor {
 			) {
 				const value = tag.comment.replace(/\r?\n/g, "\n");
 				result.since = value;
+
 				if (result.sinceTags === undefined) {
 					result.sinceTags = [value];
 				} else {

@@ -59,6 +59,7 @@ export class TypeDefinitionFeature extends TextDocumentLanguageFeature<
 			ensure(capabilities, "textDocument")!,
 			"typeDefinition",
 		)!.dynamicRegistration = true;
+
 		const typeDefinitionSupport = ensure(
 			ensure(capabilities, "textDocument")!,
 			"typeDefinition",
@@ -75,6 +76,7 @@ export class TypeDefinitionFeature extends TextDocumentLanguageFeature<
 			documentSelector,
 			capabilities.typeDefinitionProvider,
 		);
+
 		if (!id || !options) {
 			return;
 		}
@@ -85,9 +87,11 @@ export class TypeDefinitionFeature extends TextDocumentLanguageFeature<
 		options: TypeDefinitionRegistrationOptions,
 	): [Disposable, TypeDefinitionProvider] {
 		const selector = options.documentSelector!;
+
 		const provider: TypeDefinitionProvider = {
 			provideTypeDefinition: (document, position, token) => {
 				const client = this._client;
+
 				const provideTypeDefinition: ProvideTypeDefinitionSignature = (
 					document,
 					position,
@@ -122,7 +126,9 @@ export class TypeDefinitionFeature extends TextDocumentLanguageFeature<
 							},
 						);
 				};
+
 				const middleware = client.middleware;
+
 				return middleware.provideTypeDefinition
 					? middleware.provideTypeDefinition(
 							document,
@@ -133,6 +139,7 @@ export class TypeDefinitionFeature extends TextDocumentLanguageFeature<
 					: provideTypeDefinition(document, position, token);
 			},
 		};
+
 		return [this.registerProvider(selector, provider), provider];
 	}
 

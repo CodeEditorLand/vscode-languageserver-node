@@ -67,8 +67,10 @@ export interface DeclarationParams
 export namespace DeclarationRequest {
 	export const method: "textDocument/declaration" =
 		"textDocument/declaration";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		DeclarationParams,
 		Declaration | DeclarationLink[] | null,
@@ -76,6 +78,7 @@ export namespace DeclarationRequest {
 		void,
 		DeclarationRegistrationOptions
 	>(method);
+
 	export type HandlerSignature = RequestHandler<
 		DeclarationParams,
 		Declaration | DeclarationLink[] | null,

@@ -75,6 +75,7 @@ export class HoverFeature extends TextDocumentLanguageFeature<
 			documentSelector,
 			capabilities.hoverProvider,
 		);
+
 		if (!options) {
 			return;
 		}
@@ -88,9 +89,11 @@ export class HoverFeature extends TextDocumentLanguageFeature<
 		options: HoverRegistrationOptions,
 	): [Disposable, HoverProvider] {
 		const selector = options.documentSelector!;
+
 		const provider: HoverProvider = {
 			provideHover: (document, position, token) => {
 				const client = this._client;
+
 				const provideHover: ProvideHoverSignature = (
 					document,
 					position,
@@ -124,7 +127,9 @@ export class HoverFeature extends TextDocumentLanguageFeature<
 							},
 						);
 				};
+
 				const middleware = client.middleware;
+
 				return middleware.provideHover
 					? middleware.provideHover(
 							document,
@@ -135,6 +140,7 @@ export class HoverFeature extends TextDocumentLanguageFeature<
 					: provideHover(document, position, token);
 			},
 		};
+
 		return [this.registerProvider(selector, provider), provider];
 	}
 

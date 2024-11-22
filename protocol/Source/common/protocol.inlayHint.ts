@@ -115,8 +115,10 @@ export type InlayHintParams = WorkDoneProgressParams & {
  */
 export namespace InlayHintRequest {
 	export const method: "textDocument/inlayHint" = "textDocument/inlayHint";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		InlayHintParams,
 		InlayHint[] | null,
@@ -124,6 +126,7 @@ export namespace InlayHintRequest {
 		void,
 		InlayHintRegistrationOptions
 	>(method);
+
 	export type HandlerSignature = RequestHandler<
 		InlayHintParams,
 		InlayHint[] | null,
@@ -140,8 +143,10 @@ export namespace InlayHintRequest {
  */
 export namespace InlayHintResolveRequest {
 	export const method: "inlayHint/resolve" = "inlayHint/resolve";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		InlayHint,
 		InlayHint,
@@ -149,6 +154,7 @@ export namespace InlayHintResolveRequest {
 		void,
 		void
 	>(method);
+
 	export type HandlerSignature = RequestHandler<InlayHint, InlayHint, void>;
 }
 
@@ -157,10 +163,13 @@ export namespace InlayHintResolveRequest {
  */
 export namespace InlayHintRefreshRequest {
 	export const method: `workspace/inlayHint/refresh` = `workspace/inlayHint/refresh`;
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.serverToClient;
+
 	export const type = new ProtocolRequestType0<void, void, void, void>(
 		method,
 	);
+
 	export type HandlerSignature = RequestHandler0<void, void>;
 }

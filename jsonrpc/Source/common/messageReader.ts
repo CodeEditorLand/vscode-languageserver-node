@@ -50,6 +50,7 @@ export interface MessageReader {
 export namespace MessageReader {
 	export function is(value: any): value is MessageReader {
 		const candidate: MessageReader = value;
+
 		return (
 			candidate &&
 			Is.func(candidate.listen) &&
@@ -137,16 +138,23 @@ namespace ResolvedMessageReaderOptions {
 		options?: RAL.MessageBufferEncoding | MessageReaderOptions,
 	): ResolvedMessageReaderOptions {
 		let charset: RAL.MessageBufferEncoding;
+
 		let result: ResolvedMessageReaderOptions;
+
 		let contentDecoder: ContentDecoder | undefined;
+
 		const contentDecoders: typeof result.contentDecoders = new Map();
+
 		let contentTypeDecoder: ContentTypeDecoder | undefined;
+
 		const contentTypeDecoders: typeof result.contentTypeDecoders =
 			new Map();
+
 		if (options === undefined || typeof options === "string") {
 			charset = options ?? "utf-8";
 		} else {
 			charset = options.charset ?? "utf-8";
+
 			if (options.contentDecoder !== undefined) {
 				contentDecoder = options.contentDecoder;
 				contentDecoders.set(contentDecoder.name, contentDecoder);
@@ -225,47 +233,57 @@ export class ReadableStreamMessageReader extends AbstractMessageReader {
 		this.messageToken = 0;
 		this.partialMessageTimer = undefined;
 		this.callback = callback;
+
 		const result = this.readable.onData((data: Uint8Array) => {
 			this.onData(data);
 		});
 		this.readable.onError((error: any) => this.fireError(error));
 		this.readable.onClose(() => this.fireClose());
+
 		return result;
 	}
 
 	private onData(data: Uint8Array): void {
 		try {
 			this.buffer.append(data);
+
 			while (true) {
 				if (this.nextMessageLength === -1) {
 					const headers = this.buffer.tryReadHeaders(true);
+
 					if (!headers) {
 						return;
 					}
 					const contentLength = headers.get("content-length");
+
 					if (!contentLength) {
 						this.fireError(
 							new Error(
 								`Header must provide a Content-Length property.\n${JSON.stringify(Object.fromEntries(headers))}`,
 							),
 						);
+
 						return;
 					}
 					const length = parseInt(contentLength);
+
 					if (isNaN(length)) {
 						this.fireError(
 							new Error(
 								`Content-Length value must be a number. Got ${contentLength}`,
 							),
 						);
+
 						return;
 					}
 					this.nextMessageLength = length;
 				}
 				const body = this.buffer.tryReadBody(this.nextMessageLength);
+
 				if (body === undefined) {
 					/** We haven't received the full message yet. */
 					this.setPartialMessageTimer();
+
 					return;
 				}
 				this.clearPartialMessageTimer();
@@ -280,6 +298,7 @@ export class ReadableStreamMessageReader extends AbstractMessageReader {
 							this.options.contentDecoder !== undefined
 								? await this.options.contentDecoder.decode(body)
 								: body;
+
 						const message =
 							await this.options.contentTypeDecoder.decode(
 								bytes,
@@ -305,12 +324,14 @@ export class ReadableStreamMessageReader extends AbstractMessageReader {
 
 	private setPartialMessageTimer(): void {
 		this.clearPartialMessageTimer();
+
 		if (this._partialMessageTimeout <= 0) {
 			return;
 		}
 		this.partialMessageTimer = RAL().timer.setTimeout(
 			(token, timeout) => {
 				this.partialMessageTimer = undefined;
+
 				if (token === this.messageToken) {
 					this.firePartialMessage({
 						messageToken: token,

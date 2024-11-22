@@ -78,10 +78,12 @@ interface RAL {
 			ms: number,
 			...args: any[]
 		): Disposable;
+
 		setImmediate(
 			callback: (...args: any[]) => void,
 			...args: any[]
 		): Disposable;
+
 		setInterval(
 			callback: (...args: any[]) => void,
 			ms: number,
@@ -101,10 +103,15 @@ function RAL(): RAL {
 
 namespace RAL {
 	export type MessageBuffer = _MessageBuffer;
+
 	export type MessageBufferEncoding = _MessageBufferEncoding;
+
 	export type ReadableStream = _ReadableStream;
+
 	export type WritableStream = _WritableStream;
+
 	export type DuplexStream = _DuplexStream;
+
 	export function install(ral: RAL): void {
 		if (ral === undefined) {
 			throw new Error(`No runtime abstraction layer provided`);

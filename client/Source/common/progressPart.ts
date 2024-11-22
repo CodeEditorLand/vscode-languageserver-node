@@ -64,13 +64,19 @@ export class ProgressPart {
 				switch (value.kind) {
 					case "begin":
 						this.begin(value);
+
 						break;
+
 					case "report":
 						this.report(value);
+
 						break;
+
 					case "end":
 						this.done();
+
 						done && done(this);
+
 						break;
 				}
 			},
@@ -106,6 +112,7 @@ export class ProgressPart {
 						);
 					});
 				this.report(params);
+
 				return new Promise<void>((resolve, reject) => {
 					this._resolve = resolve;
 					this._reject = reject;
@@ -122,6 +129,7 @@ export class ProgressPart {
 				this._progress.report({ message: params.message });
 		} else if (Is.number(params.percentage)) {
 			const percentage = Math.max(0, Math.min(params.percentage, 100));
+
 			const delta = Math.max(0, percentage - this._reported);
 			this._reported += delta;
 			this._progress !== undefined &&
@@ -134,6 +142,7 @@ export class ProgressPart {
 
 	public cancel(): void {
 		this.cleanup();
+
 		if (this._reject !== undefined) {
 			this._reject();
 			this._resolve = undefined;
@@ -143,6 +152,7 @@ export class ProgressPart {
 
 	public done(): void {
 		this.cleanup();
+
 		if (this._resolve !== undefined) {
 			this._resolve();
 			this._resolve = undefined;

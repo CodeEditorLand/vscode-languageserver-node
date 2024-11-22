@@ -67,9 +67,11 @@ export class BrowserMessageWriter
 	public write(msg: Message): Promise<void> {
 		try {
 			this.port.postMessage(msg);
+
 			return Promise.resolve();
 		} catch (error) {
 			this.handleError(error, msg);
+
 			return Promise.reject(error);
 		}
 	}

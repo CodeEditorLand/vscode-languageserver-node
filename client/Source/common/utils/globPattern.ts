@@ -9,6 +9,7 @@ import type { GlobPattern } from "vscode-languageserver-protocol";
 
 export function matchGlobPattern(pattern: GlobPattern, resource: Uri): boolean {
 	let miniMatchPattern: string;
+
 	if (typeof pattern === "string") {
 		miniMatchPattern = pattern.replace(/\\/g, "/");
 	} else {
@@ -26,6 +27,7 @@ export function matchGlobPattern(pattern: GlobPattern, resource: Uri): boolean {
 		}
 	}
 	const matcher = new minimatch.Minimatch(miniMatchPattern, { noext: true });
+
 	if (!matcher.makeRe()) {
 		return false;
 	}

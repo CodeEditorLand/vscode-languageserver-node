@@ -800,11 +800,13 @@ class DefaultErrorHandler implements ErrorHandler {
 
 	public closed(): CloseHandlerResult {
 		this.restarts.push(Date.now());
+
 		if (this.restarts.length <= this.maxRestartCount) {
 			return { action: CloseAction.Restart };
 		} else {
 			const diff =
 				this.restarts[this.restarts.length - 1] - this.restarts[0];
+
 			if (diff <= 3 * 60 * 1000) {
 				return {
 					action: CloseAction.DoNotRestart,
@@ -812,6 +814,7 @@ class DefaultErrorHandler implements ErrorHandler {
 				};
 			} else {
 				this.restarts.shift();
+
 				return { action: CloseAction.Restart };
 			}
 		}
@@ -836,6 +839,7 @@ export interface MessageTransports {
 export namespace MessageTransports {
 	export function is(value: any): value is MessageTransports {
 		const candidate: MessageTransports = value;
+
 		return (
 			candidate &&
 			MessageReader.is(value.reader) &&
@@ -865,16 +869,20 @@ class Tabs implements TabsModel {
 		this._onOpen = new EventEmitter();
 		this._onClose = new EventEmitter();
 		Tabs.fillTabResources(this.open);
+
 		const openTabsHandler = (event: TabChangeEvent) => {
 			if (event.closed.length === 0 && event.opened.length === 0) {
 				return;
 			}
 			const oldTabs = this.open;
+
 			const currentTabs: Set<string> = new Set();
 			Tabs.fillTabResources(currentTabs);
 
 			const closed: Set<string> = new Set();
+
 			const opened: Set<string> = new Set(currentTabs);
+
 			for (const tab of oldTabs.values()) {
 				if (currentTabs.has(tab)) {
 					opened.delete(tab);
@@ -883,8 +891,10 @@ class Tabs implements TabsModel {
 				}
 			}
 			this.open = currentTabs;
+
 			if (closed.size > 0) {
 				const toFire: Set<Uri> = new Set();
+
 				for (const item of closed) {
 					toFire.add(Uri.parse(item));
 				}
@@ -892,6 +902,7 @@ class Tabs implements TabsModel {
 			}
 			if (opened.size > 0) {
 				const toFire: Set<Uri> = new Set();
+
 				for (const item of opened) {
 					toFire.add(Uri.parse(item));
 				}
@@ -926,6 +937,7 @@ class Tabs implements TabsModel {
 
 	public isVisible(document: TextDocument | Uri): boolean {
 		const uri = document instanceof Uri ? document : document.uri;
+
 		if (uri.scheme === NotebookDocumentSyncFeature.CellScheme) {
 			// Notebook cells aren't in the list of tabs, but the notebook should be.
 			return Workspace.notebookDocuments.some((notebook) => {
@@ -936,6 +948,7 @@ class Tabs implements TabsModel {
 							(cell) =>
 								cell.document.uri.toString() === uri.toString(),
 						);
+
 					return cell !== undefined;
 				}
 				return false;
@@ -947,6 +960,7 @@ class Tabs implements TabsModel {
 	public getTabResources(): Set<Uri> {
 		const result: Set<Uri> = new Set();
 		Tabs.fillTabResources(new Set(), result);
+
 		return result;
 	}
 
@@ -955,10 +969,13 @@ class Tabs implements TabsModel {
 		uris?: Set<Uri>,
 	): void {
 		const seen = strings ?? new Set();
+
 		for (const group of Window.tabGroups.all) {
 			for (const tab of group.tabs) {
 				const input = tab.input;
+
 				let uri: Uri | undefined;
+
 				if (input instanceof TabInputText) {
 					uri = input.uri;
 				} else if (input instanceof TabInputTextDiff) {
@@ -1069,6 +1086,7 @@ export abstract class BaseLanguageClient
 			supportHtml: false,
 			supportThemeIcons: false,
 		};
+
 		if (clientOptions.markdown !== undefined) {
 			markdown.isTrusted = ResolvedClientOptions.sanitizeIsTrusted(
 				clientOptions.markdown.isTrusted,
@@ -1137,6 +1155,7 @@ export abstract class BaseLanguageClient
 		this._connection = undefined;
 		// this._idleStart = undefined;
 		this._initializeResult = undefined;
+
 		if (clientOptions.outputChannel) {
 			this._outputChannel = clientOptions.outputChannel;
 			this._disposeOutputChannel = false;
@@ -1263,7 +1282,9 @@ export abstract class BaseLanguageClient
 	private set $state(value: ClientState) {
 		const oldState = this.getPublicState();
 		this._state = value;
+
 		const newState = this.getPublicState();
+
 		if (newState !== oldState) {
 			this._stateChangeEmitter.fire({ oldState, newState });
 		}
@@ -1273,10 +1294,13 @@ export abstract class BaseLanguageClient
 		switch (this.$state) {
 			case ClientState.Starting:
 				return State.Starting;
+
 			case ClientState.Running:
 				return State.Running;
+
 			case ClientState.StartFailed:
 				return State.StartFailed;
+
 			default:
 				return State.Stopped;
 		}
@@ -1346,6 +1370,7 @@ export abstract class BaseLanguageClient
 		}
 
 		let param: any | undefined = undefined;
+
 		let token: CancellationToken | undefined = undefined;
 		// Separate cancellation tokens from other parameters for a better client interface
 		if (params.length === 1) {
@@ -1368,6 +1393,7 @@ export abstract class BaseLanguageClient
 			);
 		}
 		const _sendRequest = this._clientOptions.middleware?.sendRequest;
+
 		if (_sendRequest !== undefined) {
 			// Return the general middleware invocation defining `next` as a utility function that reorganizes parameters to
 			// pass them to the original sendRequest function.
@@ -1417,8 +1443,11 @@ export abstract class BaseLanguageClient
 	): Disposable {
 		const method = typeof type === "string" ? type : type.method;
 		this._requestHandlers.set(method, handler);
+
 		const connection = this.activeConnection();
+
 		let disposable: Disposable;
+
 		if (connection !== undefined) {
 			this._requestDisposables.set(
 				method,
@@ -1427,6 +1456,7 @@ export abstract class BaseLanguageClient
 			disposable = {
 				dispose: () => {
 					const disposable = this._requestDisposables.get(method);
+
 					if (disposable !== undefined) {
 						disposable.dispose();
 						this._requestDisposables.delete(method);
@@ -1438,7 +1468,9 @@ export abstract class BaseLanguageClient
 			disposable = {
 				dispose: () => {
 					this._pendingRequestHandlers.delete(method);
+
 					const disposable = this._requestDisposables.get(method);
+
 					if (disposable !== undefined) {
 						disposable.dispose();
 						this._requestDisposables.delete(method);
@@ -1488,7 +1520,9 @@ export abstract class BaseLanguageClient
 		const needsPendingFullTextDocumentSync: boolean =
 			this._didChangeTextDocumentFeature!.syncKind ===
 			TextDocumentSyncKind.Full;
+
 		let openNotification: string | undefined;
+
 		if (
 			needsPendingFullTextDocumentSync &&
 			typeof type !== "string" &&
@@ -1499,6 +1533,7 @@ export abstract class BaseLanguageClient
 			this._inFlightOpenNotifications.add(openNotification);
 		}
 		let documentToClose: string | undefined;
+
 		if (
 			typeof type !== "string" &&
 			type.method === DidCloseTextDocumentNotification.method
@@ -1570,8 +1605,11 @@ export abstract class BaseLanguageClient
 	): Disposable {
 		const method = typeof type === "string" ? type : type.method;
 		this._notificationHandlers.set(method, handler);
+
 		const connection = this.activeConnection();
+
 		let disposable: Disposable;
+
 		if (connection !== undefined) {
 			this._notificationDisposables.set(
 				method,
@@ -1581,6 +1619,7 @@ export abstract class BaseLanguageClient
 				dispose: () => {
 					const disposable =
 						this._notificationDisposables.get(method);
+
 					if (disposable !== undefined) {
 						disposable.dispose();
 						this._notificationDisposables.delete(method);
@@ -1592,8 +1631,10 @@ export abstract class BaseLanguageClient
 			disposable = {
 				dispose: () => {
 					this._pendingNotificationHandlers.delete(method);
+
 					const disposable =
 						this._notificationDisposables.get(method);
+
 					if (disposable !== undefined) {
 						disposable.dispose();
 						this._notificationDisposables.delete(method);
@@ -1629,9 +1670,11 @@ export abstract class BaseLanguageClient
 		try {
 			// Ensure we have a connection before we force the document sync.
 			const connection = await this.$start();
+
 			return connection.sendProgress(type, token, value);
 		} catch (error) {
 			this.error(`Sending progress for token ${token} failed.`, error);
+
 			throw error;
 		}
 	}
@@ -1642,10 +1685,14 @@ export abstract class BaseLanguageClient
 		handler: NotificationHandler<P>,
 	): Disposable {
 		this._progressHandlers.set(token, { type, handler });
+
 		const connection = this.activeConnection();
+
 		let disposable: Disposable;
+
 		const handleWorkDoneProgress =
 			this._clientOptions.middleware?.handleWorkDoneProgress;
+
 		const realHandler =
 			WorkDoneProgress.is(type) && handleWorkDoneProgress !== undefined
 				? (params: P) => {
@@ -1654,6 +1701,7 @@ export abstract class BaseLanguageClient
 						);
 					}
 				: handler;
+
 		if (connection !== undefined) {
 			this._progressDisposables.set(
 				token,
@@ -1662,6 +1710,7 @@ export abstract class BaseLanguageClient
 			disposable = {
 				dispose: () => {
 					const disposable = this._progressDisposables.get(token);
+
 					if (disposable !== undefined) {
 						disposable.dispose();
 						this._progressDisposables.delete(token);
@@ -1673,7 +1722,9 @@ export abstract class BaseLanguageClient
 			disposable = {
 				dispose: () => {
 					this._pendingProgressHandlers.delete(token);
+
 					const disposable = this._progressDisposables.get(token);
+
 					if (disposable !== undefined) {
 						disposable.dispose();
 						this._progressDisposables.delete(token);
@@ -1698,7 +1749,9 @@ export abstract class BaseLanguageClient
 
 	public async setTrace(value: Trace): Promise<void> {
 		this._trace = value;
+
 		const connection = this.activeConnection();
+
 		if (connection !== undefined) {
 			await connection.trace(this._trace, this._tracer, {
 				sendNotification: false,
@@ -1710,6 +1763,7 @@ export abstract class BaseLanguageClient
 	private data2String(data: Object): string {
 		if (data instanceof ResponseError) {
 			const responseError = data as ResponseError<any>;
+
 			return `  Message: ${responseError.message}\n  Code: ${responseError.code} ${responseError.data ? "\n" + responseError.data.toString() : ""}`;
 		}
 		if (data instanceof Error) {
@@ -1795,6 +1849,7 @@ export abstract class BaseLanguageClient
 		this.outputChannel.appendLine(
 			`[${name.padEnd(5)} - ${new Date().toLocaleTimeString()}] ${message}`,
 		);
+
 		if (data !== null && data !== undefined) {
 			this.outputChannel.appendLine(this.data2String(data));
 		}
@@ -1815,6 +1870,7 @@ export abstract class BaseLanguageClient
 		message =
 			message ??
 			"A request has failed. See the output for more information.";
+
 		if (data) {
 			message += "\n" + this.data2String(data);
 		}
@@ -1835,6 +1891,7 @@ export abstract class BaseLanguageClient
 		this.traceOutputChannel.appendLine(
 			`[Trace - ${new Date().toLocaleTimeString()}] ${message}`,
 		);
+
 		if (data) {
 			this.traceOutputChannel.appendLine(this.data2String(data));
 		}
@@ -1924,6 +1981,7 @@ export abstract class BaseLanguageClient
 		}
 
 		this.$state = ClientState.Starting;
+
 		try {
 			const connection = await this.createConnection();
 			connection.onNotification(
@@ -1932,16 +1990,24 @@ export abstract class BaseLanguageClient
 					switch (message.type) {
 						case MessageType.Error:
 							this.error(message.message, undefined, false);
+
 							break;
+
 						case MessageType.Warning:
 							this.warn(message.message, undefined, false);
+
 							break;
+
 						case MessageType.Info:
 							this.info(message.message, undefined, false);
+
 							break;
+
 						case MessageType.Debug:
 							this.debug(message.message, undefined, false);
+
 							break;
+
 						default:
 							this.outputChannel.appendLine(message.message);
 					}
@@ -1953,13 +2019,19 @@ export abstract class BaseLanguageClient
 					switch (message.type) {
 						case MessageType.Error:
 							void Window.showErrorMessage(message.message);
+
 							break;
+
 						case MessageType.Warning:
 							void Window.showWarningMessage(message.message);
+
 							break;
+
 						case MessageType.Info:
 							void Window.showInformationMessage(message.message);
+
 							break;
+
 						default:
 							void Window.showInformationMessage(message.message);
 					}
@@ -1970,20 +2042,28 @@ export abstract class BaseLanguageClient
 					message: string,
 					...items: T[]
 				) => Thenable<T>;
+
 				switch (params.type) {
 					case MessageType.Error:
 						messageFunc = Window.showErrorMessage;
+
 						break;
+
 					case MessageType.Warning:
 						messageFunc = Window.showWarningMessage;
+
 						break;
+
 					case MessageType.Info:
 						messageFunc = Window.showInformationMessage;
+
 						break;
+
 					default:
 						messageFunc = Window.showInformationMessage;
 				}
 				const actions = params.actions || [];
+
 				return messageFunc(params.message, ...actions);
 			});
 			connection.onNotification(
@@ -2001,12 +2081,15 @@ export abstract class BaseLanguageClient
 						const uri = this.protocol2CodeConverter.asUri(
 							params.uri,
 						);
+
 						try {
 							if (params.external === true) {
 								const success = await Env.openExternal(uri);
+
 								return { success };
 							} else {
 								const options: TextDocumentShowOptions = {};
+
 								if (params.selection !== undefined) {
 									options.selection =
 										this.protocol2CodeConverter.asRange(
@@ -2022,14 +2105,17 @@ export abstract class BaseLanguageClient
 									options.preserveFocus = false;
 								}
 								await Window.showTextDocument(uri, options);
+
 								return { success: true };
 							}
 						} catch (error) {
 							return { success: false };
 						}
 					};
+
 					const middleware =
 						this._clientOptions.middleware.window?.showDocument;
+
 					if (middleware !== undefined) {
 						return middleware(params, token, showDocument);
 					} else {
@@ -2058,11 +2144,14 @@ export abstract class BaseLanguageClient
 		(error: any) => void,
 	] {
 		let resolve!: () => void;
+
 		let reject!: (error: any) => void;
+
 		const promise: Promise<void> = new Promise((_resolve, _reject) => {
 			resolve = _resolve;
 			reject = _reject;
 		});
+
 		return [promise, resolve, reject];
 	}
 
@@ -2070,6 +2159,7 @@ export abstract class BaseLanguageClient
 		connection: Connection,
 	): Promise<InitializeResult> {
 		this.refreshTrace(connection, false);
+
 		const initOption = this._clientOptions.initializationOptions;
 		// If the client is locked to a workspace folder use it. In this case the workspace folder
 		// feature is not registered and we need to initialize the value here.
@@ -2087,6 +2177,7 @@ export abstract class BaseLanguageClient
 						],
 					]
 				: [this._clientGetRootPath(), null];
+
 		const initParams: InitializeParams = {
 			processId: null,
 			clientInfo: {
@@ -2104,16 +2195,21 @@ export abstract class BaseLanguageClient
 			workspaceFolders: workspaceFolders,
 		};
 		this.fillInitializeParams(initParams);
+
 		if (this._clientOptions.progressOnInitialization) {
 			const token: ProgressToken = UUID.generateUuid();
+
 			const part: ProgressPart = new ProgressPart(connection, token);
 			initParams.workDoneToken = token;
+
 			try {
 				const result = await this.doInitialize(connection, initParams);
 				part.done();
+
 				return result;
 			} catch (error) {
 				part.cancel();
+
 				throw error;
 			}
 		} else {
@@ -2127,6 +2223,7 @@ export abstract class BaseLanguageClient
 	): Promise<InitializeResult> {
 		try {
 			const result = await connection.initialize(initParams);
+
 			if (
 				result.capabilities.positionEncoding !== undefined &&
 				result.capabilities.positionEncoding !==
@@ -2142,6 +2239,7 @@ export abstract class BaseLanguageClient
 
 			let textDocumentSyncOptions: TextDocumentSyncOptions | undefined =
 				undefined;
+
 			if (Is.number(result.capabilities.textDocumentSync)) {
 				if (
 					result.capabilities.textDocumentSync ===
@@ -2202,6 +2300,7 @@ export abstract class BaseLanguageClient
 				);
 			}
 			this._pendingNotificationHandlers.clear();
+
 			for (const [method, handler] of this._pendingRequestHandlers) {
 				this._requestDisposables.set(
 					method,
@@ -2209,6 +2308,7 @@ export abstract class BaseLanguageClient
 				);
 			}
 			this._pendingRequestHandlers.clear();
+
 			for (const [token, data] of this._pendingProgressHandlers) {
 				this._progressDisposables.set(
 					token,
@@ -2263,10 +2363,12 @@ export abstract class BaseLanguageClient
 
 	private _clientGetRootPath(): string | undefined {
 		const folders = Workspace.workspaceFolders;
+
 		if (!folders || folders.length === 0) {
 			return undefined;
 		}
 		const folder = folders[0];
+
 		if (folder.uri.scheme === "file") {
 			return folder.uri.fsPath;
 		}
@@ -2281,6 +2383,7 @@ export abstract class BaseLanguageClient
 	public dispose(timeout: number = 2000): Promise<void> {
 		try {
 			this._disposed = "disposing";
+
 			return this.stop(timeout);
 		} finally {
 			this._disposed = "disposed";
@@ -2327,9 +2430,11 @@ export abstract class BaseLanguageClient
 		const tp = new Promise<undefined>((c) => {
 			RAL().timer.setTimeout(c, timeout);
 		});
+
 		const shutdown = (async (connection) => {
 			await connection.shutdown();
 			await connection.exit();
+
 			return connection;
 		})(connection);
 
@@ -2346,11 +2451,13 @@ export abstract class BaseLanguageClient
 							undefined,
 							false,
 						);
+
 						throw new Error(`Stopping the server timed out`);
 					}
 				},
 				(error) => {
 					this.error(`Stopping server failed`, error, false);
+
 					throw error;
 				},
 			)
@@ -2370,6 +2477,7 @@ export abstract class BaseLanguageClient
 		this._fileEventDelayer.cancel();
 
 		const disposables = this._listeners.splice(0, this._listeners.length);
+
 		for (const disposable of disposables) {
 			disposable.dispose();
 		}
@@ -2378,6 +2486,7 @@ export abstract class BaseLanguageClient
 			this._syncedDocuments.clear();
 		}
 		// Clear features in reverse order;
+
 		for (const feature of Array.from(this._features.entries())
 			.map((entry) => entry[1])
 			.reverse()) {
@@ -2407,14 +2516,17 @@ export abstract class BaseLanguageClient
 
 	private notifyFileEvent(event: FileEvent): void {
 		const client = this;
+
 		async function didChangeWatchedFile(
 			this: void,
 			event: FileEvent,
 		): Promise<void> {
 			client._fileEvents.push(event);
+
 			return client._fileEventDelayer.trigger(async (): Promise<void> => {
 				const fileEvents = client._fileEvents;
 				client._fileEvents = [];
+
 				try {
 					await client.sendNotification(
 						DidChangeWatchedFilesNotification.type,
@@ -2423,6 +2535,7 @@ export abstract class BaseLanguageClient
 				} catch (error) {
 					// Restore the file events.
 					client._fileEvents.push(...fileEvents);
+
 					throw error;
 				}
 			});
@@ -2448,6 +2561,7 @@ export abstract class BaseLanguageClient
 					this._didChangeTextDocumentFeature!.getPendingDocumentChanges(
 						this._inFlightOpenNotifications,
 					);
+
 				if (changes.length === 0) {
 					return;
 				}
@@ -2470,6 +2584,7 @@ export abstract class BaseLanguageClient
 				}
 			} catch (error) {
 				this.error(`Sending pending changes failed`, error, false);
+
 				throw error;
 			}
 		});
@@ -2479,8 +2594,10 @@ export abstract class BaseLanguageClient
 		this._pendingChangeDelayer
 			.trigger(async () => {
 				const connection = this.activeConnection();
+
 				if (connection === undefined) {
 					this.triggerPendingChangeDelivery();
+
 					return;
 				}
 				await this.sendPendingFullTextDocumentChanges(connection);
@@ -2495,6 +2612,7 @@ export abstract class BaseLanguageClient
 		| { state: "idle" }
 		| {
 				state: "busy";
+
 				document: string;
 				tokenSource: CancellationTokenSource;
 		  } = { state: "idle" };
@@ -2503,6 +2621,7 @@ export abstract class BaseLanguageClient
 			return;
 		}
 		const key = params.uri;
+
 		if (
 			this._diagnosticQueueState.state === "busy" &&
 			this._diagnosticQueueState.document === key
@@ -2525,12 +2644,14 @@ export abstract class BaseLanguageClient
 			return;
 		}
 		const next = this._diagnosticQueue.entries().next();
+
 		if (next.done === true) {
 			// Nothing in the queue
 			return;
 		}
 		const [document, diagnostics] = next.value;
 		this._diagnosticQueue.delete(document);
+
 		const tokenSource = new CancellationTokenSource();
 		this._diagnosticQueueState = {
 			state: "busy",
@@ -2542,7 +2663,9 @@ export abstract class BaseLanguageClient
 			.then((converted) => {
 				if (!tokenSource.token.isCancellationRequested) {
 					const uri = this._p2c.asUri(document);
+
 					const middleware = this.clientOptions.middleware!;
+
 					if (middleware.handleDiagnostics) {
 						middleware.handleDiagnostics(
 							uri,
@@ -2584,7 +2707,9 @@ export abstract class BaseLanguageClient
 			throw new Error(`Previous start failed. Can't restart server.`);
 		}
 		await this.start();
+
 		const connection = this.activeConnection();
+
 		if (connection === undefined) {
 			throw new Error(`Starting server failed`);
 		}
@@ -2618,6 +2743,7 @@ export abstract class BaseLanguageClient
 			closeHandler,
 			this._clientOptions.connectionOptions,
 		);
+
 		return this._connection;
 	}
 
@@ -2636,6 +2762,7 @@ export abstract class BaseLanguageClient
 		let handlerResult: CloseHandlerResult = {
 			action: CloseAction.DoNotRestart,
 		};
+
 		if (this.$state !== ClientState.Stopping) {
 			try {
 				handlerResult =
@@ -2645,6 +2772,7 @@ export abstract class BaseLanguageClient
 			}
 		}
 		this._connection = undefined;
+
 		if (handlerResult.action === CloseAction.DoNotRestart) {
 			this.error(
 				handlerResult.message ??
@@ -2653,6 +2781,7 @@ export abstract class BaseLanguageClient
 				handlerResult.handled === true ? false : "force",
 			);
 			this.cleanUp(ShutdownMode.Stop);
+
 			if (this.$state === ClientState.Starting) {
 				this.$state = ClientState.StartFailed;
 			} else {
@@ -2688,6 +2817,7 @@ export abstract class BaseLanguageClient
 				message,
 				count,
 			);
+
 		if (handlerResult.action === ErrorAction.Shutdown) {
 			this.error(
 				handlerResult.message ??
@@ -2721,8 +2851,11 @@ export abstract class BaseLanguageClient
 		sendNotification: boolean = false,
 	): void {
 		const config = Workspace.getConfiguration(this._id);
+
 		let trace: Trace = Trace.Off;
+
 		let traceFormat: TraceFormat = TraceFormat.Text;
+
 		if (config) {
 			const traceConfig = config.get("trace.server", "off");
 
@@ -2751,10 +2884,12 @@ export abstract class BaseLanguageClient
 
 	private hookFileEvents(_connection: Connection): void {
 		const fileEvents = this._clientOptions.synchronize.fileEvents;
+
 		if (!fileEvents) {
 			return;
 		}
 		let watchers: VFileSystemWatcher[];
+
 		if (Is.array(fileEvents)) {
 			watchers = <VFileSystemWatcher[]>fileEvents;
 		} else {
@@ -2784,6 +2919,7 @@ export abstract class BaseLanguageClient
 
 	public registerFeature(feature: StaticFeature | DynamicFeature<any>): void {
 		this._features.push(feature);
+
 		if (DynamicFeature.is(feature)) {
 			const registrationType = feature.registrationType;
 			this._dynamicFeatures.set(registrationType.method, feature);
@@ -2793,184 +2929,227 @@ export abstract class BaseLanguageClient
 	getFeature(
 		request: typeof DidOpenTextDocumentNotification.method,
 	): DidOpenTextDocumentFeatureShape;
+
 	getFeature(
 		request: typeof DidChangeTextDocumentNotification.method,
 	): DidChangeTextDocumentFeatureShape;
+
 	getFeature(
 		request: typeof WillSaveTextDocumentNotification.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentSendFeature<(textDocument: TextDocument) => Promise<void>>;
+
 	getFeature(
 		request: typeof WillSaveTextDocumentWaitUntilRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentSendFeature<
 			(textDocument: TextDocument) => ProviderResult<VTextEdit[]>
 		>;
+
 	getFeature(
 		request: typeof DidSaveTextDocumentNotification.method,
 	): DidSaveTextDocumentFeatureShape;
+
 	getFeature(
 		request: typeof DidCloseTextDocumentNotification.method,
 	): DidCloseTextDocumentFeatureShape;
+
 	getFeature(
 		request: typeof DidCreateFilesNotification.method,
 	): DynamicFeature<FileOperationRegistrationOptions> & {
 		send: (event: FileCreateEvent) => Promise<void>;
 	};
+
 	getFeature(
 		request: typeof DidRenameFilesNotification.method,
 	): DynamicFeature<FileOperationRegistrationOptions> & {
 		send: (event: FileRenameEvent) => Promise<void>;
 	};
+
 	getFeature(
 		request: typeof DidDeleteFilesNotification.method,
 	): DynamicFeature<FileOperationRegistrationOptions> & {
 		send: (event: FileDeleteEvent) => Promise<void>;
 	};
+
 	getFeature(
 		request: typeof WillCreateFilesRequest.method,
 	): DynamicFeature<FileOperationRegistrationOptions> & {
 		send: (event: FileWillCreateEvent) => Promise<void>;
 	};
+
 	getFeature(
 		request: typeof WillRenameFilesRequest.method,
 	): DynamicFeature<FileOperationRegistrationOptions> & {
 		send: (event: FileWillRenameEvent) => Promise<void>;
 	};
+
 	getFeature(
 		request: typeof WillDeleteFilesRequest.method,
 	): DynamicFeature<FileOperationRegistrationOptions> & {
 		send: (event: FileWillDeleteEvent) => Promise<void>;
 	};
+
 	getFeature(
 		request: typeof CompletionRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<CompletionItemProvider>;
+
 	getFeature(
 		request: typeof HoverRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<HoverProvider>;
+
 	getFeature(
 		request: typeof SignatureHelpRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<SignatureHelpProvider>;
+
 	getFeature(
 		request: typeof DefinitionRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<DefinitionProvider>;
+
 	getFeature(
 		request: typeof ReferencesRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<ReferenceProvider>;
+
 	getFeature(
 		request: typeof DocumentHighlightRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<DocumentHighlightProvider>;
+
 	getFeature(
 		request: typeof CodeActionRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<CodeActionProvider>;
+
 	getFeature(
 		request: typeof CodeLensRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<CodeLensProviderShape>;
+
 	getFeature(
 		request: typeof DocumentFormattingRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<DocumentFormattingEditProvider>;
+
 	getFeature(
 		request: typeof DocumentRangeFormattingRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<DocumentRangeFormattingEditProvider>;
+
 	getFeature(
 		request: typeof DocumentOnTypeFormattingRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<OnTypeFormattingEditProvider>;
+
 	getFeature(
 		request: typeof RenameRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<RenameProvider>;
+
 	getFeature(
 		request: typeof DocumentSymbolRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<DocumentSymbolProvider>;
+
 	getFeature(
 		request: typeof DocumentLinkRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<DocumentLinkProvider>;
+
 	getFeature(
 		request: typeof DocumentColorRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<DocumentColorProvider>;
+
 	getFeature(
 		request: typeof DeclarationRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<DeclarationProvider>;
+
 	getFeature(
 		request: typeof FoldingRangeRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<FoldingRangeProviderShape>;
+
 	getFeature(
 		request: typeof ImplementationRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<ImplementationProvider>;
+
 	getFeature(
 		request: typeof SelectionRangeRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<SelectionRangeProvider>;
+
 	getFeature(
 		request: typeof TypeDefinitionRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<TypeDefinitionProvider>;
+
 	getFeature(
 		request: typeof CallHierarchyPrepareRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<CallHierarchyProvider>;
+
 	getFeature(
 		request: typeof SemanticTokensRegistrationType.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<SemanticTokensProviderShape>;
+
 	getFeature(
 		request: typeof LinkedEditingRangeRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<LinkedEditingRangeProvider>;
+
 	getFeature(
 		request: typeof TypeHierarchyPrepareRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<TypeHierarchyProvider>;
+
 	getFeature(
 		request: typeof InlineValueRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<InlineValueProviderShape>;
+
 	getFeature(
 		request: typeof InlayHintRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<InlayHintsProviderShape>;
+
 	getFeature(
 		request: typeof WorkspaceSymbolRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		WorkspaceProviderFeature<WorkspaceSymbolProvider>;
+
 	getFeature(
 		request: typeof DocumentDiagnosticRequest.method,
 	): DynamicFeature<TextDocumentRegistrationOptions> &
 		TextDocumentProviderFeature<DiagnosticProviderShape> &
 		DiagnosticFeatureShape;
+
 	getFeature(
 		request: typeof NotebookDocumentSyncRegistrationType.method,
 	): DynamicFeature<NotebookDocumentSyncRegistrationOptions> &
 		NotebookDocumentProviderShape;
+
 	getFeature(
 		request: typeof InlineCompletionRequest.method,
 	):
 		| (DynamicFeature<InlineCompletionRegistrationOptions> &
 				TextDocumentProviderFeature<InlineCompletionItemProvider>)
 		| undefined;
+
 	getFeature(
 		request: typeof TextDocumentContentRequest.method,
 	):
 		| (DynamicFeature<TextDocumentRegistrationOptions> &
 				WorkspaceProviderFeature<TextDocumentContentProviderShape>)
 		| undefined;
+
 	getFeature(
 		request: typeof ExecuteCommandRequest.method,
 	): DynamicFeature<ExecuteCommandOptions>;
@@ -2984,6 +3163,7 @@ export abstract class BaseLanguageClient
 		const feature = this.getFeature(
 			NotebookDocumentSyncRegistrationType.method,
 		);
+
 		if (
 			feature === undefined ||
 			!(feature instanceof NotebookDocumentSyncFeature)
@@ -3121,8 +3301,10 @@ export abstract class BaseLanguageClient
 		textDocumentFilter.relativePatternSupport = true;
 
 		const windowCapabilities = ensure(result, 'window')!;
+
 		const showMessage = ensure(windowCapabilities, 'showMessage')!;
 		showMessage.messageActionItem = { additionalPropertiesSupport: true };
+
 		const showDocument = ensure(windowCapabilities, "showDocument")!;
 		showDocument.support = true;
 
@@ -3184,6 +3366,7 @@ export abstract class BaseLanguageClient
 
 	private initializeFeatures(_connection: Connection): void {
 		const documentSelector = this._clientOptions.documentSelector;
+
 		for (const feature of this._features) {
 			if (Is.func(feature.preInitialize)) {
 				feature.preInitialize(this._capabilities, documentSelector);
@@ -3199,6 +3382,7 @@ export abstract class BaseLanguageClient
 	): Promise<void> {
 		const middleware =
 			this.clientOptions.middleware?.handleRegisterCapability;
+
 		if (middleware) {
 			return middleware(params, (nextParams) =>
 				this.doRegisterCapability(nextParams),
@@ -3226,6 +3410,7 @@ export abstract class BaseLanguageClient
 		}
 		for (const registration of params.registrations) {
 			const feature = this._dynamicFeatures.get(registration.method);
+
 			if (feature === undefined) {
 				return Promise.reject(
 					new Error(
@@ -3237,10 +3422,12 @@ export abstract class BaseLanguageClient
 			(options as unknown as WithDocumentSelector).documentSelector =
 				(options as unknown as WithDocumentSelector).documentSelector ??
 				this._clientOptions.documentSelector;
+
 			const data: RegistrationData<any> = {
 				id: registration.id,
 				registerOptions: options,
 			};
+
 			try {
 				feature.register(data);
 			} catch (err) {
@@ -3254,6 +3441,7 @@ export abstract class BaseLanguageClient
 	): Promise<void> {
 		const middleware =
 			this.clientOptions.middleware?.handleUnregisterCapability;
+
 		if (middleware) {
 			return middleware(params, (nextParams) =>
 				this.doUnregisterCapability(nextParams),
@@ -3271,6 +3459,7 @@ export abstract class BaseLanguageClient
 				continue;
 			}
 			const feature = this._dynamicFeatures.get(unregistration.method);
+
 			if (!feature) {
 				return Promise.reject(
 					new Error(
@@ -3287,10 +3476,12 @@ export abstract class BaseLanguageClient
 	): Promise<ApplyWorkspaceEditResult> {
 		const middleware =
 			this.clientOptions.middleware?.workspace?.handleApplyEdit;
+
 		if (middleware) {
 			const resultOrError = await middleware(params, (nextParams) =>
 				this.doHandleApplyWorkspaceEdit(nextParams),
 			);
+
 			if (resultOrError instanceof ResponseError) {
 				return Promise.reject(resultOrError);
 			}
@@ -3321,7 +3512,9 @@ export abstract class BaseLanguageClient
 		Workspace.textDocuments.forEach((document) =>
 			openTextDocuments.set(document.uri.toString(), document),
 		);
+
 		let versionMismatch = false;
+
 		if (workspaceEdit.documentChanges) {
 			for (const change of workspaceEdit.documentChanges) {
 				if (
@@ -3332,12 +3525,15 @@ export abstract class BaseLanguageClient
 					const changeUri = this._p2c
 						.asUri(change.textDocument.uri)
 						.toString();
+
 					const textDocument = openTextDocuments.get(changeUri);
+
 					if (
 						textDocument &&
 						textDocument.version !== change.textDocument.version
 					) {
 						versionMismatch = true;
+
 						break;
 					}
 				}
@@ -3418,6 +3614,7 @@ export abstract class BaseLanguageClient
 			}
 		}
 		this.error(`Request ${type.method} failed.`, error, showNotification);
+
 		throw error;
 	}
 
@@ -3670,11 +3867,13 @@ function createConnection(
 	options?: ConnectionOptions,
 ): Connection {
 	const logger = new ConsoleLogger();
+
 	const connection = createProtocolConnection(input, output, logger, options);
 	connection.onError((data) => {
 		errorHandler(data[0], data[1], data[2]);
 	});
 	connection.onClose(closeHandler);
+
 	const result: Connection = {
 		listen: (): void => connection.listen(),
 
@@ -3751,6 +3950,7 @@ export namespace ProposedFeatures {
 			new InlineCompletionItemFeature(_client),
 			new TextDocumentContentFeature(_client),
 		];
+
 		return result;
 	}
 }

@@ -83,8 +83,10 @@ export interface TextDocumentContentResult {
 export namespace TextDocumentContentRequest {
 	export const method: "workspace/textDocumentContent" =
 		"workspace/textDocumentContent";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		TextDocumentContentParams,
 		TextDocumentContentResult,
@@ -92,6 +94,7 @@ export namespace TextDocumentContentRequest {
 		void,
 		TextDocumentContentRegistrationOptions
 	>(method);
+
 	export type HandlerSignature = RequestHandler<
 		TextDocumentContentParams,
 		TextDocumentContentResult,
@@ -121,8 +124,10 @@ export interface TextDocumentContentRefreshParams {
  */
 export namespace TextDocumentContentRefreshRequest {
 	export const method: `workspace/textDocumentContent/refresh` = `workspace/textDocumentContent/refresh`;
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.serverToClient;
+
 	export const type = new ProtocolRequestType<
 		TextDocumentContentRefreshParams,
 		void,
@@ -130,6 +135,7 @@ export namespace TextDocumentContentRefreshRequest {
 		void,
 		void
 	>(method);
+
 	export type HandlerSignature = RequestHandler<
 		TextDocumentContentRefreshParams,
 		void,

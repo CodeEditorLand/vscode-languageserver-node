@@ -408,6 +408,7 @@ export type TextDocumentFilter =
 export namespace TextDocumentFilter {
 	export function is(value: any): value is TextDocumentFilter {
 		const candidate: TextDocumentFilter = value;
+
 		return (
 			Is.string(candidate) ||
 			Is.string(candidate.language) ||
@@ -504,6 +505,7 @@ export type NotebookDocumentFilter =
 export namespace NotebookDocumentFilter {
 	export function is(value: any): value is NotebookDocumentFilter {
 		const candidate: NotebookDocumentFilter = value;
+
 		return (
 			Is.objectLiteral(candidate) &&
 			(Is.string(candidate.notebookType) ||
@@ -546,6 +548,7 @@ export type NotebookCellTextDocumentFilter = {
 export namespace NotebookCellTextDocumentFilter {
 	export function is(value: any): value is NotebookCellTextDocumentFilter {
 		const candidate: NotebookCellTextDocumentFilter = value;
+
 		return (
 			Is.objectLiteral(candidate) &&
 			(Is.string(candidate.notebook) ||
@@ -630,8 +633,10 @@ export interface RegistrationParams {
 export namespace RegistrationRequest {
 	export const method: "client/registerCapability" =
 		"client/registerCapability";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.serverToClient;
+
 	export const type = new ProtocolRequestType<
 		RegistrationParams,
 		void,
@@ -639,6 +644,7 @@ export namespace RegistrationRequest {
 		void,
 		void
 	>(method);
+
 	export type HandlerSignature = RequestHandler<
 		RegistrationParams,
 		void,
@@ -676,8 +682,10 @@ export interface UnregistrationParams {
 export namespace UnregistrationRequest {
 	export const method: "client/unregisterCapability" =
 		"client/unregisterCapability";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.serverToClient;
+
 	export const type = new ProtocolRequestType<
 		UnregistrationParams,
 		void,
@@ -685,6 +693,7 @@ export namespace UnregistrationRequest {
 		void,
 		void
 	>(method);
+
 	export type HandlerSignature = RequestHandler<
 		UnregistrationParams,
 		void,
@@ -1355,6 +1364,7 @@ export interface StaticRegistrationOptions {
 export namespace StaticRegistrationOptions {
 	export function hasId(value: object): value is { id: string } {
 		const candidate = value as StaticRegistrationOptions;
+
 		return candidate && Is.string(candidate.id) && candidate.id.length > 0;
 	}
 }
@@ -1377,6 +1387,7 @@ export interface TextDocumentRegistrationOptions {
 export namespace TextDocumentRegistrationOptions {
 	export function is(value: any): value is TextDocumentRegistrationOptions {
 		const candidate = value as TextDocumentRegistrationOptions;
+
 		return (
 			candidate &&
 			(candidate.documentSelector === null ||
@@ -1406,6 +1417,7 @@ export interface WorkDoneProgressOptions {
 export namespace WorkDoneProgressOptions {
 	export function is(value: any): value is WorkDoneProgressOptions {
 		const candidate = value as WorkDoneProgressOptions;
+
 		return (
 			Is.objectLiteral(candidate) &&
 			(candidate.workDoneProgress === undefined ||
@@ -1416,6 +1428,7 @@ export namespace WorkDoneProgressOptions {
 		value: any,
 	): value is { workDoneProgress: boolean } {
 		const candidate = value as WorkDoneProgressOptions;
+
 		return candidate && Is.boolean(candidate.workDoneProgress);
 	}
 }
@@ -1754,8 +1767,10 @@ export type ClientInfo = {
  */
 export namespace InitializeRequest {
 	export const method: "initialize" = "initialize";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		InitializeParams,
 		InitializeResult,
@@ -1896,8 +1911,10 @@ export interface InitializedParams {}
  */
 export namespace InitializedNotification {
 	export const method: "initialized" = "initialized";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolNotificationType<InitializedParams, void>(
 		method,
 	);
@@ -1913,8 +1930,10 @@ export namespace InitializedNotification {
  */
 export namespace ShutdownRequest {
 	export const method: "shutdown" = "shutdown";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType0<void, never, void, void>(
 		method,
 	);
@@ -1928,8 +1947,10 @@ export namespace ShutdownRequest {
  */
 export namespace ExitNotification {
 	export const method: "exit" = "exit";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolNotificationType0<void>(method);
 }
 
@@ -1950,8 +1971,10 @@ export interface DidChangeConfigurationClientCapabilities {
 export namespace DidChangeConfigurationNotification {
 	export const method: "workspace/didChangeConfiguration" =
 		"workspace/didChangeConfiguration";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolNotificationType<
 		DidChangeConfigurationParams,
 		DidChangeConfigurationRegistrationOptions
@@ -2026,8 +2049,10 @@ export interface ShowMessageParams {
  */
 export namespace ShowMessageNotification {
 	export const method: "window/showMessage" = "window/showMessage";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.serverToClient;
+
 	export const type = new ProtocolNotificationType<ShowMessageParams, void>(
 		method,
 	);
@@ -2093,8 +2118,10 @@ export interface ShowMessageRequestParams {
 export namespace ShowMessageRequest {
 	export const method: "window/showMessageRequest" =
 		"window/showMessageRequest";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.serverToClient;
+
 	export const type = new ProtocolRequestType<
 		ShowMessageRequestParams,
 		MessageActionItem | null,
@@ -2110,8 +2137,10 @@ export namespace ShowMessageRequest {
  */
 export namespace LogMessageNotification {
 	export const method: "window/logMessage" = "window/logMessage";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.serverToClient;
+
 	export const type = new ProtocolNotificationType<LogMessageParams, void>(
 		method,
 	);
@@ -2140,8 +2169,10 @@ export interface LogMessageParams {
  */
 export namespace TelemetryEventNotification {
 	export const method: "telemetry/event" = "telemetry/event";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.serverToClient;
+
 	export const type = new ProtocolNotificationType<LSPAny, void>(method);
 }
 
@@ -2257,8 +2288,10 @@ export interface DidOpenTextDocumentParams {
  */
 export namespace DidOpenTextDocumentNotification {
 	export const method: "textDocument/didOpen" = "textDocument/didOpen";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolNotificationType<
 		DidOpenTextDocumentParams,
 		TextDocumentRegistrationOptions
@@ -2317,6 +2350,7 @@ export namespace TextDocumentContentChangeEvent {
 			rangeLength?: uinteger;
 			text: string;
 		} = event as any;
+
 		return (
 			candidate !== undefined &&
 			candidate !== null &&
@@ -2338,6 +2372,7 @@ export namespace TextDocumentContentChangeEvent {
 			rangeLength?: uinteger;
 			text: string;
 		} = event as any;
+
 		return (
 			candidate !== undefined &&
 			candidate !== null &&
@@ -2392,8 +2427,10 @@ export interface TextDocumentChangeRegistrationOptions
  */
 export namespace DidChangeTextDocumentNotification {
 	export const method: "textDocument/didChange" = "textDocument/didChange";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolNotificationType<
 		DidChangeTextDocumentParams,
 		TextDocumentChangeRegistrationOptions
@@ -2421,8 +2458,10 @@ export interface DidCloseTextDocumentParams {
  */
 export namespace DidCloseTextDocumentNotification {
 	export const method: "textDocument/didClose" = "textDocument/didClose";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolNotificationType<
 		DidCloseTextDocumentParams,
 		TextDocumentRegistrationOptions
@@ -2458,8 +2497,10 @@ export interface TextDocumentSaveRegistrationOptions
  */
 export namespace DidSaveTextDocumentNotification {
 	export const method: "textDocument/didSave" = "textDocument/didSave";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolNotificationType<
 		DidSaveTextDocumentParams,
 		TextDocumentSaveRegistrationOptions
@@ -2510,8 +2551,10 @@ export interface WillSaveTextDocumentParams {
  */
 export namespace WillSaveTextDocumentNotification {
 	export const method: "textDocument/willSave" = "textDocument/willSave";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolNotificationType<
 		WillSaveTextDocumentParams,
 		TextDocumentRegistrationOptions
@@ -2529,8 +2572,10 @@ export namespace WillSaveTextDocumentNotification {
 export namespace WillSaveTextDocumentWaitUntilRequest {
 	export const method: "textDocument/willSaveWaitUntil" =
 		"textDocument/willSaveWaitUntil";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		WillSaveTextDocumentParams,
 		TextEdit[] | null,
@@ -2566,8 +2611,10 @@ export interface DidChangeWatchedFilesClientCapabilities {
 export namespace DidChangeWatchedFilesNotification {
 	export const method: "workspace/didChangeWatchedFiles" =
 		"workspace/didChangeWatchedFiles";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolNotificationType<
 		DidChangeWatchedFilesParams,
 		DidChangeWatchedFilesRegistrationOptions
@@ -2664,6 +2711,7 @@ export interface RelativePattern {
 export namespace RelativePattern {
 	export function is(value: any): value is RelativePattern {
 		const candidate: RelativePattern = value;
+
 		return (
 			Is.objectLiteral(candidate) &&
 			(URI.is(candidate.baseUri) ||
@@ -2683,6 +2731,7 @@ export type GlobPattern = Pattern | RelativePattern;
 export namespace GlobPattern {
 	export function is(value: any): value is GlobPattern {
 		const candidate: GlobPattern = value;
+
 		return Is.string(candidate) || RelativePattern.is(candidate);
 	}
 }
@@ -2810,8 +2859,10 @@ export interface PublishDiagnosticsParams {
 export namespace PublishDiagnosticsNotification {
 	export const method: "textDocument/publishDiagnostics" =
 		"textDocument/publishDiagnostics";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.serverToClient;
+
 	export const type = new ProtocolNotificationType<
 		PublishDiagnosticsParams,
 		void
@@ -3151,8 +3202,10 @@ export interface CompletionRegistrationOptions
  */
 export namespace CompletionRequest {
 	export const method: "textDocument/completion" = "textDocument/completion";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		CompletionParams,
 		CompletionItem[] | CompletionList | null,
@@ -3169,8 +3222,10 @@ export namespace CompletionRequest {
  */
 export namespace CompletionResolveRequest {
 	export const method: "completionItem/resolve" = "completionItem/resolve";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		CompletionItem,
 		CompletionItem,
@@ -3221,8 +3276,10 @@ export interface HoverRegistrationOptions
  */
 export namespace HoverRequest {
 	export const method: "textDocument/hover" = "textDocument/hover";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		HoverParams,
 		Hover | null,
@@ -3408,8 +3465,10 @@ export interface SignatureHelpRegistrationOptions
 export namespace SignatureHelpRequest {
 	export const method: "textDocument/signatureHelp" =
 		"textDocument/signatureHelp";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		SignatureHelpParams,
 		SignatureHelp | null,
@@ -3466,8 +3525,10 @@ export interface DefinitionRegistrationOptions
  */
 export namespace DefinitionRequest {
 	export const method: "textDocument/definition" = "textDocument/definition";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		DefinitionParams,
 		Definition | DefinitionLink[] | null,
@@ -3519,8 +3580,10 @@ export interface ReferenceRegistrationOptions
  */
 export namespace ReferencesRequest {
 	export const method: "textDocument/references" = "textDocument/references";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		ReferenceParams,
 		Location[] | null,
@@ -3571,8 +3634,10 @@ export interface DocumentHighlightRegistrationOptions
 export namespace DocumentHighlightRequest {
 	export const method: "textDocument/documentHighlight" =
 		"textDocument/documentHighlight";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		DocumentHighlightParams,
 		DocumentHighlight[] | null,
@@ -3663,8 +3728,10 @@ export interface DocumentSymbolRegistrationOptions
 export namespace DocumentSymbolRequest {
 	export const method: "textDocument/documentSymbol" =
 		"textDocument/documentSymbol";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		DocumentSymbolParams,
 		SymbolInformation[] | DocumentSymbol[] | null,
@@ -3895,8 +3962,10 @@ export interface CodeActionRegistrationOptions
  */
 export namespace CodeActionRequest {
 	export const method: "textDocument/codeAction" = "textDocument/codeAction";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		CodeActionParams,
 		(Command | CodeAction)[] | null,
@@ -3913,8 +3982,10 @@ export namespace CodeActionRequest {
  */
 export namespace CodeActionResolveRequest {
 	export const method: "codeAction/resolve" = "codeAction/resolve";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		CodeAction,
 		CodeAction,
@@ -4047,8 +4118,10 @@ export interface WorkspaceSymbolRegistrationOptions
  */
 export namespace WorkspaceSymbolRequest {
 	export const method: "workspace/symbol" = "workspace/symbol";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		WorkspaceSymbolParams,
 		SymbolInformation[] | WorkspaceSymbol[] | null,
@@ -4066,8 +4139,10 @@ export namespace WorkspaceSymbolRequest {
  */
 export namespace WorkspaceSymbolResolveRequest {
 	export const method: "workspaceSymbol/resolve" = "workspaceSymbol/resolve";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		WorkspaceSymbol,
 		WorkspaceSymbol,
@@ -4157,8 +4232,10 @@ export interface CodeLensRegistrationOptions
  */
 export namespace CodeLensRequest {
 	export const method: "textDocument/codeLens" = "textDocument/codeLens";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		CodeLensParams,
 		CodeLens[] | null,
@@ -4173,8 +4250,10 @@ export namespace CodeLensRequest {
  */
 export namespace CodeLensResolveRequest {
 	export const method: "codeLens/resolve" = "codeLens/resolve";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		CodeLens,
 		CodeLens,
@@ -4191,8 +4270,10 @@ export namespace CodeLensResolveRequest {
  */
 export namespace CodeLensRefreshRequest {
 	export const method: `workspace/codeLens/refresh` = `workspace/codeLens/refresh`;
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.serverToClient;
+
 	export const type = new ProtocolRequestType0<void, void, void, void>(
 		method,
 	);
@@ -4251,8 +4332,10 @@ export interface DocumentLinkRegistrationOptions
 export namespace DocumentLinkRequest {
 	export const method: "textDocument/documentLink" =
 		"textDocument/documentLink";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		DocumentLinkParams,
 		DocumentLink[] | null,
@@ -4269,8 +4352,10 @@ export namespace DocumentLinkRequest {
  */
 export namespace DocumentLinkResolveRequest {
 	export const method: "documentLink/resolve" = "documentLink/resolve";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		DocumentLink,
 		DocumentLink,
@@ -4324,8 +4409,10 @@ export interface DocumentFormattingRegistrationOptions
  */
 export namespace DocumentFormattingRequest {
 	export const method: "textDocument/formatting" = "textDocument/formatting";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		DocumentFormattingParams,
 		TextEdit[] | null,
@@ -4423,8 +4510,10 @@ export interface DocumentRangeFormattingRegistrationOptions
 export namespace DocumentRangeFormattingRequest {
 	export const method: "textDocument/rangeFormatting" =
 		"textDocument/rangeFormatting";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		DocumentRangeFormattingParams,
 		TextEdit[] | null,
@@ -4443,8 +4532,10 @@ export namespace DocumentRangeFormattingRequest {
 export namespace DocumentRangesFormattingRequest {
 	export const method: "textDocument/rangesFormatting" =
 		"textDocument/rangesFormatting";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		DocumentRangesFormattingParams,
 		TextEdit[] | null,
@@ -4522,8 +4613,10 @@ export interface DocumentOnTypeFormattingRegistrationOptions
 export namespace DocumentOnTypeFormattingRequest {
 	export const method: "textDocument/onTypeFormatting" =
 		"textDocument/onTypeFormatting";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		DocumentOnTypeFormattingParams,
 		TextEdit[] | null,
@@ -4627,8 +4720,10 @@ export interface RenameRegistrationOptions
  */
 export namespace RenameRequest {
 	export const method: "textDocument/rename" = "textDocument/rename";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		RenameParams,
 		WorkspaceEdit | null,
@@ -4670,8 +4765,10 @@ export type PrepareRenameResult =
 export namespace PrepareRenameRequest {
 	export const method: "textDocument/prepareRename" =
 		"textDocument/prepareRename";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		PrepareRenameParams,
 		PrepareRenameResult | null,
@@ -4730,8 +4827,10 @@ export interface ExecuteCommandRegistrationOptions
 export namespace ExecuteCommandRequest {
 	export const method: "workspace/executeCommand" =
 		"workspace/executeCommand";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		ExecuteCommandParams,
 		LSPAny | null,
@@ -4874,8 +4973,10 @@ export type ApplyWorkspaceEditResponse = ApplyWorkspaceEditResult;
  */
 export namespace ApplyWorkspaceEditRequest {
 	export const method: "workspace/applyEdit" = "workspace/applyEdit";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.serverToClient;
+
 	export const type = new ProtocolRequestType<
 		ApplyWorkspaceEditParams,
 		ApplyWorkspaceEditResult,
@@ -4883,6 +4984,7 @@ export namespace ApplyWorkspaceEditRequest {
 		void,
 		void
 	>("workspace/applyEdit");
+
 	export type HandlerSignature = RequestHandler<
 		ApplyWorkspaceEditParams,
 		ApplyWorkspaceEditResult,

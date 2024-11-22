@@ -68,8 +68,10 @@ export interface LinkedEditingRanges {
 export namespace LinkedEditingRangeRequest {
 	export const method: "textDocument/linkedEditingRange" =
 		"textDocument/linkedEditingRange";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		LinkedEditingRangeParams,
 		LinkedEditingRanges | null,
@@ -77,6 +79,7 @@ export namespace LinkedEditingRangeRequest {
 		void,
 		LinkedEditingRangeRegistrationOptions
 	>(method);
+
 	export type HandlerSignature = RequestHandler<
 		LinkedEditingRangeParams,
 		LinkedEditingRanges | null,

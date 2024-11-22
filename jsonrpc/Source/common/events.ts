@@ -26,6 +26,7 @@ export interface Event<T> {
 
 export namespace Event {
 	const _disposable = { dispose() {} };
+
 	export const None: Event<any> = function () {
 		return _disposable;
 	};
@@ -58,12 +59,14 @@ class CallbackList {
 		}
 
 		let foundCallbackWithDifferentContext = false;
+
 		for (let i = 0, len = this._callbacks.length; i < len; i++) {
 			if (this._callbacks[i] === callback) {
 				if (this._contexts![i] === context) {
 					// callback & context match => remove it
 					this._callbacks.splice(i, 1);
 					this._contexts!.splice(i, 1);
+
 					return;
 				} else {
 					foundCallbackWithDifferentContext = true;
@@ -153,6 +156,7 @@ export class Emitter<T> {
 
 						this._callbacks.remove(listener, thisArgs);
 						result.dispose = Emitter._noop;
+
 						if (
 							this._options &&
 							this._options.onLastListenerRemove &&
@@ -162,6 +166,7 @@ export class Emitter<T> {
 						}
 					},
 				};
+
 				if (Array.isArray(disposables)) {
 					disposables.push(result);
 				}

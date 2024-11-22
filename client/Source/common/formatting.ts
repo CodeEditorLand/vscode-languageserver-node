@@ -48,6 +48,7 @@ namespace FileFormattingOptions {
 		document: TextDocument,
 	): c2p.FileFormattingOptions {
 		const filesConfig = Workspace.getConfiguration("files", document);
+
 		return {
 			trimTrailingWhitespace: filesConfig.get("trimTrailingWhitespace"),
 			trimFinalNewlines: filesConfig.get("trimFinalNewlines"),
@@ -156,6 +157,7 @@ export class DocumentFormattingFeature extends TextDocumentLanguageFeature<
 			documentSelector,
 			capabilities.documentFormattingProvider,
 		);
+
 		if (!options) {
 			return;
 		}
@@ -166,9 +168,11 @@ export class DocumentFormattingFeature extends TextDocumentLanguageFeature<
 		options: TextDocumentRegistrationOptions,
 	): [Disposable, DocumentFormattingEditProvider] {
 		const selector = options.documentSelector!;
+
 		const provider: DocumentFormattingEditProvider = {
 			provideDocumentFormattingEdits: (document, options, token) => {
 				const client = this._client;
+
 				const provideDocumentFormattingEdits: ProvideDocumentFormattingEditsSignature =
 					(document, options, token) => {
 						const params: DocumentFormattingParams = {
@@ -184,6 +188,7 @@ export class DocumentFormattingFeature extends TextDocumentLanguageFeature<
 									),
 								),
 						};
+
 						return client
 							.sendRequest(
 								DocumentFormattingRequest.type,
@@ -210,7 +215,9 @@ export class DocumentFormattingFeature extends TextDocumentLanguageFeature<
 								},
 							);
 					};
+
 				const middleware = client.middleware;
+
 				return middleware.provideDocumentFormattingEdits
 					? middleware.provideDocumentFormattingEdits(
 							document,
@@ -221,6 +228,7 @@ export class DocumentFormattingFeature extends TextDocumentLanguageFeature<
 					: provideDocumentFormattingEdits(document, options, token);
 			},
 		};
+
 		return [
 			Languages.registerDocumentFormattingEditProvider(
 				this._client.protocol2CodeConverter.asDocumentSelector(
@@ -260,6 +268,7 @@ export class DocumentRangeFormattingFeature extends TextDocumentLanguageFeature<
 			documentSelector,
 			capabilities.documentRangeFormattingProvider,
 		);
+
 		if (!options) {
 			return;
 		}
@@ -270,6 +279,7 @@ export class DocumentRangeFormattingFeature extends TextDocumentLanguageFeature<
 		options: DocumentRangeFormattingRegistrationOptions,
 	): [Disposable, DocumentRangeFormattingEditProvider] {
 		const selector = options.documentSelector!;
+
 		const provider: DocumentRangeFormattingEditProvider = {
 			provideDocumentRangeFormattingEdits: (
 				document,
@@ -278,6 +288,7 @@ export class DocumentRangeFormattingFeature extends TextDocumentLanguageFeature<
 				token,
 			) => {
 				const client = this._client;
+
 				const provideDocumentRangeFormattingEdits: ProvideDocumentRangeFormattingEditsSignature =
 					(document, range, options, token) => {
 						const params: DocumentRangeFormattingParams = {
@@ -294,6 +305,7 @@ export class DocumentRangeFormattingFeature extends TextDocumentLanguageFeature<
 									),
 								),
 						};
+
 						return client
 							.sendRequest(
 								DocumentRangeFormattingRequest.type,
@@ -320,7 +332,9 @@ export class DocumentRangeFormattingFeature extends TextDocumentLanguageFeature<
 								},
 							);
 					};
+
 				const middleware = client.middleware;
+
 				return middleware.provideDocumentRangeFormattingEdits
 					? middleware.provideDocumentRangeFormattingEdits(
 							document,
@@ -346,6 +360,7 @@ export class DocumentRangeFormattingFeature extends TextDocumentLanguageFeature<
 				token,
 			) => {
 				const client = this._client;
+
 				const provideDocumentRangesFormattingEdits: ProvideDocumentRangesFormattingEditsSignature =
 					(document, ranges, options, token) => {
 						const params: DocumentRangesFormattingParams = {
@@ -364,6 +379,7 @@ export class DocumentRangeFormattingFeature extends TextDocumentLanguageFeature<
 									),
 								),
 						};
+
 						return client
 							.sendRequest(
 								DocumentRangesFormattingRequest.type,
@@ -390,7 +406,9 @@ export class DocumentRangeFormattingFeature extends TextDocumentLanguageFeature<
 								},
 							);
 					};
+
 				const middleware = client.middleware;
+
 				return middleware.provideDocumentRangesFormattingEdits
 					? middleware.provideDocumentRangesFormattingEdits(
 							document,
@@ -444,6 +462,7 @@ export class DocumentOnTypeFormattingFeature extends TextDocumentLanguageFeature
 			documentSelector,
 			capabilities.documentOnTypeFormattingProvider,
 		);
+
 		if (!options) {
 			return;
 		}
@@ -454,6 +473,7 @@ export class DocumentOnTypeFormattingFeature extends TextDocumentLanguageFeature
 		options: DocumentOnTypeFormattingRegistrationOptions,
 	): [Disposable, OnTypeFormattingEditProvider] {
 		const selector = options.documentSelector!;
+
 		const provider: OnTypeFormattingEditProvider = {
 			provideOnTypeFormattingEdits: (
 				document,
@@ -463,6 +483,7 @@ export class DocumentOnTypeFormattingFeature extends TextDocumentLanguageFeature
 				token,
 			) => {
 				const client = this._client;
+
 				const provideOnTypeFormattingEdits: ProvideOnTypeFormattingEditsSignature =
 					(document, position, ch, options, token) => {
 						const params: DocumentOnTypeFormattingParams = {
@@ -483,6 +504,7 @@ export class DocumentOnTypeFormattingFeature extends TextDocumentLanguageFeature
 									),
 								),
 						};
+
 						return client
 							.sendRequest(
 								DocumentOnTypeFormattingRequest.type,
@@ -509,7 +531,9 @@ export class DocumentOnTypeFormattingFeature extends TextDocumentLanguageFeature
 								},
 							);
 					};
+
 				const middleware = client.middleware;
+
 				return middleware.provideOnTypeFormattingEdits
 					? middleware.provideOnTypeFormattingEdits(
 							document,
@@ -530,6 +554,7 @@ export class DocumentOnTypeFormattingFeature extends TextDocumentLanguageFeature
 		};
 
 		const moreTriggerCharacter = options.moreTriggerCharacter || [];
+
 		return [
 			Languages.registerOnTypeFormattingEditProvider(
 				this._client.protocol2CodeConverter.asDocumentSelector(

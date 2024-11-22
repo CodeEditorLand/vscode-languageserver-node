@@ -23,6 +23,7 @@ interface RequestMessageWithCancellationData extends RequestMessage {
 
 namespace CancellationState {
 	export const Continue: number = 0;
+
 	export const Cancelled: number = 1;
 }
 
@@ -38,6 +39,7 @@ export class SharedArraySenderStrategy implements CancellationSenderStrategy {
 			return;
 		}
 		const buffer = new SharedArrayBuffer(4);
+
 		const data = new Int32Array(buffer, 0, 1);
 		data[0] = CancellationState.Continue;
 		this.buffers.set(request.id, buffer);
@@ -50,6 +52,7 @@ export class SharedArraySenderStrategy implements CancellationSenderStrategy {
 		id: CancellationId,
 	): Promise<void> {
 		const buffer = this.buffers.get(id);
+
 		if (buffer === undefined) {
 			return;
 		}
@@ -108,6 +111,7 @@ export class SharedArrayReceiverStrategy
 	): AbstractCancellationTokenSource {
 		const buffer = (request as RequestMessageWithCancellationData)
 			.$cancellationData;
+
 		if (buffer === undefined) {
 			return new CancellationTokenSource();
 		}

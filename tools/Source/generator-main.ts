@@ -13,12 +13,14 @@ function loadConfigFile(file: string): ts.ParsedCommandLine {
 	const absolute = path.resolve(file);
 
 	const readResult = ts.readConfigFile(absolute, ts.sys.readFile);
+
 	if (readResult.error) {
 		throw new Error(
 			ts.formatDiagnostics([readResult.error], ts.createCompilerHost({})),
 		);
 	}
 	const config = readResult.config;
+
 	if (config.compilerOptions !== undefined) {
 		config.compilerOptions = Object.assign(
 			config.compilerOptions,
@@ -30,6 +32,7 @@ function loadConfigFile(file: string): ts.ParsedCommandLine {
 		ts.sys,
 		path.dirname(absolute),
 	);
+
 	if (result.errors.length > 0) {
 		throw new Error(
 			ts.formatDiagnostics(result.errors, ts.createCompilerHost({})),
@@ -40,13 +43,16 @@ function loadConfigFile(file: string): ts.ParsedCommandLine {
 
 async function main(): Promise<number> {
 	let config: ts.ParsedCommandLine = ts.parseCommandLine(ts.sys.args);
+
 	const configFilePath: string | undefined =
 		tss.CompileOptions.getConfigFilePath(config.options);
+
 	if (configFilePath && config.options.project) {
 		config = loadConfigFile(configFilePath);
 	}
 
 	const scriptSnapshots: Map<string, ts.IScriptSnapshot> = new Map();
+
 	const host: ts.LanguageServiceHost = {
 		getScriptFileNames: () => {
 			return config.fileNames;
@@ -68,8 +74,10 @@ async function main(): Promise<number> {
 		): ts.IScriptSnapshot | undefined => {
 			let result: ts.IScriptSnapshot | undefined =
 				scriptSnapshots.get(fileName);
+
 			if (result === undefined) {
 				const content: string | undefined = ts.sys.readFile(fileName);
+
 				if (content === undefined) {
 					return undefined;
 				}
@@ -105,12 +113,15 @@ async function main(): Promise<number> {
 	});
 
 	const languageService = ts.createLanguageService(host);
+
 	const program = languageService.getProgram();
+
 	if (program === undefined) {
 		console.error(
 			"Couldn't create language service with underlying program.",
 		);
 		process.exitCode = -1;
+
 		return -1;
 	}
 	const visitor = new Visitor(program);
@@ -118,6 +129,7 @@ async function main(): Promise<number> {
 	await visitor.endVisitProgram();
 
 	console.log(JSON.stringify(visitor.getMetaModel(), undefined, "\t"));
+
 	return 0;
 }
 

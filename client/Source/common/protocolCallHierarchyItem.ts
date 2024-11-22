@@ -19,6 +19,7 @@ export default class ProtocolCallHierarchyItem extends code.CallHierarchyItem {
 		data?: LSPAny,
 	) {
 		super(kind, name, detail, uri, range, selectionRange);
+
 		if (data !== undefined) {
 			this.data = data;
 		}

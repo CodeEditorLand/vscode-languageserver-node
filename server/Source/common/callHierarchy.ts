@@ -88,6 +88,7 @@ export const CallHierarchyFeature: Feature<_Languages, CallHierarchy> = (
 					>,
 				): Disposable => {
 					const type = CallHierarchyIncomingCallsRequest.type;
+
 					return this.connection.onRequest(type, (params, cancel) => {
 						return handler(
 							params,
@@ -106,6 +107,7 @@ export const CallHierarchyFeature: Feature<_Languages, CallHierarchy> = (
 					>,
 				): Disposable => {
 					const type = CallHierarchyOutgoingCallsRequest.type;
+
 					return this.connection.onRequest(type, (params, cancel) => {
 						return handler(
 							params,

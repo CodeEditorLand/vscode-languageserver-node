@@ -65,6 +65,7 @@ export class TextDocumentContentFeature
 
 	public getState(): FeatureState {
 		const registrations = this._registrations.size > 0;
+
 		return {
 			kind: "workspace",
 			id: TextDocumentContentRequest.method,
@@ -78,6 +79,7 @@ export class TextDocumentContentFeature
 
 	public getProviders(): TextDocumentContentProviderShape[] {
 		const result: TextDocumentContentProviderShape[] = [];
+
 		for (const registration of this._registrations.values()) {
 			result.push(...registration.providers);
 		}
@@ -98,6 +100,7 @@ export class TextDocumentContentFeature
 			TextDocumentContentRefreshRequest.type,
 			async (params) => {
 				const uri = client.protocol2CodeConverter.asUri(params.uri);
+
 				for (const registrations of this._registrations.values()) {
 					for (const provider of registrations.providers) {
 						if (provider.scheme !== uri.scheme) {
@@ -112,6 +115,7 @@ export class TextDocumentContentFeature
 			return;
 		}
 		const capability = capabilities.workspace.textDocumentContent;
+
 		const id = StaticRegistrationOptions.hasId(capability)
 			? capability.id
 			: UUID.generateUuid();
@@ -125,7 +129,9 @@ export class TextDocumentContentFeature
 		data: RegistrationData<TextDocumentContentRegistrationOptions>,
 	): void {
 		const registrations: TextDocumentContentProviderShape[] = [];
+
 		const disposables: vscode.Disposable[] = [];
+
 		for (const scheme of data.registerOptions.schemes) {
 			const [disposable, registration] =
 				this.registerTextDocumentContentProvider(scheme);
@@ -143,15 +149,18 @@ export class TextDocumentContentFeature
 	): [vscode.Disposable, TextDocumentContentProviderShape] {
 		const eventEmitter: vscode.EventEmitter<vscode.Uri> =
 			new vscode.EventEmitter<vscode.Uri>();
+
 		const provider: vscode.TextDocumentContentProvider = {
 			onDidChange: eventEmitter.event,
 			provideTextDocumentContent: (uri, token) => {
 				const client = this._client;
+
 				const provideTextDocumentContent: ProvideTextDocumentContentSignature =
 					(uri, token) => {
 						const params: TextDocumentContentParams = {
 							uri: client.code2ProtocolConverter.asUri(uri),
 						};
+
 						return client
 							.sendRequest(
 								TextDocumentContentRequest.type,
@@ -175,7 +184,9 @@ export class TextDocumentContentFeature
 								},
 							);
 					};
+
 				const middleware = client.middleware;
+
 				return middleware.provideTextDocumentContent
 					? middleware.provideTextDocumentContent(
 							uri,
@@ -185,6 +196,7 @@ export class TextDocumentContentFeature
 					: provideTextDocumentContent(uri, token);
 			},
 		};
+
 		return [
 			vscode.workspace.registerTextDocumentContentProvider(
 				scheme,
@@ -196,6 +208,7 @@ export class TextDocumentContentFeature
 
 	public unregister(id: string): void {
 		const registration = this._registrations.get(id);
+
 		if (registration !== undefined) {
 			this._registrations.delete(id);
 			registration.disposable.dispose();

@@ -71,6 +71,7 @@ export class ImplementationFeature extends TextDocumentLanguageFeature<
 			documentSelector,
 			capabilities.implementationProvider,
 		);
+
 		if (!id || !options) {
 			return;
 		}
@@ -81,9 +82,11 @@ export class ImplementationFeature extends TextDocumentLanguageFeature<
 		options: ImplementationRegistrationOptions,
 	): [Disposable, ImplementationProvider] {
 		const selector = options.documentSelector!;
+
 		const provider: ImplementationProvider = {
 			provideImplementation: (document, position, token) => {
 				const client = this._client;
+
 				const provideImplementation: ProvideImplementationSignature = (
 					document,
 					position,
@@ -118,7 +121,9 @@ export class ImplementationFeature extends TextDocumentLanguageFeature<
 							},
 						);
 				};
+
 				const middleware = client.middleware;
+
 				return middleware.provideImplementation
 					? middleware.provideImplementation(
 							document,
@@ -129,6 +134,7 @@ export class ImplementationFeature extends TextDocumentLanguageFeature<
 					: provideImplementation(document, position, token);
 			},
 		};
+
 		return [this.registerProvider(selector, provider), provider];
 	}
 

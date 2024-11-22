@@ -98,6 +98,7 @@ export class FoldingRangeFeature extends TextDocumentLanguageFeature<
 			documentSelector,
 			capabilities.foldingRangeProvider,
 		);
+
 		if (!id || !options) {
 			return;
 		}
@@ -108,11 +109,14 @@ export class FoldingRangeFeature extends TextDocumentLanguageFeature<
 		options: FoldingRangeRegistrationOptions,
 	): [Disposable, FoldingRangeProviderShape] {
 		const selector = options.documentSelector!;
+
 		const eventEmitter: EventEmitter<void> = new EventEmitter<void>();
+
 		const provider: FoldingRangeProvider = {
 			onDidChangeFoldingRanges: eventEmitter.event,
 			provideFoldingRanges: (document, context, token) => {
 				const client = this._client;
+
 				const provideFoldingRanges: ProvideFoldingRangeSignature = (
 					document,
 					_,
@@ -124,6 +128,7 @@ export class FoldingRangeFeature extends TextDocumentLanguageFeature<
 								document,
 							),
 					};
+
 					return client
 						.sendRequest(
 							FoldingRangeRequest.type,
@@ -150,7 +155,9 @@ export class FoldingRangeFeature extends TextDocumentLanguageFeature<
 							},
 						);
 				};
+
 				const middleware = client.middleware;
+
 				return middleware.provideFoldingRanges
 					? middleware.provideFoldingRanges(
 							document,
@@ -161,6 +168,7 @@ export class FoldingRangeFeature extends TextDocumentLanguageFeature<
 					: provideFoldingRanges(document, context, token);
 			},
 		};
+
 		return [
 			Languages.registerFoldingRangeProvider(
 				this._client.protocol2CodeConverter.asDocumentSelector(

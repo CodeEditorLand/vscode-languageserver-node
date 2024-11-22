@@ -38,9 +38,13 @@ export interface RequestMessage extends Message {
 export namespace ErrorCodes {
 	// Defined by JSON RPC
 	export const ParseError: -32700 = -32700;
+
 	export const InvalidRequest: -32600 = -32600;
+
 	export const MethodNotFound: -32601 = -32601;
+
 	export const InvalidParams: -32602 = -32602;
+
 	export const InternalError: -32603 = -32603;
 
 	/**
@@ -83,6 +87,7 @@ export namespace ErrorCodes {
 	 * request before the server has received the `initialize` request.
 	 */
 	export const ServerNotInitialized: -32002 = -32002;
+
 	export const UnknownErrorCode: -32001 = -32001;
 
 	/**
@@ -137,6 +142,7 @@ export class ResponseError<D = void> extends Error {
 			code: this.code,
 			message: this.message,
 		};
+
 		if (this.data !== undefined) {
 			result.data = this.data;
 		}
@@ -258,6 +264,7 @@ export class RequestType0<R, E> extends AbstractMessageSignature {
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */
 	public readonly _: [R, E, _EM] | undefined;
+
 	constructor(method: string) {
 		super(method, 0);
 	}
@@ -268,6 +275,7 @@ export class RequestType<P, R, E> extends AbstractMessageSignature {
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */
 	public readonly _: [P, R, E, _EM] | undefined;
+
 	constructor(
 		method: string,
 		private _parameterStructures: ParameterStructures = ParameterStructures.auto,
@@ -285,6 +293,7 @@ export class RequestType1<P1, R, E> extends AbstractMessageSignature {
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */
 	public readonly _: [P1, R, E, _EM] | undefined;
+
 	constructor(
 		method: string,
 		private _parameterStructures: ParameterStructures = ParameterStructures.auto,
@@ -302,6 +311,7 @@ export class RequestType2<P1, P2, R, E> extends AbstractMessageSignature {
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */
 	public readonly _: [P1, P2, R, E, _EM] | undefined;
+
 	constructor(method: string) {
 		super(method, 2);
 	}
@@ -312,6 +322,7 @@ export class RequestType3<P1, P2, P3, R, E> extends AbstractMessageSignature {
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */
 	public readonly _: [P1, P2, P3, R, E, _EM] | undefined;
+
 	constructor(method: string) {
 		super(method, 3);
 	}
@@ -329,6 +340,7 @@ export class RequestType4<
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */
 	public readonly _: [P1, P2, P3, P4, R, E, _EM] | undefined;
+
 	constructor(method: string) {
 		super(method, 4);
 	}
@@ -347,6 +359,7 @@ export class RequestType5<
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */
 	public readonly _: [P1, P2, P3, P4, P5, R, E, _EM] | undefined;
+
 	constructor(method: string) {
 		super(method, 5);
 	}
@@ -366,6 +379,7 @@ export class RequestType6<
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */
 	public readonly _: [P1, P2, P3, P4, P5, P6, R, E, _EM] | undefined;
+
 	constructor(method: string) {
 		super(method, 6);
 	}
@@ -386,6 +400,7 @@ export class RequestType7<
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */
 	public readonly _: [P1, P2, P3, P4, P5, P6, P7, R, E, _EM] | undefined;
+
 	constructor(method: string) {
 		super(method, 7);
 	}
@@ -407,6 +422,7 @@ export class RequestType8<
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */
 	public readonly _: [P1, P2, P3, P4, P5, P6, P7, P8, R, E, _EM] | undefined;
+
 	constructor(method: string) {
 		super(method, 8);
 	}
@@ -431,6 +447,7 @@ export class RequestType9<
 	public readonly _:
 		| [P1, P2, P3, P4, P5, P6, P7, P8, P9, R, E, _EM]
 		| undefined;
+
 	constructor(method: string) {
 		super(method, 9);
 	}
@@ -456,6 +473,7 @@ export class NotificationType<P> extends AbstractMessageSignature {
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */
 	public readonly _: [P, _EM] | undefined;
+
 	constructor(
 		method: string,
 		private _parameterStructures: ParameterStructures = ParameterStructures.auto,
@@ -473,6 +491,7 @@ export class NotificationType0 extends AbstractMessageSignature {
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */
 	public readonly _: [_EM] | undefined;
+
 	constructor(method: string) {
 		super(method, 0);
 	}
@@ -483,6 +502,7 @@ export class NotificationType1<P1> extends AbstractMessageSignature {
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */
 	public readonly _: [P1, _EM] | undefined;
+
 	constructor(
 		method: string,
 		private _parameterStructures: ParameterStructures = ParameterStructures.auto,
@@ -500,6 +520,7 @@ export class NotificationType2<P1, P2> extends AbstractMessageSignature {
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */
 	public readonly _: [P1, P2, _EM] | undefined;
+
 	constructor(method: string) {
 		super(method, 2);
 	}
@@ -510,6 +531,7 @@ export class NotificationType3<P1, P2, P3> extends AbstractMessageSignature {
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */
 	public readonly _: [P1, P2, P3, _EM] | undefined;
+
 	constructor(method: string) {
 		super(method, 3);
 	}
@@ -525,6 +547,7 @@ export class NotificationType4<
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */
 	public readonly _: [P1, P2, P3, P4, _EM] | undefined;
+
 	constructor(method: string) {
 		super(method, 4);
 	}
@@ -541,6 +564,7 @@ export class NotificationType5<
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */
 	public readonly _: [P1, P2, P3, P4, P5, _EM] | undefined;
+
 	constructor(method: string) {
 		super(method, 5);
 	}
@@ -558,6 +582,7 @@ export class NotificationType6<
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */
 	public readonly _: [P1, P2, P3, P4, P5, P6, _EM] | undefined;
+
 	constructor(method: string) {
 		super(method, 6);
 	}
@@ -576,6 +601,7 @@ export class NotificationType7<
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */
 	public readonly _: [P1, P2, P3, P4, P5, P6, P7, _EM] | undefined;
+
 	constructor(method: string) {
 		super(method, 7);
 	}
@@ -595,6 +621,7 @@ export class NotificationType8<
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */
 	public readonly _: [P1, P2, P3, P4, P5, P6, P7, P8, _EM] | undefined;
+
 	constructor(method: string) {
 		super(method, 8);
 	}
@@ -615,6 +642,7 @@ export class NotificationType9<
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */
 	public readonly _: [P1, P2, P3, P4, P5, P6, P7, P8, P9, _EM] | undefined;
+
 	constructor(method: string) {
 		super(method, 9);
 	}
@@ -628,6 +656,7 @@ export namespace Message {
 		message: Message | undefined,
 	): message is RequestMessage {
 		const candidate = <RequestMessage>message;
+
 		return (
 			candidate &&
 			is.string(candidate.method) &&
@@ -642,6 +671,7 @@ export namespace Message {
 		message: Message | undefined,
 	): message is NotificationMessage {
 		const candidate = <NotificationMessage>message;
+
 		return (
 			candidate &&
 			is.string(candidate.method) &&
@@ -656,6 +686,7 @@ export namespace Message {
 		message: Message | undefined,
 	): message is ResponseMessage {
 		const candidate = <ResponseMessage>message;
+
 		return (
 			candidate &&
 			(candidate.result !== void 0 || !!candidate.error) &&

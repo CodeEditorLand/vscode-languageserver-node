@@ -97,6 +97,7 @@ export class WorkspaceSymbolFeature extends WorkspaceFeature<
 		const provider: WorkspaceSymbolProvider = {
 			provideWorkspaceSymbols: (query, token) => {
 				const client = this._client;
+
 				const provideWorkspaceSymbols: ProvideWorkspaceSymbolsSignature =
 					(query, token) => {
 						return client
@@ -125,7 +126,9 @@ export class WorkspaceSymbolFeature extends WorkspaceFeature<
 								},
 							);
 					};
+
 				const middleware = client.middleware;
+
 				return middleware.provideWorkspaceSymbols
 					? middleware.provideWorkspaceSymbols(
 							query,
@@ -138,6 +141,7 @@ export class WorkspaceSymbolFeature extends WorkspaceFeature<
 				options.resolveProvider === true
 					? (item, token) => {
 							const client = this._client;
+
 							const resolveWorkspaceSymbol: ResolveWorkspaceSymbolSignature =
 								(item, token) => {
 									return client
@@ -169,7 +173,9 @@ export class WorkspaceSymbolFeature extends WorkspaceFeature<
 											},
 										);
 								};
+
 							const middleware = client.middleware;
+
 							return middleware.resolveWorkspaceSymbol
 								? middleware.resolveWorkspaceSymbol(
 										item,
@@ -180,6 +186,7 @@ export class WorkspaceSymbolFeature extends WorkspaceFeature<
 						}
 					: undefined,
 		};
+
 		return [Languages.registerWorkspaceSymbolProvider(provider), provider];
 	}
 }

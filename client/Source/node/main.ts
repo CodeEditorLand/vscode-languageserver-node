@@ -72,6 +72,7 @@ namespace Transport {
 		value: Transport | undefined,
 	): value is SocketTransport {
 		const candidate = value as SocketTransport;
+
 		return (
 			candidate &&
 			candidate.kind === TransportKind.socket &&
@@ -130,6 +131,7 @@ export interface StreamInfo {
 namespace StreamInfo {
 	export function is(value: any): value is StreamInfo {
 		const candidate = value as StreamInfo;
+
 		return (
 			candidate &&
 			candidate.writer !== undefined &&
@@ -146,6 +148,7 @@ export interface ChildProcessInfo {
 namespace ChildProcessInfo {
 	export function is(value: any): value is ChildProcessInfo {
 		const candidate = value as ChildProcessInfo;
+
 		return (
 			candidate &&
 			candidate.process !== undefined &&
@@ -191,21 +194,28 @@ export class LanguageClient extends BaseLanguageClient {
 		arg5?: boolean,
 	) {
 		let id: string;
+
 		let name: string;
+
 		let serverOptions: ServerOptions;
+
 		let clientOptions: LanguageClientOptions;
+
 		let forceDebug: boolean;
+
 		if (Is.string(arg2)) {
 			id = arg1;
 			name = arg2;
 			serverOptions = arg3 as ServerOptions;
 			clientOptions = arg4 as LanguageClientOptions;
+
 			forceDebug = !!arg5;
 		} else {
 			id = arg1.toLowerCase();
 			name = arg1;
 			serverOptions = arg2 as ServerOptions;
 			clientOptions = arg3 as LanguageClientOptions;
+
 			forceDebug = arg4 as boolean;
 		}
 		if (forceDebug === undefined) {
@@ -215,6 +225,7 @@ export class LanguageClient extends BaseLanguageClient {
 		this._serverOptions = serverOptions;
 		this._forceDebug = forceDebug;
 		this._isInDebugMode = forceDebug;
+
 		try {
 			this.checkVersion();
 		} catch (error: any) {
@@ -227,6 +238,7 @@ export class LanguageClient extends BaseLanguageClient {
 
 	private checkVersion() {
 		const codeVersion = semverParse(VSCodeVersion);
+
 		if (!codeVersion) {
 			throw new Error(
 				`No valid VS Code version detected. Version string is: ${VSCodeVersion}`,
@@ -269,6 +281,7 @@ export class LanguageClient extends BaseLanguageClient {
 			if (this._serverProcess) {
 				const toCheck = this._serverProcess;
 				this._serverProcess = undefined;
+
 				if (this._isDetached === undefined || !this._isDetached) {
 					this.checkProcessDied(toCheck);
 				}
@@ -296,11 +309,13 @@ export class LanguageClient extends BaseLanguageClient {
 
 	protected handleConnectionClosed(): Promise<void> {
 		this._serverProcess = undefined;
+
 		return super.handleConnectionClosed();
 	}
 
 	protected fillInitializeParams(params: InitializeParams): void {
 		super.fillInitializeParams(params);
+
 		if (params.processId === null) {
 			params.processId = process.pid;
 		}
@@ -317,6 +332,7 @@ export class LanguageClient extends BaseLanguageClient {
 			Object.keys(process.env).forEach(
 				(key) => (result[key] = process.env[key]),
 			);
+
 			if (fork) {
 				result["ELECTRON_RUN_AS_NODE"] = "1";
 				result["ELECTRON_NO_ASAR"] = "1";
@@ -333,14 +349,17 @@ export class LanguageClient extends BaseLanguageClient {
 			"--inspect=",
 			"--inspect-brk=",
 		];
+
 		const debugEquals: string[] = [
 			"--debug",
 			"--debug-brk",
 			"--inspect",
 			"--inspect-brk",
 		];
+
 		function startedInDebugMode(): boolean {
 			const args: string[] = (process as any).execArgv;
+
 			if (args) {
 				return args.some((arg) => {
 					return (
@@ -370,15 +389,18 @@ export class LanguageClient extends BaseLanguageClient {
 			return server().then((result) => {
 				if (MessageTransports.is(result)) {
 					this._isDetached = !!result.detached;
+
 					return result;
 				} else if (StreamInfo.is(result)) {
 					this._isDetached = !!result.detached;
+
 					return {
 						reader: new StreamMessageReader(result.reader),
 						writer: new StreamMessageWriter(result.writer),
 					};
 				} else {
 					let cp: ChildProcess;
+
 					if (ChildProcessInfo.is(result)) {
 						cp = result.process;
 						this._isDetached = result.detached;
@@ -391,6 +413,7 @@ export class LanguageClient extends BaseLanguageClient {
 							Is.string(data) ? data : data.toString(encoding),
 						),
 					);
+
 					return {
 						reader: new StreamMessageReader(cp.stdout!),
 						writer: new StreamMessageWriter(cp.stdin!),
@@ -399,7 +422,9 @@ export class LanguageClient extends BaseLanguageClient {
 			});
 		}
 		let json: NodeModule | Executable;
+
 		const runDebug = <{ run: any; debug: any }>server;
+
 		if (runDebug.run || runDebug.debug) {
 			if (this._forceDebug || startedInDebugMode()) {
 				json = runDebug.debug;
@@ -415,17 +440,22 @@ export class LanguageClient extends BaseLanguageClient {
 			.then((serverWorkingDir) => {
 				if (NodeModule.is(json) && json.module) {
 					const node = json;
+
 					const transport = node.transport || TransportKind.stdio;
+
 					if (node.runtime) {
 						const args: string[] = [];
+
 						const options: ForkOptions =
 							node.options ?? Object.create(null);
+
 						if (options.execArgv) {
 							options.execArgv.forEach((element) =>
 								args.push(element),
 							);
 						}
 						args.push(node.module);
+
 						if (node.args) {
 							node.args.forEach((element) => args.push(element));
 						}
@@ -433,11 +463,14 @@ export class LanguageClient extends BaseLanguageClient {
 							Object.create(null);
 						execOptions.cwd = serverWorkingDir;
 						execOptions.env = getEnvironment(options.env, false);
+
 						const runtime = this._getRuntimePath(
 							node.runtime,
 							serverWorkingDir,
 						);
+
 						let pipeName: string | undefined = undefined;
+
 						if (transport === TransportKind.ipc) {
 							// exec options not correctly typed in lib
 							execOptions.stdio = <any>[null, null, null, "ipc"];
@@ -453,6 +486,7 @@ export class LanguageClient extends BaseLanguageClient {
 						args.push(
 							`--clientProcessId=${process.pid.toString()}`,
 						);
+
 						if (
 							transport === TransportKind.ipc ||
 							transport === TransportKind.stdio
@@ -462,6 +496,7 @@ export class LanguageClient extends BaseLanguageClient {
 								args,
 								execOptions,
 							);
+
 							if (!serverProcess || !serverProcess.pid) {
 								return handleChildProcessStartError(
 									serverProcess,
@@ -476,6 +511,7 @@ export class LanguageClient extends BaseLanguageClient {
 										: data.toString(encoding),
 								),
 							);
+
 							if (transport === TransportKind.ipc) {
 								serverProcess.stdout.on("data", (data) =>
 									this.outputChannel.append(
@@ -484,6 +520,7 @@ export class LanguageClient extends BaseLanguageClient {
 											: data.toString(encoding),
 									),
 								);
+
 								return Promise.resolve({
 									reader: new IPCMessageReader(serverProcess),
 									writer: new IPCMessageWriter(serverProcess),
@@ -506,6 +543,7 @@ export class LanguageClient extends BaseLanguageClient {
 										args,
 										execOptions,
 									);
+
 									if (!process || !process.pid) {
 										return handleChildProcessStartError(
 											process,
@@ -527,6 +565,7 @@ export class LanguageClient extends BaseLanguageClient {
 												: data.toString(encoding),
 										),
 									);
+
 									return transport
 										.onConnected()
 										.then((protocol) => {
@@ -546,6 +585,7 @@ export class LanguageClient extends BaseLanguageClient {
 									args,
 									execOptions,
 								);
+
 								if (!process || !process.pid) {
 									return handleChildProcessStartError(
 										process,
@@ -567,6 +607,7 @@ export class LanguageClient extends BaseLanguageClient {
 											: data.toString(encoding),
 									),
 								);
+
 								return transport
 									.onConnected()
 									.then((protocol) => {
@@ -579,10 +620,12 @@ export class LanguageClient extends BaseLanguageClient {
 						}
 					} else {
 						let pipeName: string | undefined = undefined;
+
 						return new Promise<MessageTransports>(
 							(resolve, reject) => {
 								const args =
 									(node.args && node.args.slice()) ?? [];
+
 								if (transport === TransportKind.ipc) {
 									args.push("--node-ipc");
 								} else if (transport === TransportKind.stdio) {
@@ -596,12 +639,14 @@ export class LanguageClient extends BaseLanguageClient {
 								args.push(
 									`--clientProcessId=${process.pid.toString()}`,
 								);
+
 								const options: cp.ForkOptions =
 									node.options ?? Object.create(null);
 								options.env = getEnvironment(options.env, true);
 								options.execArgv = options.execArgv || [];
 								options.cwd = serverWorkingDir;
 								options.silent = true;
+
 								if (
 									transport === TransportKind.ipc ||
 									transport === TransportKind.stdio
@@ -620,6 +665,7 @@ export class LanguageClient extends BaseLanguageClient {
 												: data.toString(encoding),
 										),
 									);
+
 									if (transport === TransportKind.ipc) {
 										sp.stdout.on("data", (data) =>
 											this.outputChannel.append(
@@ -725,10 +771,14 @@ export class LanguageClient extends BaseLanguageClient {
 					}
 				} else if (Executable.is(json) && json.command) {
 					const command: Executable = <Executable>json;
+
 					const args: string[] =
 						json.args !== undefined ? json.args.slice(0) : [];
+
 					let pipeName: string | undefined = undefined;
+
 					const transport = json.transport;
+
 					if (transport === TransportKind.stdio) {
 						args.push("--stdio");
 					} else if (transport === TransportKind.pipe) {
@@ -743,6 +793,7 @@ export class LanguageClient extends BaseLanguageClient {
 					}
 					const options = Object.assign({}, command.options);
 					options.cwd = options.cwd || serverWorkingDir;
+
 					if (
 						transport === undefined ||
 						transport === TransportKind.stdio
@@ -752,6 +803,7 @@ export class LanguageClient extends BaseLanguageClient {
 							args,
 							options,
 						);
+
 						if (!serverProcess || !serverProcess.pid) {
 							return handleChildProcessStartError(
 								serverProcess,
@@ -767,6 +819,7 @@ export class LanguageClient extends BaseLanguageClient {
 						);
 						this._serverProcess = serverProcess;
 						this._isDetached = !!options.detached;
+
 						return Promise.resolve({
 							reader: new StreamMessageReader(
 								serverProcess.stdout,
@@ -783,6 +836,7 @@ export class LanguageClient extends BaseLanguageClient {
 									args,
 									options,
 								);
+
 								if (!serverProcess || !serverProcess.pid) {
 									return handleChildProcessStartError(
 										serverProcess,
@@ -805,6 +859,7 @@ export class LanguageClient extends BaseLanguageClient {
 											: data.toString(encoding),
 									),
 								);
+
 								return transport
 									.onConnected()
 									.then((protocol) => {
@@ -823,6 +878,7 @@ export class LanguageClient extends BaseLanguageClient {
 									args,
 									options,
 								);
+
 								if (!serverProcess || !serverProcess.pid) {
 									return handleChildProcessStartError(
 										serverProcess,
@@ -845,6 +901,7 @@ export class LanguageClient extends BaseLanguageClient {
 											: data.toString(encoding),
 									),
 								);
+
 								return transport
 									.onConnected()
 									.then((protocol) => {
@@ -900,14 +957,17 @@ export class LanguageClient extends BaseLanguageClient {
 			return runtime;
 		}
 		const mainRootPath = this._mainGetRootPath();
+
 		if (mainRootPath !== undefined) {
 			const result = path.join(mainRootPath, runtime);
+
 			if (fs.existsSync(result)) {
 				return result;
 			}
 		}
 		if (serverWorkingDirectory !== undefined) {
 			const result = path.join(serverWorkingDirectory, runtime);
+
 			if (fs.existsSync(result)) {
 				return result;
 			}
@@ -917,10 +977,12 @@ export class LanguageClient extends BaseLanguageClient {
 
 	private _mainGetRootPath(): string | undefined {
 		const folders = Workspace.workspaceFolders;
+
 		if (!folders || folders.length === 0) {
 			return undefined;
 		}
 		const folder = folders[0];
+
 		if (folder.uri.scheme === "file") {
 			return folder.uri.fsPath;
 		}
@@ -931,6 +993,7 @@ export class LanguageClient extends BaseLanguageClient {
 		cwd?: string;
 	}): Promise<string | undefined> {
 		let cwd = options && options.cwd;
+
 		if (!cwd) {
 			cwd = this.clientOptions.workspaceFolder
 				? this.clientOptions.workspaceFolder.uri.fsPath
@@ -965,6 +1028,7 @@ export class SettingMonitor {
 			this._listeners,
 		);
 		this.onDidChangeConfiguration();
+
 		return new Disposable(() => {
 			if (this._client.needsStop()) {
 				void this._client.stop();
@@ -974,12 +1038,16 @@ export class SettingMonitor {
 
 	private onDidChangeConfiguration(): void {
 		const index = this._setting.indexOf(".");
+
 		const primary =
 			index >= 0 ? this._setting.substr(0, index) : this._setting;
+
 		const rest = index >= 0 ? this._setting.substr(index + 1) : undefined;
+
 		const enabled = rest
 			? Workspace.getConfiguration(primary).get(rest, false)
 			: Workspace.getConfiguration(primary);
+
 		if (enabled && this._client.needsStart()) {
 			this._client
 				.start()

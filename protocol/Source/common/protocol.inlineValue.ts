@@ -104,8 +104,10 @@ export type InlineValueParams = WorkDoneProgressParams & {
 export namespace InlineValueRequest {
 	export const method: "textDocument/inlineValue" =
 		"textDocument/inlineValue";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		InlineValueParams,
 		InlineValue[] | null,
@@ -113,6 +115,7 @@ export namespace InlineValueRequest {
 		void,
 		InlineValueRegistrationOptions
 	>(method);
+
 	export type HandlerSignature = RequestHandler<
 		InlineValueParams,
 		InlineValue[] | null,
@@ -125,10 +128,13 @@ export namespace InlineValueRequest {
  */
 export namespace InlineValueRefreshRequest {
 	export const method: `workspace/inlineValue/refresh` = `workspace/inlineValue/refresh`;
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.serverToClient;
+
 	export const type = new ProtocolRequestType0<void, void, void, void>(
 		method,
 	);
+
 	export type HandlerSignature = RequestHandler0<void, void>;
 }

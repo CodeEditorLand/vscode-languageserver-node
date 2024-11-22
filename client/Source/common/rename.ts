@@ -106,6 +106,7 @@ export class RenameFeature extends TextDocumentLanguageFeature<
 			documentSelector,
 			capabilities.renameProvider,
 		);
+
 		if (!options) {
 			return;
 		}
@@ -119,9 +120,11 @@ export class RenameFeature extends TextDocumentLanguageFeature<
 		options: RenameRegistrationOptions & DocumentSelectorOptions,
 	): [Disposable, RenameProvider] {
 		const selector = options.documentSelector;
+
 		const provider: RenameProvider = {
 			provideRenameEdits: (document, position, newName, token) => {
 				const client = this._client;
+
 				const provideRenameEdits: ProvideRenameEditsSignature = (
 					document,
 					position,
@@ -137,6 +140,7 @@ export class RenameFeature extends TextDocumentLanguageFeature<
 							client.code2ProtocolConverter.asPosition(position),
 						newName: newName,
 					};
+
 					return client
 						.sendRequest(RenameRequest.type, params, token)
 						.then(
@@ -160,7 +164,9 @@ export class RenameFeature extends TextDocumentLanguageFeature<
 							},
 						);
 				};
+
 				const middleware = client.middleware;
+
 				return middleware.provideRenameEdits
 					? middleware.provideRenameEdits(
 							document,
@@ -174,6 +180,7 @@ export class RenameFeature extends TextDocumentLanguageFeature<
 			prepareRename: options.prepareProvider
 				? (document, position, token) => {
 						const client = this._client;
+
 						const prepareRename: PrepareRenameSignature = (
 							document,
 							position,
@@ -189,6 +196,7 @@ export class RenameFeature extends TextDocumentLanguageFeature<
 										position,
 									),
 							};
+
 							return client
 								.sendRequest(
 									PrepareRenameRequest.type,
@@ -244,7 +252,9 @@ export class RenameFeature extends TextDocumentLanguageFeature<
 									},
 								);
 						};
+
 						const middleware = client.middleware;
+
 						return middleware.prepareRename
 							? middleware.prepareRename(
 									document,
@@ -256,6 +266,7 @@ export class RenameFeature extends TextDocumentLanguageFeature<
 					}
 				: undefined,
 		};
+
 		return [this.registerProvider(selector, provider), provider];
 	}
 
@@ -271,6 +282,7 @@ export class RenameFeature extends TextDocumentLanguageFeature<
 
 	private isDefaultBehavior(value: any): value is DefaultBehavior {
 		const candidate: DefaultBehavior = value;
+
 		return candidate && Is.boolean(candidate.defaultBehavior);
 	}
 }

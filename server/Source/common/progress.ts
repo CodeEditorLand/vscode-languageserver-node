@@ -81,6 +81,7 @@ class WorkDoneProgressReporterImpl implements WorkDoneProgressReporter {
 			message,
 			cancellable,
 		};
+
 		if (typeof percentage === "number") {
 			// Round to the nearest integer, because the percentage
 			// is a uinteger according to the specification
@@ -97,10 +98,12 @@ class WorkDoneProgressReporterImpl implements WorkDoneProgressReporter {
 		const param: WorkDoneProgressReport = {
 			kind: "report",
 		};
+
 		if (typeof arg0 === "number") {
 			// Round to the nearest integer, because the percentage
 			// is a uinteger according to the specification
 			param.percentage = Math.round(arg0);
+
 			if (arg1 !== undefined) {
 				param.message = arg1;
 			}
@@ -139,6 +142,7 @@ class WorkDoneProgressServerReporterImpl
 
 	done(): void {
 		this._source.dispose();
+
 		super.done();
 	}
 
@@ -191,6 +195,7 @@ export function attachWorkDone(
 
 	const token = params.workDoneToken;
 	delete params.workDoneToken;
+
 	return new WorkDoneProgressReporterImpl(connection, token);
 }
 
@@ -205,6 +210,7 @@ export const ProgressFeature: Feature<_RemoteWindow, WindowProgress> = (
 		}
 		public initialize(capabilities: ClientCapabilities): void {
 			super.initialize(capabilities);
+
 			if (capabilities?.window?.workDoneProgress === true) {
 				this._progressSupported = true;
 				this.connection.onNotification(
@@ -214,6 +220,7 @@ export const ProgressFeature: Feature<_RemoteWindow, WindowProgress> = (
 							WorkDoneProgressReporterImpl.Instances.get(
 								params.token,
 							);
+
 						if (
 							progress instanceof
 								WorkDoneProgressServerReporterImpl ||
@@ -237,6 +244,7 @@ export const ProgressFeature: Feature<_RemoteWindow, WindowProgress> = (
 		public createWorkDoneProgress(): Promise<WorkDoneProgressServerReporter> {
 			if (this._progressSupported) {
 				const token: string = generateUuid();
+
 				return this.connection
 					.sendRequest(WorkDoneProgressCreateRequest.type, { token })
 					.then(() => {
@@ -245,6 +253,7 @@ export const ProgressFeature: Feature<_RemoteWindow, WindowProgress> = (
 								this.connection,
 								token,
 							);
+
 						return result;
 					});
 			} else {
@@ -283,5 +292,6 @@ export function attachPartialResult<R>(
 
 	const token = params.partialResultToken;
 	delete params.partialResultToken;
+
 	return new ResultProgressReporterImpl<R>(connection, token);
 }

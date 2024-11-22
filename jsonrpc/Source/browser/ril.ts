@@ -82,6 +82,7 @@ class ReadableStreamWrapper implements RAL.ReadableStream {
 
 	public onClose(listener: () => void): Disposable {
 		this.socket.addEventListener("close", listener);
+
 		return Disposable.create(() =>
 			this.socket.removeEventListener("close", listener),
 		);
@@ -89,6 +90,7 @@ class ReadableStreamWrapper implements RAL.ReadableStream {
 
 	public onError(listener: (error: any) => void): Disposable {
 		this.socket.addEventListener("error", listener);
+
 		return Disposable.create(() =>
 			this.socket.removeEventListener("error", listener),
 		);
@@ -96,6 +98,7 @@ class ReadableStreamWrapper implements RAL.ReadableStream {
 
 	public onEnd(listener: () => void): Disposable {
 		this.socket.addEventListener("end", listener);
+
 		return Disposable.create(() =>
 			this.socket.removeEventListener("end", listener),
 		);
@@ -111,6 +114,7 @@ class WritableStreamWrapper implements RAL.WritableStream {
 
 	public onClose(listener: () => void): Disposable {
 		this.socket.addEventListener("close", listener);
+
 		return Disposable.create(() =>
 			this.socket.removeEventListener("close", listener),
 		);
@@ -118,6 +122,7 @@ class WritableStreamWrapper implements RAL.WritableStream {
 
 	public onError(listener: (error: any) => void): Disposable {
 		this.socket.addEventListener("error", listener);
+
 		return Disposable.create(() =>
 			this.socket.removeEventListener("error", listener),
 		);
@@ -125,6 +130,7 @@ class WritableStreamWrapper implements RAL.WritableStream {
 
 	public onEnd(listener: () => void): Disposable {
 		this.socket.addEventListener("end", listener);
+
 		return Disposable.create(() =>
 			this.socket.removeEventListener("end", listener),
 		);
@@ -160,6 +166,7 @@ interface RIL extends RAL {
 }
 
 const _textEncoder = new TextEncoder();
+
 const _ril: RIL = Object.freeze<RIL>({
 	messageBuffer: Object.freeze({
 		create: (encoding: RAL.MessageBufferEncoding) =>
@@ -213,6 +220,7 @@ const _ril: RIL = Object.freeze<RIL>({
 			...args: any[]
 		): Disposable {
 			const handle = setTimeout(callback, ms, ...args);
+
 			return { dispose: () => clearTimeout(handle) };
 		},
 		setImmediate(
@@ -220,6 +228,7 @@ const _ril: RIL = Object.freeze<RIL>({
 			...args: any[]
 		): Disposable {
 			const handle = setTimeout(callback, 0, ...args);
+
 			return { dispose: () => clearTimeout(handle) };
 		},
 		setInterval(
@@ -228,6 +237,7 @@ const _ril: RIL = Object.freeze<RIL>({
 			...args: any[]
 		): Disposable {
 			const handle = setInterval(callback, ms, ...args);
+
 			return { dispose: () => clearInterval(handle) };
 		},
 	}),

@@ -68,8 +68,10 @@ export interface ImplementationParams
 export namespace ImplementationRequest {
 	export const method: "textDocument/implementation" =
 		"textDocument/implementation";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		ImplementationParams,
 		Definition | DefinitionLink[] | null,
@@ -77,6 +79,7 @@ export namespace ImplementationRequest {
 		void,
 		ImplementationRegistrationOptions
 	>(method);
+
 	export type HandlerSignature = RequestHandler<
 		ImplementationParams,
 		Definition | DefinitionLink[] | null,

@@ -70,6 +70,7 @@ export class DeclarationFeature extends TextDocumentLanguageFeature<
 			documentSelector,
 			capabilities.declarationProvider,
 		);
+
 		if (!id || !options) {
 			return;
 		}
@@ -80,6 +81,7 @@ export class DeclarationFeature extends TextDocumentLanguageFeature<
 		options: DeclarationRegistrationOptions,
 	): [Disposable, DeclarationProvider] {
 		const selector = options.documentSelector!;
+
 		const provider: DeclarationProvider = {
 			provideDeclaration: (
 				document: TextDocument,
@@ -87,6 +89,7 @@ export class DeclarationFeature extends TextDocumentLanguageFeature<
 				token: CancellationToken,
 			): ProviderResult<VDeclaration> => {
 				const client = this._client;
+
 				const provideDeclaration: ProvideDeclarationSignature = (
 					document,
 					position,
@@ -121,7 +124,9 @@ export class DeclarationFeature extends TextDocumentLanguageFeature<
 							},
 						);
 				};
+
 				const middleware = client.middleware;
+
 				return middleware.provideDeclaration
 					? middleware.provideDeclaration(
 							document,
@@ -132,6 +137,7 @@ export class DeclarationFeature extends TextDocumentLanguageFeature<
 					: provideDeclaration(document, position, token);
 			},
 		};
+
 		return [this.registerProvider(selector, provider), provider];
 	}
 

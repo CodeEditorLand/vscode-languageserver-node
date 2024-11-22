@@ -79,17 +79,20 @@ export class FileSystemWatcherFeature
 			return;
 		}
 		const disposables: Disposable[] = [];
+
 		for (const watcher of data.registerOptions.watchers) {
 			const globPattern =
 				this._client.protocol2CodeConverter.asGlobPattern(
 					watcher.globPattern,
 				);
+
 			if (globPattern === undefined) {
 				continue;
 			}
 			let watchCreate: boolean = true,
 				watchChange: boolean = true,
 				watchDelete: boolean = true;
+
 			if (watcher.kind !== undefined && watcher.kind !== null) {
 				watchCreate = (watcher.kind & WatchKind.Create) !== 0;
 				watchChange = (watcher.kind & WatchKind.Change) !== 0;
@@ -116,6 +119,7 @@ export class FileSystemWatcherFeature
 
 	public registerRaw(id: string, fileSystemWatchers: VFileSystemWatcher[]) {
 		const disposables: Disposable[] = [];
+
 		for (const fileSystemWatcher of fileSystemWatchers) {
 			this.hookListeners(
 				fileSystemWatcher,
@@ -178,8 +182,10 @@ export class FileSystemWatcherFeature
 
 	public unregister(id: string): void {
 		const disposables = this._watchers.get(id);
+
 		if (disposables) {
 			this._watchers.delete(id);
+
 			for (const disposable of disposables) {
 				disposable.dispose();
 			}

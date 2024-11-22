@@ -46,6 +46,7 @@ export const MonikerFeature: Feature<_Languages, MonikerFeatureShape> = (
 					>,
 				): Disposable => {
 					const type = MonikerRequest.type;
+
 					return this.connection.onRequest(type, (params, cancel) => {
 						return handler(
 							params,

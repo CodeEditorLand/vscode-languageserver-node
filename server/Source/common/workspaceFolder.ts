@@ -39,7 +39,9 @@ export const WorkspaceFoldersFeature: Feature<
 		}
 		public initialize(capabilities: ClientCapabilities): void {
 			super.initialize(capabilities);
+
 			const workspaceCapabilities = capabilities.workspace;
+
 			if (
 				workspaceCapabilities &&
 				workspaceCapabilities.workspaceFolders
@@ -56,6 +58,7 @@ export const WorkspaceFoldersFeature: Feature<
 		}
 		public fillServerCapabilities(capabilities: ServerCapabilities): void {
 			super.fillServerCapabilities(capabilities);
+
 			const changeNotifications =
 				capabilities.workspace?.workspaceFolders?.changeNotifications;
 			this._notificationIsAutoRegistered =

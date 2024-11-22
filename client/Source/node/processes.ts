@@ -9,7 +9,9 @@ import { join } from "path";
 import ChildProcess = cp.ChildProcess;
 
 const isWindows = process.platform === "win32";
+
 const isMacintosh = process.platform === "darwin";
+
 const isLinux = process.platform === "linux";
 export function terminate(
 	process: ChildProcess & { pid: number },
@@ -23,6 +25,7 @@ export function terminate(
 			const options: any = {
 				stdio: ["pipe", "pipe", "ignore"],
 			};
+
 			if (cwd) {
 				options.cwd = cwd;
 			}
@@ -31,6 +34,7 @@ export function terminate(
 				["/T", "/F", "/PID", process.pid.toString()],
 				options,
 			);
+
 			return true;
 		} catch (err) {
 			return false;
@@ -38,13 +42,16 @@ export function terminate(
 	} else if (isLinux || isMacintosh) {
 		try {
 			const cmd = join(__dirname, "terminateProcess.sh");
+
 			const result = (<any>cp).spawnSync(cmd, [process.pid.toString()]);
+
 			return result.error ? false : true;
 		} catch (err) {
 			return false;
 		}
 	} else {
 		process.kill("SIGKILL");
+
 		return true;
 	}
 }

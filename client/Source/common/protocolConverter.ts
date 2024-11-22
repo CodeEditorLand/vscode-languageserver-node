@@ -614,6 +614,7 @@ interface CodeFenceBlock {
 namespace CodeBlock {
 	export function is(value: any): value is CodeFenceBlock {
 		const candidate: CodeFenceBlock = value;
+
 		return (
 			candidate &&
 			Is.string(candidate.language) &&
@@ -643,6 +644,7 @@ export function createConverter(
 			| code.DocumentFilter
 			| string
 			| Array<code.DocumentFilter | string> = [];
+
 		for (const filter of selector) {
 			if (typeof filter === "string") {
 				result.push(filter);
@@ -685,6 +687,7 @@ export function createConverter(
 		diagnostics: ls.Diagnostic[],
 	): code.Diagnostic[] {
 		const result: code.Diagnostic[] = new Array(diagnostics.length);
+
 		for (let i = 0; i < diagnostics.length; i++) {
 			result[i] = asDiagnostic(diagnostics[i]);
 		}
@@ -698,6 +701,7 @@ export function createConverter(
 			asDiagnosticSeverity(diagnostic.severity),
 			diagnostic.data,
 		);
+
 		if (diagnostic.code !== undefined) {
 			if (
 				typeof diagnostic.code === "string" ||
@@ -715,6 +719,7 @@ export function createConverter(
 				// This is for backwards compatibility of a proposed API.
 				// We should remove this at some point.
 				result.hasDiagnosticCode = true;
+
 				const diagnosticCode = diagnostic.code as DiagnosticCode;
 				result.code = {
 					value: diagnosticCode.value,
@@ -742,6 +747,7 @@ export function createConverter(
 		const result: code.DiagnosticRelatedInformation[] = new Array(
 			relatedInformation.length,
 		);
+
 		for (let i = 0; i < relatedInformation.length; i++) {
 			const info = relatedInformation[i];
 			result[i] = new code.DiagnosticRelatedInformation(
@@ -753,10 +759,13 @@ export function createConverter(
 	}
 
 	function asDiagnosticTags(tags: undefined | null): undefined;
+
 	function asDiagnosticTags(tags: ls.DiagnosticTag[]): code.DiagnosticTag[];
+
 	function asDiagnosticTags(
 		tags: ls.DiagnosticTag[] | undefined | null,
 	): code.DiagnosticTag[] | undefined;
+
 	function asDiagnosticTags(
 		tags: ls.DiagnosticTag[] | undefined | null,
 	): code.DiagnosticTag[] | undefined {
@@ -764,8 +773,10 @@ export function createConverter(
 			return undefined;
 		}
 		const result: code.DiagnosticTag[] = [];
+
 		for (const tag of tags) {
 			const converted = asDiagnosticTag(tag);
+
 			if (converted !== undefined) {
 				result.push(converted);
 			}
@@ -779,18 +790,23 @@ export function createConverter(
 		switch (tag) {
 			case ls.DiagnosticTag.Unnecessary:
 				return code.DiagnosticTag.Unnecessary;
+
 			case ls.DiagnosticTag.Deprecated:
 				return code.DiagnosticTag.Deprecated;
+
 			default:
 				return undefined;
 		}
 	}
 
 	function asPosition(value: undefined | null): undefined;
+
 	function asPosition(value: ls.Position): code.Position;
+
 	function asPosition(
 		value: ls.Position | undefined | null,
 	): code.Position | undefined;
+
 	function asPosition(
 		value: ls.Position | undefined | null,
 	): code.Position | undefined {
@@ -800,10 +816,13 @@ export function createConverter(
 	}
 
 	function asRange(value: undefined | null): undefined;
+
 	function asRange(value: ls.Range): code.Range;
+
 	function asRange(
 		value: ls.Range | undefined | null,
 	): code.Range | undefined;
+
 	function asRange(
 		value: ls.Range | undefined | null,
 	): code.Range | undefined {
@@ -844,10 +863,13 @@ export function createConverter(
 		switch (value) {
 			case ls.DiagnosticSeverity.Error:
 				return code.DiagnosticSeverity.Error;
+
 			case ls.DiagnosticSeverity.Warning:
 				return code.DiagnosticSeverity.Warning;
+
 			case ls.DiagnosticSeverity.Information:
 				return code.DiagnosticSeverity.Information;
+
 			case ls.DiagnosticSeverity.Hint:
 				return code.DiagnosticSeverity.Hint;
 		}
@@ -861,11 +883,14 @@ export function createConverter(
 			return asMarkdownString(value);
 		} else if (CodeBlock.is(value)) {
 			const result = asMarkdownString();
+
 			return result.appendCodeblock(value.value, value.language);
 		} else if (Array.isArray(value)) {
 			const result: code.MarkdownString[] = [];
+
 			for (const element of value) {
 				const item = asMarkdownString();
+
 				if (CodeBlock.is(element)) {
 					item.appendCodeblock(element.value, element.language);
 				} else {
@@ -888,8 +913,10 @@ export function createConverter(
 			switch (value.kind) {
 				case ls.MarkupKind.Markdown:
 					return asMarkdownString(value.value);
+
 				case ls.MarkupKind.PlainText:
 					return value.value;
+
 				default:
 					return `Unsupported Markup content received. Kind is: ${value.kind}`;
 			}
@@ -900,36 +927,46 @@ export function createConverter(
 		value?: string | ls.MarkupContent,
 	): code.MarkdownString {
 		let result: code.MarkdownString;
+
 		if (value === undefined || typeof value === "string") {
 			result = new code.MarkdownString(value);
 		} else {
 			switch (value.kind) {
 				case ls.MarkupKind.Markdown:
 					result = new code.MarkdownString(value.value);
+
 					break;
+
 				case ls.MarkupKind.PlainText:
 					result = new code.MarkdownString();
 					result.appendText(value.value);
+
 					break;
+
 				default:
 					result = new code.MarkdownString();
 					result.appendText(
 						`Unsupported Markup content received. Kind is: ${value.kind}`,
 					);
+
 					break;
 			}
 		}
 		result.isTrusted = trustMarkdown;
 		result.supportHtml = supportHtml;
 		result.supportThemeIcons = supportThemeIcons;
+
 		return result;
 	}
 
 	function asHover(hover: ls.Hover): code.Hover;
+
 	function asHover(hover: undefined | null): undefined;
+
 	function asHover(
 		hover: ls.Hover | undefined | null,
 	): code.Hover | undefined;
+
 	function asHover(
 		hover: ls.Hover | undefined | null,
 	): code.Hover | undefined {
@@ -947,21 +984,25 @@ export function createConverter(
 		allCommitCharacters: string[] | undefined,
 		token?: code.CancellationToken,
 	): Promise<code.CompletionList>;
+
 	function asCompletionResult(
 		value: ls.CompletionItem[],
 		allCommitCharacters: string[] | undefined,
 		token?: code.CancellationToken,
 	): Promise<code.CompletionItem[]>;
+
 	function asCompletionResult(
 		value: undefined | null,
 		allCommitCharacters: string[] | undefined,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	function asCompletionResult(
 		value: ls.CompletionItem[] | ls.CompletionList | undefined | null,
 		allCommitCharacters: string[] | undefined,
 		token?: code.CancellationToken,
 	): Promise<code.CompletionItem[] | code.CompletionList | undefined>;
+
 	async function asCompletionResult(
 		value: ls.CompletionItem[] | ls.CompletionList | undefined | null,
 		allCommitCharacters: string[] | undefined,
@@ -978,10 +1019,12 @@ export function createConverter(
 			);
 		}
 		const list = <ls.CompletionList>value;
+
 		const { defaultRange, commitCharacters } = getCompletionItemDefaults(
 			list,
 			allCommitCharacters,
 		);
+
 		const converted = await async.map(
 			list.items,
 			(item) => {
@@ -998,6 +1041,7 @@ export function createConverter(
 			},
 			token,
 		);
+
 		return new code.CompletionList(converted, list.isIncomplete);
 	}
 
@@ -1009,8 +1053,10 @@ export function createConverter(
 		commitCharacters: string[] | undefined;
 	} {
 		const rangeDefaults = list.itemDefaults?.editRange;
+
 		const commitCharacters =
 			list.itemDefaults?.commitCharacters ?? allCommitCharacters;
+
 		return ls.Range.is(rangeDefaults)
 			? { defaultRange: asRange(rangeDefaults), commitCharacters }
 			: rangeDefaults !== undefined
@@ -1054,8 +1100,10 @@ export function createConverter(
 			return [];
 		}
 		const result: code.CompletionItemTag[] = [];
+
 		for (const tag of tags) {
 			const converted = asCompletionItemTag(tag);
+
 			if (converted !== undefined) {
 				result.push(converted);
 			}
@@ -1074,7 +1122,9 @@ export function createConverter(
 		dataApplyKind?: ls.ApplyKind,
 	): ProtocolCompletionItem {
 		const tags: code.CompletionItemTag[] = asCompletionItemTags(item.tags);
+
 		const label = asCompletionItemLabel(item);
+
 		const result = new ProtocolCompletionItem(label);
 
 		if (item.detail) {
@@ -1094,6 +1144,7 @@ export function createConverter(
 			defaultRange,
 			defaultInsertTextFormat,
 		);
+
 		if (insertText) {
 			result.insertText = insertText.text;
 			result.range = insertText.range;
@@ -1102,6 +1153,7 @@ export function createConverter(
 		if (Is.number(item.kind)) {
 			const [itemKind, original] = asCompletionItemKind(item.kind);
 			result.kind = itemKind;
+
 			if (original) {
 				result.originalItemKind = original;
 			}
@@ -1119,6 +1171,7 @@ export function createConverter(
 			defaultCommitCharacters,
 			commitCharactersApplyKind,
 		);
+
 		if (commitCharacters) {
 			result.commitCharacters = commitCharacters.slice();
 		}
@@ -1127,6 +1180,7 @@ export function createConverter(
 		}
 		if (item.deprecated === true || item.deprecated === false) {
 			result.deprecated = item.deprecated;
+
 			if (item.deprecated === true) {
 				tags.push(code.CompletionItemTag.Deprecated);
 			}
@@ -1135,6 +1189,7 @@ export function createConverter(
 			result.preselect = item.preselect;
 		}
 		const data = applyData(item, defaultData, dataApplyKind);
+
 		if (data !== undefined) {
 			result.data = data;
 		}
@@ -1142,8 +1197,10 @@ export function createConverter(
 			result.tags = tags;
 		}
 		const insertTextMode = item.insertTextMode ?? defaultInsertTextMode;
+
 		if (insertTextMode !== undefined) {
 			result.insertTextMode = insertTextMode;
+
 			if (insertTextMode === ls.InsertTextMode.asIs) {
 				result.keepWhitespace = true;
 			}
@@ -1161,6 +1218,7 @@ export function createConverter(
 				return undefined;
 			}
 			const set = new Set<string>();
+
 			if (defaultCommitCharacters) {
 				for (const char of defaultCommitCharacters) {
 					set.add(char);
@@ -1232,11 +1290,13 @@ export function createConverter(
 		| undefined {
 		const insertTextFormat =
 			item.insertTextFormat ?? defaultInsertTextFormat;
+
 		if (item.textEdit !== undefined || defaultRange !== undefined) {
 			const [range, newText] =
 				item.textEdit !== undefined
 					? getCompletionRangeAndText(item.textEdit)
 					: [defaultRange, item.textEditText ?? item.label];
+
 			if (insertTextFormat === ls.InsertTextFormat.Snippet) {
 				return {
 					text: new code.SnippetString(newText),
@@ -1277,7 +1337,9 @@ export function createConverter(
 	}
 
 	function asTextEdit(edit: undefined | null): undefined;
+
 	function asTextEdit(edit: ls.TextEdit): code.TextEdit;
+
 	function asTextEdit(
 		edit: ls.TextEdit | undefined | null,
 	): code.TextEdit | undefined {
@@ -1291,14 +1353,17 @@ export function createConverter(
 		items: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	function asTextEdits(
 		items: ls.TextEdit[],
 		token?: code.CancellationToken,
 	): Promise<code.TextEdit[]>;
+
 	function asTextEdits(
 		items: ls.TextEdit[] | undefined | null,
 		token?: code.CancellationToken,
 	): Promise<code.TextEdit[] | undefined>;
+
 	async function asTextEdits(
 		items: ls.TextEdit[] | undefined | null,
 		token?: code.CancellationToken,
@@ -1310,10 +1375,13 @@ export function createConverter(
 	}
 
 	function asTextEditsSync(items: undefined | null): undefined;
+
 	function asTextEditsSync(items: ls.TextEdit[]): code.TextEdit[];
+
 	function asTextEditsSync(
 		items: ls.TextEdit[] | undefined | null,
 	): code.TextEdit[] | undefined;
+
 	function asTextEditsSync(
 		items: ls.TextEdit[] | undefined | null,
 	): code.TextEdit[] | undefined {
@@ -1321,6 +1389,7 @@ export function createConverter(
 			return undefined;
 		}
 		const result: code.TextEdit[] = new Array(items.length);
+
 		for (let i = 0; i < items.length; i++) {
 			result[i] = asTextEdit(items[i]);
 		}
@@ -1331,14 +1400,17 @@ export function createConverter(
 		item: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	function asSignatureHelp(
 		item: ls.SignatureHelp,
 		token?: code.CancellationToken,
 	): Promise<code.SignatureHelp>;
+
 	function asSignatureHelp(
 		item: ls.SignatureHelp | undefined | null,
 		token?: code.CancellationToken,
 	): Promise<code.SignatureHelp | undefined>;
+
 	async function asSignatureHelp(
 		item: ls.SignatureHelp | undefined | null,
 		token?: code.CancellationToken,
@@ -1347,6 +1419,7 @@ export function createConverter(
 			return undefined;
 		}
 		const result = new code.SignatureHelp();
+
 		if (Is.number(item.activeSignature)) {
 			result.activeSignature = item.activeSignature;
 		} else {
@@ -1382,6 +1455,7 @@ export function createConverter(
 		token?: code.CancellationToken,
 	): Promise<code.SignatureInformation> {
 		const result = new code.SignatureInformation(item.label);
+
 		if (item.documentation !== undefined) {
 			result.documentation = asDocumentation(item.documentation);
 		}
@@ -1410,6 +1484,7 @@ export function createConverter(
 		item: ls.ParameterInformation,
 	): code.ParameterInformation {
 		const result = new code.ParameterInformation(item.label);
+
 		if (item.documentation) {
 			result.documentation = asDocumentation(item.documentation);
 		}
@@ -1417,10 +1492,13 @@ export function createConverter(
 	}
 
 	function asLocation(item: undefined | null): undefined;
+
 	function asLocation(item: ls.Location): code.Location;
+
 	function asLocation(
 		item: ls.Location | undefined | null,
 	): code.Location | undefined;
+
 	function asLocation(
 		item: ls.Location | undefined | null,
 	): code.Location | undefined {
@@ -1433,14 +1511,17 @@ export function createConverter(
 		item: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	function asDeclarationResult(
 		item: ls.Declaration,
 		token?: code.CancellationToken,
 	): Promise<code.Location | code.Location[]>;
+
 	function asDeclarationResult(
 		item: ls.DeclarationLink[],
 		token?: code.CancellationToken,
 	): Promise<code.LocationLink[]>;
+
 	async function asDeclarationResult(
 		item: ls.Declaration | ls.DeclarationLink[] | undefined | null,
 		token?: code.CancellationToken,
@@ -1455,14 +1536,17 @@ export function createConverter(
 		item: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	function asDefinitionResult(
 		item: ls.Definition,
 		token?: code.CancellationToken,
 	): Promise<code.Definition>;
+
 	function asDefinitionResult(
 		item: ls.DefinitionLink[],
 		token?: code.CancellationToken,
 	): Promise<code.DefinitionLink[]>;
+
 	async function asDefinitionResult(
 		item: ls.Definition | ls.DefinitionLink[] | undefined | null,
 		token?: code.CancellationToken,
@@ -1474,7 +1558,9 @@ export function createConverter(
 	}
 
 	function asLocationLink(item: undefined | null): undefined;
+
 	function asLocationLink(item: ls.LocationLink): code.LocationLink;
+
 	function asLocationLink(
 		item: ls.LocationLink | undefined | null,
 	): code.LocationLink | undefined {
@@ -1487,6 +1573,7 @@ export function createConverter(
 			originSelectionRange: asRange(item.originSelectionRange),
 			targetSelectionRange: asRange(item.targetSelectionRange),
 		};
+
 		if (!result.targetSelectionRange) {
 			throw new Error(
 				`targetSelectionRange must not be undefined or null`,
@@ -1514,9 +1601,11 @@ export function createConverter(
 				return [];
 			} else if (ls.LocationLink.is(item[0])) {
 				const links = item as ls.LocationLink[];
+
 				return async.map(links, asLocationLink, token);
 			} else {
 				const locations = item as ls.Location[];
+
 				return async.map(
 					locations,
 					asLocation as (item: ls.Location) => code.Location,
@@ -1534,14 +1623,17 @@ export function createConverter(
 		values: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	function asReferences(
 		values: ls.Location[],
 		token?: code.CancellationToken,
 	): Promise<code.Location[]>;
+
 	function asReferences(
 		values: ls.Location[] | undefined | null,
 		token?: code.CancellationToken,
 	): Promise<code.Location[] | undefined>;
+
 	async function asReferences(
 		values: ls.Location[] | undefined | null,
 		token?: code.CancellationToken,
@@ -1560,14 +1652,17 @@ export function createConverter(
 		values: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	function asDocumentHighlights(
 		values: ls.DocumentHighlight[],
 		token?: code.CancellationToken,
 	): Promise<code.DocumentHighlight[]>;
+
 	function asDocumentHighlights(
 		values: ls.DocumentHighlight[] | undefined | null,
 		token?: code.CancellationToken,
 	): Promise<code.DocumentHighlight[] | undefined>;
+
 	async function asDocumentHighlights(
 		values: ls.DocumentHighlight[] | undefined | null,
 		token?: code.CancellationToken,
@@ -1582,6 +1677,7 @@ export function createConverter(
 		item: ls.DocumentHighlight,
 	): code.DocumentHighlight {
 		const result = new code.DocumentHighlight(asRange(item.range));
+
 		if (Is.number(item.kind)) {
 			result.kind = asDocumentHighlightKind(item.kind);
 		}
@@ -1592,8 +1688,10 @@ export function createConverter(
 		switch (item) {
 			case ls.DocumentHighlightKind.Text:
 				return code.DocumentHighlightKind.Text;
+
 			case ls.DocumentHighlightKind.Read:
 				return code.DocumentHighlightKind.Read;
+
 			case ls.DocumentHighlightKind.Write:
 				return code.DocumentHighlightKind.Write;
 		}
@@ -1604,14 +1702,17 @@ export function createConverter(
 		values: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	function asSymbolInformations(
 		values: ls.SymbolInformation[],
 		token?: code.CancellationToken,
 	): Promise<code.SymbolInformation[]>;
+
 	function asSymbolInformations(
 		values: ls.SymbolInformation[] | undefined | null,
 		token?: code.CancellationToken,
 	): Promise<code.SymbolInformation[] | undefined>;
+
 	async function asSymbolInformations(
 		values: ls.SymbolInformation[] | undefined | null,
 		token?: code.CancellationToken,
@@ -1634,16 +1735,20 @@ export function createConverter(
 		switch (value) {
 			case ls.SymbolTag.Deprecated:
 				return code.SymbolTag.Deprecated;
+
 			default:
 				return undefined;
 		}
 	}
 
 	function asSymbolTags(items: undefined | null): undefined;
+
 	function asSymbolTags(items: ReadonlyArray<ls.SymbolTag>): code.SymbolTag[];
+
 	function asSymbolTags(
 		items: ReadonlyArray<ls.SymbolTag> | undefined | null,
 	): code.SymbolTag[] | undefined;
+
 	function asSymbolTags(
 		items: ReadonlyArray<ls.SymbolTag> | undefined | null,
 	): code.SymbolTag[] | undefined {
@@ -1651,8 +1756,10 @@ export function createConverter(
 			return undefined;
 		}
 		const result: code.SymbolTag[] = [];
+
 		for (const item of items) {
 			const converted = asSymbolTag(item);
+
 			if (converted !== undefined) {
 				result.push(converted);
 			}
@@ -1664,8 +1771,10 @@ export function createConverter(
 		item: ls.SymbolInformation | ls.WorkspaceSymbol,
 	): code.SymbolInformation {
 		const data: ls.LSPAny | undefined = (item as ls.WorkspaceSymbol).data;
+
 		const location: Omit<ls.Location, "range"> & { range?: ls.Range } =
 			item.location;
+
 		const result: code.SymbolInformation =
 			location.range === undefined || data !== undefined
 				? new WorkspaceSymbol(
@@ -1690,6 +1799,7 @@ export function createConverter(
 						),
 					);
 		fillTags(result, item);
+
 		return result;
 	}
 
@@ -1697,10 +1807,12 @@ export function createConverter(
 		values: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	function asDocumentSymbols(
 		values: ls.DocumentSymbol[],
 		token?: code.CancellationToken,
 	): Promise<code.DocumentSymbol[]>;
+
 	async function asDocumentSymbols(
 		values: ls.DocumentSymbol[] | undefined | null,
 		token?: code.CancellationToken,
@@ -1720,8 +1832,10 @@ export function createConverter(
 			asRange(value.selectionRange),
 		);
 		fillTags(result, value);
+
 		if (value.children !== undefined && value.children.length > 0) {
 			const children: code.DocumentSymbol[] = [];
+
 			for (const child of value.children) {
 				children.push(asDocumentSymbol(child));
 			}
@@ -1735,6 +1849,7 @@ export function createConverter(
 		value: { tags?: ls.SymbolTag[]; deprecated?: boolean },
 	): void {
 		result.tags = asSymbolTags(value.tags);
+
 		if (value.deprecated) {
 			if (!result.tags) {
 				result.tags = [code.SymbolTag.Deprecated];
@@ -1751,6 +1866,7 @@ export function createConverter(
 			title: item.title,
 			command: item.command,
 		};
+
 		if (item.tooltip) {
 			result.tooltip = item.tooltip;
 		}
@@ -1764,14 +1880,17 @@ export function createConverter(
 		items: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	function asCommands(
 		items: ls.Command[],
 		token?: code.CancellationToken,
 	): Promise<code.Command[]>;
+
 	function asCommands(
 		items: ls.Command[] | undefined | null,
 		token?: code.CancellationToken,
 	): Promise<code.Command[] | undefined>;
+
 	async function asCommands(
 		items: ls.Command[] | undefined | null,
 		token?: code.CancellationToken,
@@ -1805,10 +1924,13 @@ export function createConverter(
 	);
 
 	function asCodeActionKind(item: null | undefined): undefined;
+
 	function asCodeActionKind(item: ls.CodeActionKind): code.CodeActionKind;
+
 	function asCodeActionKind(
 		item: ls.CodeActionKind | null | undefined,
 	): code.CodeActionKind | undefined;
+
 	function asCodeActionKind(
 		item: ls.CodeActionKind | null | undefined,
 	): code.CodeActionKind | undefined {
@@ -1816,11 +1938,13 @@ export function createConverter(
 			return undefined;
 		}
 		let result: code.CodeActionKind | undefined = kindMapping.get(item);
+
 		if (result) {
 			return result;
 		}
 		const parts = item.split(".");
 		result = code.CodeActionKind.Empty;
+
 		for (const part of parts) {
 			result = result.append(part);
 		}
@@ -1828,12 +1952,15 @@ export function createConverter(
 	}
 
 	function asCodeActionKinds(item: null | undefined): undefined;
+
 	function asCodeActionKinds(
 		items: ls.CodeActionKind[],
 	): code.CodeActionKind[];
+
 	function asCodeActionKinds(
 		items: ls.CodeActionKind[] | null | undefined,
 	): code.CodeActionKind[] | undefined;
+
 	function asCodeActionKinds(
 		items: ls.CodeActionKind[] | null | undefined,
 	): code.CodeActionKind[] | undefined {
@@ -1844,12 +1971,15 @@ export function createConverter(
 	}
 
 	function asCodeActionDocumentations(items: null | undefined): undefined;
+
 	function asCodeActionDocumentations(
 		items: ls.CodeActionKindDocumentation[],
 	): code.CodeActionProviderMetadata["documentation"];
+
 	function asCodeActionDocumentations(
 		items: ls.CodeActionKindDocumentation[] | null | undefined,
 	): code.CodeActionProviderMetadata["documentation"] | undefined;
+
 	function asCodeActionDocumentations(
 		items: ls.CodeActionKindDocumentation[] | null | undefined,
 	): code.CodeActionProviderMetadata["documentation"] | undefined {
@@ -1866,14 +1996,17 @@ export function createConverter(
 		item: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	function asCodeAction(
 		item: ls.CodeAction,
 		token?: code.CancellationToken,
 	): Promise<code.CodeAction>;
+
 	function asCodeAction(
 		item: ls.CodeAction | undefined | null,
 		token?: code.CancellationToken,
 	): Promise<code.CodeAction | undefined>;
+
 	async function asCodeAction(
 		item: ls.CodeAction | undefined | null,
 		token?: code.CancellationToken,
@@ -1882,6 +2015,7 @@ export function createConverter(
 			return undefined;
 		}
 		const result = new ProtocolCodeAction(item.title, item.data);
+
 		if (item.kind !== undefined) {
 			result.kind = asCodeActionKind(item.kind);
 		}
@@ -1925,10 +2059,13 @@ export function createConverter(
 	}
 
 	function asCodeLens(item: undefined | null): undefined;
+
 	function asCodeLens(item: ls.CodeLens): code.CodeLens;
+
 	function asCodeLens(
 		item: ls.CodeLens | undefined | null,
 	): code.CodeLens | undefined;
+
 	function asCodeLens(
 		item: ls.CodeLens | undefined | null,
 	): code.CodeLens | undefined {
@@ -1938,6 +2075,7 @@ export function createConverter(
 		const result: ProtocolCodeLens = new ProtocolCodeLens(
 			asRange(item.range),
 		);
+
 		if (item.command) {
 			result.command = asCommand(item.command);
 		}
@@ -1951,14 +2089,17 @@ export function createConverter(
 		items: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	function asCodeLenses(
 		items: ls.CodeLens[],
 		token?: code.CancellationToken,
 	): Promise<code.CodeLens[]>;
+
 	function asCodeLenses(
 		items: ls.CodeLens[] | undefined | null,
 		token?: code.CancellationToken,
 	): Promise<code.CodeLens[] | undefined>;
+
 	async function asCodeLenses(
 		items: ls.CodeLens[] | undefined | null,
 		token?: code.CancellationToken,
@@ -1977,14 +2118,17 @@ export function createConverter(
 		item: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	function asWorkspaceEdit(
 		item: ls.WorkspaceEdit,
 		token?: code.CancellationToken,
 	): Promise<code.WorkspaceEdit>;
+
 	function asWorkspaceEdit(
 		item: ls.WorkspaceEdit | undefined | null,
 		token?: code.CancellationToken,
 	): Promise<code.WorkspaceEdit | undefined>;
+
 	async function asWorkspaceEdit(
 		item: ls.WorkspaceEdit | undefined | null,
 		token?: code.CancellationToken,
@@ -1994,6 +2138,7 @@ export function createConverter(
 		}
 		const sharedMetadata: Map<string, code.WorkspaceEditEntryMetadata> =
 			new Map();
+
 		if (item.changeAnnotations !== undefined) {
 			const changeAnnotations = item.changeAnnotations;
 			await async.forEach(
@@ -2016,7 +2161,9 @@ export function createConverter(
 				return sharedMetadata.get(annotation);
 			}
 		};
+
 		const result = new code.WorkspaceEdit();
+
 		if (item.documentChanges) {
 			const documentChanges = item.documentChanges;
 			await async.forEach(
@@ -2043,10 +2190,12 @@ export function createConverter(
 						);
 					} else if (ls.TextDocumentEdit.is(change)) {
 						const uri = _uriConverter(change.textDocument.uri);
+
 						const edits: [
 							code.TextEdit | code.SnippetTextEdit,
 							code.WorkspaceEditEntryMetadata | undefined,
 						][] = [];
+
 						for (const edit of change.edits) {
 							if (ls.AnnotatedTextEdit.is(edit)) {
 								edits.push([
@@ -2102,12 +2251,15 @@ export function createConverter(
 	}
 
 	function asWorkspaceEditEntryMetadata(annotation: undefined): undefined;
+
 	function asWorkspaceEditEntryMetadata(
 		annotation: ls.ChangeAnnotation,
 	): code.WorkspaceEditEntryMetadata;
+
 	function asWorkspaceEditEntryMetadata(
 		annotation: ls.ChangeAnnotation | undefined,
 	): code.WorkspaceEditEntryMetadata | undefined;
+
 	function asWorkspaceEditEntryMetadata(
 		annotation: ls.ChangeAnnotation | undefined,
 	): code.WorkspaceEditEntryMetadata | undefined {
@@ -2123,9 +2275,11 @@ export function createConverter(
 
 	function asDocumentLink(item: ls.DocumentLink): code.DocumentLink {
 		const range = asRange(item.range);
+
 		const target = item.target ? asUri(item.target) : undefined;
 		// target must be optional in DocumentLink
 		const link = new ProtocolDocumentLink(range, target);
+
 		if (item.tooltip !== undefined) {
 			link.tooltip = item.tooltip;
 		}
@@ -2139,14 +2293,17 @@ export function createConverter(
 		items: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	function asDocumentLinks(
 		items: ls.DocumentLink[],
 		token?: code.CancellationToken,
 	): Promise<code.DocumentLink[]>;
+
 	function asDocumentLinks(
 		items: ls.DocumentLink[] | undefined | null,
 		token?: code.CancellationToken,
 	): Promise<code.DocumentLink[] | undefined>;
+
 	async function asDocumentLinks(
 		items: ls.DocumentLink[] | undefined | null,
 		token?: code.CancellationToken,
@@ -2171,10 +2328,12 @@ export function createConverter(
 		colorInformation: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	function asColorInformations(
 		colorInformation: ls.ColorInformation[],
 		token?: code.CancellationToken,
 	): Promise<code.ColorInformation[]>;
+
 	async function asColorInformations(
 		colorInformation: ls.ColorInformation[] | undefined | null,
 		token?: code.CancellationToken,
@@ -2192,6 +2351,7 @@ export function createConverter(
 		presentation.additionalTextEdits = asTextEditsSync(
 			cp.additionalTextEdits,
 		);
+
 		if (cp.textEdit) {
 			presentation.textEdit = asTextEdit(cp.textEdit);
 		}
@@ -2202,10 +2362,12 @@ export function createConverter(
 		colorPresentations: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	function asColorPresentations(
 		colorPresentations: ls.ColorPresentation[],
 		token?: code.CancellationToken,
 	): Promise<code.ColorPresentation[]>;
+
 	async function asColorPresentations(
 		colorPresentations: ls.ColorPresentation[] | undefined | null,
 		token?: code.CancellationToken,
@@ -2223,8 +2385,10 @@ export function createConverter(
 			switch (kind) {
 				case ls.FoldingRangeKind.Comment:
 					return code.FoldingRangeKind.Comment;
+
 				case ls.FoldingRangeKind.Imports:
 					return code.FoldingRangeKind.Imports;
+
 				case ls.FoldingRangeKind.Region:
 					return code.FoldingRangeKind.Region;
 			}
@@ -2244,14 +2408,17 @@ export function createConverter(
 		foldingRanges: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	function asFoldingRanges(
 		foldingRanges: ls.FoldingRange[],
 		token?: code.CancellationToken,
 	): Promise<code.FoldingRange[]>;
+
 	function asFoldingRanges(
 		foldingRanges: ls.FoldingRange[] | undefined | null,
 		token?: code.CancellationToken,
 	): Promise<code.FoldingRange[] | undefined>;
+
 	async function asFoldingRanges(
 		foldingRanges: ls.FoldingRange[] | undefined | null,
 		token?: code.CancellationToken,
@@ -2277,14 +2444,17 @@ export function createConverter(
 		selectionRanges: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	function asSelectionRanges(
 		selectionRanges: ls.SelectionRange[],
 		token?: code.CancellationToken,
 	): Promise<code.SelectionRange[]>;
+
 	function asSelectionRanges(
 		selectionRanges: ls.SelectionRange[] | undefined | null,
 		token?: code.CancellationToken,
 	): Promise<code.SelectionRange[] | undefined>;
+
 	async function asSelectionRanges(
 		selectionRanges: ls.SelectionRange[] | undefined | null,
 		token?: code.CancellationToken,
@@ -2319,14 +2489,17 @@ export function createConverter(
 		inlineValues: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	function asInlineValues(
 		inlineValues: ls.InlineValue[],
 		token?: code.CancellationToken,
 	): Promise<code.SelectionRange[]>;
+
 	function asInlineValues(
 		inlineValues: ls.InlineValue[] | undefined | null,
 		token?: code.CancellationToken,
 	): Promise<code.InlineValue[] | undefined>;
+
 	async function asInlineValues(
 		inlineValues: ls.InlineValue[] | undefined | null,
 		token?: code.CancellationToken,
@@ -2345,7 +2518,9 @@ export function createConverter(
 			typeof value.label === "string"
 				? value.label
 				: await async.map(value.label, asInlayHintLabelPart, token);
+
 		const result = new ProtocolInlayHint(asPosition(value.position), label);
+
 		if (value.kind !== undefined) {
 			result.kind = value.kind;
 		}
@@ -2371,6 +2546,7 @@ export function createConverter(
 		part: ls.InlayHintLabelPart,
 	): code.InlayHintLabelPart {
 		const result = new code.InlayHintLabelPart(part.value);
+
 		if (part.location !== undefined) {
 			result.location = asLocation(part.location);
 		}
@@ -2396,14 +2572,17 @@ export function createConverter(
 		values: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	function asInlayHints(
 		values: ls.InlayHint[],
 		token?: code.CancellationToken,
 	): Promise<code.InlayHint[]>;
+
 	function asInlayHints(
 		values: ls.InlayHint[] | undefined | null,
 		token?: code.CancellationToken,
 	): Promise<code.InlayHint[] | undefined>;
+
 	async function asInlayHints(
 		values: ls.InlayHint[] | undefined | null,
 		token?: code.CancellationToken,
@@ -2417,12 +2596,15 @@ export function createConverter(
 	//----- call hierarchy
 
 	function asCallHierarchyItem(item: null): undefined;
+
 	function asCallHierarchyItem(
 		item: ls.CallHierarchyItem,
 	): code.CallHierarchyItem;
+
 	function asCallHierarchyItem(
 		item: ls.CallHierarchyItem | null,
 	): code.CallHierarchyItem | undefined;
+
 	function asCallHierarchyItem(
 		item: ls.CallHierarchyItem | null,
 	): code.CallHierarchyItem | undefined {
@@ -2438,6 +2620,7 @@ export function createConverter(
 			asRange(item.selectionRange),
 			item.data,
 		);
+
 		if (item.tags !== undefined) {
 			result.tags = asSymbolTags(item.tags);
 		}
@@ -2448,14 +2631,17 @@ export function createConverter(
 		items: null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	function asCallHierarchyItems(
 		items: ls.CallHierarchyItem[],
 		token?: code.CancellationToken,
 	): Promise<code.CallHierarchyItem[]>;
+
 	function asCallHierarchyItems(
 		items: ls.CallHierarchyItem[] | null,
 		token?: code.CancellationToken,
 	): Promise<code.CallHierarchyItem[] | undefined>;
+
 	async function asCallHierarchyItems(
 		items: ls.CallHierarchyItem[] | null,
 		token?: code.CancellationToken,
@@ -2485,14 +2671,17 @@ export function createConverter(
 		items: null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	function asCallHierarchyIncomingCalls(
 		items: ReadonlyArray<ls.CallHierarchyIncomingCall>,
 		token?: code.CancellationToken,
 	): Promise<code.CallHierarchyIncomingCall[]>;
+
 	function asCallHierarchyIncomingCalls(
 		items: ReadonlyArray<ls.CallHierarchyIncomingCall> | null,
 		token?: code.CancellationToken,
 	): Promise<code.CallHierarchyIncomingCall[] | undefined>;
+
 	async function asCallHierarchyIncomingCalls(
 		items: ReadonlyArray<ls.CallHierarchyIncomingCall> | null,
 		token?: code.CancellationToken,
@@ -2517,14 +2706,17 @@ export function createConverter(
 		items: null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	function asCallHierarchyOutgoingCalls(
 		items: ReadonlyArray<ls.CallHierarchyOutgoingCall>,
 		token?: code.CancellationToken,
 	): Promise<code.CallHierarchyOutgoingCall[]>;
+
 	function asCallHierarchyOutgoingCalls(
 		items: ReadonlyArray<ls.CallHierarchyOutgoingCall> | null,
 		token?: code.CancellationToken,
 	): Promise<code.CallHierarchyOutgoingCall[] | undefined>;
+
 	async function asCallHierarchyOutgoingCalls(
 		items: ReadonlyArray<ls.CallHierarchyOutgoingCall> | null,
 		token?: code.CancellationToken,
@@ -2541,14 +2733,17 @@ export function createConverter(
 		value: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	function asSemanticTokens(
 		value: ls.SemanticTokens,
 		token?: code.CancellationToken,
 	): Promise<code.SemanticTokens>;
+
 	function asSemanticTokens(
 		value: ls.SemanticTokens | undefined | null,
 		token?: code.CancellationToken,
 	): Promise<code.SemanticTokens | undefined>;
+
 	async function asSemanticTokens(
 		value: ls.SemanticTokens | undefined | null,
 		_token?: code.CancellationToken,
@@ -2576,14 +2771,17 @@ export function createConverter(
 		value: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	function asSemanticTokensEdits(
 		value: ls.SemanticTokensDelta,
 		token?: code.CancellationToken,
 	): Promise<code.SemanticTokensEdits>;
+
 	function asSemanticTokensEdits(
 		value: ls.SemanticTokensDelta | undefined | null,
 		token?: code.CancellationToken,
 	): Promise<code.SemanticTokensEdits | undefined>;
+
 	async function asSemanticTokensEdits(
 		value: ls.SemanticTokensDelta | undefined | null,
 		_token?: code.CancellationToken,
@@ -2607,14 +2805,17 @@ export function createConverter(
 		value: null | undefined,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	function asLinkedEditingRanges(
 		value: ls.LinkedEditingRanges,
 		token?: code.CancellationToken,
 	): Promise<code.LinkedEditingRanges>;
+
 	function asLinkedEditingRanges(
 		value: ls.LinkedEditingRanges | null | undefined,
 		token?: code.CancellationToken,
 	): Promise<code.LinkedEditingRanges | undefined>;
+
 	async function asLinkedEditingRanges(
 		value: ls.LinkedEditingRanges | null | undefined,
 		token?: code.CancellationToken,
@@ -2629,10 +2830,13 @@ export function createConverter(
 	}
 
 	function asRegularExpression(value: null | undefined): undefined;
+
 	function asRegularExpression(value: string): RegExp;
+
 	function asRegularExpression(
 		value: string | null | undefined,
 	): RegExp | undefined;
+
 	function asRegularExpression(
 		value: string | null | undefined,
 	): RegExp | undefined {
@@ -2644,12 +2848,15 @@ export function createConverter(
 
 	//------ Type Hierarchy
 	function asTypeHierarchyItem(item: null): undefined;
+
 	function asTypeHierarchyItem(
 		item: ls.TypeHierarchyItem,
 	): code.TypeHierarchyItem;
+
 	function asTypeHierarchyItem(
 		item: ls.TypeHierarchyItem | null,
 	): code.TypeHierarchyItem | undefined;
+
 	function asTypeHierarchyItem(
 		item: ls.TypeHierarchyItem | null,
 	): code.TypeHierarchyItem | undefined {
@@ -2665,6 +2872,7 @@ export function createConverter(
 			asRange(item.selectionRange),
 			item.data,
 		);
+
 		if (item.tags !== undefined) {
 			result.tags = asSymbolTags(item.tags);
 		}
@@ -2675,14 +2883,17 @@ export function createConverter(
 		items: null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	function asTypeHierarchyItems(
 		items: ls.TypeHierarchyItem[],
 		token?: code.CancellationToken,
 	): Promise<code.TypeHierarchyItem[]>;
+
 	function asTypeHierarchyItems(
 		items: ls.TypeHierarchyItem[] | null,
 		token?: code.CancellationToken,
 	): Promise<code.TypeHierarchyItem[] | undefined>;
+
 	async function asTypeHierarchyItems(
 		items: ls.TypeHierarchyItem[] | null,
 		token?: code.CancellationToken,
@@ -2700,9 +2911,11 @@ export function createConverter(
 	}
 
 	function asGlobPattern(pattern: undefined | null): undefined;
+
 	function asGlobPattern(
 		pattern: ls.GlobPattern | null | undefined,
 	): code.GlobPattern | undefined;
+
 	function asGlobPattern(
 		pattern: ls.GlobPattern | null | undefined,
 	): code.GlobPattern | undefined {
@@ -2719,6 +2932,7 @@ export function createConverter(
 				const workspaceFolder = code.workspace.getWorkspaceFolder(
 					asUri(pattern.baseUri.uri),
 				);
+
 				return workspaceFolder !== undefined
 					? new code.RelativePattern(workspaceFolder, pattern.pattern)
 					: undefined;
@@ -2731,14 +2945,17 @@ export function createConverter(
 		value: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	function asInlineCompletionResult(
 		value: ls.InlineCompletionList,
 		token?: code.CancellationToken,
 	): Promise<code.InlineCompletionList>;
+
 	function asInlineCompletionResult(
 		value: ls.InlineCompletionItem[],
 		token?: code.CancellationToken,
 	): Promise<code.InlineCompletionItem[]>;
+
 	function asInlineCompletionResult(
 		value:
 			| ls.InlineCompletionItem[]
@@ -2749,6 +2966,7 @@ export function createConverter(
 	): Promise<
 		code.InlineCompletionItem[] | code.InlineCompletionList | undefined
 	>;
+
 	async function asInlineCompletionResult(
 		value:
 			| ls.InlineCompletionItem[]
@@ -2770,6 +2988,7 @@ export function createConverter(
 			);
 		}
 		const list = <ls.InlineCompletionList>value;
+
 		const converted = await async.map(
 			list.items,
 			(item) => {
@@ -2777,6 +2996,7 @@ export function createConverter(
 			},
 			token,
 		);
+
 		return new code.InlineCompletionList(converted);
 	}
 
@@ -2784,6 +3004,7 @@ export function createConverter(
 		item: ls.InlineCompletionItem,
 	): code.InlineCompletionItem {
 		let insertText: string | code.SnippetString;
+
 		if (typeof item.insertText === "string") {
 			insertText = item.insertText;
 		} else {
@@ -2791,6 +3012,7 @@ export function createConverter(
 		}
 
 		let command: code.Command | undefined = undefined;
+
 		if (item.command) {
 			command = asCommand(item.command);
 		}

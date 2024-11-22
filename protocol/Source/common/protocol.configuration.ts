@@ -25,8 +25,10 @@ import { MessageDirection, ProtocolRequestType } from "./messages";
  */
 export namespace ConfigurationRequest {
 	export const method: "workspace/configuration" = "workspace/configuration";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.serverToClient;
+
 	export const type = new ProtocolRequestType<
 		ConfigurationParams,
 		LSPAny[],
@@ -34,11 +36,13 @@ export namespace ConfigurationRequest {
 		void,
 		void
 	>(method);
+
 	export type HandlerSignature = RequestHandler<
 		ConfigurationParams,
 		LSPAny[],
 		void
 	>;
+
 	export type MiddlewareSignature = (
 		params: ConfigurationParams,
 		token: CancellationToken,

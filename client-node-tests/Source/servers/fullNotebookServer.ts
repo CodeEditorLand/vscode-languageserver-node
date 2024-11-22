@@ -26,16 +26,19 @@ console.error = connection.console.error.bind(connection.console);
 const receivedNotifications: Set<string> = new Set();
 namespace GotNotifiedRequest {
 	export const method: "testing/gotNotified" = "testing/gotNotified";
+
 	export const type = new RequestType<string, boolean, void>(method);
 }
 
 namespace ClearNotifiedRequest {
 	export const method: "testing/clearNotified" = "testing/clearNotified";
+
 	export const type = new RequestType<string, void, void>(method);
 }
 
 namespace SetDiagnosticsNotification {
 	export const method: "testing/setDiagnostics" = "testing/setDiagnostics";
+
 	export const type = new NotificationType<DocumentDiagnosticReport>(method);
 }
 
@@ -59,6 +62,7 @@ connection.onInitialize((_params: InitializeParams): any => {
 			workspaceDiagnostics: false,
 		},
 	};
+
 	return { capabilities };
 });
 
@@ -76,15 +80,18 @@ connection.notebooks.synchronization.onDidCloseNotebookDocument(() => {
 });
 connection.languages.diagnostics.on((params) => {
 	receivedNotifications.add(PublishDiagnosticsNotification.method);
+
 	const result = diagnostics.get(params.textDocument.uri) || {
 		kind: "unchanged",
 		resultId: params.previousResultId || "",
 	};
+
 	return result;
 });
 
 connection.onRequest(GotNotifiedRequest.type, (method: string) => {
 	const result = receivedNotifications.has(method);
+
 	if (result) {
 		receivedNotifications.delete(method);
 	}

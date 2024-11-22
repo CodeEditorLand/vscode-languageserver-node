@@ -78,8 +78,10 @@ export type InlineCompletionParams = WorkDoneProgressParams &
 export namespace InlineCompletionRequest {
 	export const method: "textDocument/inlineCompletion" =
 		"textDocument/inlineCompletion";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		InlineCompletionParams,
 		InlineCompletionList | InlineCompletionItem[] | null,
@@ -87,6 +89,7 @@ export namespace InlineCompletionRequest {
 		void,
 		InlineCompletionRegistrationOptions
 	>(method);
+
 	export type HandlerSignature = RequestHandler<
 		InlineCompletionParams,
 		InlineCompletionList | InlineCompletionItem[] | null,

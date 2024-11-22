@@ -87,7 +87,9 @@ class TypeHierarchyProvider implements VTypeHierarchyProvider {
 		token: CancellationToken,
 	): ProviderResult<VTypeHierarchyItem[]> {
 		const client = this.client;
+
 		const middleware = this.middleware;
+
 		const prepareTypeHierarchy: PrepareTypeHierarchySignature = (
 			document,
 			position,
@@ -98,6 +100,7 @@ class TypeHierarchyProvider implements VTypeHierarchyProvider {
 					document,
 					position,
 				);
+
 			return client
 				.sendRequest(TypeHierarchyPrepareRequest.type, params, token)
 				.then(
@@ -120,6 +123,7 @@ class TypeHierarchyProvider implements VTypeHierarchyProvider {
 					},
 				);
 		};
+
 		return middleware.prepareTypeHierarchy
 			? middleware.prepareTypeHierarchy(
 					document,
@@ -135,7 +139,9 @@ class TypeHierarchyProvider implements VTypeHierarchyProvider {
 		token: CancellationToken,
 	): ProviderResult<VTypeHierarchyItem[]> {
 		const client = this.client;
+
 		const middleware = this.middleware;
+
 		const provideTypeHierarchySupertypes: TypeHierarchySupertypesSignature =
 			(item, token) => {
 				const params: TypeHierarchySupertypesParams = {
@@ -143,6 +149,7 @@ class TypeHierarchyProvider implements VTypeHierarchyProvider {
 						item,
 					),
 				};
+
 				return client
 					.sendRequest(
 						TypeHierarchySupertypesRequest.type,
@@ -169,6 +176,7 @@ class TypeHierarchyProvider implements VTypeHierarchyProvider {
 						},
 					);
 			};
+
 		return middleware.provideTypeHierarchySupertypes
 			? middleware.provideTypeHierarchySupertypes(
 					item,
@@ -183,7 +191,9 @@ class TypeHierarchyProvider implements VTypeHierarchyProvider {
 		token: CancellationToken,
 	): ProviderResult<VTypeHierarchyItem[]> {
 		const client = this.client;
+
 		const middleware = this.middleware;
+
 		const provideTypeHierarchySubtypes: TypeHierarchySubtypesSignature = (
 			item,
 			token,
@@ -191,6 +201,7 @@ class TypeHierarchyProvider implements VTypeHierarchyProvider {
 			const params: TypeHierarchySubtypesParams = {
 				item: client.code2ProtocolConverter.asTypeHierarchyItem(item),
 			};
+
 			return client
 				.sendRequest(TypeHierarchySubtypesRequest.type, params, token)
 				.then(
@@ -213,6 +224,7 @@ class TypeHierarchyProvider implements VTypeHierarchyProvider {
 					},
 				);
 		};
+
 		return middleware.provideTypeHierarchySubtypes
 			? middleware.provideTypeHierarchySubtypes(
 					item,
@@ -249,6 +261,7 @@ export class TypeHierarchyFeature extends TextDocumentLanguageFeature<
 			documentSelector,
 			capabilities.typeHierarchyProvider,
 		);
+
 		if (!id || !options) {
 			return;
 		}
@@ -259,7 +272,9 @@ export class TypeHierarchyFeature extends TextDocumentLanguageFeature<
 		options: TypeHierarchyRegistrationOptions,
 	): [Disposable, TypeHierarchyProvider] {
 		const client = this._client;
+
 		const provider = new TypeHierarchyProvider(client);
+
 		return [
 			Languages.registerTypeHierarchyProvider(
 				client.protocol2CodeConverter.asDocumentSelector(

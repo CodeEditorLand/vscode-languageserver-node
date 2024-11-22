@@ -352,15 +352,20 @@ export namespace Trace {
 			return Trace.Off;
 		}
 		value = value.toLowerCase();
+
 		switch (value) {
 			case "off":
 				return Trace.Off;
+
 			case "messages":
 				return Trace.Messages;
+
 			case "compact":
 				return Trace.Compact;
+
 			case "verbose":
 				return Trace.Verbose;
+
 			default:
 				return Trace.Off;
 		}
@@ -370,12 +375,16 @@ export namespace Trace {
 		switch (value) {
 			case Trace.Off:
 				return "off";
+
 			case Trace.Messages:
 				return "messages";
+
 			case Trace.Compact:
 				return "compact";
+
 			case Trace.Verbose:
 				return "verbose";
+
 			default:
 				return "off";
 		}
@@ -392,6 +401,7 @@ export namespace TraceFormat {
 			return TraceFormat.Text;
 		}
 		value = value.toLowerCase();
+
 		if (value === "json") {
 			return TraceFormat.JSON;
 		} else {
@@ -464,6 +474,7 @@ export type ConnectionStrategy = {
 export namespace ConnectionStrategy {
 	export function is(value: any): value is ConnectionStrategy {
 		const candidate: ConnectionStrategy = value;
+
 		return candidate && Is.func(candidate.cancelUndispatched);
 	}
 }
@@ -491,6 +502,7 @@ export interface IdCancellationReceiverStrategy {
 export namespace IdCancellationReceiverStrategy {
 	export function is(value: any): value is IdCancellationReceiverStrategy {
 		const candidate: IdCancellationReceiverStrategy = value;
+
 		return (
 			candidate &&
 			(candidate.kind === undefined || candidate.kind === "id") &&
@@ -523,6 +535,7 @@ export namespace RequestCancellationReceiverStrategy {
 		value: any,
 	): value is RequestCancellationReceiverStrategy {
 		const candidate: RequestCancellationReceiverStrategy = value;
+
 		return (
 			candidate &&
 			candidate.kind === "request" &&
@@ -598,6 +611,7 @@ export namespace CancellationSenderStrategy {
 
 	export function is(value: any): value is CancellationSenderStrategy {
 		const candidate: CancellationSenderStrategy = value;
+
 		return (
 			candidate &&
 			Is.func(candidate.sendCancellation) &&
@@ -620,6 +634,7 @@ export namespace CancellationStrategy {
 
 	export function is(value: any): value is CancellationStrategy {
 		const candidate: CancellationStrategy = value;
+
 		return (
 			candidate &&
 			CancellationReceiverStrategy.is(candidate.receiver) &&
@@ -638,6 +653,7 @@ export interface MessageStrategy {
 export namespace MessageStrategy {
 	export function is(value: any): value is MessageStrategy {
 		const candidate: MessageStrategy = value;
+
 		return candidate && Is.func(candidate.handleMessage);
 	}
 }
@@ -656,6 +672,7 @@ export interface ConnectionOptions {
 export namespace ConnectionOptions {
 	export function is(value: any): value is ConnectionOptions {
 		const candidate: ConnectionOptions = value;
+
 		return (
 			candidate &&
 			(CancellationStrategy.is(candidate.cancellationStrategy) ||
@@ -1012,46 +1029,66 @@ export function createMessageConnection(
 	const logger: Logger = _logger !== undefined ? _logger : NullLogger;
 
 	let sequenceNumber = 0;
+
 	let notificationSequenceNumber = 0;
+
 	let unknownResponseSequenceNumber = 0;
+
 	const version: string = "2.0";
+
 	const maxParallelism = options?.maxParallelism ?? -1;
+
 	let inFlight: number = 0;
 
 	let starRequestHandler: StarRequestHandler | undefined = undefined;
+
 	const requestHandlers: Map<string, RequestHandlerElement> = new Map();
+
 	let starNotificationHandler: StarNotificationHandler | undefined =
 		undefined;
+
 	const notificationHandlers: Map<string, NotificationHandlerElement> =
 		new Map();
+
 	const progressHandlers: Map<
 		number | string,
 		NotificationHandler1<any>
 	> = new Map();
 
 	let timer: Disposable | undefined;
+
 	let messageQueue: MessageQueue = new LinkedMap<string, Message>();
+
 	let responsePromises: Map<string | number, ResponsePromise> = new Map();
+
 	let knownCanceledRequests: Set<string | number> = new Set();
+
 	let requestTokens: Map<string | number, AbstractCancellationTokenSource> =
 		new Map();
 
 	let trace: Trace = Trace.Off;
+
 	let traceFormat: TraceFormat = TraceFormat.Text;
+
 	let tracer: Tracer | undefined;
 
 	let state: ConnectionState = ConnectionState.New;
+
 	const errorEmitter: Emitter<
 		[Error, Message | undefined, number | undefined]
 	> = new Emitter<[Error, Message, number]>();
+
 	const closeEmitter: Emitter<void> = new Emitter<void>();
+
 	const unhandledNotificationEmitter: Emitter<NotificationMessage> =
 		new Emitter<NotificationMessage>();
+
 	const unhandledProgressEmitter: Emitter<ProgressParams<any>> = new Emitter<
 		ProgressParams<any>
 	>();
 
 	const disposeEmitter: Emitter<void> = new Emitter<void>();
+
 	const cancellationStrategy =
 		options && options.cancellationStrategy
 			? options.cancellationStrategy
@@ -1152,6 +1189,7 @@ export function createMessageConnection(
 		}
 		timer = RAL().timer.setImmediate(async () => {
 			timer = undefined;
+
 			if (messageQueue.size === 0) {
 				return;
 			}
@@ -1159,10 +1197,14 @@ export function createMessageConnection(
 				return;
 			}
 			const message = messageQueue.shift()!;
+
 			let result: NotificationResult | undefined;
+
 			try {
 				inFlight++;
+
 				const messageStrategy = options?.messageStrategy;
+
 				if (MessageStrategy.is(messageStrategy)) {
 					result = messageStrategy.handleMessage(
 						message,
@@ -1216,10 +1258,14 @@ export function createMessageConnection(
 				message.method === CancelNotification.type.method
 			) {
 				const cancelId = (message.params as CancelParams).id;
+
 				const key = createRequestQueueKey(cancelId);
+
 				const toCancel = messageQueue.get(key);
+
 				if (Message.isRequest(toCancel)) {
 					const strategy = options?.connectionStrategy;
+
 					const response =
 						strategy && strategy.cancelUndispatched
 							? strategy.cancelUndispatched(
@@ -1227,6 +1273,7 @@ export function createMessageConnection(
 									cancelUndispatched,
 								)
 							: cancelUndispatched(toCancel);
+
 					if (
 						response &&
 						(response.error !== undefined ||
@@ -1247,6 +1294,7 @@ export function createMessageConnection(
 									`Sending response for canceled message failed.`,
 								),
 							);
+
 						return;
 					}
 				}
@@ -1255,6 +1303,7 @@ export function createMessageConnection(
 				if (cancellationToken !== undefined) {
 					cancellationToken.cancel();
 					traceReceivedNotification(message);
+
 					return;
 				} else {
 					// Remember the cancel but still queue the message to
@@ -1286,6 +1335,7 @@ export function createMessageConnection(
 				jsonrpc: version,
 				id: requestMessage.id,
 			};
+
 			if (resultOrError instanceof ResponseError) {
 				message.error = (<ResponseError<any>>resultOrError).toJson();
 			} else {
@@ -1293,6 +1343,7 @@ export function createMessageConnection(
 					resultOrError === undefined ? null : resultOrError;
 			}
 			traceSendingResponse(message, method, startTime);
+
 			return messageWriter.write(message);
 		}
 		function replyError(
@@ -1306,18 +1357,23 @@ export function createMessageConnection(
 				error: error.toJson(),
 			};
 			traceSendingResponse(message, method, startTime);
+
 			return messageWriter.write(message);
 		}
 		traceReceivedRequest(requestMessage);
 
 		const element = requestHandlers.get(requestMessage.method);
+
 		let type: MessageSignature | undefined;
+
 		let requestHandler: GenericRequestHandler<any, any> | undefined;
+
 		if (element) {
 			type = element.type;
 			requestHandler = element.handler;
 		}
 		const startTime = Date.now();
+
 		if (requestHandler || starRequestHandler) {
 			const tokenKey = requestMessage.id ?? String(Date.now()); //
 			const cancellationSource = IdCancellationReceiverStrategy.is(
@@ -1341,6 +1397,7 @@ export function createMessageConnection(
 			}
 			try {
 				let handlerResult: any;
+
 				if (requestHandler) {
 					if (requestMessage.params === undefined) {
 						if (type !== undefined && type.numberOfParams !== 0) {
@@ -1464,10 +1521,13 @@ export function createMessageConnection(
 			}
 		} else {
 			const key = responseMessage.id;
+
 			const responsePromise = responsePromises.get(key);
 			traceReceivedResponse(responseMessage, responsePromise);
+
 			if (responsePromise !== undefined) {
 				responsePromises.delete(key);
+
 				try {
 					if (responseMessage.error) {
 						const error = responseMessage.error;
@@ -1506,14 +1566,18 @@ export function createMessageConnection(
 			return;
 		}
 		let type: MessageSignature | undefined = undefined;
+
 		let notificationHandler: GenericNotificationHandler | undefined;
+
 		if (message.method === CancelNotification.type.method) {
 			const cancelId = (message.params as CancelParams).id;
 			knownCanceledRequests.delete(cancelId);
 			traceReceivedNotification(message);
+
 			return;
 		} else {
 			const element = notificationHandlers.get(message.method);
+
 			if (element) {
 				notificationHandler = element.handler;
 				type = element.type;
@@ -1522,6 +1586,7 @@ export function createMessageConnection(
 		if (notificationHandler || starNotificationHandler) {
 			try {
 				traceReceivedNotification(message);
+
 				if (notificationHandler) {
 					if (message.params === undefined) {
 						if (type !== undefined) {
@@ -1540,6 +1605,7 @@ export function createMessageConnection(
 						// There are JSON-RPC libraries that send progress message as positional params although
 						// specified as named. So convert them if this is the case.
 						const params = message.params;
+
 						if (
 							message.method ===
 								ProgressNotification.type.method &&
@@ -1608,6 +1674,7 @@ export function createMessageConnection(
 	function handleInvalidMessage(message: Message): void {
 		if (!message) {
 			logger.error("Received empty message.");
+
 			return;
 		}
 		logger.error(
@@ -1615,9 +1682,12 @@ export function createMessageConnection(
 		);
 		// Test whether we find an id to reject the promise
 		const responseMessage: ResponseMessage = message as ResponseMessage;
+
 		if (Is.string(responseMessage.id) || Is.number(responseMessage.id)) {
 			const key = responseMessage.id;
+
 			const responseHandler = responsePromises.get(key);
+
 			if (responseHandler) {
 				responseHandler.reject(
 					new Error(
@@ -1631,9 +1701,11 @@ export function createMessageConnection(
 	function stringifyTrace(
 		params: string | number | boolean | object | any[],
 	): string;
+
 	function stringifyTrace(
 		params: string | number | boolean | object | any[] | undefined | null,
 	): string | undefined;
+
 	function stringifyTrace(
 		params: string | number | boolean | object | any[] | undefined | null,
 	): string | undefined {
@@ -1643,8 +1715,10 @@ export function createMessageConnection(
 		switch (trace) {
 			case Trace.Verbose:
 				return JSON.stringify(params, null, 4);
+
 			case Trace.Compact:
 				return JSON.stringify(params);
+
 			default:
 				return undefined;
 		}
@@ -1657,6 +1731,7 @@ export function createMessageConnection(
 
 		if (traceFormat === TraceFormat.Text) {
 			let data: string | undefined = undefined;
+
 			if (
 				(trace === Trace.Verbose || trace === Trace.Compact) &&
 				message.params
@@ -1679,6 +1754,7 @@ export function createMessageConnection(
 
 		if (traceFormat === TraceFormat.Text) {
 			let data: string | undefined = undefined;
+
 			if (trace === Trace.Verbose || trace === Trace.Compact) {
 				if (message.params) {
 					data = `Params: ${stringifyTrace(message.params)}\n\n`;
@@ -1703,6 +1779,7 @@ export function createMessageConnection(
 
 		if (traceFormat === TraceFormat.Text) {
 			let data: string | undefined = undefined;
+
 			if (trace === Trace.Verbose || trace === Trace.Compact) {
 				if (message.error && message.error.data) {
 					data = `Error data: ${stringifyTrace(message.error.data)}\n\n`;
@@ -1730,6 +1807,7 @@ export function createMessageConnection(
 
 		if (traceFormat === TraceFormat.Text) {
 			let data: string | undefined = undefined;
+
 			if (
 				(trace === Trace.Verbose || trace === Trace.Compact) &&
 				message.params
@@ -1756,6 +1834,7 @@ export function createMessageConnection(
 
 		if (traceFormat === TraceFormat.Text) {
 			let data: string | undefined = undefined;
+
 			if (trace === Trace.Verbose || trace === Trace.Compact) {
 				if (message.params) {
 					data = `Params: ${stringifyTrace(message.params)}\n\n`;
@@ -1779,6 +1858,7 @@ export function createMessageConnection(
 
 		if (traceFormat === TraceFormat.Text) {
 			let data: string | undefined = undefined;
+
 			if (trace === Trace.Verbose || trace === Trace.Compact) {
 				if (message.error && message.error.data) {
 					data = `Error data: ${stringifyTrace(message.error.data)}\n\n`;
@@ -1900,8 +1980,10 @@ export function createMessageConnection(
 					);
 				}
 				return nullToUndefined(param);
+
 			case ParameterStructures.byPosition:
 				return [undefinedToNull(param)];
+
 			default:
 				throw new Error(
 					`Unknown parameter structure ${parameterStructures.toString()}`,
@@ -1914,19 +1996,26 @@ export function createMessageConnection(
 		params: any[],
 	): any | any[] | null {
 		let result: any | any[] | null;
+
 		const numberOfParams = type.numberOfParams;
+
 		switch (numberOfParams) {
 			case 0:
 				result = undefined;
+
 				break;
+
 			case 1:
 				result = computeSingleParam(
 					type.parameterStructures,
 					params[0],
 				);
+
 				break;
+
 			default:
 				result = [];
+
 				for (let i = 0; i < params.length && i < numberOfParams; i++) {
 					result.push(undefinedToNull(params[i]));
 				}
@@ -1948,29 +2037,41 @@ export function createMessageConnection(
 			throwIfClosedOrDisposed();
 
 			let method: string;
+
 			let messageParams: object | [] | undefined;
+
 			if (Is.string(type)) {
 				method = type;
+
 				const first: unknown = args[0];
+
 				let paramStart: number = 0;
+
 				let parameterStructures: ParameterStructures =
 					ParameterStructures.auto;
+
 				if (ParameterStructures.is(first)) {
 					paramStart = 1;
 					parameterStructures = first;
 				}
 				const paramEnd: number = args.length;
+
 				const numberOfParams = paramEnd - paramStart;
+
 				switch (numberOfParams) {
 					case 0:
 						messageParams = undefined;
+
 						break;
+
 					case 1:
 						messageParams = computeSingleParam(
 							parameterStructures,
 							args[paramStart],
 						);
+
 						break;
+
 					default:
 						if (
 							parameterStructures === ParameterStructures.byName
@@ -1982,6 +2083,7 @@ export function createMessageConnection(
 						messageParams = args
 							.slice(paramStart, paramEnd)
 							.map((value) => undefinedToNull(value));
+
 						break;
 				}
 			} else {
@@ -1995,8 +2097,10 @@ export function createMessageConnection(
 				params: messageParams,
 			};
 			traceSendingNotification(notificationMessage);
+
 			return messageWriter.write(notificationMessage).catch((error) => {
 				logger.error(`Sending notification failed.`);
+
 				throw error;
 			});
 		},
@@ -2005,7 +2109,9 @@ export function createMessageConnection(
 			handler?: GenericNotificationHandler,
 		): Disposable => {
 			throwIfClosedOrDisposed();
+
 			let method: string | undefined;
+
 			if (Is.func(type)) {
 				starNotificationHandler = type as StarNotificationHandler;
 			} else if (handler) {
@@ -2041,6 +2147,7 @@ export function createMessageConnection(
 				);
 			}
 			progressHandlers.set(token, handler);
+
 			return {
 				dispose: () => {
 					progressHandlers.delete(token);
@@ -2065,6 +2172,7 @@ export function createMessageConnection(
 			...args: any[]
 		) => {
 			throwIfClosedOrDisposed();
+
 			throwIfNotListening();
 
 			function sendCancellation(
@@ -2075,6 +2183,7 @@ export function createMessageConnection(
 					connection,
 					id,
 				);
+
 				if (p === undefined) {
 					logger.log(
 						`Received no promise from cancellation strategy when cancelling id ${id}`,
@@ -2089,35 +2198,49 @@ export function createMessageConnection(
 			}
 
 			let method: string;
+
 			let messageParams: object | [] | undefined;
+
 			let token: CancellationToken | undefined = undefined;
+
 			if (Is.string(type)) {
 				method = type;
+
 				const first: unknown = args[0];
+
 				const last: unknown = args[args.length - 1];
+
 				let paramStart: number = 0;
+
 				let parameterStructures: ParameterStructures =
 					ParameterStructures.auto;
+
 				if (ParameterStructures.is(first)) {
 					paramStart = 1;
 					parameterStructures = first;
 				}
 				let paramEnd: number = args.length;
+
 				if (CancellationToken.is(last)) {
 					paramEnd = paramEnd - 1;
 					token = last;
 				}
 				const numberOfParams = paramEnd - paramStart;
+
 				switch (numberOfParams) {
 					case 0:
 						messageParams = undefined;
+
 						break;
+
 					case 1:
 						messageParams = computeSingleParam(
 							parameterStructures,
 							args[paramStart],
 						);
+
 						break;
+
 					default:
 						if (
 							parameterStructures === ParameterStructures.byName
@@ -2129,12 +2252,14 @@ export function createMessageConnection(
 						messageParams = args
 							.slice(paramStart, paramEnd)
 							.map((value) => undefinedToNull(value));
+
 						break;
 				}
 			} else {
 				const params = args;
 				method = type.method;
 				messageParams = computeMessageParams(type, params);
+
 				const numberOfParams = type.numberOfParams;
 				token = CancellationToken.is(params[numberOfParams])
 					? params[numberOfParams]
@@ -2142,8 +2267,11 @@ export function createMessageConnection(
 			}
 
 			const id = sequenceNumber++;
+
 			let disposable: Disposable;
+
 			let tokenWasCancelled = false;
+
 			if (token !== undefined) {
 				if (token.isCancellationRequested) {
 					tokenWasCancelled = true;
@@ -2162,6 +2290,7 @@ export function createMessageConnection(
 			};
 
 			traceSendingRequest(requestMessage);
+
 			if (
 				typeof cancellationStrategy.sender.enableCancellation ===
 				"function"
@@ -2177,20 +2306,24 @@ export function createMessageConnection(
 						cancellationStrategy.sender.cleanup(id);
 						disposable?.dispose();
 					};
+
 					const rejectWithCleanup = (r: any) => {
 						reject(r);
 						cancellationStrategy.sender.cleanup(id);
 						disposable?.dispose();
 					};
+
 					const responsePromise: ResponsePromise | null = {
 						method: method,
 						timerStart: Date.now(),
 						resolve: resolveWithCleanup,
 						reject: rejectWithCleanup,
 					};
+
 					try {
 						responsePromises.set(id, responsePromise);
 						await messageWriter.write(requestMessage);
+
 						if (tokenWasCancelled) {
 							sendCancellation(connection, id);
 						}
@@ -2207,6 +2340,7 @@ export function createMessageConnection(
 							),
 						);
 						logger.error(`Sending request failed.`);
+
 						throw error;
 					}
 				},
@@ -2219,11 +2353,13 @@ export function createMessageConnection(
 			throwIfClosedOrDisposed();
 
 			let method: string | undefined | null = null;
+
 			if (StarRequestHandler.is(type)) {
 				method = undefined;
 				starRequestHandler = type;
 			} else if (Is.string(type)) {
 				method = null;
+
 				if (handler !== undefined) {
 					method = type;
 					requestHandlers.set(type, {
@@ -2259,6 +2395,7 @@ export function createMessageConnection(
 			sendNotificationOrTraceOptions?: boolean | TraceOptions,
 		): Promise<void> => {
 			let _sendNotification: boolean = false;
+
 			let _traceFormat: TraceFormat = TraceFormat.Text;
 
 			if (sendNotificationOrTraceOptions !== undefined) {
@@ -2276,6 +2413,7 @@ export function createMessageConnection(
 
 			trace = _value;
 			traceFormat = _traceFormat;
+
 			if (trace === Trace.Off) {
 				tracer = undefined;
 			} else {
@@ -2300,10 +2438,12 @@ export function createMessageConnection(
 			}
 			state = ConnectionState.Disposed;
 			disposeEmitter.fire(undefined);
+
 			const error = new ResponseError(
 				ErrorCodes.PendingResponseRejected,
 				"Pending response rejected since connection got disposed",
 			);
+
 			for (const promise of responsePromises.values()) {
 				promise.reject(error);
 			}
@@ -2321,6 +2461,7 @@ export function createMessageConnection(
 		},
 		listen: () => {
 			throwIfClosedOrDisposed();
+
 			throwIfListening();
 
 			state = ConnectionState.Listening;
@@ -2342,6 +2483,7 @@ export function createMessageConnection(
 
 	connection.onNotification(ProgressNotification.type, async (params) => {
 		const handler = progressHandlers.get(params.token);
+
 		if (handler) {
 			await handler(params.value);
 		} else {

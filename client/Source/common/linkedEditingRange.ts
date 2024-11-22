@@ -60,6 +60,7 @@ export class LinkedEditingFeature extends TextDocumentLanguageFeature<
 			documentSelector,
 			capabilities.linkedEditingRangeProvider,
 		);
+
 		if (!id || !options) {
 			return;
 		}
@@ -70,9 +71,11 @@ export class LinkedEditingFeature extends TextDocumentLanguageFeature<
 		options: proto.LinkedEditingRangeRegistrationOptions,
 	): [code.Disposable, code.LinkedEditingRangeProvider] {
 		const selector = options.documentSelector!;
+
 		const provider: code.LinkedEditingRangeProvider = {
 			provideLinkedEditingRanges: (document, position, token) => {
 				const client = this._client;
+
 				const provideLinkedEditing: ProvideLinkedEditingRangeSignature =
 					(document, position, token) => {
 						return client
@@ -104,7 +107,9 @@ export class LinkedEditingFeature extends TextDocumentLanguageFeature<
 								},
 							);
 					};
+
 				const middleware = client.middleware;
+
 				return middleware.provideLinkedEditingRange
 					? middleware.provideLinkedEditingRange(
 							document,
@@ -115,6 +120,7 @@ export class LinkedEditingFeature extends TextDocumentLanguageFeature<
 					: provideLinkedEditing(document, position, token);
 			},
 		};
+
 		return [this.registerProvider(selector, provider), provider];
 	}
 

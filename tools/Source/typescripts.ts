@@ -11,11 +11,13 @@ const isWindows = process.platform === "win32";
 function normalizePath(value: string): string {
 	if (isWindows) {
 		value = value.replace(/\\/g, "/");
+
 		if (/^[a-z]:/.test(value)) {
 			value = value.charAt(0).toUpperCase() + value.substring(1);
 		}
 	}
 	const result = path.posix.normalize(value);
+
 	return result.length > 0 && result.charAt(result.length - 1) === "/"
 		? result.substr(0, result.length - 1)
 		: result;
@@ -42,6 +44,7 @@ export namespace CompileOptions {
 	): string | undefined {
 		if (options.project) {
 			const projectPath = path.resolve(options.project);
+
 			if (ts.sys.directoryExists(projectPath)) {
 				return normalizePath(path.join(projectPath, "tsconfig.json"));
 			} else {
@@ -49,6 +52,7 @@ export namespace CompileOptions {
 			}
 		}
 		const result = (options as InternalCompilerOptions).configFilePath;
+
 		return result && makeAbsolute(result);
 	}
 
@@ -63,6 +67,7 @@ export namespace CompileOptions {
 						noEmit: true,
 					}
 				: {};
+
 		return options;
 	}
 }
@@ -193,10 +198,12 @@ export class Symbols {
 	public createKey(symbol: ts.Symbol): string {
 		let result: string | undefined = (symbol as InternalSymbol)
 			.__symbol__data__key__;
+
 		if (result !== undefined) {
 			return result;
 		}
 		const declarations = symbol.getDeclarations();
+
 		if (declarations === undefined) {
 			if (this.typeChecker.isUnknownSymbol(symbol)) {
 				return Symbols.Unknown;
@@ -207,6 +214,7 @@ export class Symbols {
 			}
 		}
 		const fragments: { f: string; s: number; e: number; k: number }[] = [];
+
 		for (const declaration of declarations) {
 			fragments.push({
 				f: declaration.getSourceFile().fileName,
@@ -218,14 +226,17 @@ export class Symbols {
 		if (fragments.length > 1) {
 			fragments.sort((a, b) => {
 				let result = a.f < b.f ? -1 : a.f > b.f ? 1 : 0;
+
 				if (result !== 0) {
 					return result;
 				}
 				result = a.s - b.s;
+
 				if (result !== 0) {
 					return result;
 				}
 				result = a.e - b.e;
+
 				if (result !== 0) {
 					return result;
 				}
@@ -233,12 +244,14 @@ export class Symbols {
 			});
 		}
 		const hash = crypto.createHash("sha256");
+
 		if ((symbol.flags & ts.SymbolFlags.Transient) !== 0) {
 			hash.update(JSON.stringify({ trans: true }, undefined, 0));
 		}
 		hash.update(JSON.stringify(fragments, undefined, 0));
 		result = hash.digest("base64");
 		(symbol as InternalSymbol).__symbol__data__key__ = result;
+
 		return result;
 	}
 
@@ -246,22 +259,28 @@ export class Symbols {
 		symbol: ts.Symbol,
 	): ts.Symbol[] | undefined {
 		const result: ts.Symbol[] = [];
+
 		const declarations = symbol.getDeclarations();
+
 		if (declarations === undefined) {
 			return undefined;
 		}
 		const typeChecker = this.typeChecker;
+
 		for (const declaration of declarations) {
 			if (ts.isClassDeclaration(declaration)) {
 				const heritageClauses = declaration.heritageClauses;
+
 				if (heritageClauses) {
 					for (const heritageClause of heritageClauses) {
 						for (const type of heritageClause.types) {
 							const tsType = typeChecker.getTypeAtLocation(
 								type.expression,
 							);
+
 							if (tsType !== undefined) {
 								const baseSymbol = tsType.getSymbol();
+
 								if (
 									baseSymbol !== undefined &&
 									baseSymbol !== symbol
@@ -281,14 +300,18 @@ export class Symbols {
 		symbol: ts.Symbol,
 	): ts.Symbol[] | undefined {
 		const result: ts.Symbol[] = [];
+
 		const tsType = this.typeChecker.getDeclaredTypeOfSymbol(symbol);
+
 		if (tsType === undefined) {
 			return undefined;
 		}
 		const baseTypes = tsType.getBaseTypes();
+
 		if (baseTypes !== undefined) {
 			for (const base of baseTypes) {
 				const symbol = base.getSymbol();
+
 				if (symbol) {
 					result.push(symbol);
 				}
@@ -302,6 +325,7 @@ export class Symbols {
 			return this.typeChecker.getDeclaredTypeOfSymbol(symbol);
 		}
 		const location = this.inferLocationNode(symbol);
+
 		if (location !== undefined) {
 			return this.typeChecker.getTypeOfSymbolAtLocation(symbol, location);
 		} else {
@@ -311,11 +335,13 @@ export class Symbols {
 
 	private inferLocationNode(symbol: ts.Symbol): ts.Node | undefined {
 		const declarations = symbol.declarations;
+
 		if (declarations !== undefined && declarations.length > 0) {
 			return declarations[0];
 		}
 		if (Symbols.isPrototype(symbol)) {
 			const parent = Symbols.getParent(symbol);
+
 			if (parent !== undefined) {
 				return this.inferLocationNode(parent);
 			}

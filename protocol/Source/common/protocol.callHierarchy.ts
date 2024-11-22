@@ -67,8 +67,10 @@ export interface CallHierarchyPrepareParams
 export namespace CallHierarchyPrepareRequest {
 	export const method: "textDocument/prepareCallHierarchy" =
 		"textDocument/prepareCallHierarchy";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		CallHierarchyPrepareParams,
 		CallHierarchyItem[] | null,
@@ -76,6 +78,7 @@ export namespace CallHierarchyPrepareRequest {
 		void,
 		CallHierarchyRegistrationOptions
 	>(method);
+
 	export type HandlerSignature = RequestHandler<
 		CallHierarchyPrepareParams,
 		CallHierarchyItem[] | null,
@@ -102,8 +105,10 @@ export interface CallHierarchyIncomingCallsParams
 export namespace CallHierarchyIncomingCallsRequest {
 	export const method: "callHierarchy/incomingCalls" =
 		"callHierarchy/incomingCalls";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		CallHierarchyIncomingCallsParams,
 		CallHierarchyIncomingCall[] | null,
@@ -111,6 +116,7 @@ export namespace CallHierarchyIncomingCallsRequest {
 		void,
 		void
 	>(method);
+
 	export type HandlerSignature = RequestHandler<
 		CallHierarchyIncomingCallsParams,
 		CallHierarchyIncomingCall[] | null,
@@ -137,8 +143,10 @@ export interface CallHierarchyOutgoingCallsParams
 export namespace CallHierarchyOutgoingCallsRequest {
 	export const method: "callHierarchy/outgoingCalls" =
 		"callHierarchy/outgoingCalls";
+
 	export const messageDirection: MessageDirection =
 		MessageDirection.clientToServer;
+
 	export const type = new ProtocolRequestType<
 		CallHierarchyOutgoingCallsParams,
 		CallHierarchyOutgoingCall[] | null,
@@ -146,6 +154,7 @@ export namespace CallHierarchyOutgoingCallsRequest {
 		void,
 		void
 	>(method);
+
 	export type HandlerSignature = RequestHandler<
 		CallHierarchyOutgoingCallsParams,
 		CallHierarchyOutgoingCall[] | null,
