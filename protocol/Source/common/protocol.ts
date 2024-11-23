@@ -2177,7 +2177,6 @@ export namespace TelemetryEventNotification {
 }
 
 export interface TextDocumentFilterClientCapabilities {
-
 	/**
 	 * The client supports Relative Patterns.
 	 *
