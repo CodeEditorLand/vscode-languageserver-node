@@ -3703,6 +3703,7 @@ export abstract class BaseLanguageClient
 }
 
 export type ServerOptions = () => Promise<MessageTransports>;
+
 export class LanguageClient extends BaseLanguageClient {
 	private readonly serverOptions: ServerOptions;
 

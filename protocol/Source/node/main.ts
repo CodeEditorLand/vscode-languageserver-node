@@ -15,6 +15,7 @@ import {
 } from "../common/api";
 
 export * from "vscode-jsonrpc/node";
+
 export * from "../common/api";
 
 export function createProtocolConnection(
@@ -23,12 +24,14 @@ export function createProtocolConnection(
 	logger?: Logger,
 	options?: ConnectionStrategy | ConnectionOptions,
 ): ProtocolConnection;
+
 export function createProtocolConnection(
 	input: NodeJS.ReadableStream,
 	output: NodeJS.WritableStream,
 	logger?: Logger,
 	options?: ConnectionStrategy | ConnectionOptions,
 ): ProtocolConnection;
+
 export function createProtocolConnection(
 	input: MessageReader | NodeJS.ReadableStream,
 	output: MessageWriter | NodeJS.WritableStream,

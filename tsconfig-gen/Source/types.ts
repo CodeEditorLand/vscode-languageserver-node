@@ -139,4 +139,5 @@ export type ProjectOptions = {
 };
 
 export type ProjectEntry = [ProjectDescription, ProjectOptions[]];
+
 export type Projects = ProjectEntry[];

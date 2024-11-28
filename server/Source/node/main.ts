@@ -32,6 +32,7 @@ import * as Is from "../common/utils/is";
 import * as fm from "./files";
 
 export * from "vscode-languageserver-protocol/node";
+
 export * from "../common/api";
 
 export namespace Files {

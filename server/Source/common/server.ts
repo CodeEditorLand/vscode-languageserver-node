@@ -2014,6 +2014,7 @@ export interface Feature<B extends FeatureBase, P> {
 }
 
 export type ConsoleFeature<P> = Feature<RemoteConsole, P>;
+
 export function combineConsoleFeatures<O, T>(
 	one: ConsoleFeature<O>,
 	two: ConsoleFeature<T>,
@@ -2026,6 +2027,7 @@ export function combineConsoleFeatures<O, T>(
 }
 
 export type TelemetryFeature<P> = Feature<Telemetry, P>;
+
 export function combineTelemetryFeatures<O, T>(
 	one: TelemetryFeature<O>,
 	two: TelemetryFeature<T>,
@@ -2036,6 +2038,7 @@ export function combineTelemetryFeatures<O, T>(
 }
 
 export type TracerFeature<P> = Feature<RemoteTracer, P>;
+
 export function combineTracerFeatures<O, T>(
 	one: TracerFeature<O>,
 	two: TracerFeature<T>,
@@ -2048,6 +2051,7 @@ export function combineTracerFeatures<O, T>(
 }
 
 export type ClientFeature<P> = Feature<RemoteClient, P>;
+
 export function combineClientFeatures<O, T>(
 	one: ClientFeature<O>,
 	two: ClientFeature<T>,
@@ -2059,6 +2063,7 @@ export function combineClientFeatures<O, T>(
 	};
 }
 export type WindowFeature<P> = Feature<_RemoteWindow, P>;
+
 export function combineWindowFeatures<O, T>(
 	one: WindowFeature<O>,
 	two: WindowFeature<T>,
@@ -2070,6 +2075,7 @@ export function combineWindowFeatures<O, T>(
 	};
 }
 export type WorkspaceFeature<P> = Feature<_RemoteWorkspace, P>;
+
 export function combineWorkspaceFeatures<O, T>(
 	one: WorkspaceFeature<O>,
 	two: WorkspaceFeature<T>,
@@ -2081,6 +2087,7 @@ export function combineWorkspaceFeatures<O, T>(
 	};
 }
 export type LanguagesFeature<P> = Feature<_Languages, P>;
+
 export function combineLanguagesFeatures<O, T>(
 	one: LanguagesFeature<O>,
 	two: LanguagesFeature<T>,
@@ -2090,6 +2097,7 @@ export function combineLanguagesFeatures<O, T>(
 	};
 }
 export type NotebooksFeature<P> = Feature<_Notebooks, P>;
+
 export function combineNotebooksFeatures<O, T>(
 	one: NotebooksFeature<O>,
 	two: NotebooksFeature<T>,

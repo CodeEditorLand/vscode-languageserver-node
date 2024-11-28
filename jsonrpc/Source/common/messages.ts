@@ -102,6 +102,7 @@ export namespace ErrorCodes {
 		/* jsonrpcReservedErrorRangeEnd */ -32000;
 }
 type integer = number;
+
 export type ErrorCodes = integer;
 
 export interface ResponseErrorLiteral<D = void> {

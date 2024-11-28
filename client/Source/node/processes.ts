@@ -13,6 +13,7 @@ const isWindows = process.platform === "win32";
 const isMacintosh = process.platform === "darwin";
 
 const isLinux = process.platform === "linux";
+
 export function terminate(
 	process: ChildProcess & { pid: number },
 	cwd?: string,

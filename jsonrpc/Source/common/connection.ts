@@ -63,6 +63,7 @@ namespace CancelNotification {
 }
 
 export type ProgressToken = number | string;
+
 export namespace ProgressToken {
 	export function is(value: any): value is number | string {
 		return typeof value === "string" || typeof value === "number";
@@ -344,6 +345,7 @@ export type TraceValue = "off" | "messages" | "compact" | "verbose";
  * @deprecated Use TraceValue instead
  */
 export const TraceValues = TraceValue;
+
 export type TraceValues = TraceValue;
 
 export namespace Trace {

@@ -15,6 +15,7 @@ import {
 } from "../common/api";
 
 export * from "vscode-jsonrpc/browser";
+
 export * from "../common/api";
 
 export function createProtocolConnection(

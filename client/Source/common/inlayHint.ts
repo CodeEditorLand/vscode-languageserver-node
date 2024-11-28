@@ -34,6 +34,7 @@ export type ProvideInlayHintsSignature = (
 	viewPort: VRange,
 	token: CancellationToken,
 ) => ProviderResult<VInlayHint[]>;
+
 export type ResolveInlayHintSignature = (
 	this: void,
 	item: VInlayHint,

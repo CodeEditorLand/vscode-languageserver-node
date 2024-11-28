@@ -173,6 +173,7 @@ export class Semaphore<T = void> {
 }
 
 let $test: boolean = false;
+
 export function setTestMode() {
 	$test = true;
 }

@@ -43,8 +43,11 @@ export function thenable<T>(value: any): value is Thenable<T> {
 }
 
 export function asPromise<T>(value: Promise<T>): Promise<T>;
+
 export function asPromise<T>(value: Thenable<T>): Promise<T>;
+
 export function asPromise<T>(value: T): Promise<T>;
+
 export function asPromise(value: any): Promise<any> {
 	if (value instanceof Promise) {
 		return value;

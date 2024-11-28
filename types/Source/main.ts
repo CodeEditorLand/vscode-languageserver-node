@@ -99,7 +99,9 @@ export type decimal = number;
  * @since 3.17.0
  */
 export type LSPAny = any;
+
 export type LSPObject = object;
+
 export type LSPArray = any[];
 
 /**

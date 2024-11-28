@@ -38,6 +38,7 @@ import semverParse = require("semver/functions/parse");
 import semverSatisfies = require("semver/functions/satisfies");
 
 export * from "vscode-languageserver-protocol/node";
+
 export * from "../common/api";
 
 const REQUIRED_VSCODE_VERSION = "^1.91.0"; // do not change format, updated by `updateVSCode` script

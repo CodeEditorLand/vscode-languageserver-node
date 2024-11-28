@@ -6,9 +6,11 @@
 import type { integer } from "vscode-languageserver-types";
 
 export * from "vscode-jsonrpc";
+
 export * from "vscode-languageserver-types";
 
 export * from "./messages";
+
 export * from "./protocol";
 
 export { ProtocolConnection, createProtocolConnection } from "./connection";

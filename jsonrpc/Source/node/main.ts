@@ -362,12 +362,14 @@ export function createMessageConnection(
 	logger?: Logger,
 	options?: ConnectionStrategy | ConnectionOptions,
 ): MessageConnection;
+
 export function createMessageConnection(
 	inputStream: NodeJS.ReadableStream,
 	outputStream: NodeJS.WritableStream,
 	logger?: Logger,
 	options?: ConnectionStrategy | ConnectionOptions,
 ): MessageConnection;
+
 export function createMessageConnection(
 	input: MessageReader | NodeJS.ReadableStream,
 	output: MessageWriter | NodeJS.WritableStream,

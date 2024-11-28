@@ -21,11 +21,13 @@ import {
 } from "./textDocuments";
 
 export * from "vscode-languageserver-protocol";
+
 export {
 	WorkDoneProgressReporter,
 	WorkDoneProgressServerReporter,
 	ResultProgressReporter,
 };
+
 export { SemanticTokensBuilder };
 
 export {
@@ -36,6 +38,7 @@ export {
 };
 
 export { NotebookDocuments };
+
 export * from "./server";
 
 export namespace ProposedFeatures {

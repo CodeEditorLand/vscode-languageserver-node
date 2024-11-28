@@ -21,6 +21,7 @@ import {
 } from "../common/api";
 
 export * from "vscode-languageserver-protocol/browser";
+
 export * from "../common/api";
 
 let _shutdownReceived: boolean = false;
@@ -87,6 +88,7 @@ export function createConnection(
 	writer: MessageWriter,
 	options?: ConnectionStrategy | ConnectionOptions,
 ): Connection;
+
 export function createConnection(
 	arg1: any,
 	arg2: any,
