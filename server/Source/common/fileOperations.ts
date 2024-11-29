@@ -30,18 +30,23 @@ export interface FileOperationsFeatureShape {
 	onDidCreateFiles(
 		handler: NotificationHandler<CreateFilesParams>,
 	): Disposable;
+
 	onDidRenameFiles(
 		handler: NotificationHandler<RenameFilesParams>,
 	): Disposable;
+
 	onDidDeleteFiles(
 		handler: NotificationHandler<DeleteFilesParams>,
 	): Disposable;
+
 	onWillCreateFiles(
 		handler: RequestHandler<CreateFilesParams, WorkspaceEdit | null, never>,
 	): Disposable;
+
 	onWillRenameFiles(
 		handler: RequestHandler<RenameFilesParams, WorkspaceEdit | null, never>,
 	): Disposable;
+
 	onWillDeleteFiles(
 		handler: RequestHandler<DeleteFilesParams, WorkspaceEdit | null, never>,
 	): Disposable;
@@ -62,6 +67,7 @@ export const FileOperationsFeature: Feature<
 				},
 			);
 		}
+
 		public onDidRenameFiles(
 			handler: NotificationHandler<RenameFilesParams>,
 		): Disposable {
@@ -72,6 +78,7 @@ export const FileOperationsFeature: Feature<
 				},
 			);
 		}
+
 		public onDidDeleteFiles(
 			handler: NotificationHandler<DeleteFilesParams>,
 		): Disposable {
@@ -82,6 +89,7 @@ export const FileOperationsFeature: Feature<
 				},
 			);
 		}
+
 		public onWillCreateFiles(
 			handler: RequestHandler<
 				CreateFilesParams,
@@ -96,6 +104,7 @@ export const FileOperationsFeature: Feature<
 				},
 			);
 		}
+
 		public onWillRenameFiles(
 			handler: RequestHandler<
 				RenameFilesParams,
@@ -110,6 +119,7 @@ export const FileOperationsFeature: Feature<
 				},
 			);
 		}
+
 		public onWillDeleteFiles(
 			handler: RequestHandler<
 				DeleteFilesParams,

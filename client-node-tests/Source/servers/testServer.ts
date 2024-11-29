@@ -63,14 +63,17 @@ import { URI } from "vscode-uri";
 const connection = createConnection(ProposedFeatures.all);
 
 console.log = connection.console.log.bind(connection.console);
+
 console.error = connection.console.error.bind(connection.console);
 
 connection.onInitialize((params: InitializeParams): any => {
 	assert.equal((params.capabilities.workspace as any).applyEdit, true);
+
 	assert.equal(
 		params.capabilities.workspace!.workspaceEdit!.documentChanges,
 		true,
 	);
+
 	assert.deepEqual(
 		params.capabilities.workspace!.workspaceEdit!.resourceOperations,
 		[
@@ -79,91 +82,111 @@ connection.onInitialize((params: InitializeParams): any => {
 			ResourceOperationKind.Delete,
 		],
 	);
+
 	assert.equal(
 		params.capabilities.workspace!.workspaceEdit!.failureHandling,
 		FailureHandlingKind.TextOnlyTransactional,
 	);
+
 	assert.equal(
 		params.capabilities.workspace!.symbol!.resolveSupport!.properties[0],
 		"location.range",
 	);
+
 	assert.equal(
 		params.capabilities.textDocument!.completion!.completionItem!
 			.deprecatedSupport,
 		true,
 	);
+
 	assert.equal(
 		params.capabilities.textDocument!.completion!.completionItem!
 			.preselectSupport,
 		true,
 	);
+
 	assert.equal(
 		params.capabilities.textDocument!.completion!.completionItem!
 			.tagSupport!.valueSet.length,
 		1,
 	);
+
 	assert.equal(
 		params.capabilities.textDocument!.completion!.completionItem!
 			.tagSupport!.valueSet[0],
 		CompletionItemTag.Deprecated,
 	);
+
 	assert.equal(
 		params.capabilities.textDocument!.signatureHelp!.signatureInformation!
 			.parameterInformation!.labelOffsetSupport,
 		true,
 	);
+
 	assert.equal(
 		params.capabilities.textDocument!.definition!.linkSupport,
 		true,
 	);
+
 	assert.equal(
 		params.capabilities.textDocument!.declaration!.linkSupport,
 		true,
 	);
+
 	assert.equal(
 		params.capabilities.textDocument!.implementation!.linkSupport,
 		true,
 	);
+
 	assert.equal(
 		params.capabilities.textDocument!.typeDefinition!.linkSupport,
 		true,
 	);
+
 	assert.equal(
 		params.capabilities.textDocument!.rename!.prepareSupport,
 		true,
 	);
+
 	assert.equal(
 		params.capabilities.textDocument!.publishDiagnostics!
 			.relatedInformation,
 		true,
 	);
+
 	assert.equal(
 		params.capabilities.textDocument!.publishDiagnostics!.tagSupport!
 			.valueSet.length,
 		2,
 	);
+
 	assert.equal(
 		params.capabilities.textDocument!.publishDiagnostics!.tagSupport!
 			.valueSet[0],
 		DiagnosticTag.Unnecessary,
 	);
+
 	assert.equal(
 		params.capabilities.textDocument!.publishDiagnostics!.tagSupport!
 			.valueSet[1],
 		DiagnosticTag.Deprecated,
 	);
+
 	assert.equal(
 		params.capabilities.textDocument!.documentLink!.tooltipSupport,
 		true,
 	);
+
 	assert.equal(
 		params.capabilities.textDocument!.inlineValue!.dynamicRegistration,
 		true,
 	);
+
 	assert.equal(
 		params.capabilities.textDocument!.inlayHint!.dynamicRegistration,
 		true,
 	);
+
 	assert.equal(
 		params.capabilities.textDocument!.inlayHint!.resolveSupport!
 			.properties[0],
@@ -173,11 +196,14 @@ connection.onInitialize((params: InitializeParams): any => {
 	const valueSet =
 		params.capabilities.textDocument!.completion!.completionItemKind!
 			.valueSet!;
+
 	assert.equal(valueSet[0], 1);
+
 	assert.equal(
 		valueSet[valueSet.length - 1],
 		CompletionItemKind.TypeParameter,
 	);
+
 	assert.equal(
 		params.capabilities.workspace!.fileOperations!.willCreate,
 		true,
@@ -185,10 +211,13 @@ connection.onInitialize((params: InitializeParams): any => {
 
 	const diagnosticClientCapabilities =
 		params.capabilities.textDocument!.diagnostic;
+
 	assert.equal(diagnosticClientCapabilities?.dynamicRegistration, true);
+
 	assert.equal(diagnosticClientCapabilities?.relatedDocumentSupport, false);
 
 	const notebookCapabilities = params.capabilities.notebookDocument!;
+
 	assert.equal(
 		notebookCapabilities.synchronization.dynamicRegistration,
 		true,
@@ -374,6 +403,7 @@ connection.onInitialized(() => {
 			},
 		],
 	});
+
 	void connection.client.register(DidRenameFilesNotification.type, {
 		filters: [
 			{
@@ -389,6 +419,7 @@ connection.onInitialized(() => {
 			},
 		],
 	});
+
 	void connection.client.register(DidDeleteFilesNotification.type, {
 		filters: [
 			{
@@ -397,6 +428,7 @@ connection.onInitialized(() => {
 			},
 		],
 	});
+
 	void connection.client.register(WillCreateFilesRequest.type, {
 		filters: [
 			{
@@ -405,6 +437,7 @@ connection.onInitialized(() => {
 			},
 		],
 	});
+
 	void connection.client.register(WillRenameFilesRequest.type, {
 		filters: [
 			{
@@ -420,6 +453,7 @@ connection.onInitialized(() => {
 			},
 		],
 	});
+
 	void connection.client.register(WillDeleteFilesRequest.type, {
 		filters: [
 			{
@@ -434,6 +468,7 @@ connection.onInitialized(() => {
 
 connection.onDeclaration((params) => {
 	assert.equal(params.position.line, 1);
+
 	assert.equal(params.position.character, 1);
 
 	return {
@@ -447,6 +482,7 @@ connection.onDeclaration((params) => {
 
 connection.onDefinition((params) => {
 	assert.equal(params.position.line, 1);
+
 	assert.equal(params.position.character, 1);
 
 	return {
@@ -580,6 +616,7 @@ connection.onFoldingRanges((_params) => {
 
 connection.onImplementation((params) => {
 	assert.equal(params.position.line, 1);
+
 	assert.equal(params.position.character, 1);
 
 	return {
@@ -673,6 +710,7 @@ connection.workspace.onWillDeleteFiles((params) => {
 
 connection.onTypeDefinition((params) => {
 	assert.equal(params.position.line, 1);
+
 	assert.equal(params.position.character, 1);
 
 	return {
@@ -786,9 +824,11 @@ connection.languages.typeHierarchy.onPrepare((params) => {
 		selectionRange: Range.create(2, 2, 2, 2),
 		uri: params.textDocument.uri,
 	} as TypeHierarchyItem;
+
 	typeHierarchySample.superTypes = [
 		{ ...currentItem, name: "classA", uri: "uri-for-A" },
 	];
+
 	typeHierarchySample.subTypes = [
 		{ ...currentItem, name: "classC", uri: "uri-for-C" },
 	];
@@ -825,6 +865,7 @@ connection.languages.inlayHint.on(() => {
 		[InlayHintLabelPart.create("type")],
 		InlayHintKind.Type,
 	);
+
 	one.data = "1";
 
 	const two = InlayHint.create(
@@ -832,6 +873,7 @@ connection.languages.inlayHint.on(() => {
 		[InlayHintLabelPart.create("parameter")],
 		InlayHintKind.Parameter,
 	);
+
 	two.data = "2";
 
 	return [one, two];
@@ -839,6 +881,7 @@ connection.languages.inlayHint.on(() => {
 
 connection.languages.inlayHint.resolve((hint) => {
 	(hint.label as InlayHintLabelPart[])[0].tooltip = "tooltip";
+
 	hint.textEdits = [TextEdit.insert(Position.create(1, 1), "number")];
 
 	return hint;
@@ -864,18 +907,22 @@ connection.onRequest(
 	),
 	async (_, __) => {
 		const progressToken = "TEST-PROGRESS-TOKEN";
+
 		await connection.sendRequest(WorkDoneProgressCreateRequest.type, {
 			token: progressToken,
 		});
+
 		void connection.sendProgress(WorkDoneProgress.type, progressToken, {
 			kind: "begin",
 			title: "Test Progress",
 		});
+
 		void connection.sendProgress(WorkDoneProgress.type, progressToken, {
 			kind: "report",
 			percentage: 50,
 			message: "Halfway!",
 		});
+
 		void connection.sendProgress(WorkDoneProgress.type, progressToken, {
 			kind: "end",
 			message: "Completed!",
@@ -891,14 +938,18 @@ connection.onRequest(
 		// According to the spec, the reported percentage has to be an integer.
 		// Because JS doesn't have integer support, we have rounding code in place.
 		const progressToken2 = "TEST-PROGRESS-PERCENTAGE";
+
 		await connection.sendRequest(WorkDoneProgressCreateRequest.type, {
 			token: progressToken2,
 		});
 
 		const progress =
 			connection.window.attachWorkDoneProgress(progressToken2);
+
 		progress.begin("Test Progress", 0.1);
+
 		progress.report(49.9, "Halfway!");
+
 		progress.done();
 	},
 );
@@ -931,6 +982,7 @@ connection.onRequest(
 			label: "Apply Edit",
 			edit: {},
 		};
+
 		await connection.sendRequest(ApplyWorkspaceEditRequest.type, params);
 	},
 );

@@ -39,10 +39,12 @@ export class ExecuteCommandFeature
 	implements DynamicFeature<ExecuteCommandRegistrationOptions>
 {
 	private readonly _client: FeatureClient<ExecuteCommandMiddleware>;
+
 	private readonly _commands: Map<string, Disposable[]>;
 
 	constructor(client: FeatureClient<ExecuteCommandMiddleware>) {
 		this._client = client;
+
 		this._commands = new Map();
 	}
 
@@ -69,6 +71,7 @@ export class ExecuteCommandFeature
 		if (!capabilities.executeCommandProvider) {
 			return;
 		}
+
 		this.register({
 			id: UUID.generateUuid(),
 			registerOptions: Object.assign(
@@ -122,6 +125,7 @@ export class ExecuteCommandFeature
 					}),
 				);
 			}
+
 			this._commands.set(data.id, disposables);
 		}
 	}
@@ -131,6 +135,7 @@ export class ExecuteCommandFeature
 
 		if (disposables) {
 			this._commands.delete(id);
+
 			disposables.forEach((disposable) => disposable.dispose());
 		}
 	}
@@ -139,6 +144,7 @@ export class ExecuteCommandFeature
 		this._commands.forEach((value) => {
 			value.forEach((disposable) => disposable.dispose());
 		});
+
 		this._commands.clear();
 	}
 }

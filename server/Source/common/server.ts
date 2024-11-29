@@ -202,6 +202,7 @@ function null2Undefined<T>(value: T | null): T | undefined {
 	if (value === null) {
 		return undefined;
 	}
+
 	return value;
 }
 
@@ -229,7 +230,9 @@ export class ErrorMessageTracker {
 		if (!count) {
 			count = 0;
 		}
+
 		count++;
+
 		this._messages[message] = count;
 	}
 
@@ -327,6 +330,7 @@ export interface RemoteConsole extends FeatureBase {
 
 class RemoteConsoleImpl implements Logger, RemoteConsole, Remote {
 	private _rawConnection: ProtocolConnection | undefined;
+
 	private _connection: Connection | undefined;
 
 	public constructor() {}
@@ -343,6 +347,7 @@ class RemoteConsoleImpl implements Logger, RemoteConsole, Remote {
 		if (!this._connection) {
 			throw new Error("Remote is not attached to a connection yet.");
 		}
+
 		return this._connection;
 	}
 
@@ -403,6 +408,7 @@ export interface _RemoteWindow extends FeatureBase {
 	 *  will be the value of the resolved promise
 	 */
 	showErrorMessage(message: string): void;
+
 	showErrorMessage<T extends MessageActionItem>(
 		message: string,
 		...actions: T[]
@@ -417,6 +423,7 @@ export interface _RemoteWindow extends FeatureBase {
 	 *  will be the value of the resolved promise
 	 */
 	showWarningMessage(message: string): void;
+
 	showWarningMessage<T extends MessageActionItem>(
 		message: string,
 		...actions: T[]
@@ -431,6 +438,7 @@ export interface _RemoteWindow extends FeatureBase {
 	 *  will be the value of the resolved promise
 	 */
 	showInformationMessage(message: string): void;
+
 	showInformationMessage<T extends MessageActionItem>(
 		message: string,
 		...actions: T[]
@@ -454,6 +462,7 @@ class _RemoteWindowImpl implements _RemoteWindow, Remote {
 		if (!this._connection) {
 			throw new Error("Remote is not attached to a connection yet.");
 		}
+
 		return this._connection;
 	}
 
@@ -526,6 +535,7 @@ export interface BulkRegistration {
 	 * @param registerParams special registration parameters.
 	 */
 	add<RO>(type: ProtocolNotificationType0<RO>, registerParams: RO): void;
+
 	add<P, RO>(type: ProtocolNotificationType<P, RO>, registerParams: RO): void;
 
 	/**
@@ -537,6 +547,7 @@ export interface BulkRegistration {
 		type: ProtocolRequestType0<R, PR, E, RO>,
 		registerParams: RO,
 	): void;
+
 	add<P, PR, R, E, RO>(
 		type: ProtocolRequestType<P, PR, R, E, RO>,
 		registerParams: RO,
@@ -562,6 +573,7 @@ export namespace BulkRegistration {
 
 class BulkRegistrationImpl {
 	private _registrations: Registration[] = [];
+
 	private _registered: Set<string> = new Set<string>();
 
 	public add<RO>(type: string | MethodType, registerOptions?: RO): void {
@@ -570,12 +582,15 @@ class BulkRegistrationImpl {
 		if (this._registered.has(method)) {
 			throw new Error(`${method} is already added to this registration`);
 		}
+
 		const id = UUID.generateUuid();
+
 		this._registrations.push({
 			id: id,
 			method: method,
 			registerOptions: registerOptions || {},
 		});
+
 		this._registered.add(method);
 	}
 
@@ -636,9 +651,11 @@ class BulkUnregistrationImpl implements BulkUnregistration {
 		for (const unregistration of this._unregistrations.values()) {
 			unregistrations.push(unregistration);
 		}
+
 		const params: UnregistrationParams = {
 			unregisterations: unregistrations,
 		};
+
 		this._connection!.sendRequest(UnregistrationRequest.type, params).catch(
 			() => {
 				this._connection!.console.info(`Bulk unregistration failed.`);
@@ -658,6 +675,7 @@ class BulkUnregistrationImpl implements BulkUnregistration {
 		const params: UnregistrationParams = {
 			unregisterations: [unregistration],
 		};
+
 		this._connection!.sendRequest(UnregistrationRequest.type, params).then(
 			() => {
 				this._unregistrations.delete(method);
@@ -693,6 +711,7 @@ export interface RemoteClient extends FeatureBase {
 		type: ProtocolNotificationType<P, RO>,
 		registerParams?: RO,
 	): Promise<Disposable>;
+
 	register<RO>(
 		type: ProtocolNotificationType0<RO>,
 		registerParams?: RO,
@@ -711,6 +730,7 @@ export interface RemoteClient extends FeatureBase {
 		type: ProtocolNotificationType<P, RO>,
 		registerParams?: RO,
 	): Promise<Disposable>;
+
 	register<RO>(
 		unregisteration: BulkUnregistration,
 		type: ProtocolNotificationType0<RO>,
@@ -728,6 +748,7 @@ export interface RemoteClient extends FeatureBase {
 		type: ProtocolRequestType<P, R, PR, E, RO>,
 		registerParams?: RO,
 	): Promise<Disposable>;
+
 	register<R, PR, E, RO>(
 		type: ProtocolRequestType0<R, PR, E, RO>,
 		registerParams?: RO,
@@ -746,6 +767,7 @@ export interface RemoteClient extends FeatureBase {
 		type: ProtocolRequestType<P, R, PR, E, RO>,
 		registerParams?: RO,
 	): Promise<Disposable>;
+
 	register<R, PR, E, RO>(
 		unregisteration: BulkUnregistration,
 		type: ProtocolRequestType0<R, PR, E, RO>,
@@ -797,6 +819,7 @@ class RemoteClientImpl implements RemoteClient, Remote {
 		if (!this._connection) {
 			throw new Error("Remote is not attached to a connection yet.");
 		}
+
 		return this._connection;
 	}
 
@@ -847,6 +870,7 @@ class RemoteClientImpl implements RemoteClient, Remote {
 		if (!unregistration.isAttached) {
 			unregistration.attach(this.connection);
 		}
+
 		return this.connection
 			.sendRequest(RegistrationRequest.type, params)
 			.then(
@@ -980,6 +1004,7 @@ class _RemoteWorkspaceImpl implements _RemoteWorkspace, Remote {
 		if (!this._connection) {
 			throw new Error("Remote is not attached to a connection yet.");
 		}
+
 		return this._connection;
 	}
 
@@ -1049,6 +1074,7 @@ export interface RemoteTracer extends FeatureBase {
 
 class TracerImpl implements RemoteTracer, Remote {
 	private _trace: Trace;
+
 	private _connection: Connection | undefined;
 
 	constructor() {
@@ -1063,6 +1089,7 @@ class TracerImpl implements RemoteTracer, Remote {
 		if (!this._connection) {
 			throw new Error("Remote is not attached to a connection yet.");
 		}
+
 		return this._connection;
 	}
 
@@ -1078,6 +1105,7 @@ class TracerImpl implements RemoteTracer, Remote {
 		if (this._trace === Trace.Off) {
 			return;
 		}
+
 		this.connection
 			.sendNotification(LogTraceNotification.type, {
 				message: message,
@@ -1103,6 +1131,7 @@ class TelemetryImpl implements Telemetry, Remote {
 		if (!this._connection) {
 			throw new Error("Remote is not attached to a connection yet.");
 		}
+
 		return this._connection;
 	}
 
@@ -1123,9 +1152,11 @@ class TelemetryImpl implements Telemetry, Remote {
 
 export interface _Languages extends FeatureBase {
 	connection: Connection;
+
 	attachWorkDoneProgress(
 		params: WorkDoneProgressParams,
 	): WorkDoneProgressReporter;
+
 	attachPartialResultProgress<PR>(
 		type: ProgressType<PR>,
 		params: PartialResultParams,
@@ -1145,6 +1176,7 @@ export class _LanguagesImpl implements Remote, _Languages {
 		if (!this._connection) {
 			throw new Error("Remote is not attached to a connection yet.");
 		}
+
 		return this._connection;
 	}
 
@@ -1197,9 +1229,11 @@ const LanguagesImpl: new () => Languages = FoldingRangeFeature(
 
 export interface _Notebooks extends FeatureBase {
 	connection: Connection;
+
 	attachWorkDoneProgress(
 		params: WorkDoneProgressParams,
 	): WorkDoneProgressReporter;
+
 	attachPartialResultProgress<PR>(
 		type: ProgressType<PR>,
 		params: PartialResultParams,
@@ -1219,6 +1253,7 @@ export class _NotebooksImpl implements Remote, _Notebooks {
 		if (!this._connection) {
 			throw new Error("Remote is not attached to a connection yet.");
 		}
+
 		return this._connection;
 	}
 
@@ -1286,14 +1321,17 @@ export interface _Connection<
 		type: ProtocolRequestType0<R, PR, E, RO>,
 		handler: RequestHandler0<R, E>,
 	): Disposable;
+
 	onRequest<P, R, PR, E, RO>(
 		type: ProtocolRequestType<P, R, PR, E, RO>,
 		handler: RequestHandler<P, R, E>,
 	): Disposable;
+
 	onRequest<R, PR, E, RO>(
 		type: RequestType0<R, E>,
 		handler: RequestHandler0<R, E>,
 	): Disposable;
+
 	onRequest<P, R, E>(
 		type: RequestType<P, R, E>,
 		handler: RequestHandler<P, R, E>,
@@ -1327,15 +1365,18 @@ export interface _Connection<
 		type: ProtocolRequestType0<R, PR, E, RO>,
 		token?: CancellationToken,
 	): Promise<R>;
+
 	sendRequest<P, R, PR, E, RO>(
 		type: ProtocolRequestType<P, R, PR, E, RO>,
 		params: P,
 		token?: CancellationToken,
 	): Promise<R>;
+
 	sendRequest<R, E>(
 		type: RequestType0<R, E>,
 		token?: CancellationToken,
 	): Promise<R>;
+
 	sendRequest<P, R, E>(
 		type: RequestType<P, R, E>,
 		params: P,
@@ -1349,6 +1390,7 @@ export interface _Connection<
 	 * @param params The request's parameters.
 	 */
 	sendRequest<R>(method: string, token?: CancellationToken): Promise<R>;
+
 	sendRequest<R>(
 		method: string,
 		params: any,
@@ -1365,14 +1407,17 @@ export interface _Connection<
 		type: ProtocolNotificationType0<RO>,
 		handler: NotificationHandler0,
 	): Disposable;
+
 	onNotification<P, RO>(
 		type: ProtocolNotificationType<P, RO>,
 		handler: NotificationHandler<P>,
 	): Disposable;
+
 	onNotification(
 		type: NotificationType0,
 		handler: NotificationHandler0,
 	): Disposable;
+
 	onNotification<P>(
 		type: NotificationType<P>,
 		handler: NotificationHandler<P>,
@@ -1403,11 +1448,14 @@ export interface _Connection<
 	 * @param params The notification's parameters.
 	 */
 	sendNotification<RO>(type: ProtocolNotificationType0<RO>): Promise<void>;
+
 	sendNotification<P, RO>(
 		type: ProtocolNotificationType<P, RO>,
 		params: P,
 	): Promise<void>;
+
 	sendNotification(type: NotificationType0): Promise<void>;
+
 	sendNotification<P>(type: NotificationType<P>, params: P): Promise<void>;
 
 	/**
@@ -2118,13 +2166,21 @@ export interface Features<
 	PNotebooks = _,
 > {
 	__brand: "features";
+
 	console?: ConsoleFeature<PConsole>;
+
 	tracer?: TracerFeature<PTracer>;
+
 	telemetry?: TelemetryFeature<PTelemetry>;
+
 	client?: ClientFeature<PClient>;
+
 	window?: WindowFeature<PWindow>;
+
 	workspace?: WorkspaceFeature<PWorkspace>;
+
 	languages?: LanguagesFeature<PLanguages>;
+
 	notebooks?: NotebooksFeature<PNotebooks>;
 }
 
@@ -2189,6 +2245,7 @@ export function combineFeatures<
 			return two;
 		}
 	}
+
 	const result: Features<
 		OConsole & TConsole,
 		OTracer & TTracer,
@@ -2231,7 +2288,9 @@ export function combineFeatures<
 
 export interface WatchDog {
 	shutdownReceived: boolean;
+
 	initialize(params: InitializeParams): void;
+
 	exit(code: number): void;
 }
 
@@ -2274,6 +2333,7 @@ export function createConnection<
 	) as RemoteConsoleImpl & PConsole;
 
 	const connection = connectionFactory(logger);
+
 	logger.rawAttach(connection);
 
 	const tracer = (
@@ -2796,9 +2856,11 @@ export function createConnection<
 		if (Is.string(params.trace)) {
 			tracer.trace = Trace.fromString(params.trace);
 		}
+
 		for (const remote of allRemotes) {
 			remote.initialize(params.capabilities);
 		}
+
 		if (initializeHandler) {
 			const result = initializeHandler(
 				params,
@@ -2811,17 +2873,21 @@ export function createConnection<
 				if (value instanceof ResponseError) {
 					return value;
 				}
+
 				let result = <InitializeResult>value;
 
 				if (!result) {
 					result = { capabilities: {} };
 				}
+
 				let capabilities = result.capabilities;
 
 				if (!capabilities) {
 					capabilities = {};
+
 					result.capabilities = capabilities;
 				}
+
 				if (
 					capabilities.textDocumentSync === undefined ||
 					capabilities.textDocumentSync === null
@@ -2841,9 +2907,11 @@ export function createConnection<
 						? protocolConnection.__textDocumentSync
 						: TextDocumentSyncKind.None;
 				}
+
 				for (const remote of allRemotes) {
 					remote.fillServerCapabilities(capabilities);
 				}
+
 				return result;
 			});
 		} else {
@@ -2854,6 +2922,7 @@ export function createConnection<
 			for (const remote of allRemotes) {
 				remote.fillServerCapabilities(result.capabilities);
 			}
+
 			return result;
 		}
 	});

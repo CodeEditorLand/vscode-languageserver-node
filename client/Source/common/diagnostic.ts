@@ -61,6 +61,7 @@ function ensure<T, K extends keyof T>(target: T, key: K): T[K] {
 	if (target[key] === void 0) {
 		target[key] = {} as any;
 	}
+
 	return target[key];
 }
 
@@ -72,7 +73,9 @@ export namespace vsdiag {
 
 	export interface FullDocumentDiagnosticReport {
 		kind: DocumentDiagnosticReportKind.full;
+
 		resultId?: string;
+
 		items: VDiagnostic[];
 	}
 
@@ -87,6 +90,7 @@ export namespace vsdiag {
 
 	export interface UnchangedDocumentDiagnosticReport {
 		kind: DocumentDiagnosticReportKind.unChanged;
+
 		resultId: string;
 	}
 
@@ -98,24 +102,28 @@ export namespace vsdiag {
 				| UnchangedDocumentDiagnosticReport;
 		};
 	}
+
 	export type DocumentDiagnosticReport =
 		| RelatedFullDocumentDiagnosticReport
 		| RelatedUnchangedDocumentDiagnosticReport;
 
 	export type PreviousResultId = {
 		uri: Uri;
+
 		value: string;
 	};
 
 	export interface WorkspaceFullDocumentDiagnosticReport
 		extends FullDocumentDiagnosticReport {
 		uri: Uri;
+
 		version: number | null;
 	}
 
 	export interface WorkspaceUnchangedDocumentDiagnosticReport
 		extends UnchangedDocumentDiagnosticReport {
 		uri: Uri;
+
 		version: number | null;
 	}
 
@@ -137,11 +145,13 @@ export namespace vsdiag {
 
 	export interface DiagnosticProvider {
 		onDidChangeDiagnostics: VEvent<void>;
+
 		provideDiagnostics(
 			document: TextDocument | Uri,
 			previousResultId: string | undefined,
 			token: CancellationToken,
 		): ProviderResult<DocumentDiagnosticReport>;
+
 		provideWorkspaceDiagnostics?(
 			resultIds: PreviousResultId[],
 			token: CancellationToken,
@@ -172,6 +182,7 @@ export type DiagnosticProviderMiddleware = {
 		token: CancellationToken,
 		next: ProvideDiagnosticSignature,
 	) => ProviderResult<vsdiag.DocumentDiagnosticReport>;
+
 	provideWorkspaceDiagnostics?: (
 		this: void,
 		resultIds: vsdiag.PreviousResultId[],
@@ -254,7 +265,9 @@ type RequestState =
 			state: RequestStateKind.active;
 
 			document: TextDocument | Uri;
+
 			version: number | undefined;
+
 			tokenSource: CancellationTokenSource;
 	  }
 	| {
@@ -270,7 +283,9 @@ type RequestState =
 
 type DocumentPullState = {
 	document: Uri;
+
 	pulledVersion: number | undefined;
+
 	resultId: string | undefined;
 };
 
@@ -289,10 +304,12 @@ namespace DocumentOrUri {
 
 class DocumentPullStateTracker {
 	private readonly documentPullStates: Map<string, DocumentPullState>;
+
 	private readonly workspacePullStates: Map<string, DocumentPullState>;
 
 	constructor() {
 		this.documentPullStates = new Map();
+
 		this.workspacePullStates = new Map();
 	}
 
@@ -300,11 +317,13 @@ class DocumentPullStateTracker {
 		kind: PullState,
 		textDocument: TextDocument,
 	): DocumentPullState;
+
 	public track(
 		kind: PullState,
 		uri: Uri,
 		version: number | undefined,
 	): DocumentPullState;
+
 	public track(
 		kind: PullState,
 		document: TextDocument | Uri,
@@ -328,8 +347,10 @@ class DocumentPullStateTracker {
 				pulledVersion: version,
 				resultId: undefined,
 			};
+
 			states.set(key, state);
 		}
+
 		return state;
 	}
 
@@ -338,12 +359,14 @@ class DocumentPullStateTracker {
 		textDocument: TextDocument,
 		resultId: string | undefined,
 	): void;
+
 	public update(
 		kind: PullState,
 		uri: Uri,
 		version: number | undefined,
 		resultId: string | undefined,
 	): void;
+
 	public update(
 		kind: PullState,
 		document: TextDocument | Uri,
@@ -374,9 +397,11 @@ class DocumentPullStateTracker {
 
 		if (state === undefined) {
 			state = { document: uri, pulledVersion: version, resultId };
+
 			states.set(key, state);
 		} else {
 			state.pulledVersion = version;
+
 			state.resultId = resultId;
 		}
 	}
@@ -388,6 +413,7 @@ class DocumentPullStateTracker {
 			kind === PullState.document
 				? this.documentPullStates
 				: this.workspacePullStates;
+
 		states.delete(key);
 	}
 
@@ -423,31 +449,42 @@ class DocumentPullStateTracker {
 			if (this.documentPullStates.has(uri)) {
 				value = this.documentPullStates.get(uri)!;
 			}
+
 			if (value.resultId !== undefined) {
 				result.push({ uri, value: value.resultId });
 			}
 		}
+
 		return result;
 	}
 }
 
 class DiagnosticRequestor implements Disposable {
 	private isDisposed: boolean;
+
 	private readonly client: FeatureClient<
 		DiagnosticProviderMiddleware,
 		$DiagnosticPullOptions
 	>;
+
 	private readonly tabs: TabsModel;
+
 	private readonly options: DiagnosticRegistrationOptions;
 
 	public readonly onDidChangeDiagnosticsEmitter: EventEmitter<void>;
+
 	public readonly provider: vsdiag.DiagnosticProvider;
+
 	private readonly diagnostics: DiagnosticCollection;
+
 	private readonly openRequests: Map<string, RequestState>;
+
 	private readonly documentStates: DocumentPullStateTracker;
 
 	private workspaceErrorCounter: number;
+
 	private workspaceCancellation: CancellationTokenSource | undefined;
+
 	private workspaceTimeout: Disposable | undefined;
 
 	public constructor(
@@ -459,18 +496,25 @@ class DiagnosticRequestor implements Disposable {
 		options: DiagnosticRegistrationOptions,
 	) {
 		this.client = client;
+
 		this.tabs = tabs;
+
 		this.options = options;
 
 		this.isDisposed = false;
+
 		this.onDidChangeDiagnosticsEmitter = new EventEmitter<void>();
+
 		this.provider = this.createProvider();
 
 		this.diagnostics = Languages.createDiagnosticCollection(
 			options.identifier,
 		);
+
 		this.openRequests = new Map();
+
 		this.documentStates = new DocumentPullStateTracker();
+
 		this.workspaceErrorCounter = 0;
 	}
 
@@ -491,7 +535,9 @@ class DiagnosticRequestor implements Disposable {
 		if (this.isDisposed) {
 			return;
 		}
+
 		const uri = document instanceof Uri ? document : document.uri;
+
 		this.pullAsync(document).then(
 			() => {
 				if (cb) {
@@ -515,11 +561,13 @@ class DiagnosticRequestor implements Disposable {
 		if (this.isDisposed) {
 			return;
 		}
+
 		const isUri = document instanceof Uri;
 
 		const uri = isUri ? document : document.uri;
 
 		const key = uri.toString();
+
 		version = isUri ? version : document.version;
 
 		const currentRequestState = this.openRequests.get(key);
@@ -530,6 +578,7 @@ class DiagnosticRequestor implements Disposable {
 
 		if (currentRequestState === undefined) {
 			const tokenSource = new CancellationTokenSource();
+
 			this.openRequests.set(key, {
 				state: RequestStateKind.active,
 				document: document,
@@ -558,6 +607,7 @@ class DiagnosticRequestor implements Disposable {
 				) {
 					afterState = { state: RequestStateKind.outDated, document };
 				}
+
 				if (
 					afterState === undefined &&
 					error instanceof CancellationError
@@ -570,6 +620,7 @@ class DiagnosticRequestor implements Disposable {
 					throw error;
 				}
 			}
+
 			afterState = afterState ?? this.openRequests.get(key);
 
 			if (afterState === undefined) {
@@ -577,10 +628,12 @@ class DiagnosticRequestor implements Disposable {
 				this.client.error(
 					`Lost request state in diagnostic pull model. Clearing diagnostics for ${key}`,
 				);
+
 				this.diagnostics.delete(uri);
 
 				return;
 			}
+
 			this.openRequests.delete(key);
 
 			if (!this.tabs.isVisible(document)) {
@@ -588,6 +641,7 @@ class DiagnosticRequestor implements Disposable {
 
 				return;
 			}
+
 			if (afterState.state === RequestStateKind.outDated) {
 				return;
 			}
@@ -596,10 +650,12 @@ class DiagnosticRequestor implements Disposable {
 				if (report.kind === vsdiag.DocumentDiagnosticReportKind.full) {
 					this.diagnostics.set(uri, report.items);
 				}
+
 				documentState.pulledVersion = version;
 
 				documentState.resultId = report.resultId;
 			}
+
 			if (afterState.state === RequestStateKind.reschedule) {
 				this.pull(document);
 			}
@@ -607,6 +663,7 @@ class DiagnosticRequestor implements Disposable {
 			if (currentRequestState.state === RequestStateKind.active) {
 				// Cancel the current request and reschedule a new one when the old one returned.
 				currentRequestState.tokenSource.cancel();
+
 				this.openRequests.set(key, {
 					state: RequestStateKind.reschedule,
 					document: currentRequestState.document,
@@ -650,12 +707,15 @@ class DiagnosticRequestor implements Disposable {
 				if (request.state === RequestStateKind.active) {
 					request.tokenSource.cancel();
 				}
+
 				this.openRequests.set(key, {
 					state: RequestStateKind.outDated,
 					document: document,
 				});
 			}
+
 			this.diagnostics.delete(uri);
+
 			this.forget(PullState.document, document);
 		}
 	}
@@ -664,6 +724,7 @@ class DiagnosticRequestor implements Disposable {
 		if (this.isDisposed) {
 			return;
 		}
+
 		this.pullWorkspaceAsync().then(
 			() => {
 				this.workspaceTimeout = RAL().timer.setTimeout(() => {
@@ -680,8 +741,10 @@ class DiagnosticRequestor implements Disposable {
 						error,
 						false,
 					);
+
 					this.workspaceErrorCounter++;
 				}
+
 				if (this.workspaceErrorCounter <= 5) {
 					this.workspaceTimeout = RAL().timer.setTimeout(() => {
 						this.pullWorkspace();
@@ -695,10 +758,13 @@ class DiagnosticRequestor implements Disposable {
 		if (!this.provider.provideWorkspaceDiagnostics || this.isDisposed) {
 			return;
 		}
+
 		if (this.workspaceCancellation !== undefined) {
 			this.workspaceCancellation.cancel();
+
 			this.workspaceCancellation = undefined;
 		}
+
 		this.workspaceCancellation = new CancellationTokenSource();
 
 		const previousResultIds: vsdiag.PreviousResultId[] = this.documentStates
@@ -709,6 +775,7 @@ class DiagnosticRequestor implements Disposable {
 					value: item.value,
 				};
 			});
+
 		await this.provider.provideWorkspaceDiagnostics(
 			previousResultIds,
 			this.workspaceCancellation.token,
@@ -716,6 +783,7 @@ class DiagnosticRequestor implements Disposable {
 				if (!chunk || this.isDisposed) {
 					return;
 				}
+
 				for (const item of chunk.items) {
 					if (
 						item.kind === vsdiag.DocumentDiagnosticReportKind.full
@@ -731,6 +799,7 @@ class DiagnosticRequestor implements Disposable {
 							this.diagnostics.set(item.uri, item.items);
 						}
 					}
+
 					this.documentStates.update(
 						PullState.workspace,
 						item.uri,
@@ -769,6 +838,7 @@ class DiagnosticRequestor implements Disposable {
 							items: [],
 						};
 					}
+
 					return this.client
 						.sendRequest(
 							DocumentDiagnosticRequest.type,
@@ -789,6 +859,7 @@ class DiagnosticRequestor implements Disposable {
 										items: [],
 									};
 								}
+
 								if (
 									result.kind ===
 									DocumentDiagnosticReportKind.Full
@@ -889,6 +960,7 @@ class DiagnosticRequestor implements Disposable {
 							value: item.value,
 						});
 					}
+
 					return converted;
 				};
 
@@ -912,6 +984,7 @@ class DiagnosticRequestor implements Disposable {
 
 									return;
 								}
+
 								const converted: vsdiag.WorkspaceDiagnosticReportPartialResult =
 									{
 										items: [],
@@ -929,6 +1002,7 @@ class DiagnosticRequestor implements Disposable {
 										);
 									}
 								}
+
 								resultReporter(converted);
 							},
 						);
@@ -946,6 +1020,7 @@ class DiagnosticRequestor implements Disposable {
 						) {
 							return { items: [] };
 						}
+
 						return this.client
 							.sendRequest(
 								WorkspaceDiagnosticRequest.type,
@@ -959,6 +1034,7 @@ class DiagnosticRequestor implements Disposable {
 									if (token.isCancellationRequested) {
 										return { items: [] };
 									}
+
 									const converted: vsdiag.WorkspaceDiagnosticReport =
 										{
 											items: [],
@@ -969,7 +1045,9 @@ class DiagnosticRequestor implements Disposable {
 											await convertReport(item),
 										);
 									}
+
 									disposable.dispose();
+
 									resultReporter(converted);
 
 									return { items: [] };
@@ -1000,6 +1078,7 @@ class DiagnosticRequestor implements Disposable {
 					: provideDiagnostics(resultIds, token, resultReporter);
 			};
 		}
+
 		return result;
 	}
 
@@ -1008,6 +1087,7 @@ class DiagnosticRequestor implements Disposable {
 
 		// Cancel and clear workspace pull if present.
 		this.workspaceCancellation?.cancel();
+
 		this.workspaceTimeout?.dispose();
 
 		// Cancel all request and mark open requests as outdated.
@@ -1015,6 +1095,7 @@ class DiagnosticRequestor implements Disposable {
 			if (request.state === RequestStateKind.active) {
 				request.tokenSource.cancel();
 			}
+
 			this.openRequests.set(key, {
 				state: RequestStateKind.outDated,
 				document: request.document,
@@ -1051,9 +1132,13 @@ class BackgroundScheduler implements Disposable {
 		DiagnosticProviderMiddleware,
 		$DiagnosticPullOptions
 	>;
+
 	private readonly diagnosticRequestor: DiagnosticRequestor;
+
 	private lastDocumentToPull: TextDocument | Uri | undefined;
+
 	private readonly documents: LinkedMap<string, TextDocument | Uri>;
+
 	private timeoutHandle: Disposable | undefined;
 	// The problem is that there could be outstanding diagnostic requests
 	// when we shutdown which when we receive the result will trigger a
@@ -1069,8 +1154,11 @@ class BackgroundScheduler implements Disposable {
 		diagnosticRequestor: DiagnosticRequestor,
 	) {
 		this.client = client;
+
 		this.diagnosticRequestor = diagnosticRequestor;
+
 		this.documents = new LinkedMap();
+
 		this.isDisposed = false;
 	}
 
@@ -1078,11 +1166,13 @@ class BackgroundScheduler implements Disposable {
 		if (this.isDisposed === true) {
 			return;
 		}
+
 		const key = DocumentOrUri.asKey(document);
 
 		if (this.documents.has(key)) {
 			return;
 		}
+
 		this.documents.set(key, document, Touch.Last);
 		// Make sure we run up to that document. We could
 		// consider inserting it after the current last
@@ -1093,6 +1183,7 @@ class BackgroundScheduler implements Disposable {
 
 	public remove(document: TextDocument | Uri): void {
 		const key = DocumentOrUri.asKey(document);
+
 		this.documents.delete(key);
 		// No more documents. Stop background activity.
 		if (this.documents.size === 0) {
@@ -1114,6 +1205,7 @@ class BackgroundScheduler implements Disposable {
 
 	public trigger(): void {
 		this.lastDocumentToPull = this.documents.last;
+
 		this.runLoop();
 	}
 
@@ -1140,13 +1232,16 @@ class BackgroundScheduler implements Disposable {
 		if (this.timeoutHandle !== undefined) {
 			return;
 		}
+
 		this.timeoutHandle = RAL().timer.setTimeout(() => {
 			const document = this.documents.first;
 
 			if (document === undefined) {
 				return;
 			}
+
 			const key = DocumentOrUri.asKey(document);
+
 			this.diagnosticRequestor
 				.pullAsync(document)
 				.catch((error) => {
@@ -1158,6 +1253,7 @@ class BackgroundScheduler implements Disposable {
 				})
 				.finally(() => {
 					this.timeoutHandle = undefined;
+
 					this.documents.set(key, document, Touch.Last);
 
 					if (key !== this.lastDocumentToPullKey()) {
@@ -1169,14 +1265,19 @@ class BackgroundScheduler implements Disposable {
 
 	public dispose(): void {
 		this.isDisposed = true;
+
 		this.stop();
+
 		this.documents.clear();
+
 		this.lastDocumentToPull = undefined;
 	}
 
 	private stop(): void {
 		this.timeoutHandle?.dispose();
+
 		this.timeoutHandle = undefined;
+
 		this.lastDocumentToPull = undefined;
 	}
 
@@ -1189,8 +1290,11 @@ class BackgroundScheduler implements Disposable {
 
 class DiagnosticFeatureProviderImpl implements DiagnosticProviderShape {
 	public readonly disposable: Disposable;
+
 	private readonly diagnosticRequestor: DiagnosticRequestor;
+
 	private activeTextDocument: TextDocument | undefined;
+
 	private readonly backgroundScheduler: BackgroundScheduler;
 
 	constructor(
@@ -1219,9 +1323,11 @@ class DiagnosticFeatureProviderImpl implements DiagnosticProviderShape {
 			if (typeof filter === "string") {
 				return false;
 			}
+
 			if (filter.language !== undefined && filter.language !== "*") {
 				return false;
 			}
+
 			if (
 				filter.scheme !== undefined &&
 				filter.scheme !== "*" &&
@@ -1229,12 +1335,14 @@ class DiagnosticFeatureProviderImpl implements DiagnosticProviderShape {
 			) {
 				return false;
 			}
+
 			if (
 				filter.pattern !== undefined &&
 				!matchGlobPattern(filter.pattern, resource)
 			) {
 				return false;
 			}
+
 			return true;
 		};
 
@@ -1244,14 +1352,17 @@ class DiagnosticFeatureProviderImpl implements DiagnosticProviderShape {
 			if (diagnosticPullOptions.match !== undefined) {
 				return diagnosticPullOptions.match(selector!, resource);
 			}
+
 			for (const filter of selector) {
 				if (!TextDocumentFilter.is(filter)) {
 					continue;
 				}
+
 				if (matchFilter(filter, resource)) {
 					return true;
 				}
 			}
+
 			return false;
 		};
 
@@ -1282,6 +1393,7 @@ class DiagnosticFeatureProviderImpl implements DiagnosticProviderShape {
 			tabs,
 			options,
 		);
+
 		this.backgroundScheduler = new BackgroundScheduler(
 			client,
 			this.diagnosticRequestor,
@@ -1298,6 +1410,7 @@ class DiagnosticFeatureProviderImpl implements DiagnosticProviderShape {
 			) {
 				return;
 			}
+
 			this.backgroundScheduler.add(document);
 		};
 
@@ -1313,14 +1426,17 @@ class DiagnosticFeatureProviderImpl implements DiagnosticProviderShape {
 		};
 
 		this.activeTextDocument = Window.activeTextEditor?.document;
+
 		disposables.push(
 			Window.onDidChangeActiveTextEditor((editor) => {
 				const oldActive = this.activeTextDocument;
+
 				this.activeTextDocument = editor?.document;
 
 				if (oldActive !== undefined) {
 					addToBackgroundIfNeeded(oldActive);
 				}
+
 				if (this.activeTextDocument !== undefined) {
 					this.backgroundScheduler.remove(this.activeTextDocument);
 
@@ -1349,6 +1465,7 @@ class DiagnosticFeatureProviderImpl implements DiagnosticProviderShape {
 		const openFeature = client.getFeature(
 			DidOpenTextDocumentNotification.method,
 		);
+
 		disposables.push(
 			openFeature.onNotificationSent((event) => {
 				const textDocument = event.textDocument;
@@ -1361,6 +1478,7 @@ class DiagnosticFeatureProviderImpl implements DiagnosticProviderShape {
 				) {
 					return;
 				}
+
 				if (matches(textDocument)) {
 					this.diagnosticRequestor.pull(textDocument, () => {
 						addToBackgroundIfNeeded(textDocument);
@@ -1372,6 +1490,7 @@ class DiagnosticFeatureProviderImpl implements DiagnosticProviderShape {
 		const notebookFeature = client.getFeature(
 			NotebookDocumentSyncRegistrationType.method,
 		);
+
 		disposables.push(
 			notebookFeature.onOpenNotificationSent((event) => {
 				// Send a pull for all opened cells in the notebook.
@@ -1397,6 +1516,7 @@ class DiagnosticFeatureProviderImpl implements DiagnosticProviderShape {
 					) {
 						continue;
 					}
+
 					const uriStr = resource.toString();
 
 					let textDocument: TextDocument | undefined;
@@ -1433,6 +1553,7 @@ class DiagnosticFeatureProviderImpl implements DiagnosticProviderShape {
 				this.diagnosticRequestor.pull(textDocument, () => {
 					addToBackgroundIfNeeded(textDocument);
 				});
+
 				pulledTextDocuments.add(textDocument.uri.toString());
 			}
 		}
@@ -1443,6 +1564,7 @@ class DiagnosticFeatureProviderImpl implements DiagnosticProviderShape {
 					this.diagnosticRequestor.pull(cell.document, () => {
 						addToBackgroundIfNeeded(cell.document);
 					});
+
 					pulledTextDocuments.add(cell.document.uri.toString());
 				}
 			}
@@ -1470,6 +1592,7 @@ class DiagnosticFeatureProviderImpl implements DiagnosticProviderShape {
 			const changeFeature = client.getFeature(
 				DidChangeTextDocumentNotification.method,
 			);
+
 			disposables.push(
 				changeFeature.onNotificationSent(async (event) => {
 					const textDocument = event.textDocument;
@@ -1486,6 +1609,7 @@ class DiagnosticFeatureProviderImpl implements DiagnosticProviderShape {
 					}
 				}),
 			);
+
 			disposables.push(
 				notebookFeature.onChangeNotificationSent(async (event) => {
 					// Send a pull for all changed cells in the notebook.
@@ -1534,6 +1658,7 @@ class DiagnosticFeatureProviderImpl implements DiagnosticProviderShape {
 			const saveFeature = client.getFeature(
 				DidSaveTextDocumentNotification.method,
 			);
+
 			disposables.push(
 				saveFeature.onNotificationSent((event) => {
 					const textDocument = event.textDocument;
@@ -1548,6 +1673,7 @@ class DiagnosticFeatureProviderImpl implements DiagnosticProviderShape {
 					}
 				}),
 			);
+
 			disposables.push(
 				notebookFeature.onSaveNotificationSent((event) => {
 					for (const cell of event.getCells()) {
@@ -1563,11 +1689,13 @@ class DiagnosticFeatureProviderImpl implements DiagnosticProviderShape {
 		const closeFeature = client.getFeature(
 			DidCloseTextDocumentNotification.method,
 		);
+
 		disposables.push(
 			closeFeature.onNotificationSent((event) => {
 				this.cleanUpDocument(event.textDocument);
 			}),
 		);
+
 		disposables.push(
 			notebookFeature.onCloseNotificationSent((event) => {
 				for (const cell of event.getCells()) {
@@ -1658,11 +1786,15 @@ export class DiagnosticFeature
 		)!;
 
 		capability.relatedInformation = true;
+
 		capability.tagSupport = {
 			valueSet: [DiagnosticTag.Unnecessary, DiagnosticTag.Deprecated],
 		};
+
 		capability.codeDescriptionSupport = true;
+
 		capability.dataSupport = true;
+
 		capability.dynamicRegistration = true;
 		// We first need to decide how a UI will look with related documents.
 		// An easy implementation would be to only show related diagnostics for
@@ -1680,6 +1812,7 @@ export class DiagnosticFeature
 		documentSelector: DocumentSelector,
 	): void {
 		const client = this._client;
+
 		client.onRequest(DiagnosticRefreshRequest.type, async () => {
 			for (const provider of this.getAllProviders()) {
 				provider.onDidChangeDiagnosticsEmitter.fire();
@@ -1694,6 +1827,7 @@ export class DiagnosticFeature
 		if (!id || !options) {
 			return;
 		}
+
 		this.register({ id: id, registerOptions: options });
 	}
 

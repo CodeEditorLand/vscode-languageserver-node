@@ -105,15 +105,21 @@ export function createConnection(
 
 	if (arg1 !== void 0 && (arg1 as Features).__brand === "features") {
 		factories = arg1;
+
 		arg1 = arg2;
+
 		arg2 = arg3;
+
 		arg3 = arg4;
 	}
+
 	if (ConnectionStrategy.is(arg1) || ConnectionOptions.is(arg1)) {
 		options = arg1;
 	} else {
 		reader = arg1;
+
 		writer = arg2;
+
 		options = arg3;
 	}
 

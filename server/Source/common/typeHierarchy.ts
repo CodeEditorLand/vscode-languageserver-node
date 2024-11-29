@@ -32,6 +32,7 @@ export interface TypeHierarchyFeatureShape {
 				void
 			>,
 		): Disposable;
+
 		onSupertypes(
 			handler: ServerRequestHandler<
 				TypeHierarchySupertypesParams,
@@ -40,6 +41,7 @@ export interface TypeHierarchyFeatureShape {
 				void
 			>,
 		): Disposable;
+
 		onSubtypes(
 			handler: ServerRequestHandler<
 				TypeHierarchySubtypesParams,

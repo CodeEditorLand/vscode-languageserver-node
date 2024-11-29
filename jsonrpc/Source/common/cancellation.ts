@@ -64,6 +64,7 @@ const shortcutEvent: Event<any> = Object.freeze(function (
 
 class MutableToken implements CancellationToken {
 	private _isCancelled: boolean = false;
+
 	private _emitter: Emitter<any> | undefined;
 
 	public cancel() {
@@ -72,6 +73,7 @@ class MutableToken implements CancellationToken {
 
 			if (this._emitter) {
 				this._emitter.fire(undefined);
+
 				this.dispose();
 			}
 		}
@@ -85,15 +87,18 @@ class MutableToken implements CancellationToken {
 		if (this._isCancelled) {
 			return shortcutEvent;
 		}
+
 		if (!this._emitter) {
 			this._emitter = new Emitter<any>();
 		}
+
 		return this._emitter.event;
 	}
 
 	public dispose(): void {
 		if (this._emitter) {
 			this._emitter.dispose();
+
 			this._emitter = undefined;
 		}
 	}
@@ -101,6 +106,7 @@ class MutableToken implements CancellationToken {
 
 export interface AbstractCancellationTokenSource extends Disposable {
 	token: CancellationToken;
+
 	cancel(): void;
 }
 
@@ -115,6 +121,7 @@ export class CancellationTokenSource
 			// actually needed
 			this._token = new MutableToken();
 		}
+
 		return this._token;
 	}
 

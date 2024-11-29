@@ -588,6 +588,7 @@ export namespace DocumentSelector {
 		if (!Array.isArray(value)) {
 			return false;
 		}
+
 		for (const elem of value) {
 			if (
 				!Is.string(elem) &&
@@ -597,6 +598,7 @@ export namespace DocumentSelector {
 				return false;
 			}
 		}
+
 		return true;
 	}
 }
@@ -1424,6 +1426,7 @@ export namespace WorkDoneProgressOptions {
 				Is.boolean(candidate.workDoneProgress))
 		);
 	}
+
 	export function hasWorkDoneProgress(
 		value: any,
 	): value is { workDoneProgress: boolean } {
@@ -2346,7 +2349,9 @@ export namespace TextDocumentContentChangeEvent {
 	): event is { range: Range; rangeLength?: uinteger; text: string } {
 		const candidate: {
 			range: Range;
+
 			rangeLength?: uinteger;
+
 			text: string;
 		} = event as any;
 
@@ -2368,7 +2373,9 @@ export namespace TextDocumentContentChangeEvent {
 	): event is { text: string } {
 		const candidate: {
 			range?: Range;
+
 			rangeLength?: uinteger;
+
 			text: string;
 		} = event as any;
 
@@ -4741,6 +4748,7 @@ export interface PrepareRenameParams
  */
 export type PrepareRenamePlaceholder = {
 	range: Range;
+
 	placeholder: string;
 };
 

@@ -19,6 +19,7 @@ function loadConfigFile(file: string): ts.ParsedCommandLine {
 			ts.formatDiagnostics([readResult.error], ts.createCompilerHost({})),
 		);
 	}
+
 	const config = readResult.config;
 
 	if (config.compilerOptions !== undefined) {
@@ -27,6 +28,7 @@ function loadConfigFile(file: string): ts.ParsedCommandLine {
 			tss.CompileOptions.getDefaultOptions(file),
 		);
 	}
+
 	const result = ts.parseJsonConfigFileContent(
 		config,
 		ts.sys,
@@ -38,6 +40,7 @@ function loadConfigFile(file: string): ts.ParsedCommandLine {
 			ts.formatDiagnostics(result.errors, ts.createCompilerHost({})),
 		);
 	}
+
 	return result;
 }
 
@@ -81,9 +84,12 @@ async function main(): Promise<number> {
 				if (content === undefined) {
 					return undefined;
 				}
+
 				result = ts.ScriptSnapshot.fromString(content);
+
 				scriptSnapshots.set(fileName, result);
 			}
+
 			return result;
 		},
 		getCurrentDirectory: () => {
@@ -120,12 +126,16 @@ async function main(): Promise<number> {
 		console.error(
 			"Couldn't create language service with underlying program.",
 		);
+
 		process.exitCode = -1;
 
 		return -1;
 	}
+
 	const visitor = new Visitor(program);
+
 	await visitor.visitProgram();
+
 	await visitor.endVisitProgram();
 
 	console.log(JSON.stringify(visitor.getMetaModel(), undefined, "\t"));
@@ -136,6 +146,7 @@ async function main(): Promise<number> {
 if (require.main === module) {
 	main().then(undefined, (error) => {
 		console.error(error);
+
 		process.exitCode = 1;
 	});
 }

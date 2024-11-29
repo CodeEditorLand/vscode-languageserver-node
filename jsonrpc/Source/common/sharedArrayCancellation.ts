@@ -38,10 +38,13 @@ export class SharedArraySenderStrategy implements CancellationSenderStrategy {
 		if (request.id === null) {
 			return;
 		}
+
 		const buffer = new SharedArrayBuffer(4);
 
 		const data = new Int32Array(buffer, 0, 1);
+
 		data[0] = CancellationState.Continue;
+
 		this.buffers.set(request.id, buffer);
 		(request as RequestMessageWithCancellationData).$cancellationData =
 			buffer;
@@ -56,7 +59,9 @@ export class SharedArraySenderStrategy implements CancellationSenderStrategy {
 		if (buffer === undefined) {
 			return;
 		}
+
 		const data = new Int32Array(buffer, 0, 1);
+
 		Atomics.store(data, 0, CancellationState.Cancelled);
 	}
 
@@ -115,6 +120,7 @@ export class SharedArrayReceiverStrategy
 		if (buffer === undefined) {
 			return new CancellationTokenSource();
 		}
+
 		return new SharedArrayBufferCancellationTokenSource(buffer);
 	}
 }

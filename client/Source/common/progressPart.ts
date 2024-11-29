@@ -28,6 +28,7 @@ export interface ProgressContext {
 		token: string | number,
 		handler: NotificationHandler<P>,
 	): Disposable;
+
 	sendNotification<P, RO>(
 		type: ProtocolNotificationType<P, RO>,
 		params?: P,
@@ -36,6 +37,7 @@ export interface ProgressContext {
 
 export class ProgressPart {
 	private _infinite: boolean;
+
 	private _reported: number;
 
 	// listener for LSP progress messages. Set in constructor.
@@ -45,9 +47,13 @@ export class ProgressPart {
 	private _progress:
 		| Progress<{ message?: string; increment?: number }>
 		| undefined;
+
 	private _cancellationToken: CancellationToken | undefined;
+
 	private _tokenDisposable: Disposable | undefined;
+
 	private _resolve: (() => void) | undefined;
+
 	private _reject: ((reason?: any) => void) | undefined;
 
 	public constructor(
@@ -56,7 +62,9 @@ export class ProgressPart {
 		done?: (part: ProgressPart) => void,
 	) {
 		this._reported = 0;
+
 		this._infinite = false;
+
 		this._lspProgressDisposable = this._client.onProgress(
 			WorkDoneProgress.type,
 			this._token,
@@ -102,8 +110,11 @@ export class ProgressPart {
 				if (this._lspProgressDisposable === undefined) {
 					return;
 				}
+
 				this._progress = progress;
+
 				this._cancellationToken = cancellationToken;
+
 				this._tokenDisposable =
 					this._cancellationToken.onCancellationRequested(() => {
 						this._client.sendNotification(
@@ -111,10 +122,12 @@ export class ProgressPart {
 							{ token: this._token },
 						);
 					});
+
 				this.report(params);
 
 				return new Promise<void>((resolve, reject) => {
 					this._resolve = resolve;
+
 					this._reject = reject;
 				});
 			},
@@ -131,7 +144,9 @@ export class ProgressPart {
 			const percentage = Math.max(0, Math.min(params.percentage, 100));
 
 			const delta = Math.max(0, percentage - this._reported);
+
 			this._reported += delta;
+
 			this._progress !== undefined &&
 				this._progress.report({
 					message: params.message,
@@ -145,7 +160,9 @@ export class ProgressPart {
 
 		if (this._reject !== undefined) {
 			this._reject();
+
 			this._resolve = undefined;
+
 			this._reject = undefined;
 		}
 	}
@@ -155,7 +172,9 @@ export class ProgressPart {
 
 		if (this._resolve !== undefined) {
 			this._resolve();
+
 			this._resolve = undefined;
+
 			this._reject = undefined;
 		}
 	}
@@ -163,13 +182,18 @@ export class ProgressPart {
 	private cleanup(): void {
 		if (this._lspProgressDisposable !== undefined) {
 			this._lspProgressDisposable.dispose();
+
 			this._lspProgressDisposable = undefined;
 		}
+
 		if (this._tokenDisposable !== undefined) {
 			this._tokenDisposable.dispose();
+
 			this._tokenDisposable = undefined;
 		}
+
 		this._progress = undefined;
+
 		this._cancellationToken = undefined;
 	}
 }

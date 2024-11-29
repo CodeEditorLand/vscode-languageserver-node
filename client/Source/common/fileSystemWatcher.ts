@@ -32,7 +32,9 @@ export class FileSystemWatcherFeature
 	implements DynamicFeature<DidChangeWatchedFilesRegistrationOptions>
 {
 	private readonly _client: FeatureClient<object>;
+
 	private readonly _notifyFileEvent: (event: FileEvent) => void;
+
 	private readonly _watchers: Map<string, Disposable[]>;
 
 	constructor(
@@ -40,7 +42,9 @@ export class FileSystemWatcherFeature
 		notifyFileEvent: (event: FileEvent) => void,
 	) {
 		this._client = client;
+
 		this._notifyFileEvent = notifyFileEvent;
+
 		this._watchers = new Map<string, Disposable[]>();
 	}
 
@@ -61,6 +65,7 @@ export class FileSystemWatcherFeature
 			ensure(capabilities, "workspace")!,
 			"didChangeWatchedFiles",
 		)!.dynamicRegistration = true;
+
 		ensure(
 			ensure(capabilities, "workspace")!,
 			"didChangeWatchedFiles",
@@ -78,6 +83,7 @@ export class FileSystemWatcherFeature
 		if (!Array.isArray(data.registerOptions.watchers)) {
 			return;
 		}
+
 		const disposables: Disposable[] = [];
 
 		for (const watcher of data.registerOptions.watchers) {
@@ -89,15 +95,19 @@ export class FileSystemWatcherFeature
 			if (globPattern === undefined) {
 				continue;
 			}
+
 			let watchCreate: boolean = true,
 				watchChange: boolean = true,
 				watchDelete: boolean = true;
 
 			if (watcher.kind !== undefined && watcher.kind !== null) {
 				watchCreate = (watcher.kind & WatchKind.Create) !== 0;
+
 				watchChange = (watcher.kind & WatchKind.Change) !== 0;
+
 				watchDelete = (watcher.kind & WatchKind.Delete) !== 0;
 			}
+
 			const fileSystemWatcher: VFileSystemWatcher =
 				Workspace.createFileSystemWatcher(
 					globPattern,
@@ -105,6 +115,7 @@ export class FileSystemWatcherFeature
 					!watchChange,
 					!watchDelete,
 				);
+
 			this.hookListeners(
 				fileSystemWatcher,
 				watchCreate,
@@ -112,8 +123,10 @@ export class FileSystemWatcherFeature
 				watchDelete,
 				disposables,
 			);
+
 			disposables.push(fileSystemWatcher);
 		}
+
 		this._watchers.set(data.id, disposables);
 	}
 
@@ -129,6 +142,7 @@ export class FileSystemWatcherFeature
 				disposables,
 			);
 		}
+
 		this._watchers.set(id, disposables);
 	}
 
@@ -152,6 +166,7 @@ export class FileSystemWatcherFeature
 				listeners,
 			);
 		}
+
 		if (watchChange) {
 			fileSystemWatcher.onDidChange(
 				(resource) =>
@@ -165,6 +180,7 @@ export class FileSystemWatcherFeature
 				listeners,
 			);
 		}
+
 		if (watchDelete) {
 			fileSystemWatcher.onDidDelete(
 				(resource) =>
@@ -198,6 +214,7 @@ export class FileSystemWatcherFeature
 				disposable.dispose();
 			}
 		});
+
 		this._watchers.clear();
 	}
 }

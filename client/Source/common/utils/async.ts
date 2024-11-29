@@ -10,18 +10,26 @@ export type ITask<T> = () => T;
 
 export class Delayer<T> {
 	public defaultDelay: number;
+
 	private timeout: Disposable | undefined;
+
 	private completionPromise: Promise<T> | undefined;
+
 	private onSuccess:
 		| ((value: T | Promise<T> | undefined) => void)
 		| undefined;
+
 	private task: ITask<T> | undefined;
 
 	constructor(defaultDelay: number) {
 		this.defaultDelay = defaultDelay;
+
 		this.timeout = undefined;
+
 		this.completionPromise = undefined;
+
 		this.onSuccess = undefined;
+
 		this.task = undefined;
 	}
 
@@ -40,9 +48,11 @@ export class Delayer<T> {
 				this.onSuccess = resolve;
 			}).then(() => {
 				this.completionPromise = undefined;
+
 				this.onSuccess = undefined;
 
 				const result = this.task!();
+
 				this.task = undefined;
 
 				return result;
@@ -53,6 +63,7 @@ export class Delayer<T> {
 			this.timeout = RAL().timer.setTimeout(
 				() => {
 					this.timeout = undefined;
+
 					this.onSuccess!(undefined);
 				},
 				delay >= 0 ? delay : this.defaultDelay,
@@ -66,11 +77,15 @@ export class Delayer<T> {
 		if (!this.completionPromise) {
 			return undefined;
 		}
+
 		this.cancelTimeout();
 
 		const result: T = this.task!();
+
 		this.completionPromise = undefined;
+
 		this.onSuccess = undefined;
+
 		this.task = undefined;
 
 		return result;
@@ -82,12 +97,14 @@ export class Delayer<T> {
 
 	public cancel(): void {
 		this.cancelTimeout();
+
 		this.completionPromise = undefined;
 	}
 
 	private cancelTimeout(): void {
 		if (this.timeout !== undefined) {
 			this.timeout.dispose();
+
 			this.timeout = undefined;
 		}
 	}
@@ -97,27 +114,35 @@ type Thunk<T> = () => T;
 
 type Waiting<T> = {
 	thunk: Thunk<T | PromiseLike<T>>;
+
 	resolve: (value: T | PromiseLike<T>) => void;
+
 	reject: (reason?: any) => void;
 };
 
 export class Semaphore<T = void> {
 	private _capacity: number;
+
 	private _active: number;
+
 	private _waiting: Waiting<T>[];
 
 	public constructor(capacity: number = 1) {
 		if (capacity <= 0) {
 			throw new Error("Capacity must be greater than 0");
 		}
+
 		this._capacity = capacity;
+
 		this._active = 0;
+
 		this._waiting = [];
 	}
 
 	public lock(thunk: () => T | PromiseLike<T>): Promise<T> {
 		return new Promise((resolve, reject) => {
 			this._waiting.push({ thunk, resolve, reject });
+
 			this.runNext();
 		});
 	}
@@ -130,6 +155,7 @@ export class Semaphore<T = void> {
 		if (this._waiting.length === 0 || this._active === this._capacity) {
 			return;
 		}
+
 		RAL().timer.setImmediate(() => this.doRunNext());
 	}
 
@@ -137,12 +163,15 @@ export class Semaphore<T = void> {
 		if (this._waiting.length === 0 || this._active === this._capacity) {
 			return;
 		}
+
 		const next = this._waiting.shift()!;
+
 		this._active++;
 
 		if (this._active > this._capacity) {
 			throw new Error(`To many thunks active`);
 		}
+
 		try {
 			const result = next.thunk();
 
@@ -150,23 +179,31 @@ export class Semaphore<T = void> {
 				result.then(
 					(value) => {
 						this._active--;
+
 						next.resolve(value);
+
 						this.runNext();
 					},
 					(err) => {
 						this._active--;
+
 						next.reject(err);
+
 						this.runNext();
 					},
 				);
 			} else {
 				this._active--;
+
 				next.resolve(result);
+
 				this.runNext();
 			}
 		} catch (err) {
 			this._active--;
+
 			next.reject(err);
+
 			this.runNext();
 		}
 	}
@@ -187,9 +224,13 @@ declare const console: any;
 
 class Timer {
 	private readonly yieldAfter: number;
+
 	private startTime: number;
+
 	private counter: number;
+
 	private total: number;
+
 	private counterInterval: number;
 
 	constructor(yieldAfter: number = defaultYieldTimeout) {
@@ -197,24 +238,34 @@ class Timer {
 			$test === true
 				? Math.max(yieldAfter, 2)
 				: Math.max(yieldAfter, defaultYieldTimeout);
+
 		this.startTime = Date.now();
+
 		this.counter = 0;
+
 		this.total = 0;
 		// start with a counter interval of 1.
 		this.counterInterval = 1;
 	}
+
 	public start() {
 		this.counter = 0;
+
 		this.total = 0;
+
 		this.counterInterval = 1;
+
 		this.startTime = Date.now();
 	}
+
 	public shouldYield(): boolean {
 		if (++this.counter >= this.counterInterval) {
 			const timeTaken = Date.now() - this.startTime;
 
 			const timeLeft = Math.max(0, this.yieldAfter - timeTaken);
+
 			this.total += this.counter;
+
 			this.counter = 0;
 
 			if (timeTaken >= this.yieldAfter || timeLeft <= 1) {
@@ -225,6 +276,7 @@ class Timer {
 				// with using 80% of the last counter however other things (GC)
 				// affect the timing heavily since we have small timings (1 - 15ms).
 				this.counterInterval = 1;
+
 				this.total = 0;
 
 				return true;
@@ -242,6 +294,7 @@ class Timer {
 				}
 			}
 		}
+
 		return false;
 	}
 }
@@ -268,6 +321,7 @@ export async function map<P, C>(
 	if (items.length === 0) {
 		return [];
 	}
+
 	const result: C[] = new Array(items.length);
 
 	const timer = new Timer(options?.yieldAfter);
@@ -284,6 +338,7 @@ export async function map<P, C>(
 				return i + 1;
 			}
 		}
+
 		return -1;
 	}
 	// Convert the first batch sync on the same frame.
@@ -293,12 +348,14 @@ export async function map<P, C>(
 		if (token !== undefined && token.isCancellationRequested) {
 			break;
 		}
+
 		index = await new Promise((resolve) => {
 			RAL().timer.setImmediate(() => {
 				resolve(convertBatch(index));
 			});
 		});
 	}
+
 	return result;
 }
 
@@ -311,6 +368,7 @@ export async function mapAsync<P, C>(
 	if (items.length === 0) {
 		return [];
 	}
+
 	const result: C[] = new Array(items.length);
 
 	const timer = new Timer(options?.yieldAfter);
@@ -327,20 +385,24 @@ export async function mapAsync<P, C>(
 				return i + 1;
 			}
 		}
+
 		return -1;
 	}
+
 	let index = await convertBatch(0);
 
 	while (index !== -1) {
 		if (token !== undefined && token.isCancellationRequested) {
 			break;
 		}
+
 		index = await new Promise((resolve) => {
 			RAL().timer.setImmediate(() => {
 				resolve(convertBatch(index));
 			});
 		});
 	}
+
 	return result;
 }
 
@@ -353,6 +415,7 @@ export async function forEach<P>(
 	if (items.length === 0) {
 		return;
 	}
+
 	const timer = new Timer(options?.yieldAfter);
 
 	function runBatch(start: number): number {
@@ -367,6 +430,7 @@ export async function forEach<P>(
 				return i + 1;
 			}
 		}
+
 		return -1;
 	}
 	// Convert the first batch sync on the same frame.
@@ -376,6 +440,7 @@ export async function forEach<P>(
 		if (token !== undefined && token.isCancellationRequested) {
 			break;
 		}
+
 		index = await new Promise((resolve) => {
 			RAL().timer.setImmediate(() => {
 				resolve(runBatch(index));

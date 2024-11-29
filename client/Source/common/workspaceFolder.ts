@@ -37,6 +37,7 @@ function access<T, K extends keyof T>(
 	if (target === undefined || target === null) {
 		return undefined;
 	}
+
 	return target[key];
 }
 
@@ -49,6 +50,7 @@ export function arrayDiff<T>(
 
 export type WorkspaceFolderMiddleware = {
 	workspaceFolders?: WorkspaceFoldersRequest.MiddlewareSignature;
+
 	didChangeWorkspaceFolders?: NextSignature<
 		VWorkspaceFoldersChangeEvent,
 		Promise<void>
@@ -61,11 +63,14 @@ type WorkspaceFolderWorkspaceMiddleware = {
 
 export class WorkspaceFoldersFeature implements DynamicFeature<void> {
 	private readonly _client: FeatureClient<WorkspaceFolderWorkspaceMiddleware>;
+
 	private readonly _listeners: Map<string, Disposable>;
+
 	private _initialFolders: ReadonlyArray<VWorkspaceFolder> | undefined;
 
 	constructor(client: FeatureClient<WorkspaceFolderWorkspaceMiddleware>) {
 		this._client = client;
+
 		this._listeners = new Map();
 	}
 
@@ -83,6 +88,7 @@ export class WorkspaceFoldersFeature implements DynamicFeature<void> {
 
 	public fillInitializeParams(params: InitializeParams): void {
 		const folders = workspace.workspaceFolders;
+
 		this.initializeWithFolders(folders);
 
 		if (folders === void 0) {
@@ -102,11 +108,13 @@ export class WorkspaceFoldersFeature implements DynamicFeature<void> {
 
 	public fillClientCapabilities(capabilities: ClientCapabilities): void {
 		capabilities.workspace = capabilities.workspace || {};
+
 		capabilities.workspace.workspaceFolders = true;
 	}
 
 	public initialize(capabilities: ServerCapabilities): void {
 		const client = this._client;
+
 		client.onRequest(
 			WorkspaceFoldersRequest.type,
 			(token: CancellationToken) => {
@@ -117,6 +125,7 @@ export class WorkspaceFoldersFeature implements DynamicFeature<void> {
 						if (folders === undefined) {
 							return null;
 						}
+
 						const result: WorkspaceFolder[] = folders.map(
 							(folder) => {
 								return this.asProtocol(folder);
@@ -146,6 +155,7 @@ export class WorkspaceFoldersFeature implements DynamicFeature<void> {
 		} else if (value === true) {
 			id = UUID.generateUuid();
 		}
+
 		if (id) {
 			this.register({ id: id, registerOptions: undefined });
 		}
@@ -175,6 +185,7 @@ export class WorkspaceFoldersFeature implements DynamicFeature<void> {
 		} else if (currentWorkspaceFolders) {
 			promise = this.doSendEvent(currentWorkspaceFolders, []);
 		}
+
 		if (promise !== undefined) {
 			promise.catch((error) => {
 				this._client.error(
@@ -225,6 +236,7 @@ export class WorkspaceFoldersFeature implements DynamicFeature<void> {
 							didChangeWorkspaceFolders,
 						)
 					: didChangeWorkspaceFolders(event);
+
 			promise.catch((error) => {
 				this._client.error(
 					`Sending notification ${DidChangeWorkspaceFoldersNotification.type.method} failed`,
@@ -232,7 +244,9 @@ export class WorkspaceFoldersFeature implements DynamicFeature<void> {
 				);
 			});
 		});
+
 		this._listeners.set(id, disposable);
+
 		this.sendInitialEvent(workspace.workspaceFolders);
 	}
 
@@ -242,7 +256,9 @@ export class WorkspaceFoldersFeature implements DynamicFeature<void> {
 		if (disposable === void 0) {
 			return;
 		}
+
 		this._listeners.delete(id);
+
 		disposable.dispose();
 	}
 
@@ -250,17 +266,21 @@ export class WorkspaceFoldersFeature implements DynamicFeature<void> {
 		for (const disposable of this._listeners.values()) {
 			disposable.dispose();
 		}
+
 		this._listeners.clear();
 	}
 
 	private asProtocol(workspaceFolder: VWorkspaceFolder): WorkspaceFolder;
+
 	private asProtocol(workspaceFolder: undefined): null;
+
 	private asProtocol(
 		workspaceFolder: VWorkspaceFolder | undefined,
 	): WorkspaceFolder | null {
 		if (workspaceFolder === void 0) {
 			return null;
 		}
+
 		return {
 			uri: this._client.code2ProtocolConverter.asUri(workspaceFolder.uri),
 			name: workspaceFolder.name,

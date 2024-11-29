@@ -11,6 +11,7 @@ export default class ProtocolCodeAction extends vscode.CodeAction {
 
 	constructor(title: string, data: LSPAny | undefined) {
 		super(title);
+
 		this.data = data;
 	}
 }

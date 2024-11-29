@@ -20,6 +20,7 @@ function ensure<T, K extends keyof T>(target: T, key: K): T[K] {
 	if (target[key] === void 0) {
 		target[key] = {} as any;
 	}
+
 	return target[key];
 }
 
@@ -38,16 +39,21 @@ function assign<T, K extends keyof T>(target: T, key: K, value: T[K]): void {
  */
 export interface FileOperationsMiddleware {
 	didCreateFiles?: NextSignature<code.FileCreateEvent, Promise<void>>;
+
 	willCreateFiles?: NextSignature<
 		code.FileWillCreateEvent,
 		Thenable<code.WorkspaceEdit | null | undefined>
 	>;
+
 	didRenameFiles?: NextSignature<code.FileRenameEvent, Promise<void>>;
+
 	willRenameFiles?: NextSignature<
 		code.FileWillRenameEvent,
 		Thenable<code.WorkspaceEdit | null | undefined>
 	>;
+
 	didDeleteFiles?: NextSignature<code.FileDeleteEvent, Promise<void>>;
+
 	willDeleteFiles?: NextSignature<
 		code.FileWillDeleteEvent,
 		Thenable<code.WorkspaceEdit | null | undefined>
@@ -66,10 +72,15 @@ abstract class FileOperationFeature<I, E extends Event<I>>
 	implements DynamicFeature<proto.FileOperationRegistrationOptions>
 {
 	protected readonly _client: FeatureClient<FileOperationsWorkspaceMiddleware>;
+
 	private readonly _event: code.Event<E>;
+
 	private readonly _registrationType: proto.RegistrationType<proto.FileOperationRegistrationOptions>;
+
 	private readonly _clientCapability: keyof proto.FileOperationClientCapabilities;
+
 	private readonly _serverCapability: keyof proto.FileOperationOptions;
+
 	private _listener: code.Disposable | undefined;
 	// This property must stay private. Otherwise the type `minimatch.IMinimatch` becomes public and as a consequence we would need to
 	// ship the d.ts files for minimatch to make the compiler happy when compiling against the vscode-languageclient library
@@ -77,7 +88,9 @@ abstract class FileOperationFeature<I, E extends Event<I>>
 		string,
 		Array<{
 			scheme?: string;
+
 			matcher: minimatch.Minimatch;
+
 			kind?: proto.FileOperationPatternKind;
 		}>
 	>;
@@ -90,10 +103,15 @@ abstract class FileOperationFeature<I, E extends Event<I>>
 		serverCapability: keyof proto.FileOperationOptions,
 	) {
 		this._client = client;
+
 		this._event = event;
+
 		this._registrationType = registrationType;
+
 		this._clientCapability = clientCapability;
+
 		this._serverCapability = serverCapability;
+
 		this._filters = new Map();
 	}
 
@@ -122,6 +140,7 @@ abstract class FileOperationFeature<I, E extends Event<I>>
 		)!;
 		// this happens n times but it is the same value so we tolerate this.
 		assign(value, "dynamicRegistration", true);
+
 		assign(value, this._clientCapability, true);
 	}
 
@@ -153,6 +172,7 @@ abstract class FileOperationFeature<I, E extends Event<I>>
 		if (!this._listener) {
 			this._listener = this._event(this.send, this);
 		}
+
 		const minimatchFilter = data.registerOptions.filters.map((filter) => {
 			const matcher = new minimatch.Minimatch(
 				filter.pattern.glob,
@@ -162,12 +182,14 @@ abstract class FileOperationFeature<I, E extends Event<I>>
 			if (!matcher.makeRe()) {
 				throw new Error(`Invalid pattern ${filter.pattern.glob}!`);
 			}
+
 			return {
 				scheme: filter.scheme,
 				matcher,
 				kind: filter.pattern.matches,
 			};
 		});
+
 		this._filters.set(data.id, minimatchFilter);
 	}
 
@@ -178,6 +200,7 @@ abstract class FileOperationFeature<I, E extends Event<I>>
 
 		if (this._filters.size === 0 && this._listener) {
 			this._listener.dispose();
+
 			this._listener = undefined;
 		}
 	}
@@ -187,6 +210,7 @@ abstract class FileOperationFeature<I, E extends Event<I>>
 
 		if (this._listener) {
 			this._listener.dispose();
+
 			this._listener = undefined;
 		}
 	}
@@ -213,6 +237,7 @@ abstract class FileOperationFeature<I, E extends Event<I>>
 						) {
 							continue;
 						}
+
 						const fileType = await this.getFileType(uri);
 						// If we can't determine the file type than we treat it as a match.
 						// Dropping it would be another alternative.
@@ -221,6 +246,7 @@ abstract class FileOperationFeature<I, E extends Event<I>>
 
 							return true;
 						}
+
 						if ((fileType === code.FileType.File && filter.kind === proto.FileOperationPatternKind.file) || (fileType === code.FileType.Directory && filter.kind === proto.FileOperationPatternKind.folder)) {
 							return true;
 						}
@@ -232,6 +258,7 @@ abstract class FileOperationFeature<I, E extends Event<I>>
 						}
 					}
 				}
+
 				return false;
 			}),
 		);
@@ -262,6 +289,7 @@ abstract class FileOperationFeature<I, E extends Event<I>>
 		if (options?.ignoreCase === true) {
 			result.nocase = true;
 		}
+
 		return result;
 	}
 }
@@ -275,7 +303,9 @@ abstract class NotificationFileOperationFeature<
 		P,
 		proto.FileOperationRegistrationOptions
 	>;
+
 	private _accessUri: (i: I) => code.Uri;
+
 	private _createParams: (e: E) => P;
 
 	constructor(
@@ -297,8 +327,11 @@ abstract class NotificationFileOperationFeature<
 			clientCapability,
 			serverCapability,
 		);
+
 		this._notificationType = notificationType;
+
 		this._accessUri = accessUri;
+
 		this._createParams = createParams;
 	}
 
@@ -331,6 +364,7 @@ abstract class CachingNotificationFileOperationFeature<
 	P,
 > extends NotificationFileOperationFeature<I, E, P> {
 	protected _willListener: code.Disposable | undefined;
+
 	private readonly _fsPathFileTypes = new Map<String, code.FileType>();
 
 	protected async getFileType(
@@ -347,6 +381,7 @@ abstract class CachingNotificationFileOperationFeature<
 		if (type) {
 			this._fsPathFileTypes.set(fsPath, type);
 		}
+
 		return type;
 	}
 
@@ -368,6 +403,7 @@ abstract class CachingNotificationFileOperationFeature<
 
 		if (this.filterSize() === 0 && this._willListener) {
 			this._willListener.dispose();
+
 			this._willListener = undefined;
 		}
 	}
@@ -377,6 +413,7 @@ abstract class CachingNotificationFileOperationFeature<
 
 		if (this._willListener) {
 			this._willListener.dispose();
+
 			this._willListener = undefined;
 		}
 	}
@@ -437,6 +474,7 @@ export class DidRenameFilesFeature extends CachingNotificationFileOperationFeatu
 				this,
 			);
 		}
+
 		super.register(data);
 	}
 
@@ -484,6 +522,7 @@ export class DidDeleteFilesFeature extends CachingNotificationFileOperationFeatu
 				this,
 			);
 		}
+
 		super.register(data);
 	}
 
@@ -507,8 +546,11 @@ export class DidDeleteFilesFeature extends CachingNotificationFileOperationFeatu
 
 interface RequestEvent<I> {
 	readonly token: code.CancellationToken;
+
 	readonly files: ReadonlyArray<I>;
+
 	waitUntil(thenable: Thenable<code.WorkspaceEdit>): void;
+
 	waitUntil(thenable: Thenable<any>): void;
 }
 
@@ -524,7 +566,9 @@ abstract class RequestFileOperationFeature<
 		void,
 		proto.FileOperationRegistrationOptions
 	>;
+
 	private _accessUri: (i: I) => code.Uri;
+
 	private _createParams: (e: Event<I>) => P;
 
 	constructor(
@@ -543,13 +587,17 @@ abstract class RequestFileOperationFeature<
 		createParams: (e: Event<I>) => P,
 	) {
 		super(client, event, requestType, clientCapability, serverCapability);
+
 		this._requestType = requestType;
+
 		this._accessUri = accessUri;
+
 		this._createParams = createParams;
 	}
 
 	public async send(originalEvent: E & RequestEvent<I>): Promise<void> {
 		const waitUntil = this.waitUntil(originalEvent);
+
 		originalEvent.waitUntil(waitUntil);
 	}
 

@@ -58,7 +58,9 @@ export class DeclarationFeature extends TextDocumentLanguageFeature<
 			ensure(capabilities, "textDocument")!,
 			"declaration",
 		)!;
+
 		declarationSupport.dynamicRegistration = true;
+
 		declarationSupport.linkSupport = true;
 	}
 
@@ -74,6 +76,7 @@ export class DeclarationFeature extends TextDocumentLanguageFeature<
 		if (!id || !options) {
 			return;
 		}
+
 		this.register({ id: id, registerOptions: options });
 	}
 
@@ -109,6 +112,7 @@ export class DeclarationFeature extends TextDocumentLanguageFeature<
 								if (token.isCancellationRequested) {
 									return null;
 								}
+
 								return client.protocol2CodeConverter.asDeclarationResult(
 									result,
 									token,

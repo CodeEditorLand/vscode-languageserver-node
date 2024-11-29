@@ -194,9 +194,13 @@ export interface TextDocument {
 
 class FullTextDocument implements TextDocument {
 	private _uri: DocumentUri;
+
 	private _languageId: string;
+
 	private _version: number;
+
 	private _content: string;
+
 	private _lineOffsets: number[] | undefined;
 
 	public constructor(
@@ -206,9 +210,13 @@ class FullTextDocument implements TextDocument {
 		content: string,
 	) {
 		this._uri = uri;
+
 		this._languageId = languageId;
+
 		this._version = version;
+
 		this._content = content;
+
 		this._lineOffsets = undefined;
 	}
 
@@ -232,6 +240,7 @@ class FullTextDocument implements TextDocument {
 
 			return this._content.substring(start, end);
 		}
+
 		return this._content;
 	}
 
@@ -248,6 +257,7 @@ class FullTextDocument implements TextDocument {
 				const startOffset = this.offsetAt(range.start);
 
 				const endOffset = this.offsetAt(range.end);
+
 				this._content =
 					this._content.substring(0, startOffset) +
 					change.text +
@@ -269,7 +279,9 @@ class FullTextDocument implements TextDocument {
 				if (endLine - startLine === addedLineOffsets.length) {
 					for (
 						let i = 0, len = addedLineOffsets.length;
+
 						i < len;
+
 						i++
 					) {
 						lineOffsets[i + startLine + 1] = addedLineOffsets[i];
@@ -291,13 +303,16 @@ class FullTextDocument implements TextDocument {
 							);
 					}
 				}
+
 				const diff = change.text.length - (endOffset - startOffset);
 
 				if (diff !== 0) {
 					for (
 						let i = startLine + 1 + addedLineOffsets.length,
 							len = lineOffsets.length;
+
 						i < len;
+
 						i++
 					) {
 						lineOffsets[i] = lineOffsets[i] + diff;
@@ -305,11 +320,13 @@ class FullTextDocument implements TextDocument {
 				}
 			} else if (FullTextDocument.isFull(change)) {
 				this._content = change.text;
+
 				this._lineOffsets = undefined;
 			} else {
 				throw new Error("Unknown change event received");
 			}
 		}
+
 		this._version = version;
 	}
 
@@ -317,6 +334,7 @@ class FullTextDocument implements TextDocument {
 		if (this._lineOffsets === undefined) {
 			this._lineOffsets = computeLineOffsets(this._content, true);
 		}
+
 		return this._lineOffsets;
 	}
 
@@ -331,6 +349,7 @@ class FullTextDocument implements TextDocument {
 		if (high === 0) {
 			return { line: 0, character: offset };
 		}
+
 		while (low < high) {
 			const mid = Math.floor((low + high) / 2);
 
@@ -357,6 +376,7 @@ class FullTextDocument implements TextDocument {
 		} else if (position.line < 0) {
 			return 0;
 		}
+
 		const lineOffset = lineOffsets[position.line];
 
 		if (position.character <= 0) {
@@ -383,6 +403,7 @@ class FullTextDocument implements TextDocument {
 		) {
 			offset--;
 		}
+
 		return offset;
 	}
 
@@ -477,6 +498,7 @@ export namespace TextDocument {
 			if (diff === 0) {
 				return a.range.start.character - b.range.start.character;
 			}
+
 			return diff;
 		});
 
@@ -492,11 +514,14 @@ export namespace TextDocument {
 			} else if (startOffset > lastModifiedOffset) {
 				spans.push(text.substring(lastModifiedOffset, startOffset));
 			}
+
 			if (e.newText.length) {
 				spans.push(e.newText);
 			}
+
 			lastModifiedOffset = document.offsetAt(e.range.end);
 		}
+
 		spans.push(text.substr(lastModifiedOffset));
 
 		return spans.join("");
@@ -508,6 +533,7 @@ function mergeSort<T>(data: T[], compare: (a: T, b: T) => number): T[] {
 		// sorted
 		return data;
 	}
+
 	const p = (data.length / 2) | 0;
 
 	const left = data.slice(0, p);
@@ -515,6 +541,7 @@ function mergeSort<T>(data: T[], compare: (a: T, b: T) => number): T[] {
 	const right = data.slice(p);
 
 	mergeSort(left, compare);
+
 	mergeSort(right, compare);
 
 	let leftIdx = 0;
@@ -534,12 +561,15 @@ function mergeSort<T>(data: T[], compare: (a: T, b: T) => number): T[] {
 			data[i++] = right[rightIdx++];
 		}
 	}
+
 	while (leftIdx < left.length) {
 		data[i++] = left[leftIdx++];
 	}
+
 	while (rightIdx < right.length) {
 		data[i++] = right[rightIdx++];
 	}
+
 	return data;
 }
 
@@ -572,9 +602,11 @@ function computeLineOffsets(
 			) {
 				i++;
 			}
+
 			result.push(textOffset + i + 1);
 		}
 	}
+
 	return result;
 }
 
@@ -593,6 +625,7 @@ function getWellformedRange(range: Range): Range {
 	) {
 		return { start: end, end: start };
 	}
+
 	return range;
 }
 
@@ -602,5 +635,6 @@ function getWellformedEdit(textEdit: TextEdit): TextEdit {
 	if (range !== textEdit.range) {
 		return { newText: textEdit.newText, range };
 	}
+
 	return textEdit;
 }

@@ -30,15 +30,19 @@ export interface TextDocumentConnection {
 	onDidOpenTextDocument(
 		handler: NotificationHandler<DidOpenTextDocumentParams>,
 	): Disposable;
+
 	onDidChangeTextDocument(
 		handler: NotificationHandler<DidChangeTextDocumentParams>,
 	): Disposable;
+
 	onDidCloseTextDocument(
 		handler: NotificationHandler<DidCloseTextDocumentParams>,
 	): Disposable;
+
 	onWillSaveTextDocument(
 		handler: NotificationHandler<WillSaveTextDocumentParams>,
 	): Disposable;
+
 	onWillSaveTextDocumentWaitUntil(
 		handler: RequestHandler<
 			WillSaveTextDocumentParams,
@@ -46,6 +50,7 @@ export interface TextDocumentConnection {
 			void
 		>,
 	): Disposable;
+
 	onDidSaveTextDocument(
 		handler: NotificationHandler<DidSaveTextDocumentParams>,
 	): Disposable;
@@ -62,6 +67,7 @@ export interface TextDocumentsConfiguration<T extends { uri: DocumentUri }> {
 		version: number,
 		content: string,
 	): T;
+
 	update(
 		document: T,
 		changes: TextDocumentContentChangeEvent[],
@@ -109,10 +115,15 @@ export class TextDocuments<T extends { uri: DocumentUri }> {
 	private readonly _syncedDocuments: Map<string, T>;
 
 	private readonly _onDidChangeContent: Emitter<TextDocumentChangeEvent<T>>;
+
 	private readonly _onDidOpen: Emitter<TextDocumentChangeEvent<T>>;
+
 	private readonly _onDidClose: Emitter<TextDocumentChangeEvent<T>>;
+
 	private readonly _onDidSave: Emitter<TextDocumentChangeEvent<T>>;
+
 	private readonly _onWillSave: Emitter<TextDocumentWillSaveEvent<T>>;
+
 	private _willSaveWaitUntil:
 		| RequestHandler<TextDocumentWillSaveEvent<T>, TextEdit[], void>
 		| undefined;
@@ -122,12 +133,17 @@ export class TextDocuments<T extends { uri: DocumentUri }> {
 	 */
 	public constructor(configuration: TextDocumentsConfiguration<T>) {
 		this._configuration = configuration;
+
 		this._syncedDocuments = new Map();
 
 		this._onDidChangeContent = new Emitter<TextDocumentChangeEvent<T>>();
+
 		this._onDidOpen = new Emitter<TextDocumentChangeEvent<T>>();
+
 		this._onDidClose = new Emitter<TextDocumentChangeEvent<T>>();
+
 		this._onDidSave = new Emitter<TextDocumentChangeEvent<T>>();
+
 		this._onWillSave = new Emitter<TextDocumentWillSaveEvent<T>>();
 	}
 
@@ -228,6 +244,7 @@ export class TextDocuments<T extends { uri: DocumentUri }> {
 			TextDocumentSyncKind.Incremental;
 
 		const disposables: Disposable[] = [];
+
 		disposables.push(
 			connection.onDidOpenTextDocument(
 				(event: DidOpenTextDocumentParams) => {
@@ -243,11 +260,14 @@ export class TextDocuments<T extends { uri: DocumentUri }> {
 					this._syncedDocuments.set(td.uri, document);
 
 					const toFire = Object.freeze({ document });
+
 					this._onDidOpen.fire(toFire);
+
 					this._onDidChangeContent.fire(toFire);
 				},
 			),
 		);
+
 		disposables.push(
 			connection.onDidChangeTextDocument(
 				(event: DidChangeTextDocumentParams) => {
@@ -275,7 +295,9 @@ export class TextDocuments<T extends { uri: DocumentUri }> {
 							changes,
 							version,
 						);
+
 						this._syncedDocuments.set(td.uri, syncedDocument);
+
 						this._onDidChangeContent.fire(
 							Object.freeze({ document: syncedDocument }),
 						);
@@ -283,6 +305,7 @@ export class TextDocuments<T extends { uri: DocumentUri }> {
 				},
 			),
 		);
+
 		disposables.push(
 			connection.onDidCloseTextDocument(
 				(event: DidCloseTextDocumentParams) => {
@@ -292,6 +315,7 @@ export class TextDocuments<T extends { uri: DocumentUri }> {
 
 					if (syncedDocument !== undefined) {
 						this._syncedDocuments.delete(event.textDocument.uri);
+
 						this._onDidClose.fire(
 							Object.freeze({ document: syncedDocument }),
 						);
@@ -299,6 +323,7 @@ export class TextDocuments<T extends { uri: DocumentUri }> {
 				},
 			),
 		);
+
 		disposables.push(
 			connection.onWillSaveTextDocument(
 				(event: WillSaveTextDocumentParams) => {
@@ -317,6 +342,7 @@ export class TextDocuments<T extends { uri: DocumentUri }> {
 				},
 			),
 		);
+
 		disposables.push(
 			connection.onWillSaveTextDocumentWaitUntil(
 				(
@@ -344,6 +370,7 @@ export class TextDocuments<T extends { uri: DocumentUri }> {
 				},
 			),
 		);
+
 		disposables.push(
 			connection.onDidSaveTextDocument(
 				(event: DidSaveTextDocumentParams) => {

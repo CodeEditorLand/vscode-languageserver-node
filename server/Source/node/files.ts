@@ -23,11 +23,13 @@ export function uriToFilePath(uri: string): string | undefined {
 	if (parsed.protocol !== "file:" || !parsed.path) {
 		return undefined;
 	}
+
 	const segments = parsed.path.split("/");
 
 	for (let i = 0, len = segments.length; i < len; i++) {
 		segments[i] = decodeURIComponent(segments[i]);
 	}
+
 	if (process.platform === "win32" && segments.length > 1) {
 		const first = segments[0];
 
@@ -39,6 +41,7 @@ export function uriToFilePath(uri: string): string | undefined {
 			segments.shift();
 		}
 	}
+
 	return path.normalize(segments.join("/"));
 }
 
@@ -54,8 +57,11 @@ export function resolve(
 ): Promise<string> {
 	interface Message {
 		c: string;
+
 		s?: boolean;
+
 		a?: any;
+
 		r?: any;
 	}
 
@@ -83,6 +89,7 @@ export function resolve(
 		const env = process.env;
 
 		const newEnv = Object.create(null);
+
 		Object.keys(env).forEach((key) => (newEnv[key] = env[key]));
 
 		if (nodePath && fs.existsSync(nodePath) /* see issue 545 */) {
@@ -92,10 +99,12 @@ export function resolve(
 			} else {
 				newEnv[nodePathKey] = nodePath;
 			}
+
 			if (tracer) {
 				tracer(`NODE_PATH value is: ${newEnv[nodePathKey]}`);
 			}
 		}
+
 		newEnv["ELECTRON_RUN_AS_NODE"] = "1";
 
 		try {
@@ -114,9 +123,11 @@ export function resolve(
 
 				return;
 			}
+
 			cp.on("error", (error: any) => {
 				reject(error);
 			});
+
 			cp.on("message", (message: Message) => {
 				if (message.c === "r") {
 					cp.send({ c: "e" });
@@ -137,6 +148,7 @@ export function resolve(
 				c: "rs",
 				a: moduleName,
 			};
+
 			cp.send(message);
 		} catch (error) {
 			reject(error);
@@ -156,7 +168,9 @@ export function resolveGlobalNodePath(
 	let npmCommand = "npm";
 
 	const env: typeof process.env = Object.create(null);
+
 	Object.keys(process.env).forEach((key) => (env[key] = process.env[key]));
+
 	env["NO_UPDATE_NOTIFIER"] = "true";
 
 	const options: SpawnSyncOptionsWithStringEncoding = {
@@ -166,6 +180,7 @@ export function resolveGlobalNodePath(
 
 	if (isWindows()) {
 		npmCommand = "npm.cmd";
+
 		options.shell = true;
 	}
 
@@ -184,8 +199,10 @@ export function resolveGlobalNodePath(
 			if (tracer) {
 				tracer(`'npm config get prefix' didn't return a value.`);
 			}
+
 			return undefined;
 		}
+
 		const prefix = stdout.trim();
 
 		if (tracer) {
@@ -199,6 +216,7 @@ export function resolveGlobalNodePath(
 				return path.join(prefix, "lib", "node_modules");
 			}
 		}
+
 		return undefined;
 	} catch (err) {
 		return undefined;
@@ -209,6 +227,7 @@ export function resolveGlobalNodePath(
 
 interface YarnJsonFormat {
 	type: string;
+
 	data: string;
 }
 
@@ -229,6 +248,7 @@ export function resolveGlobalYarnPath(
 
 	if (isWindows()) {
 		yarnCommand = "yarn.cmd";
+
 		options.shell = true;
 	}
 
@@ -253,8 +273,10 @@ export function resolveGlobalYarnPath(
 					tracer(results.stderr);
 				}
 			}
+
 			return undefined;
 		}
+
 		const lines = stdout.trim().split(/\r?\n/);
 
 		for (const line of lines) {
@@ -268,6 +290,7 @@ export function resolveGlobalYarnPath(
 				// Do nothing. Ignore the line
 			}
 		}
+
 		return undefined;
 	} catch (err) {
 		return undefined;
@@ -283,6 +306,7 @@ export namespace FileSystem {
 		if (_isCaseSensitive !== void 0) {
 			return _isCaseSensitive;
 		}
+
 		if (process.platform === "win32") {
 			_isCaseSensitive = false;
 		} else {
@@ -292,6 +316,7 @@ export namespace FileSystem {
 				!fs.existsSync(__filename.toUpperCase()) ||
 				!fs.existsSync(__filename.toLowerCase());
 		}
+
 		return _isCaseSensitive;
 	}
 

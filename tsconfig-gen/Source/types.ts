@@ -61,9 +61,11 @@ export namespace CompilerOptions {
 		if (opt1 === undefined) {
 			return opt2;
 		}
+
 		if (opt2 === undefined) {
 			return opt1;
 		}
+
 		const result: CompilerOptions = Object.assign({}, opt1);
 
 		for (const prop of Object.keys(opt2)) {
@@ -83,6 +85,7 @@ export namespace CompilerOptions {
 				}
 			}
 		}
+
 		return result;
 	}
 }
@@ -95,46 +98,62 @@ export namespace Arrays {
 		if (arr1 === undefined) {
 			return arr2;
 		}
+
 		if (arr2 === undefined) {
 			return arr1;
 		}
+
 		return Array.from(new Set<T>(arr2.concat(...arr1)));
 	}
 }
 
 export type SharableOptions = {
 	extends?: SharableOptions[];
+
 	compilerOptions?: CompilerOptions;
+
 	include?: string[];
+
 	exclude?: string[];
+
 	files?: string[];
 };
 
 export type SourceFolderDescription = {
 	path: string;
+
 	out?: {
 		dir: string;
+
 		buildInfoFile?: string;
 	};
+
 	references?: string[];
 } & SharableOptions;
 
 export type ProjectDescription = {
 	name: string;
+
 	path: string;
+
 	out?: {
 		dir: string;
+
 		buildInfoFile?: string;
 	};
+
 	sourceFolders?: SourceFolderDescription[];
+
 	references?: (ProjectDescription | string)[];
 } & SharableOptions;
 
 export type ProjectOptions = {
 	tags: string[];
+
 	tsconfig?: string;
 
 	variables?: Map<string, string>;
+
 	compilerOptions?: CompilerOptions;
 };
 

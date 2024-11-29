@@ -67,6 +67,7 @@ export interface SemanticTokensMiddleware {
 		token: vscode.CancellationToken,
 		next: DocumentSemanticsTokensSignature,
 	) => vscode.ProviderResult<vscode.SemanticTokens>;
+
 	provideDocumentSemanticTokensEdits?: (
 		this: void,
 		document: vscode.TextDocument,
@@ -76,6 +77,7 @@ export interface SemanticTokensMiddleware {
 	) => vscode.ProviderResult<
 		vscode.SemanticTokensEdits | vscode.SemanticTokens
 	>;
+
 	provideDocumentRangeSemanticTokens?: (
 		this: void,
 		document: vscode.TextDocument,
@@ -87,7 +89,9 @@ export interface SemanticTokensMiddleware {
 
 export interface SemanticTokensProviderShape {
 	range?: vscode.DocumentRangeSemanticTokensProvider;
+
 	full?: vscode.DocumentSemanticTokensProvider;
+
 	onDidChangeSemanticTokensEmitter: vscode.EventEmitter<void>;
 }
 
@@ -106,7 +110,9 @@ export class SemanticTokensFeature extends TextDocumentLanguageFeature<
 			ensure(capabilities, "textDocument")!,
 			"semanticTokens",
 		)!;
+
 		capability.dynamicRegistration = true;
+
 		capability.tokenTypes = [
 			SemanticTokenTypes.namespace,
 			SemanticTokenTypes.type,
@@ -133,6 +139,7 @@ export class SemanticTokensFeature extends TextDocumentLanguageFeature<
 			SemanticTokenTypes.decorator,
 			SemanticTokenTypes.label,
 		];
+
 		capability.tokenModifiers = [
 			SemanticTokenModifiers.declaration,
 			SemanticTokenModifiers.definition,
@@ -145,17 +152,24 @@ export class SemanticTokensFeature extends TextDocumentLanguageFeature<
 			SemanticTokenModifiers.documentation,
 			SemanticTokenModifiers.defaultLibrary,
 		];
+
 		capability.formats = [TokenFormat.Relative];
+
 		capability.requests = {
 			range: true,
 			full: {
 				delta: true,
 			},
 		};
+
 		capability.multilineTokenSupport = false;
+
 		capability.overlappingTokenSupport = false;
+
 		capability.serverCancelSupport = true;
+
 		capability.augmentsSyntaxTokens = true;
+
 		ensure(
 			ensure(capabilities, "workspace")!,
 			"semanticTokens",
@@ -167,6 +181,7 @@ export class SemanticTokensFeature extends TextDocumentLanguageFeature<
 		documentSelector: DocumentSelector,
 	): void {
 		const client = this._client;
+
 		client.onRequest(SemanticTokensRefreshRequest.type, async () => {
 			for (const provider of this.getAllProviders()) {
 				provider.onDidChangeSemanticTokensEmitter.fire();
@@ -181,6 +196,7 @@ export class SemanticTokensFeature extends TextDocumentLanguageFeature<
 		if (!id || !options) {
 			return;
 		}
+
 		this.register({ id: id, registerOptions: options });
 	}
 
@@ -231,6 +247,7 @@ export class SemanticTokensFeature extends TextDocumentLanguageFeature<
 											if (token.isCancellationRequested) {
 												return null;
 											}
+
 											return client.protocol2CodeConverter.asSemanticTokens(
 												result,
 												token,
@@ -285,6 +302,7 @@ export class SemanticTokensFeature extends TextDocumentLanguageFeature<
 													) {
 														return null;
 													}
+
 													if (
 														SemanticTokens.is(
 															result,
@@ -367,6 +385,7 @@ export class SemanticTokensFeature extends TextDocumentLanguageFeature<
 											if (token.isCancellationRequested) {
 												return null;
 											}
+
 											return client.protocol2CodeConverter.asSemanticTokens(
 												result,
 												token,
@@ -420,6 +439,7 @@ export class SemanticTokensFeature extends TextDocumentLanguageFeature<
 				),
 			);
 		}
+
 		if (rangeProvider !== undefined) {
 			disposables.push(
 				vscode.languages.registerDocumentRangeSemanticTokensProvider(

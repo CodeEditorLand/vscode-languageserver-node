@@ -151,6 +151,7 @@ export class LSPCancellationError extends CancellationError {
 
 	constructor(data: object | Object) {
 		super();
+
 		this.data = data;
 	}
 }
@@ -159,6 +160,7 @@ export function ensure<T, K extends keyof T>(target: T, key: K): T[K] {
 	if (target[key] === undefined) {
 		target[key] = {} as any;
 	}
+
 	return target[key];
 }
 
@@ -168,6 +170,7 @@ export interface NextSignature<P, R> {
 
 export interface RegistrationData<T> {
 	id: string;
+
 	registerOptions: T;
 }
 
@@ -410,7 +413,9 @@ export interface NotificationSendEvent<
 	P extends { textDocument: TextDocumentIdentifier },
 > {
 	textDocument: TextDocument;
+
 	type: ProtocolNotificationType<P, TextDocumentRegistrationOptions>;
+
 	params: P;
 }
 
@@ -437,13 +442,18 @@ export abstract class DynamicDocumentFeature<RO, MW, CO = object>
 	public abstract fillClientCapabilities(
 		capabilities: ClientCapabilities,
 	): void;
+
 	public abstract initialize(
 		capabilities: ServerCapabilities,
 		documentSelector: DocumentSelector | undefined,
 	): void;
+
 	public abstract registrationType: RegistrationType<RO>;
+
 	public abstract register(data: RegistrationData<RO>): void;
+
 	public abstract unregister(id: string): void;
+
 	public abstract clear(): void;
 
 	/**
@@ -468,6 +478,7 @@ export abstract class DynamicDocumentFeature<RO, MW, CO = object>
 				}
 			}
 		}
+
 		const registrations = count > 0;
 
 		return {
@@ -507,22 +518,29 @@ export abstract class TextDocumentEventFeature<
 		NotifyingFeature<P>
 {
 	private readonly _event: Event<E>;
+
 	protected readonly _type: ProtocolNotificationType<
 		P,
 		TextDocumentRegistrationOptions
 	>;
+
 	protected readonly _middleware: () =>
 		| NextSignature<E, Promise<void>>
 		| undefined;
+
 	protected readonly _createParams: CreateParamsSignature<E, P>;
+
 	protected readonly _textDocument: (data: E) => TextDocument;
+
 	protected readonly _selectorFilter?: (
 		selectors: IterableIterator<VDocumentSelector>,
 		data: E,
 	) => boolean;
 
 	private _listener: Disposable | undefined;
+
 	protected readonly _selectors: Map<string, VDocumentSelector>;
+
 	private _onNotificationSent: EventEmitter<NotificationSendEvent<P>>;
 
 	public static textDocumentFilter(
@@ -534,6 +552,7 @@ export abstract class TextDocumentEventFeature<
 				return true;
 			}
 		}
+
 		return false;
 	}
 
@@ -550,20 +569,28 @@ export abstract class TextDocumentEventFeature<
 		) => boolean,
 	) {
 		super(client);
+
 		this._event = event;
+
 		this._type = type;
+
 		this._middleware = middleware;
+
 		this._createParams = createParams;
+
 		this._textDocument = textDocument;
+
 		this._selectorFilter = selectorFilter;
 
 		this._selectors = new Map<string, VDocumentSelector>();
+
 		this._onNotificationSent = new EventEmitter<NotificationSendEvent<P>>();
 	}
 
 	protected getStateInfo(): [IterableIterator<VDocumentSelector>, boolean] {
 		return [this._selectors.values(), false];
 	}
+
 	protected getDocumentSelectors(): IterableIterator<VDocumentSelector> {
 		return this._selectors.values();
 	}
@@ -574,6 +601,7 @@ export abstract class TextDocumentEventFeature<
 		if (!data.registerOptions.documentSelector) {
 			return;
 		}
+
 		if (!this._listener) {
 			this._listener = this._event((data) => {
 				this.callback(data).catch((error) => {
@@ -584,6 +612,7 @@ export abstract class TextDocumentEventFeature<
 				});
 			});
 		}
+
 		this._selectors.set(
 			data.id,
 			this._client.protocol2CodeConverter.asDocumentSelector(
@@ -595,7 +624,9 @@ export abstract class TextDocumentEventFeature<
 	protected async callback(data: E): Promise<void> {
 		const doSend = async (data: E): Promise<void> => {
 			const params = this._createParams(data);
+
 			await this._client.sendNotification(this._type, params);
+
 			this.notificationSent(
 				this.getTextDocument(data),
 				this._type,
@@ -620,6 +651,7 @@ export abstract class TextDocumentEventFeature<
 		) {
 			return false;
 		}
+
 		return (
 			!this._selectorFilter ||
 			this._selectorFilter(this._selectors.values(), data)
@@ -645,17 +677,21 @@ export abstract class TextDocumentEventFeature<
 
 		if (this._selectors.size === 0 && this._listener) {
 			this._listener.dispose();
+
 			this._listener = undefined;
 		}
 	}
 
 	public clear(): void {
 		this._selectors.clear();
+
 		this._onNotificationSent.dispose();
+
 		this._onNotificationSent = new EventEmitter<NotificationSendEvent<P>>();
 
 		if (this._listener) {
 			this._listener.dispose();
+
 			this._listener = undefined;
 		}
 	}
@@ -672,13 +708,16 @@ export abstract class TextDocumentEventFeature<
 				};
 			}
 		}
+
 		return undefined;
 	}
 }
 
 type TextDocumentFeatureRegistration<RO, PR> = {
 	disposable: Disposable;
+
 	data: RegistrationData<RO>;
+
 	provider: PR;
 };
 
@@ -709,6 +748,7 @@ export abstract class TextDocumentLanguageFeature<
 	CO = object,
 > extends DynamicDocumentFeature<RO, MW, CO> {
 	private readonly _registrationType: RegistrationType<RO>;
+
 	private readonly _registrations: Map<
 		string,
 		TextDocumentFeatureRegistration<RO, PR>
@@ -719,7 +759,9 @@ export abstract class TextDocumentLanguageFeature<
 		registrationType: RegistrationType<RO>,
 	) {
 		super(client);
+
 		this._registrationType = registrationType;
+
 		this._registrations = new Map();
 	}
 
@@ -730,6 +772,7 @@ export abstract class TextDocumentLanguageFeature<
 			if (selector === null) {
 				continue;
 			}
+
 			yield this._client.protocol2CodeConverter.asDocumentSelector(
 				selector,
 			);
@@ -753,10 +796,12 @@ export abstract class TextDocumentLanguageFeature<
 		if (!data.registerOptions.documentSelector) {
 			return;
 		}
+
 		const registration = this.registerLanguageProvider(
 			data.registerOptions,
 			data.id,
 		);
+
 		this._registrations.set(data.id, {
 			disposable: registration[0],
 			data,
@@ -774,6 +819,7 @@ export abstract class TextDocumentLanguageFeature<
 
 		if (registration !== undefined) {
 			this._registrations.delete(id);
+
 			registration.disposable.dispose();
 		}
 	}
@@ -782,6 +828,7 @@ export abstract class TextDocumentLanguageFeature<
 		this._registrations.forEach((value) => {
 			value.disposable.dispose();
 		});
+
 		this._registrations.clear();
 	}
 
@@ -816,6 +863,7 @@ export abstract class TextDocumentLanguageFeature<
 			if (!documentSelector) {
 				return [undefined, undefined];
 			}
+
 			const options: RO & { documentSelector: DocumentSelector } = (
 				Is.boolean(capability) && capability === true
 					? { documentSelector }
@@ -824,6 +872,7 @@ export abstract class TextDocumentLanguageFeature<
 
 			return [UUID.generateUuid(), options];
 		}
+
 		return [undefined, undefined];
 	}
 
@@ -834,6 +883,7 @@ export abstract class TextDocumentLanguageFeature<
 		if (!documentSelector || !capability) {
 			return undefined;
 		}
+
 		return (
 			Is.boolean(capability) && capability === true
 				? { documentSelector }
@@ -857,6 +907,7 @@ export abstract class TextDocumentLanguageFeature<
 				return registration.provider;
 			}
 		}
+
 		return undefined;
 	}
 
@@ -866,6 +917,7 @@ export abstract class TextDocumentLanguageFeature<
 		for (const item of this._registrations.values()) {
 			result.push(item.provider);
 		}
+
 		return result;
 	}
 }
@@ -876,6 +928,7 @@ export interface WorkspaceProviderFeature<PR> {
 
 type WorkspaceFeatureRegistration<PR> = {
 	disposable: Disposable;
+
 	provider: PR;
 };
 
@@ -883,7 +936,9 @@ export abstract class WorkspaceFeature<RO, PR, M>
 	implements DynamicFeature<RO>
 {
 	protected readonly _client: FeatureClient<M>;
+
 	private readonly _registrationType: RegistrationType<RO>;
+
 	protected readonly _registrations: Map<
 		string,
 		WorkspaceFeatureRegistration<PR>
@@ -894,7 +949,9 @@ export abstract class WorkspaceFeature<RO, PR, M>
 		registrationType: RegistrationType<RO>,
 	) {
 		this._client = client;
+
 		this._registrationType = registrationType;
+
 		this._registrations = new Map();
 	}
 
@@ -925,6 +982,7 @@ export abstract class WorkspaceFeature<RO, PR, M>
 		const registration = this.registerLanguageProvider(
 			data.registerOptions,
 		);
+
 		this._registrations.set(data.id, {
 			disposable: registration[0],
 			provider: registration[1],
@@ -938,6 +996,7 @@ export abstract class WorkspaceFeature<RO, PR, M>
 
 		if (registration !== undefined) {
 			this._registrations.delete(id);
+
 			registration.disposable.dispose();
 		}
 	}
@@ -946,6 +1005,7 @@ export abstract class WorkspaceFeature<RO, PR, M>
 		this._registrations.forEach((registration) => {
 			registration.disposable.dispose();
 		});
+
 		this._registrations.clear();
 	}
 
@@ -955,6 +1015,7 @@ export abstract class WorkspaceFeature<RO, PR, M>
 		for (const registration of this._registrations.values()) {
 			result.push(registration.provider);
 		}
+
 		return result;
 	}
 }
@@ -965,8 +1026,11 @@ export interface DedicatedTextSynchronizationFeature {
 
 export interface TabsModel {
 	onClose: Event<Set<Uri>>;
+
 	onOpen: Event<Set<Uri>>;
+
 	isActive(document: TextDocument | Uri): boolean;
+
 	isVisible(document: TextDocument | Uri): boolean;
 
 	getTabResources(): Set<Uri>;
@@ -974,36 +1038,45 @@ export interface TabsModel {
 
 export interface FeatureClient<M, CO = object> {
 	protocol2CodeConverter: p2c.Converter;
+
 	code2ProtocolConverter: c2p.Converter;
 
 	clientOptions: CO;
+
 	middleware: M;
 
 	tabsModel: TabsModel;
 
 	start(): Promise<void>;
+
 	isRunning(): boolean;
+
 	stop(): Promise<void>;
 
 	sendRequest<R, PR, E, RO>(
 		type: ProtocolRequestType0<R, PR, E, RO>,
 		token?: CancellationToken,
 	): Promise<R>;
+
 	sendRequest<P, R, PR, E, RO>(
 		type: ProtocolRequestType<P, R, PR, E, RO>,
 		params: P,
 		token?: CancellationToken,
 	): Promise<R>;
+
 	sendRequest<R, E>(
 		type: RequestType0<R, E>,
 		token?: CancellationToken,
 	): Promise<R>;
+
 	sendRequest<P, R, E>(
 		type: RequestType<P, R, E>,
 		params: P,
 		token?: CancellationToken,
 	): Promise<R>;
+
 	sendRequest<R>(method: string, token?: CancellationToken): Promise<R>;
+
 	sendRequest<R>(
 		method: string,
 		param: any,
@@ -1014,49 +1087,62 @@ export interface FeatureClient<M, CO = object> {
 		type: ProtocolRequestType0<R, PR, E, RO>,
 		handler: RequestHandler0<R, E>,
 	): Disposable;
+
 	onRequest<P, R, PR, E, RO>(
 		type: ProtocolRequestType<P, R, PR, E, RO>,
 		handler: RequestHandler<P, R, E>,
 	): Disposable;
+
 	onRequest<R, E>(
 		type: RequestType0<R, E>,
 		handler: RequestHandler0<R, E>,
 	): Disposable;
+
 	onRequest<P, R, E>(
 		type: RequestType<P, R, E>,
 		handler: RequestHandler<P, R, E>,
 	): Disposable;
+
 	onRequest<R, E>(
 		method: string,
 		handler: GenericRequestHandler<R, E>,
 	): Disposable;
 
 	sendNotification<RO>(type: ProtocolNotificationType0<RO>): Promise<void>;
+
 	sendNotification<P, RO>(
 		type: ProtocolNotificationType<P, RO>,
 		params?: P,
 	): Promise<void>;
+
 	sendNotification(type: NotificationType0): Promise<void>;
+
 	sendNotification<P>(type: NotificationType<P>, params?: P): Promise<void>;
+
 	sendNotification(method: string): Promise<void>;
+
 	sendNotification(method: string, params: any): Promise<void>;
 
 	onNotification<RO>(
 		type: ProtocolNotificationType0<RO>,
 		handler: NotificationHandler0,
 	): Disposable;
+
 	onNotification<P, RO>(
 		type: ProtocolNotificationType<P, RO>,
 		handler: NotificationHandler<P>,
 	): Disposable;
+
 	onNotification(
 		type: NotificationType0,
 		handler: NotificationHandler0,
 	): Disposable;
+
 	onNotification<P>(
 		type: NotificationType<P>,
 		handler: NotificationHandler<P>,
 	): Disposable;
+
 	onNotification(
 		method: string,
 		handler: GenericNotificationHandler,
@@ -1069,7 +1155,9 @@ export interface FeatureClient<M, CO = object> {
 	): Disposable;
 
 	info(message: string, data?: any, showNotification?: boolean): void;
+
 	warn(message: string, data?: any, showNotification?: boolean): void;
+
 	error(
 		message: string,
 		data?: any,

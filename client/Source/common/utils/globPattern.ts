@@ -19,6 +19,7 @@ export function matchGlobPattern(pattern: GlobPattern, resource: Uri): boolean {
 					? pattern.baseUri
 					: pattern.baseUri.uri,
 			);
+
 			miniMatchPattern = baseUri
 				.with({ path: baseUri.path + "/" + pattern.pattern })
 				.fsPath.replace(/\\/g, "/");
@@ -26,10 +27,12 @@ export function matchGlobPattern(pattern: GlobPattern, resource: Uri): boolean {
 			return false;
 		}
 	}
+
 	const matcher = new minimatch.Minimatch(miniMatchPattern, { noext: true });
 
 	if (!matcher.makeRe()) {
 		return false;
 	}
+
 	return matcher.match(resource.fsPath);
 }

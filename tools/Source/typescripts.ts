@@ -16,6 +16,7 @@ function normalizePath(value: string): string {
 			value = value.charAt(0).toUpperCase() + value.substring(1);
 		}
 	}
+
 	const result = path.posix.normalize(value);
 
 	return result.length > 0 && result.charAt(result.length - 1) === "/"
@@ -27,6 +28,7 @@ function makeAbsolute(p: string, root?: string): string {
 	if (path.isAbsolute(p)) {
 		return normalizePath(p);
 	}
+
 	if (root === undefined) {
 		return normalizePath(path.join(process.cwd(), p));
 	} else {
@@ -51,6 +53,7 @@ export namespace CompileOptions {
 				return normalizePath(projectPath);
 			}
 		}
+
 		const result = (options as InternalCompilerOptions).configFilePath;
 
 		return result && makeAbsolute(result);
@@ -113,7 +116,9 @@ export namespace Type {
 
 interface InternalSymbol extends ts.Symbol {
 	parent?: ts.Symbol;
+
 	containingType?: ts.UnionOrIntersectionType;
+
 	__symbol__data__key__: string | undefined;
 }
 
@@ -125,7 +130,9 @@ export class Symbols {
 	}
 
 	public static readonly Unknown = "unknown";
+
 	public static readonly Undefined = "undefined";
+
 	public static readonly None = "none";
 
 	public static isClass(symbol: ts.Symbol): boolean {
@@ -202,6 +209,7 @@ export class Symbols {
 		if (result !== undefined) {
 			return result;
 		}
+
 		const declarations = symbol.getDeclarations();
 
 		if (declarations === undefined) {
@@ -213,6 +221,7 @@ export class Symbols {
 				return Symbols.None;
 			}
 		}
+
 		const fragments: { f: string; s: number; e: number; k: number }[] = [];
 
 		for (const declaration of declarations) {
@@ -223,6 +232,7 @@ export class Symbols {
 				k: declaration.kind,
 			});
 		}
+
 		if (fragments.length > 1) {
 			fragments.sort((a, b) => {
 				let result = a.f < b.f ? -1 : a.f > b.f ? 1 : 0;
@@ -230,25 +240,31 @@ export class Symbols {
 				if (result !== 0) {
 					return result;
 				}
+
 				result = a.s - b.s;
 
 				if (result !== 0) {
 					return result;
 				}
+
 				result = a.e - b.e;
 
 				if (result !== 0) {
 					return result;
 				}
+
 				return a.k - b.k;
 			});
 		}
+
 		const hash = crypto.createHash("sha256");
 
 		if ((symbol.flags & ts.SymbolFlags.Transient) !== 0) {
 			hash.update(JSON.stringify({ trans: true }, undefined, 0));
 		}
+
 		hash.update(JSON.stringify(fragments, undefined, 0));
+
 		result = hash.digest("base64");
 		(symbol as InternalSymbol).__symbol__data__key__ = result;
 
@@ -265,6 +281,7 @@ export class Symbols {
 		if (declarations === undefined) {
 			return undefined;
 		}
+
 		const typeChecker = this.typeChecker;
 
 		for (const declaration of declarations) {
@@ -293,6 +310,7 @@ export class Symbols {
 				}
 			}
 		}
+
 		return result.length === 0 ? undefined : result;
 	}
 
@@ -306,6 +324,7 @@ export class Symbols {
 		if (tsType === undefined) {
 			return undefined;
 		}
+
 		const baseTypes = tsType.getBaseTypes();
 
 		if (baseTypes !== undefined) {
@@ -317,6 +336,7 @@ export class Symbols {
 				}
 			}
 		}
+
 		return result.length === 0 ? undefined : result;
 	}
 
@@ -324,6 +344,7 @@ export class Symbols {
 		if (Symbols.isTypeAlias(symbol) || Symbols.isInterface(symbol)) {
 			return this.typeChecker.getDeclaredTypeOfSymbol(symbol);
 		}
+
 		const location = this.inferLocationNode(symbol);
 
 		if (location !== undefined) {
@@ -339,6 +360,7 @@ export class Symbols {
 		if (declarations !== undefined && declarations.length > 0) {
 			return declarations[0];
 		}
+
 		if (Symbols.isPrototype(symbol)) {
 			const parent = Symbols.getParent(symbol);
 
@@ -346,6 +368,7 @@ export class Symbols {
 				return this.inferLocationNode(parent);
 			}
 		}
+
 		return undefined;
 	}
 }

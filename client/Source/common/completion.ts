@@ -87,6 +87,7 @@ export interface CompletionMiddleware {
 		token: CancellationToken,
 		next: ProvideCompletionItemsSignature,
 	) => ProviderResult<VCompletionItem[] | VCompletionList>;
+
 	resolveCompletionItem?: (
 		this: void,
 		item: VCompletionItem,
@@ -105,6 +106,7 @@ export class CompletionItemFeature extends TextDocumentLanguageFeature<
 
 	constructor(client: FeatureClient<CompletionMiddleware>) {
 		super(client, CompletionRequest.type);
+
 		this.labelDetailsSupport = new Map();
 	}
 
@@ -113,8 +115,11 @@ export class CompletionItemFeature extends TextDocumentLanguageFeature<
 			ensure(capabilities, "textDocument")!,
 			"completion",
 		)!;
+
 		completion.dynamicRegistration = true;
+
 		completion.contextSupport = true;
+
 		completion.completionItem = {
 			snippetSupport: true,
 			commitCharactersSupport: true,
@@ -134,10 +139,13 @@ export class CompletionItemFeature extends TextDocumentLanguageFeature<
 			},
 			labelDetailsSupport: true,
 		};
+
 		completion.insertTextMode = InsertTextMode.adjustIndentation;
+
 		completion.completionItemKind = {
 			valueSet: SupportedCompletionItemKinds,
 		};
+
 		completion.completionList = {
 			itemDefaults: [
 				"commitCharacters",
@@ -212,6 +220,7 @@ export class CompletionItemFeature extends TextDocumentLanguageFeature<
 									if (token.isCancellationRequested) {
 										return null;
 									}
+
 									return client.protocol2CodeConverter.asCompletionResult(
 										result,
 										defaultCommitCharacters,
@@ -269,6 +278,7 @@ export class CompletionItemFeature extends TextDocumentLanguageFeature<
 											if (token.isCancellationRequested) {
 												return null;
 											}
+
 											return client.protocol2CodeConverter.asCompletionItem(
 												result,
 											);

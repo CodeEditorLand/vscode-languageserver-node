@@ -31,6 +31,7 @@ function ensure<T, K extends keyof T>(target: T, key: K): T[K] {
 	if (target[key] === void 0) {
 		target[key] = {} as any;
 	}
+
 	return target[key];
 }
 
@@ -48,6 +49,7 @@ namespace Converter {
 				uri: base.asUri(notebookDocument.uri),
 			};
 		}
+
 		export function asNotebookDocument(
 			notebookDocument: vscode.NotebookDocument,
 			cells: vscode.NotebookCell[],
@@ -63,14 +65,17 @@ namespace Converter {
 			if (Object.keys(notebookDocument.metadata).length > 0) {
 				result.metadata = asMetadata(notebookDocument.metadata);
 			}
+
 			return result;
 		}
+
 		export function asNotebookCells(
 			cells: vscode.NotebookCell[],
 			base: _c2p.Converter,
 		): proto.NotebookCell[] {
 			return cells.map((cell) => asNotebookCell(cell, base));
 		}
+
 		export function asMetadata(metadata: {
 			[key: string]: any;
 		}): $LSPObject {
@@ -78,6 +83,7 @@ namespace Converter {
 
 			return deepCopy(seen, metadata);
 		}
+
 		export function asNotebookCell(
 			cell: vscode.NotebookCell,
 			base: _c2p.Converter,
@@ -90,6 +96,7 @@ namespace Converter {
 			if (Object.keys(cell.metadata).length > 0) {
 				result.metadata = asMetadata(cell.metadata);
 			}
+
 			if (
 				cell.executionSummary !== undefined &&
 				Is.number(cell.executionSummary.executionOrder) &&
@@ -100,8 +107,10 @@ namespace Converter {
 					success: cell.executionSummary.success,
 				};
 			}
+
 			return result;
 		}
+
 		function asNotebookCellKind(
 			kind: vscode.NotebookCellKind,
 		): proto.NotebookCellKind {
@@ -113,6 +122,7 @@ namespace Converter {
 					return proto.NotebookCellKind.Code;
 			}
 		}
+
 		function deepCopy(
 			seen: Set<any>,
 			value: { [key: string]: any },
@@ -127,6 +137,7 @@ namespace Converter {
 			if (seen.has(value)) {
 				throw new Error(`Can't deep copy cyclic structures.`);
 			}
+
 			if (Array.isArray(value)) {
 				const result: $LSPArray = [];
 
@@ -142,9 +153,11 @@ namespace Converter {
 								`Can't transfer regular expressions to the server`,
 							);
 						}
+
 						result.push(elem);
 					}
 				}
+
 				return result;
 			} else {
 				const props = Object.keys(value);
@@ -165,12 +178,15 @@ namespace Converter {
 								`Can't transfer regular expressions to the server`,
 							);
 						}
+
 						result[prop] = elem;
 					}
 				}
+
 				return result;
 			}
 		}
+
 		type TextContent = Required<
 			Required<
 				Required<proto.NotebookDocumentChangeEvent>["cells"]
@@ -192,6 +208,7 @@ namespace Converter {
 				changes: params.contentChanges,
 			};
 		}
+
 		export function asNotebookDocumentChangeEvent(
 			event: VNotebookDocumentChangeEvent,
 			base: _c2p.Converter,
@@ -202,6 +219,7 @@ namespace Converter {
 			if (event.metadata) {
 				result.metadata = Converter.c2p.asMetadata(event.metadata);
 			}
+
 			if (event.cells !== undefined) {
 				const cells: Required<proto.NotebookDocumentChangeEvent>["cells"] =
 					Object.create(null);
@@ -245,20 +263,24 @@ namespace Converter {
 								: undefined,
 					};
 				}
+
 				if (changedCells.data !== undefined) {
 					cells.data = changedCells.data.map((cell) =>
 						Converter.c2p.asNotebookCell(cell, base),
 					);
 				}
+
 				if (changedCells.textContent !== undefined) {
 					cells.textContent = changedCells.textContent.map((event) =>
 						Converter.c2p.asTextContentChange(event, base),
 					);
 				}
+
 				if (Object.keys(cells).length > 0) {
 					result.cells = cells;
 				}
 			}
+
 			return result;
 		}
 	}
@@ -267,7 +289,9 @@ namespace Converter {
 namespace $NotebookCell {
 	type ComputeDiffReturnType = {
 		start: number;
+
 		deleteCount: number;
+
 		cells?: vscode.NotebookCell[];
 	};
 
@@ -293,6 +317,7 @@ namespace $NotebookCell {
 		) {
 			startIndex++;
 		}
+
 		if (startIndex < modifiedLength && startIndex < originalLength) {
 			let originalEndIndex = originalLength - 1;
 
@@ -308,6 +333,7 @@ namespace $NotebookCell {
 				)
 			) {
 				originalEndIndex--;
+
 				modifiedEndIndex--;
 			}
 
@@ -354,6 +380,7 @@ namespace $NotebookCell {
 		) {
 			return false;
 		}
+
 		return (
 			!compareMetaData ||
 			(compareMetaData && equalsMetadata(one.metadata, other.metadata))
@@ -367,9 +394,11 @@ namespace $NotebookCell {
 		if (one === other) {
 			return true;
 		}
+
 		if (one === undefined || other === undefined) {
 			return false;
 		}
+
 		return (
 			one.executionOrder === other.executionOrder &&
 			one.success === other.success &&
@@ -384,9 +413,11 @@ namespace $NotebookCell {
 		if (one === other) {
 			return true;
 		}
+
 		if (one === undefined || other === undefined) {
 			return false;
 		}
+
 		return (
 			one.startTime === other.startTime && one.endTime === other.endTime
 		);
@@ -396,6 +427,7 @@ namespace $NotebookCell {
 		if (one === other) {
 			return true;
 		}
+
 		if (
 			one === null ||
 			one === undefined ||
@@ -404,12 +436,15 @@ namespace $NotebookCell {
 		) {
 			return false;
 		}
+
 		if (typeof one !== typeof other) {
 			return false;
 		}
+
 		if (typeof one !== "object") {
 			return false;
 		}
+
 		const oneArray = Array.isArray(one);
 
 		const otherArray = Array.isArray(other);
@@ -422,12 +457,14 @@ namespace $NotebookCell {
 			if (one.length !== other.length) {
 				return false;
 			}
+
 			for (let i = 0; i < one.length; i++) {
 				if (!equalsMetadata(one[i], other[i])) {
 					return false;
 				}
 			}
 		}
+
 		if (isObjectLiteral(one) && isObjectLiteral(other)) {
 			const oneKeys = Object.keys(one);
 
@@ -438,11 +475,13 @@ namespace $NotebookCell {
 			}
 
 			oneKeys.sort();
+
 			otherKeys.sort();
 
 			if (!equalsMetadata(oneKeys, otherKeys)) {
 				return false;
 			}
+
 			for (let i = 0; i < oneKeys.length; i++) {
 				const prop = oneKeys[i];
 
@@ -455,8 +494,10 @@ namespace $NotebookCell {
 					return false;
 				}
 			}
+
 			return true;
 		}
+
 		return false;
 	}
 
@@ -473,6 +514,7 @@ namespace $NotebookDocumentFilter {
 		if (typeof filter === "string") {
 			return filter === "*" || notebookDocument.notebookType === filter;
 		}
+
 		if (
 			filter.notebookType !== undefined &&
 			filter.notebookType !== "*" &&
@@ -480,6 +522,7 @@ namespace $NotebookDocumentFilter {
 		) {
 			return false;
 		}
+
 		const uri = notebookDocument.uri;
 
 		if (
@@ -489,11 +532,13 @@ namespace $NotebookDocumentFilter {
 		) {
 			return false;
 		}
+
 		if (filter.pattern !== undefined) {
 			if (!matchGlobPattern(filter.pattern, uri)) {
 				return false;
 			}
 		}
+
 		return true;
 	}
 }
@@ -539,6 +584,7 @@ namespace $NotebookDocumentSyncOptions {
 				);
 			}
 		}
+
 		return result;
 	}
 
@@ -601,7 +647,9 @@ export type VNotebookDocumentChangeEvent = {
 			 */
 			array: {
 				start: number;
+
 				deleteCount: number;
+
 				cells?: vscode.NotebookCell[];
 			};
 
@@ -652,6 +700,7 @@ export type NotebookDocumentMiddleware = {
 				cells: vscode.NotebookCell[],
 			) => Promise<void>,
 		) => Promise<void>;
+
 		didSave?: (
 			this: void,
 			notebookDocument: vscode.NotebookDocument,
@@ -660,6 +709,7 @@ export type NotebookDocumentMiddleware = {
 				notebookDocument: vscode.NotebookDocument,
 			) => Promise<void>,
 		) => Promise<void>;
+
 		didChange?: (
 			this: void,
 			event: VNotebookDocumentChangeEvent,
@@ -668,6 +718,7 @@ export type NotebookDocumentMiddleware = {
 				event: VNotebookDocumentChangeEvent,
 			) => Promise<void>,
 		) => Promise<void>;
+
 		didClose?: (
 			this: void,
 			notebookDocument: vscode.NotebookDocument,
@@ -685,12 +736,15 @@ export interface NotebookDocumentSyncFeatureShape {
 	sendDidOpenNotebookDocument(
 		notebookDocument: vscode.NotebookDocument,
 	): Promise<void>;
+
 	sendDidSaveNotebookDocument(
 		notebookDocument: vscode.NotebookDocument,
 	): Promise<void>;
+
 	sendDidChangeNotebookDocument(
 		event: VNotebookDocumentChangeEvent,
 	): Promise<void>;
+
 	sendDidCloseNotebookDocument(
 		notebookDocument: vscode.NotebookDocument,
 	): Promise<void>;
@@ -707,14 +761,23 @@ class NotebookDocumentSyncFeatureProvider
 		NotebookDocumentMiddleware,
 		$NotebookDocumentOptions
 	>;
+
 	private readonly options: proto.NotebookDocumentSyncOptions;
+
 	private readonly notebookSyncInfo: Map<string, SyncInfo>;
+
 	private readonly notebookDidOpen: Set<string>;
+
 	private readonly disposables: vscode.Disposable[];
+
 	private readonly selector: vscode.DocumentSelector;
+
 	private readonly onChangeNotificationSent: vscode.EventEmitter<VNotebookDocumentChangeEvent>;
+
 	private readonly onOpenNotificationSent: vscode.EventEmitter<vscode.NotebookDocument>;
+
 	private readonly onCloseNotificationSent: vscode.EventEmitter<vscode.NotebookDocument>;
+
 	private readonly onSaveNotificationSent: vscode.EventEmitter<vscode.NotebookDocument>;
 
 	constructor(
@@ -729,22 +792,32 @@ class NotebookDocumentSyncFeatureProvider
 		onSaveNotificationSent: vscode.EventEmitter<vscode.NotebookDocument>,
 	) {
 		this.client = client;
+
 		this.options = options;
+
 		this.notebookSyncInfo = new Map();
+
 		this.notebookDidOpen = new Set();
+
 		this.disposables = [];
+
 		this.selector = client.protocol2CodeConverter.asDocumentSelector(
 			$NotebookDocumentSyncOptions.asDocumentSelector(options),
 		);
+
 		this.onChangeNotificationSent = onChangeNotificationSent;
+
 		this.onOpenNotificationSent = onOpenNotificationSent;
+
 		this.onCloseNotificationSent = onCloseNotificationSent;
+
 		this.onSaveNotificationSent = onSaveNotificationSent;
 
 		// open
 		vscode.workspace.onDidOpenNotebookDocument(
 			(notebookDocument) => {
 				this.notebookDidOpen.add(notebookDocument.uri.toString());
+
 				this.didOpen(notebookDocument);
 			},
 			undefined,
@@ -753,6 +826,7 @@ class NotebookDocumentSyncFeatureProvider
 
 		for (const notebookDocument of vscode.workspace.notebookDocuments) {
 			this.notebookDidOpen.add(notebookDocument.uri.toString());
+
 			this.didOpen(notebookDocument);
 		}
 
@@ -776,6 +850,7 @@ class NotebookDocumentSyncFeatureProvider
 		vscode.workspace.onDidCloseNotebookDocument(
 			(notebookDocument) => {
 				this.didClose(notebookDocument);
+
 				this.notebookDidOpen.delete(notebookDocument.uri.toString());
 			},
 			undefined,
@@ -797,6 +872,7 @@ class NotebookDocumentSyncFeatureProvider
 				};
 			}
 		}
+
 		return {
 			kind: "document",
 			id: "$internal",
@@ -821,6 +897,7 @@ class NotebookDocumentSyncFeatureProvider
 				return true;
 			}
 		}
+
 		return false;
 	}
 
@@ -831,12 +908,14 @@ class NotebookDocumentSyncFeatureProvider
 		if (vscode.languages.match(this.selector, cell.document) === 0) {
 			return;
 		}
+
 		if (!this.notebookDidOpen.has(notebookDocument.uri.toString())) {
 			// We have never received an open notification for the notebook document.
 			// VS Code guarantees that we first get cell document open and then
 			// notebook open. So simply wait for the notebook open.
 			return;
 		}
+
 		const syncInfo = this.getSyncInfo(notebookDocument);
 		// In VS Code we receive a notebook open before a cell document open.
 		// The document and the cell is synced.
@@ -858,6 +937,7 @@ class NotebookDocumentSyncFeatureProvider
 				// cell and add it back to update the language mode on the server side.
 				return;
 			}
+
 			if (cellMatches) {
 				// don't use cells from above since there might be more matching cells in the notebook
 				// Since we had a matching cell above we will have matching cells now.
@@ -903,6 +983,7 @@ class NotebookDocumentSyncFeatureProvider
 		if (vscode.languages.match(this.selector, event.document) === 0) {
 			return;
 		}
+
 		const syncInfo = this.getSyncInfo(notebookDocument);
 		// Notebook got never synced. So it doesn't matter if a cell document changes.
 		if (
@@ -911,6 +992,7 @@ class NotebookDocumentSyncFeatureProvider
 		) {
 			return;
 		}
+
 		this.doSendChange(
 			{
 				notebook: notebookDocument,
@@ -933,6 +1015,7 @@ class NotebookDocumentSyncFeatureProvider
 			// document closes.
 			return;
 		}
+
 		const cellUri = cell.document.uri;
 
 		const index = syncInfo.cells.findIndex(
@@ -944,6 +1027,7 @@ class NotebookDocumentSyncFeatureProvider
 			// close event.
 			return;
 		}
+
 		if (index === 0 && syncInfo.cells.length === 1) {
 			// The last cell. Close the notebook document in the server.
 			this.doSendClose(notebookDocument, syncInfo.cells).catch(() => {
@@ -953,6 +1037,7 @@ class NotebookDocumentSyncFeatureProvider
 			const newCells = syncInfo.cells.slice();
 
 			const deleted = newCells.splice(index, 1);
+
 			this.doSendChange(
 				{
 					notebook: notebookDocument,
@@ -985,6 +1070,7 @@ class NotebookDocumentSyncFeatureProvider
 			if (matchingCells === undefined) {
 				matchingCells = syncInfo.cells.slice();
 			}
+
 			if (matchingCells !== undefined) {
 				const event = this.asNotebookDocumentChangeEvent(
 					notebookDocument,
@@ -1056,6 +1142,7 @@ class NotebookDocumentSyncFeatureProvider
 
 				return;
 			}
+
 			const newEvent = this.asNotebookDocumentChangeEvent(
 				event.notebook,
 				event,
@@ -1077,6 +1164,7 @@ class NotebookDocumentSyncFeatureProvider
 		if (syncInfo === undefined) {
 			return;
 		}
+
 		this.doSendSave(notebookDocument).catch(() => {
 			/* error handled in doSendSave */
 		});
@@ -1089,9 +1177,11 @@ class NotebookDocumentSyncFeatureProvider
 		if (syncInfo === undefined) {
 			return;
 		}
+
 		const syncedCells = notebookDocument
 			.getCells()
 			.filter((cell) => syncInfo.uris.has(cell.document.uri.toString()));
+
 		this.doSendClose(notebookDocument, syncedCells).catch(() => {
 			/* error handled in doSendClose */
 		});
@@ -1107,11 +1197,13 @@ class NotebookDocumentSyncFeatureProvider
 				`Notebook document ${notebookDocument.uri.toString()} is already open`,
 			);
 		}
+
 		const cells = this.getMatchingCells(notebookDocument);
 
 		if (cells === undefined) {
 			return;
 		}
+
 		return this.doSendOpen(notebookDocument, cells);
 	}
 
@@ -1141,6 +1233,7 @@ class NotebookDocumentSyncFeatureProvider
 						cellTextDocuments: cellDocuments,
 					},
 				);
+
 				this.onOpenNotificationSent.fire(notebookDocument);
 			} catch (error) {
 				this.client.error(
@@ -1153,6 +1246,7 @@ class NotebookDocumentSyncFeatureProvider
 		};
 
 		const middleware = this.client.middleware?.notebooks;
+
 		this.notebookSyncInfo.set(
 			notebookDocument.uri.toString(),
 			SyncInfo.create(cells),
@@ -1173,6 +1267,7 @@ class NotebookDocumentSyncFeatureProvider
 				`Received changed event for un-synced notebook ${event.notebook.uri.toString()}`,
 			);
 		}
+
 		return this.doSendChange(event, cells);
 	}
 
@@ -1198,6 +1293,7 @@ class NotebookDocumentSyncFeatureProvider
 						),
 					},
 				);
+
 				this.onChangeNotificationSent.fire(event);
 			} catch (error) {
 				this.client.error(
@@ -1217,6 +1313,7 @@ class NotebookDocumentSyncFeatureProvider
 				SyncInfo.create(cells),
 			);
 		}
+
 		return middleware?.didChange !== undefined
 			? middleware?.didChange(event, send)
 			: send(event);
@@ -1245,6 +1342,7 @@ class NotebookDocumentSyncFeatureProvider
 						},
 					},
 				);
+
 				this.onSaveNotificationSent.fire(notebookDocument);
 			} catch (error) {
 				this.client.error(
@@ -1273,6 +1371,7 @@ class NotebookDocumentSyncFeatureProvider
 				`Received close event for un-synced notebook ${notebookDocument.uri.toString()}`,
 			);
 		}
+
 		return this.doSendClose(notebookDocument, cells);
 	}
 
@@ -1300,6 +1399,7 @@ class NotebookDocumentSyncFeatureProvider
 						),
 					},
 				);
+
 				this.onCloseNotificationSent.fire(notebookDocument);
 			} catch (error) {
 				this.client.error(
@@ -1312,6 +1412,7 @@ class NotebookDocumentSyncFeatureProvider
 		};
 
 		const middleware = this.client.middleware?.notebooks;
+
 		this.notebookSyncInfo.delete(notebookDocument.uri.toString());
 
 		return middleware?.didClose !== undefined
@@ -1336,6 +1437,7 @@ class NotebookDocumentSyncFeatureProvider
 		if (event !== undefined && event.notebook !== notebook) {
 			throw new Error("Notebook must be identical");
 		}
+
 		const result: VNotebookDocumentChangeEvent = {
 			notebook: notebook,
 		};
@@ -1364,8 +1466,10 @@ class NotebookDocumentSyncFeatureProvider
 					data.push(cellChange.cell);
 				}
 			}
+
 			if (data.length > 0) {
 				result.cells = result.cells ?? {};
+
 				result.cells.data = data;
 			}
 		}
@@ -1401,6 +1505,7 @@ class NotebookDocumentSyncFeatureProvider
 									cell,
 								]),
 							);
+
 				removedCells =
 					diff.deleteCount === 0
 						? new Map()
@@ -1420,10 +1525,13 @@ class NotebookDocumentSyncFeatureProvider
 				for (const key of Array.from(removedCells.keys())) {
 					if (addedCells.has(key)) {
 						removedCells.delete(key);
+
 						addedCells.delete(key);
 					}
 				}
+
 				result.cells = result.cells ?? {};
+
 				type structure = Required<
 					Required<
 						Required<VNotebookDocumentChangeEvent>["cells"]
@@ -1438,10 +1546,12 @@ class NotebookDocumentSyncFeatureProvider
 					for (const cell of addedCells.values()) {
 						didOpen.push(cell);
 					}
+
 					for (const cell of removedCells.values()) {
 						didClose.push(cell);
 					}
 				}
+
 				result.cells.structure = {
 					array: diff,
 					didOpen,
@@ -1460,6 +1570,7 @@ class NotebookDocumentSyncFeatureProvider
 		if (this.options.notebookSelector === undefined) {
 			return undefined;
 		}
+
 		for (const item of this.options.notebookSelector) {
 			if (
 				item.notebook === undefined ||
@@ -1477,6 +1588,7 @@ class NotebookDocumentSyncFeatureProvider
 				return filtered.length === 0 ? undefined : filtered;
 			}
 		}
+
 		return undefined;
 	}
 
@@ -1488,6 +1600,7 @@ class NotebookDocumentSyncFeatureProvider
 		if (this.options.notebookSelector === undefined) {
 			return undefined;
 		}
+
 		let selector:
 			| NotebookDocumentFilterWithNotebook
 			| NotebookDocumentFilterWithCells
@@ -1506,6 +1619,7 @@ class NotebookDocumentSyncFeatureProvider
 				break;
 			}
 		}
+
 		if (selector === undefined) {
 			return undefined;
 		}
@@ -1518,6 +1632,7 @@ class NotebookDocumentSyncFeatureProvider
 		) {
 			return syncInfo.cells;
 		}
+
 		let cells: Set<string> | undefined;
 
 		if (event.cellChanges !== undefined && event.cellChanges.length > 0) {
@@ -1535,11 +1650,13 @@ class NotebookDocumentSyncFeatureProvider
 				for (const cell of changedCells) {
 					cells.delete(cell.document.uri.toString());
 				}
+
 				for (const cell of filtered) {
 					cells.add(cell.document.uri.toString());
 				}
 			}
 		}
+
 		if (
 			event.contentChanges !== undefined &&
 			event.contentChanges.length > 0
@@ -1547,10 +1664,12 @@ class NotebookDocumentSyncFeatureProvider
 			if (cells === undefined) {
 				cells = new Set(syncInfo.uris);
 			}
+
 			for (const item of event.contentChanges) {
 				for (const cell of item.removedCells) {
 					cells.delete(cell.document.uri.toString());
 				}
+
 				const filtered = this.filterCells(
 					notebookDocument,
 					new Array(...item.addedCells),
@@ -1562,6 +1681,7 @@ class NotebookDocumentSyncFeatureProvider
 				}
 			}
 		}
+
 		if (cells === undefined) {
 			return syncInfo.cells;
 		}
@@ -1577,6 +1697,7 @@ class NotebookDocumentSyncFeatureProvider
 				result.push(cell);
 			}
 		}
+
 		return result;
 	}
 
@@ -1616,6 +1737,7 @@ class NotebookDocumentSyncFeatureProvider
 				result.push(cell);
 			}
 		}
+
 		return result;
 	}
 
@@ -1668,8 +1790,11 @@ export type $NotebookCellTextDocumentFilter = NotebookCellTextDocumentFilter & {
 
 export type NotebookDocumentProviderShape = {
 	onOpenNotificationSent: vscode.Event<vscode.NotebookDocument>;
+
 	onChangeNotificationSent: vscode.Event<VNotebookDocumentChangeEvent>;
+
 	onCloseNotificationSent: vscode.Event<vscode.NotebookDocument>;
+
 	onSaveNotificationSent: vscode.Event<vscode.NotebookDocument>;
 
 	getProvider(
@@ -1688,14 +1813,20 @@ export class NotebookDocumentSyncFeature
 		NotebookDocumentMiddleware,
 		$NotebookDocumentOptions
 	>;
+
 	private readonly registrations: Map<
 		string,
 		NotebookDocumentSyncFeatureProvider
 	>;
+
 	private dedicatedChannel: vscode.DocumentSelector | undefined;
+
 	private _onChangeNotificationSent: vscode.EventEmitter<VNotebookDocumentChangeEvent>;
+
 	private _onOpenNotificationSent: vscode.EventEmitter<vscode.NotebookDocument>;
+
 	private _onCloseNotificationSent: vscode.EventEmitter<vscode.NotebookDocument>;
+
 	private _onSaveNotificationSent: vscode.EventEmitter<vscode.NotebookDocument>;
 
 	constructor(
@@ -1705,14 +1836,20 @@ export class NotebookDocumentSyncFeature
 		>,
 	) {
 		this.client = client;
+
 		this.registrations = new Map();
+
 		this.registrationType = proto.NotebookDocumentSyncRegistrationType.type;
+
 		this._onChangeNotificationSent =
 			new vscode.EventEmitter<VNotebookDocumentChangeEvent>();
+
 		this._onOpenNotificationSent =
 			new vscode.EventEmitter<vscode.NotebookDocument>();
+
 		this._onCloseNotificationSent =
 			new vscode.EventEmitter<vscode.NotebookDocument>();
+
 		this._onSaveNotificationSent =
 			new vscode.EventEmitter<vscode.NotebookDocument>();
 
@@ -1725,12 +1862,14 @@ export class NotebookDocumentSyncFeature
 			) {
 				return;
 			}
+
 			const [notebookDocument, notebookCell] =
 				this.findNotebookDocumentAndCell(textDocument);
 
 			if (notebookDocument === undefined || notebookCell === undefined) {
 				return;
 			}
+
 			for (const provider of this.registrations.values()) {
 				if (provider instanceof NotebookDocumentSyncFeatureProvider) {
 					provider.didOpenNotebookCellTextDocument(
@@ -1740,10 +1879,12 @@ export class NotebookDocumentSyncFeature
 				}
 			}
 		});
+
 		vscode.workspace.onDidChangeTextDocument((event) => {
 			if (event.contentChanges.length === 0) {
 				return;
 			}
+
 			const textDocument = event.document;
 
 			if (
@@ -1752,12 +1893,14 @@ export class NotebookDocumentSyncFeature
 			) {
 				return;
 			}
+
 			const [notebookDocument, cell] =
 				this.findNotebookDocumentAndCell(textDocument);
 
 			if (notebookDocument === undefined || cell === undefined) {
 				return;
 			}
+
 			for (const provider of this.registrations.values()) {
 				if (provider instanceof NotebookDocumentSyncFeatureProvider) {
 					provider.didChangeNotebookCellTextDocument(
@@ -1768,6 +1911,7 @@ export class NotebookDocumentSyncFeature
 				}
 			}
 		});
+
 		vscode.workspace.onDidCloseTextDocument((textDocument) => {
 			if (
 				textDocument.uri.scheme !==
@@ -1785,6 +1929,7 @@ export class NotebookDocumentSyncFeature
 			if (notebookDocument === undefined || notebookCell === undefined) {
 				return;
 			}
+
 			for (const provider of this.registrations.values()) {
 				if (provider instanceof NotebookDocumentSyncFeatureProvider) {
 					provider.didCloseNotebookCellTextDocument(
@@ -1805,6 +1950,7 @@ export class NotebookDocumentSyncFeature
 				matches: false,
 			};
 		}
+
 		for (const provider of this.registrations.values()) {
 			const state = provider.getState();
 
@@ -1821,6 +1967,7 @@ export class NotebookDocumentSyncFeature
 				};
 			}
 		}
+
 		return {
 			kind: "document",
 			id: this.registrationType.method,
@@ -1854,7 +2001,9 @@ export class NotebookDocumentSyncFeature
 			ensure(capabilities, "notebookDocument")!,
 			"synchronization",
 		)!;
+
 		synchronization.dynamicRegistration = true;
+
 		synchronization.executionSummarySupport = true;
 	}
 
@@ -1864,6 +2013,7 @@ export class NotebookDocumentSyncFeature
 		if (options === undefined) {
 			return;
 		}
+
 		this.dedicatedChannel =
 			this.client.protocol2CodeConverter.asDocumentSelector(
 				$NotebookDocumentSyncOptions.asDocumentSelector(options),
@@ -1876,8 +2026,10 @@ export class NotebookDocumentSyncFeature
 		if (options === undefined) {
 			return;
 		}
+
 		const id =
 			(options as StaticRegistrationOptions).id ?? UUID.generateUuid();
+
 		this.register({ id, registerOptions: options });
 	}
 
@@ -1892,6 +2044,7 @@ export class NotebookDocumentSyncFeature
 			this._onCloseNotificationSent,
 			this._onSaveNotificationSent,
 		);
+
 		this.registrations.set(data.id, provider);
 	}
 
@@ -1900,6 +2053,7 @@ export class NotebookDocumentSyncFeature
 
 		if (provider !== undefined) {
 			this.registrations.delete(id);
+
 			provider.dispose();
 		}
 	}
@@ -1908,17 +2062,26 @@ export class NotebookDocumentSyncFeature
 		for (const provider of this.registrations.values()) {
 			provider.dispose();
 		}
+
 		this.registrations.clear();
+
 		this._onChangeNotificationSent.dispose();
+
 		this._onChangeNotificationSent =
 			new vscode.EventEmitter<VNotebookDocumentChangeEvent>();
+
 		this._onOpenNotificationSent.dispose();
+
 		this._onOpenNotificationSent =
 			new vscode.EventEmitter<vscode.NotebookDocument>();
+
 		this._onCloseNotificationSent.dispose();
+
 		this._onCloseNotificationSent =
 			new vscode.EventEmitter<vscode.NotebookDocument>();
+
 		this._onSaveNotificationSent.dispose();
+
 		this._onSaveNotificationSent =
 			new vscode.EventEmitter<vscode.NotebookDocument>();
 	}
@@ -1929,17 +2092,20 @@ export class NotebookDocumentSyncFeature
 		) {
 			return false;
 		}
+
 		if (
 			this.dedicatedChannel !== undefined &&
 			vscode.languages.match(this.dedicatedChannel, textDocument) > 0
 		) {
 			return true;
 		}
+
 		for (const provider of this.registrations.values()) {
 			if (provider.handles(textDocument)) {
 				return true;
 			}
 		}
+
 		return false;
 	}
 
@@ -1951,6 +2117,7 @@ export class NotebookDocumentSyncFeature
 				return provider;
 			}
 		}
+
 		return undefined;
 	}
 
@@ -1966,6 +2133,7 @@ export class NotebookDocumentSyncFeature
 				}
 			}
 		}
+
 		return [undefined, undefined];
 	}
 }

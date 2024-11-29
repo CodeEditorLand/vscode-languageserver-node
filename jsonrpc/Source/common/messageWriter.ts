@@ -63,15 +63,18 @@ export abstract class AbstractMessageWriter {
 	private errorEmitter: Emitter<
 		[Error, Message | undefined, number | undefined]
 	>;
+
 	private closeEmitter: Emitter<void>;
 
 	constructor() {
 		this.errorEmitter = new Emitter<[Error, Message, number]>();
+
 		this.closeEmitter = new Emitter<void>();
 	}
 
 	public dispose(): void {
 		this.errorEmitter.dispose();
+
 		this.closeEmitter.dispose();
 	}
 
@@ -106,13 +109,17 @@ export abstract class AbstractMessageWriter {
 
 export interface MessageWriterOptions {
 	charset?: RAL.MessageBufferEncoding;
+
 	contentEncoder?: ContentEncoder;
+
 	contentTypeEncoder?: ContentTypeEncoder;
 }
 
 interface ResolvedMessageWriterOptions {
 	charset: RAL.MessageBufferEncoding;
+
 	contentEncoder?: ContentEncoder;
+
 	contentTypeEncoder: ContentTypeEncoder;
 }
 
@@ -141,8 +148,11 @@ export class WriteableStreamMessageWriter
 	implements MessageWriter
 {
 	private writable: RAL.WritableStream;
+
 	private options: ResolvedMessageWriterOptions;
+
 	private errorCount: number;
+
 	private writeSemaphore: Semaphore<void>;
 
 	public constructor(
@@ -150,11 +160,17 @@ export class WriteableStreamMessageWriter
 		options?: RAL.MessageBufferEncoding | MessageWriterOptions,
 	) {
 		super();
+
 		this.writable = writable;
+
 		this.options = ResolvedMessageWriterOptions.fromOptions(options);
+
 		this.errorCount = 0;
+
 		this.writeSemaphore = new Semaphore(1);
+
 		this.writable.onError((error: any) => this.fireError(error));
+
 		this.writable.onClose(() => this.fireClose());
 	}
 
@@ -173,11 +189,13 @@ export class WriteableStreamMessageWriter
 			return payload.then(
 				(buffer) => {
 					const headers: string[] = [];
+
 					headers.push(
 						ContentLength,
 						buffer.byteLength.toString(),
 						CRLF,
 					);
+
 					headers.push(CRLF);
 
 					return this.doWrite(msg, headers, buffer);
@@ -209,6 +227,7 @@ export class WriteableStreamMessageWriter
 
 	private handleError(error: any, msg: Message): void {
 		this.errorCount++;
+
 		this.fireError(error, msg, this.errorCount);
 	}
 

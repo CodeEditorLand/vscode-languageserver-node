@@ -129,12 +129,16 @@ export interface ResponseErrorLiteral<D = void> {
  */
 export class ResponseError<D = void> extends Error {
 	public readonly code: number;
+
 	public readonly data: D | undefined;
 
 	constructor(code: number, message: string, data?: D) {
 		super(message);
+
 		this.code = is.number(code) ? code : ErrorCodes.UnknownErrorCode;
+
 		this.data = data;
+
 		Object.setPrototypeOf(this, ResponseError.prototype);
 	}
 
@@ -147,6 +151,7 @@ export class ResponseError<D = void> extends Error {
 		if (this.data !== undefined) {
 			result.data = this.data;
 		}
+
 		return result;
 	}
 }
@@ -185,7 +190,9 @@ export type LSPMessageType =
 
 export interface LSPLogMessage {
 	type: LSPMessageType;
+
 	message: RequestMessage | ResponseMessage | NotificationMessage;
+
 	timestamp: number;
 }
 
@@ -229,7 +236,9 @@ export class ParameterStructures {
  */
 export interface MessageSignature {
 	readonly method: string;
+
 	readonly numberOfParams: number;
+
 	readonly parameterStructures: ParameterStructures;
 }
 
@@ -238,10 +247,12 @@ export interface MessageSignature {
  */
 export abstract class AbstractMessageSignature implements MessageSignature {
 	public readonly method: string;
+
 	public readonly numberOfParams: number;
 
 	constructor(method: string, numberOfParams: number) {
 		this.method = method;
+
 		this.numberOfParams = numberOfParams;
 	}
 

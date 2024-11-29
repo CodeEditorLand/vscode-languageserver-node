@@ -501,6 +501,7 @@ export enum State {
  */
 export interface StateChangeEvent {
 	oldState: State;
+
 	newState: State;
 }
 
@@ -553,6 +554,7 @@ type _WorkspaceMiddleware = {
 		event: FileEvent,
 		next: DidChangeWatchedFileSignature,
 	) => Promise<void>;
+
 	handleApplyEdit?: (
 		this: void,
 		params: ApplyWorkspaceEditParams,
@@ -593,6 +595,7 @@ interface _Middleware {
 		diagnostics: VDiagnostic[],
 		next: HandleDiagnosticsSignature,
 	) => void;
+
 	handleWorkDoneProgress?: (
 		this: void,
 		token: ProgressToken,
@@ -602,17 +605,21 @@ interface _Middleware {
 			| WorkDoneProgressEnd,
 		next: HandleWorkDoneProgressSignature,
 	) => void;
+
 	handleRegisterCapability?: (
 		this: void,
 		params: RegistrationParams,
 		next: RegistrationRequest.HandlerSignature,
 	) => Promise<void>;
+
 	handleUnregisterCapability?: (
 		this: void,
 		params: UnregistrationParams,
 		next: UnregistrationRequest.HandlerSignature,
 	) => Promise<void>;
+
 	workspace?: WorkspaceMiddleware;
+
 	window?: WindowMiddleware;
 }
 
@@ -678,36 +685,56 @@ export type Middleware = _Middleware &
 
 export type LanguageClientOptions = {
 	documentSelector?: DocumentSelector | string[];
+
 	diagnosticCollectionName?: string;
+
 	outputChannel?: OutputChannel;
+
 	outputChannelName?: string;
+
 	traceOutputChannel?: OutputChannel;
+
 	revealOutputChannelOn?: RevealOutputChannelOn;
 	/**
 	 * The encoding use to read stdout and stderr. Defaults
 	 * to 'utf8' if omitted.
 	 */
 	stdioEncoding?: string;
+
 	initializationOptions?: any | (() => any);
+
 	initializationFailedHandler?: InitializationFailedHandler;
+
 	progressOnInitialization?: boolean;
+
 	errorHandler?: ErrorHandler;
+
 	middleware?: Middleware;
+
 	uriConverters?: {
 		code2Protocol: c2p.URIConverter;
+
 		protocol2Code: p2c.URIConverter;
 	};
+
 	workspaceFolder?: VWorkspaceFolder;
+
 	connectionOptions?: {
 		cancellationStrategy?: CancellationStrategy;
+
 		messageStrategy?: MessageStrategy;
+
 		maxRestartCount?: number;
 	};
+
 	markdown?: {
 		isTrusted?: boolean | { readonly enabledCommands: readonly string[] };
+
 		supportHtml?: boolean;
+
 		supportThemeIcons?: boolean;
 	};
+
 	textSynchronization?: {
 		/**
 		 * Delays sending the open notification until one of the following
@@ -728,31 +755,51 @@ export type LanguageClientOptions = {
 
 type ResolvedClientOptions = {
 	documentSelector?: DocumentSelector;
+
 	synchronize: SynchronizeOptions;
+
 	diagnosticCollectionName?: string;
+
 	outputChannelName: string;
+
 	revealOutputChannelOn: RevealOutputChannelOn;
+
 	stdioEncoding: string;
+
 	initializationOptions?: any | (() => any);
+
 	initializationFailedHandler?: InitializationFailedHandler;
+
 	progressOnInitialization: boolean;
+
 	errorHandler: ErrorHandler;
+
 	middleware: Middleware;
+
 	uriConverters?: {
 		code2Protocol: c2p.URIConverter;
+
 		protocol2Code: p2c.URIConverter;
 	};
+
 	workspaceFolder?: VWorkspaceFolder;
+
 	connectionOptions?: {
 		cancellationStrategy?: CancellationStrategy;
+
 		messageStrategy?: MessageStrategy;
+
 		maxRestartCount?: number;
 	};
+
 	markdown: {
 		isTrusted: boolean | { readonly enabledCommands: readonly string[] };
+
 		supportHtml: boolean;
+
 		supportThemeIcons: boolean;
 	};
+
 	textSynchronization: {
 		delayOpenNotifications: boolean;
 	};
@@ -765,6 +812,7 @@ namespace ResolvedClientOptions {
 		if (isTrusted === undefined || isTrusted === null) {
 			return false;
 		}
+
 		if (
 			typeof isTrusted === "boolean" ||
 			(typeof isTrusted === "object" &&
@@ -773,6 +821,7 @@ namespace ResolvedClientOptions {
 		) {
 			return isTrusted;
 		}
+
 		return false;
 	}
 }
@@ -795,6 +844,7 @@ class DefaultErrorHandler implements ErrorHandler {
 		if (count && count <= 3) {
 			return { action: ErrorAction.Continue };
 		}
+
 		return { action: ErrorAction.Shutdown };
 	}
 
@@ -832,7 +882,9 @@ enum ClientState {
 
 export interface MessageTransports {
 	reader: MessageReader;
+
 	writer: MessageWriter;
+
 	detached?: boolean;
 }
 
@@ -860,23 +912,31 @@ export enum ShutdownMode {
  */
 class Tabs implements TabsModel {
 	private open: Set<string>;
+
 	private readonly _onOpen: EventEmitter<Set<Uri>>;
+
 	private readonly _onClose: EventEmitter<Set<Uri>>;
+
 	private readonly disposable: Disposable;
 
 	constructor() {
 		this.open = new Set();
+
 		this._onOpen = new EventEmitter();
+
 		this._onClose = new EventEmitter();
+
 		Tabs.fillTabResources(this.open);
 
 		const openTabsHandler = (event: TabChangeEvent) => {
 			if (event.closed.length === 0 && event.opened.length === 0) {
 				return;
 			}
+
 			const oldTabs = this.open;
 
 			const currentTabs: Set<string> = new Set();
+
 			Tabs.fillTabResources(currentTabs);
 
 			const closed: Set<string> = new Set();
@@ -890,6 +950,7 @@ class Tabs implements TabsModel {
 					closed.add(tab);
 				}
 			}
+
 			this.open = currentTabs;
 
 			if (closed.size > 0) {
@@ -898,14 +959,17 @@ class Tabs implements TabsModel {
 				for (const item of closed) {
 					toFire.add(Uri.parse(item));
 				}
+
 				this._onClose.fire(toFire);
 			}
+
 			if (opened.size > 0) {
 				const toFire: Set<Uri> = new Set();
 
 				for (const item of opened) {
 					toFire.add(Uri.parse(item));
 				}
+
 				this._onOpen.fire(toFire);
 			}
 		};
@@ -951,14 +1015,17 @@ class Tabs implements TabsModel {
 
 					return cell !== undefined;
 				}
+
 				return false;
 			});
 		}
+
 		return this.open.has(uri.toString());
 	}
 
 	public getTabResources(): Set<Uri> {
 		const result: Set<Uri> = new Set();
+
 		Tabs.fillTabResources(new Set(), result);
 
 		return result;
@@ -985,8 +1052,10 @@ class Tabs implements TabsModel {
 				} else if (input instanceof TabInputNotebook) {
 					uri = input.uri;
 				}
+
 				if (uri !== undefined && !seen.has(uri.toString())) {
 					seen.add(uri.toString());
+
 					uris !== undefined && uris.add(uri);
 				}
 			}
@@ -998,77 +1067,109 @@ export abstract class BaseLanguageClient
 	implements FeatureClient<Middleware, LanguageClientOptions>
 {
 	private _id: string;
+
 	private _name: string;
+
 	private _clientOptions: ResolvedClientOptions;
 
 	private _state: ClientState;
+
 	private _onStart: Promise<void> | undefined;
+
 	private _onStop: Promise<void> | undefined;
+
 	private _connection: Connection | undefined;
+
 	private _idleInterval: Disposable | undefined;
+
 	private readonly _ignoredRegistrations: Set<string>;
 	// private _idleStart: number | undefined;
+
 	private readonly _listeners: Disposable[];
+
 	private _disposed: "disposing" | "disposed" | undefined;
 
 	private readonly _notificationHandlers: Map<
 		string,
 		GenericNotificationHandler
 	>;
+
 	private readonly _notificationDisposables: Map<string, Disposable>;
+
 	private readonly _pendingNotificationHandlers: Map<
 		string,
 		GenericNotificationHandler
 	>;
+
 	private readonly _requestHandlers: Map<
 		string,
 		GenericRequestHandler<unknown, unknown>
 	>;
+
 	private readonly _requestDisposables: Map<string, Disposable>;
+
 	private readonly _pendingRequestHandlers: Map<
 		string,
 		GenericRequestHandler<unknown, unknown>
 	>;
+
 	private readonly _progressHandlers: Map<
 		string | number,
 		{ type: ProgressType<any>; handler: NotificationHandler<any> }
 	>;
+
 	private readonly _pendingProgressHandlers: Map<
 		string | number,
 		{ type: ProgressType<any>; handler: NotificationHandler<any> }
 	>;
+
 	private readonly _progressDisposables: Map<string | number, Disposable>;
 
 	private _initializeResult: InitializeResult | undefined;
+
 	private _outputChannel: OutputChannel | undefined;
+
 	private _disposeOutputChannel: boolean;
+
 	private _traceOutputChannel: OutputChannel | undefined;
+
 	private _capabilities!: ServerCapabilities &
 		ResolvedTextDocumentSyncCapabilities;
 
 	private _diagnostics: DiagnosticCollection | undefined;
+
 	private _syncedDocuments: Map<string, TextDocument>;
 
 	private _didChangeTextDocumentFeature:
 		| DidChangeTextDocumentFeature
 		| undefined;
+
 	private readonly _inFlightOpenNotifications: Set<string>;
+
 	private readonly _pendingChangeSemaphore: Semaphore<void>;
+
 	private readonly _pendingChangeDelayer: Delayer<void>;
+
 	private _didOpenTextDocumentFeature: DidOpenTextDocumentFeature | undefined;
 
 	private _fileEvents: FileEvent[];
+
 	private _fileEventDelayer: Delayer<void>;
 
 	private _telemetryEmitter: Emitter<any>;
+
 	private _stateChangeEmitter: Emitter<StateChangeEvent>;
 
 	private _trace: Trace;
+
 	private _traceFormat: TraceFormat = TraceFormat.Text;
+
 	private _tracer: Tracer;
 
 	private readonly _c2p: c2p.Converter;
+
 	private readonly _p2c: p2c.Converter;
+
 	private _tabsModel: TabsModel | undefined;
 
 	public constructor(
@@ -1077,6 +1178,7 @@ export abstract class BaseLanguageClient
 		clientOptions: LanguageClientOptions,
 	) {
 		this._id = id;
+
 		this._name = name;
 
 		clientOptions = clientOptions || {};
@@ -1091,7 +1193,9 @@ export abstract class BaseLanguageClient
 			markdown.isTrusted = ResolvedClientOptions.sanitizeIsTrusted(
 				clientOptions.markdown.isTrusted,
 			);
+
 			markdown.supportHtml = clientOptions.markdown.supportHtml === true;
+
 			markdown.supportThemeIcons =
 				clientOptions.markdown.supportThemeIcons === true;
 		}
@@ -1136,46 +1240,70 @@ export abstract class BaseLanguageClient
 				clientOptions.textSynchronization,
 			),
 		};
+
 		this._clientOptions.synchronize = this._clientOptions.synchronize || {};
 
 		this._state = ClientState.Initial;
+
 		this._ignoredRegistrations = new Set();
+
 		this._listeners = [];
 
 		this._notificationHandlers = new Map();
+
 		this._pendingNotificationHandlers = new Map();
+
 		this._notificationDisposables = new Map();
+
 		this._requestHandlers = new Map();
+
 		this._pendingRequestHandlers = new Map();
+
 		this._requestDisposables = new Map();
+
 		this._progressHandlers = new Map();
+
 		this._pendingProgressHandlers = new Map();
+
 		this._progressDisposables = new Map();
 
 		this._connection = undefined;
 		// this._idleStart = undefined;
+
 		this._initializeResult = undefined;
 
 		if (clientOptions.outputChannel) {
 			this._outputChannel = clientOptions.outputChannel;
+
 			this._disposeOutputChannel = false;
 		} else {
 			this._outputChannel = undefined;
+
 			this._disposeOutputChannel = true;
 		}
+
 		this._traceOutputChannel = clientOptions.traceOutputChannel;
+
 		this._diagnostics = undefined;
 
 		this._inFlightOpenNotifications = new Set();
+
 		this._pendingChangeSemaphore = new Semaphore(1);
+
 		this._pendingChangeDelayer = new Delayer<void>(250);
 
 		this._fileEvents = [];
+
 		this._fileEventDelayer = new Delayer<void>(250);
+
 		this._onStop = undefined;
+
 		this._telemetryEmitter = new Emitter<any>();
+
 		this._stateChangeEmitter = new Emitter<StateChangeEvent>();
+
 		this._trace = Trace.Off;
+
 		this._tracer = {
 			log: (messageOrDataObject: string | any, data?: string) => {
 				if (Is.string(messageOrDataObject)) {
@@ -1185,11 +1313,13 @@ export abstract class BaseLanguageClient
 				}
 			},
 		};
+
 		this._c2p = c2p.createConverter(
 			clientOptions.uriConverters
 				? clientOptions.uriConverters.code2Protocol
 				: undefined,
 		);
+
 		this._p2c = p2c.createConverter(
 			clientOptions.uriConverters
 				? clientOptions.uriConverters.protocol2Code
@@ -1198,7 +1328,9 @@ export abstract class BaseLanguageClient
 			this._clientOptions.markdown.supportHtml,
 			this._clientOptions.markdown.supportThemeIcons,
 		);
+
 		this._syncedDocuments = new Map<string, TextDocument>();
+
 		this.registerBuiltinFeatures();
 	}
 
@@ -1208,9 +1340,11 @@ export abstract class BaseLanguageClient
 		if (!options) {
 			return { delayOpenNotifications: false };
 		}
+
 		if (typeof options.delayOpenNotifications === "boolean") {
 			return { delayOpenNotifications: options.delayOpenNotifications };
 		}
+
 		return { delayOpenNotifications: false };
 	}
 
@@ -1238,6 +1372,7 @@ export abstract class BaseLanguageClient
 		if (this._tabsModel === undefined) {
 			this._tabsModel = new Tabs();
 		}
+
 		return this._tabsModel;
 	}
 
@@ -1257,6 +1392,7 @@ export abstract class BaseLanguageClient
 					: this._name,
 			);
 		}
+
 		return this._outputChannel;
 	}
 
@@ -1264,6 +1400,7 @@ export abstract class BaseLanguageClient
 		if (this._traceOutputChannel) {
 			return this._traceOutputChannel;
 		}
+
 		return this.outputChannel;
 	}
 
@@ -1281,6 +1418,7 @@ export abstract class BaseLanguageClient
 
 	private set $state(value: ClientState) {
 		const oldState = this.getPublicState();
+
 		this._state = value;
 
 		const newState = this.getPublicState();
@@ -1314,29 +1452,35 @@ export abstract class BaseLanguageClient
 		type: ProtocolRequestType0<R, PR, E, RO>,
 		token?: CancellationToken,
 	): Promise<R>;
+
 	public sendRequest<P, R, PR, E, RO>(
 		type: ProtocolRequestType<P, R, PR, E, RO>,
 		params: P,
 		token?: CancellationToken,
 	): Promise<R>;
+
 	public sendRequest<R, E>(
 		type: RequestType0<R, E>,
 		token?: CancellationToken,
 	): Promise<R>;
+
 	public sendRequest<P, R, E>(
 		type: RequestType<P, R, E>,
 		params: P,
 		token?: CancellationToken,
 	): Promise<R>;
+
 	public sendRequest<R>(
 		method: string,
 		token?: CancellationToken,
 	): Promise<R>;
+
 	public sendRequest<R>(
 		method: string,
 		param: any,
 		token?: CancellationToken,
 	): Promise<R>;
+
 	public async sendRequest<R>(
 		type: string | MessageSignature,
 		...params: any[]
@@ -1382,8 +1526,10 @@ export abstract class BaseLanguageClient
 			}
 		} else if (params.length === 2) {
 			param = params[0];
+
 			token = params[1];
 		}
+
 		if (token !== undefined && token.isCancellationRequested) {
 			return Promise.reject(
 				new ResponseError(
@@ -1392,6 +1538,7 @@ export abstract class BaseLanguageClient
 				),
 			);
 		}
+
 		const _sendRequest = this._clientOptions.middleware?.sendRequest;
 
 		if (_sendRequest !== undefined) {
@@ -1421,27 +1568,33 @@ export abstract class BaseLanguageClient
 		type: ProtocolRequestType0<R, PR, E, RO>,
 		handler: RequestHandler0<R, E>,
 	): Disposable;
+
 	public onRequest<P, R, PR, E, RO>(
 		type: ProtocolRequestType<P, R, PR, E, RO>,
 		handler: RequestHandler<P, R, E>,
 	): Disposable;
+
 	public onRequest<R, E>(
 		type: RequestType0<R, E>,
 		handler: RequestHandler0<R, E>,
 	): Disposable;
+
 	public onRequest<P, R, E>(
 		type: RequestType<P, R, E>,
 		handler: RequestHandler<P, R, E>,
 	): Disposable;
+
 	public onRequest<R, E>(
 		method: string,
 		handler: GenericRequestHandler<R, E>,
 	): Disposable;
+
 	public onRequest<R, E>(
 		type: string | MessageSignature,
 		handler: GenericRequestHandler<R, E>,
 	): Disposable {
 		const method = typeof type === "string" ? type : type.method;
+
 		this._requestHandlers.set(method, handler);
 
 		const connection = this.activeConnection();
@@ -1453,18 +1606,21 @@ export abstract class BaseLanguageClient
 				method,
 				connection.onRequest(type, handler),
 			);
+
 			disposable = {
 				dispose: () => {
 					const disposable = this._requestDisposables.get(method);
 
 					if (disposable !== undefined) {
 						disposable.dispose();
+
 						this._requestDisposables.delete(method);
 					}
 				},
 			};
 		} else {
 			this._pendingRequestHandlers.set(method, handler);
+
 			disposable = {
 				dispose: () => {
 					this._pendingRequestHandlers.delete(method);
@@ -1473,14 +1629,17 @@ export abstract class BaseLanguageClient
 
 					if (disposable !== undefined) {
 						disposable.dispose();
+
 						this._requestDisposables.delete(method);
 					}
 				},
 			};
 		}
+
 		return {
 			dispose: () => {
 				this._requestHandlers.delete(method);
+
 				disposable.dispose();
 			},
 		};
@@ -1489,17 +1648,23 @@ export abstract class BaseLanguageClient
 	public sendNotification<RO>(
 		type: ProtocolNotificationType0<RO>,
 	): Promise<void>;
+
 	public sendNotification<P, RO>(
 		type: ProtocolNotificationType<P, RO>,
 		params?: P,
 	): Promise<void>;
+
 	public sendNotification(type: NotificationType0): Promise<void>;
+
 	public sendNotification<P>(
 		type: NotificationType<P>,
 		params?: P,
 	): Promise<void>;
+
 	public sendNotification(method: string): Promise<void>;
+
 	public sendNotification(method: string, params: any): Promise<void>;
+
 	public async sendNotification<P>(
 		type: string | MessageSignature,
 		params?: P,
@@ -1530,8 +1695,10 @@ export abstract class BaseLanguageClient
 		) {
 			openNotification = (params as DidOpenTextDocumentParams)
 				?.textDocument.uri;
+
 			this._inFlightOpenNotifications.add(openNotification);
 		}
+
 		let documentToClose: string | undefined;
 
 		if (
@@ -1583,27 +1750,33 @@ export abstract class BaseLanguageClient
 		type: ProtocolNotificationType0<RO>,
 		handler: NotificationHandler0,
 	): Disposable;
+
 	public onNotification<P, RO>(
 		type: ProtocolNotificationType<P, RO>,
 		handler: NotificationHandler<P>,
 	): Disposable;
+
 	public onNotification(
 		type: NotificationType0,
 		handler: NotificationHandler0,
 	): Disposable;
+
 	public onNotification<P>(
 		type: NotificationType<P>,
 		handler: NotificationHandler<P>,
 	): Disposable;
+
 	public onNotification(
 		method: string,
 		handler: GenericNotificationHandler,
 	): Disposable;
+
 	public onNotification(
 		type: string | MessageSignature,
 		handler: GenericNotificationHandler,
 	): Disposable {
 		const method = typeof type === "string" ? type : type.method;
+
 		this._notificationHandlers.set(method, handler);
 
 		const connection = this.activeConnection();
@@ -1615,6 +1788,7 @@ export abstract class BaseLanguageClient
 				method,
 				connection.onNotification(type, handler),
 			);
+
 			disposable = {
 				dispose: () => {
 					const disposable =
@@ -1622,12 +1796,14 @@ export abstract class BaseLanguageClient
 
 					if (disposable !== undefined) {
 						disposable.dispose();
+
 						this._notificationDisposables.delete(method);
 					}
 				},
 			};
 		} else {
 			this._pendingNotificationHandlers.set(method, handler);
+
 			disposable = {
 				dispose: () => {
 					this._pendingNotificationHandlers.delete(method);
@@ -1637,14 +1813,17 @@ export abstract class BaseLanguageClient
 
 					if (disposable !== undefined) {
 						disposable.dispose();
+
 						this._notificationDisposables.delete(method);
 					}
 				},
 			};
 		}
+
 		return {
 			dispose: () => {
 				this._notificationHandlers.delete(method);
+
 				disposable.dispose();
 			},
 		};
@@ -1667,6 +1846,7 @@ export abstract class BaseLanguageClient
 				),
 			);
 		}
+
 		try {
 			// Ensure we have a connection before we force the document sync.
 			const connection = await this.$start();
@@ -1707,18 +1887,21 @@ export abstract class BaseLanguageClient
 				token,
 				connection.onProgress(type, token, realHandler),
 			);
+
 			disposable = {
 				dispose: () => {
 					const disposable = this._progressDisposables.get(token);
 
 					if (disposable !== undefined) {
 						disposable.dispose();
+
 						this._progressDisposables.delete(token);
 					}
 				},
 			};
 		} else {
 			this._pendingProgressHandlers.set(token, { type, handler });
+
 			disposable = {
 				dispose: () => {
 					this._pendingProgressHandlers.delete(token);
@@ -1727,14 +1910,17 @@ export abstract class BaseLanguageClient
 
 					if (disposable !== undefined) {
 						disposable.dispose();
+
 						this._progressDisposables.delete(token);
 					}
 				},
 			};
 		}
+
 		return {
 			dispose: (): void => {
 				this._progressHandlers.delete(token);
+
 				disposable.dispose();
 			},
 		};
@@ -1744,6 +1930,7 @@ export abstract class BaseLanguageClient
 		if (maxRestartCount !== undefined && maxRestartCount < 0) {
 			throw new Error(`Invalid maxRestartCount: ${maxRestartCount}`);
 		}
+
 		return new DefaultErrorHandler(this, maxRestartCount ?? 4);
 	}
 
@@ -1766,15 +1953,19 @@ export abstract class BaseLanguageClient
 
 			return `  Message: ${responseError.message}\n  Code: ${responseError.code} ${responseError.data ? "\n" + responseError.data.toString() : ""}`;
 		}
+
 		if (data instanceof Error) {
 			if (Is.string(data.stack)) {
 				return data.stack;
 			}
+
 			return (data as Error).message;
 		}
+
 		if (Is.string(data)) {
 			return data;
 		}
+
 		return data.toString();
 	}
 
@@ -1853,6 +2044,7 @@ export abstract class BaseLanguageClient
 		if (data !== null && data !== undefined) {
 			this.outputChannel.appendLine(this.data2String(data));
 		}
+
 		if (
 			showNotification === "force" ||
 			(showNotification &&
@@ -1874,12 +2066,14 @@ export abstract class BaseLanguageClient
 		if (data) {
 			message += "\n" + this.data2String(data);
 		}
+
 		const messageFunc =
 			type === MessageType.Error
 				? Window.showErrorMessage
 				: type === MessageType.Warning
 					? Window.showWarningMessage
 					: Window.showInformationMessage;
+
 		void messageFunc(message, "Go to output").then((selection) => {
 			if (selection !== undefined) {
 				this.outputChannel.show(true);
@@ -1907,6 +2101,7 @@ export abstract class BaseLanguageClient
 				`[Trace - ${new Date().toLocaleTimeString()}] `,
 			);
 		}
+
 		if (data) {
 			this.traceOutputChannel.appendLine(`${JSON.stringify(data)}`);
 		}
@@ -1942,6 +2137,7 @@ export abstract class BaseLanguageClient
 		if (this._disposed === "disposing" || this._disposed === "disposed") {
 			throw new Error(`Client got disposed and can't be restarted.`);
 		}
+
 		if (this.$state === ClientState.Stopping) {
 			throw new Error(
 				`Client is currently stopping. Can only restart a full stopped client`,
@@ -1952,7 +2148,9 @@ export abstract class BaseLanguageClient
 		if (this._onStart !== undefined) {
 			return this._onStart;
 		}
+
 		const [promise, resolve, reject] = this.createOnStartPromise();
+
 		this._onStart = promise;
 
 		// If we restart then the diagnostics collection is reused.
@@ -1969,11 +2167,13 @@ export abstract class BaseLanguageClient
 				this._pendingNotificationHandlers.set(method, handler);
 			}
 		}
+
 		for (const [method, handler] of this._requestHandlers) {
 			if (!this._pendingRequestHandlers.has(method)) {
 				this._pendingRequestHandlers.set(method, handler);
 			}
 		}
+
 		for (const [token, data] of this._progressHandlers) {
 			if (!this._pendingProgressHandlers.has(token)) {
 				this._pendingProgressHandlers.set(token, data);
@@ -1984,6 +2184,7 @@ export abstract class BaseLanguageClient
 
 		try {
 			const connection = await this.createConnection();
+
 			connection.onNotification(
 				LogMessageNotification.type,
 				(message) => {
@@ -2013,6 +2214,7 @@ export abstract class BaseLanguageClient
 					}
 				},
 			);
+
 			connection.onNotification(
 				ShowMessageNotification.type,
 				(message) => {
@@ -2037,6 +2239,7 @@ export abstract class BaseLanguageClient
 					}
 				},
 			);
+
 			connection.onRequest(ShowMessageRequest.type, (params) => {
 				let messageFunc: <T extends MessageItem>(
 					message: string,
@@ -2062,16 +2265,19 @@ export abstract class BaseLanguageClient
 					default:
 						messageFunc = Window.showInformationMessage;
 				}
+
 				const actions = params.actions || [];
 
 				return messageFunc(params.message, ...actions);
 			});
+
 			connection.onNotification(
 				TelemetryEventNotification.type,
 				(data) => {
 					this._telemetryEmitter.fire(data);
 				},
 			);
+
 			connection.onRequest(
 				ShowDocumentRequest.type,
 				async (params, token) => {
@@ -2096,6 +2302,7 @@ export abstract class BaseLanguageClient
 											params.selection,
 										);
 								}
+
 								if (
 									params.takeFocus === undefined ||
 									params.takeFocus === false
@@ -2104,6 +2311,7 @@ export abstract class BaseLanguageClient
 								} else if (params.takeFocus === true) {
 									options.preserveFocus = false;
 								}
+
 								await Window.showTextDocument(uri, options);
 
 								return { success: true };
@@ -2123,18 +2331,24 @@ export abstract class BaseLanguageClient
 					}
 				},
 			);
+
 			connection.listen();
+
 			await this.initialize(connection);
+
 			resolve();
 		} catch (error) {
 			this.$state = ClientState.StartFailed;
+
 			this.error(
 				`${this._name} client: couldn't create connection to server.`,
 				error,
 				"force",
 			);
+
 			reject(error);
 		}
+
 		return this._onStart;
 	}
 
@@ -2149,6 +2363,7 @@ export abstract class BaseLanguageClient
 
 		const promise: Promise<void> = new Promise((_resolve, _reject) => {
 			resolve = _resolve;
+
 			reject = _reject;
 		});
 
@@ -2194,16 +2409,19 @@ export abstract class BaseLanguageClient
 			trace: Trace.toString(this._trace),
 			workspaceFolders: workspaceFolders,
 		};
+
 		this.fillInitializeParams(initParams);
 
 		if (this._clientOptions.progressOnInitialization) {
 			const token: ProgressToken = UUID.generateUuid();
 
 			const part: ProgressPart = new ProgressPart(connection, token);
+
 			initParams.workDoneToken = token;
 
 			try {
 				const result = await this.doInitialize(connection, initParams);
+
 				part.done();
 
 				return result;
@@ -2235,6 +2453,7 @@ export abstract class BaseLanguageClient
 			}
 
 			this._initializeResult = result;
+
 			this.$state = ClientState.Running;
 
 			let textDocumentSyncOptions: TextDocumentSyncOptions | undefined =
@@ -2266,6 +2485,7 @@ export abstract class BaseLanguageClient
 				textDocumentSyncOptions = result.capabilities
 					.textDocumentSync as TextDocumentSyncOptions;
 			}
+
 			this._capabilities = Object.assign({}, result.capabilities, {
 				resolvedTextDocumentSync: textDocumentSyncOptions,
 			});
@@ -2274,6 +2494,7 @@ export abstract class BaseLanguageClient
 				PublishDiagnosticsNotification.type,
 				(params) => this.handleDiagnostics(params),
 			);
+
 			connection.onRequest(RegistrationRequest.type, (params) =>
 				this.handleRegistrationRequest(params),
 			);
@@ -2281,6 +2502,7 @@ export abstract class BaseLanguageClient
 			connection.onRequest("client/registerFeature", (params) =>
 				this.handleRegistrationRequest(params),
 			);
+
 			connection.onRequest(UnregistrationRequest.type, (params) =>
 				this.handleUnregistrationRequest(params),
 			);
@@ -2288,6 +2510,7 @@ export abstract class BaseLanguageClient
 			connection.onRequest("client/unregisterFeature", (params) =>
 				this.handleUnregistrationRequest(params),
 			);
+
 			connection.onRequest(ApplyWorkspaceEditRequest.type, (params) =>
 				this.handleApplyWorkspaceEdit(params),
 			);
@@ -2299,6 +2522,7 @@ export abstract class BaseLanguageClient
 					connection.onNotification(method, handler),
 				);
 			}
+
 			this._pendingNotificationHandlers.clear();
 
 			for (const [method, handler] of this._pendingRequestHandlers) {
@@ -2307,6 +2531,7 @@ export abstract class BaseLanguageClient
 					connection.onRequest(method, handler),
 				);
 			}
+
 			this._pendingRequestHandlers.clear();
 
 			for (const [token, data] of this._pendingProgressHandlers) {
@@ -2315,6 +2540,7 @@ export abstract class BaseLanguageClient
 					connection.onProgress(data.type, token, data.handler),
 				);
 			}
+
 			this._pendingProgressHandlers.clear();
 
 			// if (this._clientOptions.suspend.mode !== SuspendMode.off) {
@@ -2324,7 +2550,9 @@ export abstract class BaseLanguageClient
 			await connection.sendNotification(InitializedNotification.type, {});
 
 			this.hookFileEvents(connection);
+
 			this.hookConfigurationChanged(connection);
+
 			this.initializeFeatures(connection);
 
 			return result;
@@ -2354,9 +2582,12 @@ export abstract class BaseLanguageClient
 				if (error && error.message) {
 					void Window.showErrorMessage(error.message);
 				}
+
 				this.error("Server initialization failed.", error);
+
 				void this.stop();
 			}
+
 			throw error;
 		}
 	}
@@ -2367,11 +2598,13 @@ export abstract class BaseLanguageClient
 		if (!folders || folders.length === 0) {
 			return undefined;
 		}
+
 		const folder = folders[0];
 
 		if (folder.uri.scheme === "file") {
 			return folder.uri.fsPath;
 		}
+
 		return undefined;
 	}
 
@@ -2424,7 +2657,9 @@ export abstract class BaseLanguageClient
 		}
 
 		this._initializeResult = undefined;
+
 		this.$state = ClientState.Stopping;
+
 		this.cleanUp(mode);
 
 		const tp = new Promise<undefined>((c) => {
@@ -2433,6 +2668,7 @@ export abstract class BaseLanguageClient
 
 		const shutdown = (async (connection) => {
 			await connection.shutdown();
+
 			await connection.exit();
 
 			return connection;
@@ -2444,6 +2680,7 @@ export abstract class BaseLanguageClient
 					// The connection won the race with the timeout.
 					if (connection !== undefined) {
 						connection.end();
+
 						connection.dispose();
 					} else {
 						this.error(
@@ -2463,10 +2700,15 @@ export abstract class BaseLanguageClient
 			)
 			.finally(() => {
 				this.$state = ClientState.Stopped;
+
 				mode === ShutdownMode.Stop && this.cleanUpChannel();
+
 				this._onStart = undefined;
+
 				this._onStop = undefined;
+
 				this._connection = undefined;
+
 				this._ignoredRegistrations.clear();
 			}));
 	}
@@ -2474,6 +2716,7 @@ export abstract class BaseLanguageClient
 	private cleanUp(mode: ShutdownMode): void {
 		// purge outstanding file events.
 		this._fileEvents = [];
+
 		this._fileEventDelayer.cancel();
 
 		const disposables = this._listeners.splice(0, this._listeners.length);
@@ -2492,16 +2735,19 @@ export abstract class BaseLanguageClient
 			.reverse()) {
 			feature.clear();
 		}
+
 		if (
 			(mode === ShutdownMode.Stop || mode === ShutdownMode.Restart) &&
 			this._diagnostics !== undefined
 		) {
 			this._diagnostics.dispose();
+
 			this._diagnostics = undefined;
 		}
 
 		if (this._idleInterval !== undefined) {
 			this._idleInterval.dispose();
+
 			this._idleInterval = undefined;
 		}
 		// this._idleStart = undefined;
@@ -2510,6 +2756,7 @@ export abstract class BaseLanguageClient
 	private cleanUpChannel(): void {
 		if (this._outputChannel !== undefined && this._disposeOutputChannel) {
 			this._outputChannel.dispose();
+
 			this._outputChannel = undefined;
 		}
 	}
@@ -2525,6 +2772,7 @@ export abstract class BaseLanguageClient
 
 			return client._fileEventDelayer.trigger(async (): Promise<void> => {
 				const fileEvents = client._fileEvents;
+
 				client._fileEvents = [];
 
 				try {
@@ -2540,6 +2788,7 @@ export abstract class BaseLanguageClient
 				}
 			});
 		}
+
 		const workSpaceMiddleware = this.clientOptions.middleware?.workspace;
 		(workSpaceMiddleware?.didChangeWatchedFile
 			? workSpaceMiddleware.didChangeWatchedFile(
@@ -2565,6 +2814,7 @@ export abstract class BaseLanguageClient
 				if (changes.length === 0) {
 					return;
 				}
+
 				for (const document of changes) {
 					const params =
 						this.code2ProtocolConverter.asChangeTextDocumentParams(
@@ -2576,6 +2826,7 @@ export abstract class BaseLanguageClient
 						DidChangeTextDocumentNotification.type,
 						params,
 					);
+
 					this._didChangeTextDocumentFeature!.notificationSent(
 						document,
 						DidChangeTextDocumentNotification.type,
@@ -2600,6 +2851,7 @@ export abstract class BaseLanguageClient
 
 					return;
 				}
+
 				await this.sendPendingFullTextDocumentChanges(connection);
 			})
 			.catch((error) =>
@@ -2608,18 +2860,22 @@ export abstract class BaseLanguageClient
 	}
 
 	private _diagnosticQueue: Map<string, Diagnostic[]> = new Map();
+
 	private _diagnosticQueueState:
 		| { state: "idle" }
 		| {
 				state: "busy";
 
 				document: string;
+
 				tokenSource: CancellationTokenSource;
 		  } = { state: "idle" };
+
 	private handleDiagnostics(params: PublishDiagnosticsParams) {
 		if (!this._diagnostics) {
 			return;
 		}
+
 		const key = params.uri;
 
 		if (
@@ -2627,9 +2883,12 @@ export abstract class BaseLanguageClient
 			this._diagnosticQueueState.document === key
 		) {
 			// Cancel the active run;
+
 			this._diagnosticQueueState.tokenSource.cancel();
 		}
+
 		this._diagnosticQueue.set(params.uri, params.diagnostics);
+
 		this.triggerDiagnosticQueue();
 	}
 
@@ -2643,21 +2902,26 @@ export abstract class BaseLanguageClient
 		if (this._diagnosticQueueState.state === "busy") {
 			return;
 		}
+
 		const next = this._diagnosticQueue.entries().next();
 
 		if (next.done === true) {
 			// Nothing in the queue
 			return;
 		}
+
 		const [document, diagnostics] = next.value;
+
 		this._diagnosticQueue.delete(document);
 
 		const tokenSource = new CancellationTokenSource();
+
 		this._diagnosticQueueState = {
 			state: "busy",
 			document: document,
 			tokenSource,
 		};
+
 		this._p2c
 			.asDiagnostics(diagnostics, tokenSource.token)
 			.then((converted) => {
@@ -2683,6 +2947,7 @@ export abstract class BaseLanguageClient
 			})
 			.finally(() => {
 				this._diagnosticQueueState = { state: "idle" };
+
 				this.triggerDiagnosticQueue();
 			});
 	}
@@ -2691,6 +2956,7 @@ export abstract class BaseLanguageClient
 		if (!this._diagnostics) {
 			return;
 		}
+
 		this._diagnostics.set(uri, diagnostics);
 	}
 
@@ -2706,6 +2972,7 @@ export abstract class BaseLanguageClient
 		if (this.$state === ClientState.StartFailed) {
 			throw new Error(`Previous start failed. Can't restart server.`);
 		}
+
 		await this.start();
 
 		const connection = this.activeConnection();
@@ -2713,6 +2980,7 @@ export abstract class BaseLanguageClient
 		if (connection === undefined) {
 			throw new Error(`Starting server failed`);
 		}
+
 		return connection;
 	}
 
@@ -2736,6 +3004,7 @@ export abstract class BaseLanguageClient
 		const transports = await this.createMessageTransports(
 			this._clientOptions.stdioEncoding || "utf8",
 		);
+
 		this._connection = createConnection(
 			transports.reader,
 			transports.writer,
@@ -2752,6 +3021,7 @@ export abstract class BaseLanguageClient
 		if (this.$state === ClientState.Stopped) {
 			return;
 		}
+
 		try {
 			if (this._connection !== undefined) {
 				this._connection.dispose();
@@ -2759,6 +3029,7 @@ export abstract class BaseLanguageClient
 		} catch (error) {
 			// Disposing a connection could fail if error cases.
 		}
+
 		let handlerResult: CloseHandlerResult = {
 			action: CloseAction.DoNotRestart,
 		};
@@ -2771,6 +3042,7 @@ export abstract class BaseLanguageClient
 				// Ignore errors coming from the error handler.
 			}
 		}
+
 		this._connection = undefined;
 
 		if (handlerResult.action === CloseAction.DoNotRestart) {
@@ -2780,6 +3052,7 @@ export abstract class BaseLanguageClient
 				undefined,
 				handlerResult.handled === true ? false : "force",
 			);
+
 			this.cleanUp(ShutdownMode.Stop);
 
 			if (this.$state === ClientState.Starting) {
@@ -2787,7 +3060,9 @@ export abstract class BaseLanguageClient
 			} else {
 				this.$state = ClientState.Stopped;
 			}
+
 			this._onStop = Promise.resolve();
+
 			this._onStart = undefined;
 		} else if (handlerResult.action === CloseAction.Restart) {
 			this.info(
@@ -2796,10 +3071,15 @@ export abstract class BaseLanguageClient
 				undefined,
 				!handlerResult.handled,
 			);
+
 			this.cleanUp(ShutdownMode.Restart);
+
 			this.$state = ClientState.Initial;
+
 			this._onStop = Promise.resolve();
+
 			this._onStart = undefined;
+
 			this.start().catch((error) =>
 				this.error(`Restarting server failed`, error, "force"),
 			);
@@ -2825,6 +3105,7 @@ export abstract class BaseLanguageClient
 				undefined,
 				handlerResult.handled === true ? false : "force",
 			);
+
 			this.stop().catch((error) => {
 				this.error(`Stopping server failed`, error, false);
 			});
@@ -2865,13 +3146,17 @@ export abstract class BaseLanguageClient
 				trace = Trace.fromString(
 					config.get("trace.server.verbosity", "off"),
 				);
+
 				traceFormat = TraceFormat.fromString(
 					config.get("trace.server.format", "text"),
 				);
 			}
 		}
+
 		this._trace = trace;
+
 		this._traceFormat = traceFormat;
+
 		connection
 			.trace(this._trace, this._tracer, {
 				sendNotification,
@@ -2888,6 +3173,7 @@ export abstract class BaseLanguageClient
 		if (!fileEvents) {
 			return;
 		}
+
 		let watchers: VFileSystemWatcher[];
 
 		if (Is.array(fileEvents)) {
@@ -2895,6 +3181,7 @@ export abstract class BaseLanguageClient
 		} else {
 			watchers = [<VFileSystemWatcher>fileEvents];
 		}
+
 		if (!watchers) {
 			return;
 		}
@@ -2906,6 +3193,7 @@ export abstract class BaseLanguageClient
 	}
 
 	private readonly _features: (StaticFeature | DynamicFeature<any>)[] = [];
+
 	private readonly _dynamicFeatures: Map<string, DynamicFeature<any>> =
 		new Map<string, DynamicFeature<any>>();
 
@@ -2922,6 +3210,7 @@ export abstract class BaseLanguageClient
 
 		if (DynamicFeature.is(feature)) {
 			const registrationType = feature.registrationType;
+
 			this._dynamicFeatures.set(registrationType.method, feature);
 		}
 	}
@@ -3153,6 +3442,7 @@ export abstract class BaseLanguageClient
 	getFeature(
 		request: typeof ExecuteCommandRequest.method,
 	): DynamicFeature<ExecuteCommandOptions>;
+
 	public getFeature(request: string): DynamicFeature<any> | undefined {
 		return this._dynamicFeatures.get(request);
 	}
@@ -3170,29 +3460,40 @@ export abstract class BaseLanguageClient
 		) {
 			return false;
 		}
+
 		return feature.handles(textDocument);
 	}
 
 	protected registerBuiltinFeatures() {
 		const pendingFullTextDocumentChanges: Map<string, TextDocument> =
 			new Map();
+
 		this.registerFeature(new ConfigurationFeature(this));
+
 		this._didOpenTextDocumentFeature = new DidOpenTextDocumentFeature(
 			this,
 			this._syncedDocuments,
 		);
+
 		this.registerFeature(this._didOpenTextDocumentFeature);
+
 		this._didChangeTextDocumentFeature = new DidChangeTextDocumentFeature(
 			this,
 			pendingFullTextDocumentChanges,
 		);
+
 		this._didChangeTextDocumentFeature.onPendingChangeAdded(() => {
 			this.triggerPendingChangeDelivery();
 		});
+
 		this.registerFeature(this._didChangeTextDocumentFeature);
+
 		this.registerFeature(new WillSaveFeature(this));
+
 		this.registerFeature(new WillSaveWaitUntilFeature(this));
+
 		this.registerFeature(new DidSaveTextDocumentFeature(this));
+
 		this.registerFeature(
 			new DidCloseTextDocumentFeature(
 				this,
@@ -3200,53 +3501,92 @@ export abstract class BaseLanguageClient
 				pendingFullTextDocumentChanges,
 			),
 		);
+
 		this.registerFeature(
 			new FileSystemWatcherFeature(this, (event) =>
 				this.notifyFileEvent(event),
 			),
 		);
+
 		this.registerFeature(new CompletionItemFeature(this));
+
 		this.registerFeature(new HoverFeature(this));
+
 		this.registerFeature(new SignatureHelpFeature(this));
+
 		this.registerFeature(new DefinitionFeature(this));
+
 		this.registerFeature(new ReferencesFeature(this));
+
 		this.registerFeature(new DocumentHighlightFeature(this));
+
 		this.registerFeature(new DocumentSymbolFeature(this));
+
 		this.registerFeature(new WorkspaceSymbolFeature(this));
+
 		this.registerFeature(new CodeActionFeature(this));
+
 		this.registerFeature(new CodeLensFeature(this));
+
 		this.registerFeature(new DocumentFormattingFeature(this));
+
 		this.registerFeature(new DocumentRangeFormattingFeature(this));
+
 		this.registerFeature(new DocumentOnTypeFormattingFeature(this));
+
 		this.registerFeature(new RenameFeature(this));
+
 		this.registerFeature(new DocumentLinkFeature(this));
+
 		this.registerFeature(new ExecuteCommandFeature(this));
+
 		this.registerFeature(new SyncConfigurationFeature(this));
+
 		this.registerFeature(new TypeDefinitionFeature(this));
+
 		this.registerFeature(new ImplementationFeature(this));
+
 		this.registerFeature(new ColorProviderFeature(this));
 		// We only register the workspace folder feature if the client is not locked
 		// to a specific workspace folder.
 		if (this.clientOptions.workspaceFolder === undefined) {
 			this.registerFeature(new WorkspaceFoldersFeature(this));
 		}
+
 		this.registerFeature(new FoldingRangeFeature(this));
+
 		this.registerFeature(new DeclarationFeature(this));
+
 		this.registerFeature(new SelectionRangeFeature(this));
+
 		this.registerFeature(new ProgressFeature(this));
+
 		this.registerFeature(new CallHierarchyFeature(this));
+
 		this.registerFeature(new SemanticTokensFeature(this));
+
 		this.registerFeature(new LinkedEditingFeature(this));
+
 		this.registerFeature(new DidCreateFilesFeature(this));
+
 		this.registerFeature(new DidRenameFilesFeature(this));
+
 		this.registerFeature(new DidDeleteFilesFeature(this));
+
 		this.registerFeature(new WillCreateFilesFeature(this));
+
 		this.registerFeature(new WillRenameFilesFeature(this));
+
 		this.registerFeature(new WillDeleteFilesFeature(this));
+
 		this.registerFeature(new TypeHierarchyFeature(this));
+
 		this.registerFeature(new InlineValueFeature(this));
+
 		this.registerFeature(new InlayHintsFeature(this));
+
 		this.registerFeature(new DiagnosticFeature(this));
+
 		this.registerFeature(new NotebookDocumentSyncFeature(this));
 	}
 
@@ -3264,68 +3604,88 @@ export abstract class BaseLanguageClient
 
 	private computeClientCapabilities(): ClientCapabilities {
 		const result: ClientCapabilities = {};
+
 		ensure(result, "workspace")!.applyEdit = true;
 
 		const workspaceEdit = ensure(
 			ensure(result, "workspace")!,
 			"workspaceEdit",
 		)!;
+
 		workspaceEdit.documentChanges = true;
+
 		workspaceEdit.resourceOperations = [
 			ResourceOperationKind.Create,
 			ResourceOperationKind.Rename,
 			ResourceOperationKind.Delete,
 		];
+
 		workspaceEdit.failureHandling =
 			FailureHandlingKind.TextOnlyTransactional;
+
 		workspaceEdit.normalizesLineEndings = true;
+
 		workspaceEdit.changeAnnotationSupport = {
 			groupsOnLabel: true,
 		};
+
 		workspaceEdit.metadataSupport = true;
+
 		workspaceEdit.snippetEditSupport = true;
 
 		const diagnostics = ensure(
 			ensure(result, "textDocument")!,
 			"publishDiagnostics",
 		)!;
+
 		diagnostics.relatedInformation = true;
+
 		diagnostics.versionSupport = false;
+
 		diagnostics.tagSupport = {
 			valueSet: [DiagnosticTag.Unnecessary, DiagnosticTag.Deprecated],
 		};
+
 		diagnostics.codeDescriptionSupport = true;
+
 		diagnostics.dataSupport = true;
 
 		const textDocumentFilter = ensure(
 			ensure(result, "textDocument")!,
 			"filters",
 		)!;
+
 		textDocumentFilter.relativePatternSupport = true;
 
 		const windowCapabilities = ensure(result, "window")!;
 
 		const showMessage = ensure(windowCapabilities, "showMessage")!;
+
 		showMessage.messageActionItem = { additionalPropertiesSupport: true };
 
 		const showDocument = ensure(windowCapabilities, "showDocument")!;
+
 		showDocument.support = true;
 
 		const generalCapabilities = ensure(result, "general")!;
+
 		generalCapabilities.staleRequestSupport = {
 			cancel: true,
 			retryOnContentModified: Array.from(
 				BaseLanguageClient.RequestsToCancelOnContentModified,
 			),
 		};
+
 		generalCapabilities.regularExpressions = {
 			engine: "ECMAScript",
 			version: "ES2020",
 		};
+
 		generalCapabilities.markdown = {
 			parser: "marked",
 			version: "1.1.0",
 		};
+
 		generalCapabilities.positionEncodings = ["utf-16"];
 
 		if (this._clientOptions.markdown.supportHtml) {
@@ -3364,6 +3724,7 @@ export abstract class BaseLanguageClient
 		for (const feature of this._features) {
 			feature.fillClientCapabilities(result);
 		}
+
 		return result;
 	}
 
@@ -3375,6 +3736,7 @@ export abstract class BaseLanguageClient
 				feature.preInitialize(this._capabilities, documentSelector);
 			}
 		}
+
 		for (const feature of this._features) {
 			feature.initialize(this._capabilities, documentSelector);
 		}
@@ -3405,12 +3767,14 @@ export abstract class BaseLanguageClient
 			for (const registration of params.registrations) {
 				this._ignoredRegistrations.add(registration.id);
 			}
+
 			return;
 		}
 
 		interface WithDocumentSelector {
 			documentSelector: DocumentSelector | undefined;
 		}
+
 		for (const registration of params.registrations) {
 			const feature = this._dynamicFeatures.get(registration.method);
 
@@ -3421,6 +3785,7 @@ export abstract class BaseLanguageClient
 					),
 				);
 			}
+
 			const options = registration.registerOptions ?? {};
 			(options as unknown as WithDocumentSelector).documentSelector =
 				(options as unknown as WithDocumentSelector).documentSelector ??
@@ -3461,6 +3826,7 @@ export abstract class BaseLanguageClient
 			if (this._ignoredRegistrations.has(unregistration.id)) {
 				continue;
 			}
+
 			const feature = this._dynamicFeatures.get(unregistration.method);
 
 			if (!feature) {
@@ -3470,6 +3836,7 @@ export abstract class BaseLanguageClient
 					),
 				);
 			}
+
 			feature.unregister(unregistration.id);
 		}
 	}
@@ -3488,6 +3855,7 @@ export abstract class BaseLanguageClient
 			if (resultOrError instanceof ResponseError) {
 				return Promise.reject(resultOrError);
 			}
+
 			return resultOrError;
 		} else {
 			return this.doHandleApplyWorkspaceEdit(params);
@@ -3495,6 +3863,7 @@ export abstract class BaseLanguageClient
 	}
 
 	private workspaceEditLock: Semaphore<VWorkspaceEdit> = new Semaphore(1);
+
 	private async doHandleApplyWorkspaceEdit(
 		params: ApplyWorkspaceEditParams,
 	): Promise<ApplyWorkspaceEditResult> {
@@ -3512,6 +3881,7 @@ export abstract class BaseLanguageClient
 			string,
 			TextDocument
 		>();
+
 		Workspace.textDocuments.forEach((document) =>
 			openTextDocuments.set(document.uri.toString(), document),
 		);
@@ -3542,9 +3912,11 @@ export abstract class BaseLanguageClient
 				}
 			}
 		}
+
 		if (versionMismatch) {
 			return Promise.resolve({ applied: false });
 		}
+
 		return Is.asPromise(
 			Workspace.applyEdit(converted, {
 				isRefactoring: params.metadata?.isRefactoring,
@@ -3559,6 +3931,7 @@ export abstract class BaseLanguageClient
 		SemanticTokensRangeRequest.method,
 		SemanticTokensDeltaRequest.method,
 	]);
+
 	private static CancellableResolveCalls: Set<string> = new Set([
 		CompletionResolveRequest.method,
 		CodeLensResolveRequest.method,
@@ -3586,6 +3959,7 @@ export abstract class BaseLanguageClient
 			) {
 				return defaultValue;
 			}
+
 			if (
 				error.code === LSPErrorCodes.RequestCancelled ||
 				error.code === LSPErrorCodes.ServerCancelled
@@ -3616,6 +3990,7 @@ export abstract class BaseLanguageClient
 				}
 			}
 		}
+
 		this.error(`Request ${type.method} failed.`, error, showNotification);
 
 		throw error;
@@ -3714,6 +4089,7 @@ export class LanguageClient extends BaseLanguageClient {
 		clientOptions: LanguageClientOptions,
 	) {
 		super(id, name, clientOptions);
+
 		this.serverOptions = serverOptions;
 	}
 
@@ -3731,20 +4107,24 @@ interface Connection {
 		type: ProtocolRequestType0<R, PR, E, RO>,
 		token?: CancellationToken,
 	): Promise<R>;
+
 	sendRequest<P, R, PR, E, RO>(
 		type: ProtocolRequestType<P, R, PR, E, RO>,
 		params: P,
 		token?: CancellationToken,
 	): Promise<R>;
+
 	sendRequest<R, E>(
 		type: RequestType0<R, E>,
 		token?: CancellationToken,
 	): Promise<R>;
+
 	sendRequest<P, R, E>(
 		type: RequestType<P, R, E>,
 		params: P,
 		token?: CancellationToken,
 	): Promise<R>;
+
 	sendRequest<R>(
 		type: string | MessageSignature,
 		...params: any[]
@@ -3754,18 +4134,22 @@ interface Connection {
 		type: ProtocolRequestType0<R, PR, E, RO>,
 		handler: RequestHandler0<R, E>,
 	): Disposable;
+
 	onRequest<P, R, PR, E, RO>(
 		type: ProtocolRequestType<P, R, PR, E, RO>,
 		handler: RequestHandler<P, R, E>,
 	): Disposable;
+
 	onRequest<R, E>(
 		type: RequestType0<R, E>,
 		handler: RequestHandler0<R, E>,
 	): Disposable;
+
 	onRequest<P, R, E>(
 		type: RequestType<P, R, E>,
 		handler: RequestHandler<P, R, E>,
 	): Disposable;
+
 	onRequest<R, E>(
 		method: string | MessageSignature,
 		handler: GenericRequestHandler<R, E>,
@@ -3774,12 +4158,16 @@ interface Connection {
 	hasPendingResponse(): boolean;
 
 	sendNotification<RO>(type: ProtocolNotificationType0<RO>): Promise<void>;
+
 	sendNotification<P, RO>(
 		type: ProtocolNotificationType<P, RO>,
 		params?: P,
 	): Promise<void>;
+
 	sendNotification(type: NotificationType0): Promise<void>;
+
 	sendNotification<P>(type: NotificationType<P>, params?: P): Promise<void>;
+
 	sendNotification(
 		method: string | MessageSignature,
 		params?: any,
@@ -3789,18 +4177,22 @@ interface Connection {
 		type: ProtocolNotificationType0<RO>,
 		handler: NotificationHandler0,
 	): Disposable;
+
 	onNotification<P, RO>(
 		type: ProtocolNotificationType<P, RO>,
 		handler: NotificationHandler<P>,
 	): Disposable;
+
 	onNotification(
 		type: NotificationType0,
 		handler: NotificationHandler0,
 	): Disposable;
+
 	onNotification<P>(
 		type: NotificationType<P>,
 		handler: NotificationHandler<P>,
 	): Disposable;
+
 	onNotification(
 		method: string | MessageSignature,
 		handler: GenericNotificationHandler,
@@ -3811,6 +4203,7 @@ interface Connection {
 		token: string | number,
 		handler: NotificationHandler<P>,
 	): Disposable;
+
 	sendProgress<P>(
 		type: ProgressType<P>,
 		token: string | number,
@@ -3822,6 +4215,7 @@ interface Connection {
 		tracer: Tracer,
 		sendNotification?: boolean,
 	): Promise<void>;
+
 	trace(
 		value: Trace,
 		tracer: Tracer,
@@ -3829,10 +4223,13 @@ interface Connection {
 	): Promise<void>;
 
 	initialize(params: InitializeParams): Promise<InitializeResult>;
+
 	shutdown(): Promise<void>;
+
 	exit(): Promise<void>;
 
 	end(): void;
+
 	dispose(): void;
 }
 
@@ -3840,12 +4237,15 @@ class ConsoleLogger implements Logger {
 	public error(message: string): void {
 		RAL().console.error(message);
 	}
+
 	public warn(message: string): void {
 		RAL().console.warn(message);
 	}
+
 	public info(message: string): void {
 		RAL().console.info(message);
 	}
+
 	public log(message: string): void {
 		RAL().console.log(message);
 	}
@@ -3873,9 +4273,11 @@ function createConnection(
 	const logger = new ConsoleLogger();
 
 	const connection = createProtocolConnection(input, output, logger, options);
+
 	connection.onError((data) => {
 		errorHandler(data[0], data[1], data[2]);
 	});
+
 	connection.onClose(closeHandler);
 
 	const result: Connection = {

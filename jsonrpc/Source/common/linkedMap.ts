@@ -5,8 +5,11 @@
 
 interface Item<K, V> {
 	previous: Item<K, V> | undefined;
+
 	next: Item<K, V> | undefined;
+
 	key: K;
+
 	value: V;
 }
 
@@ -28,25 +31,36 @@ export class LinkedMap<K, V> implements Map<K, V> {
 	readonly [Symbol.toStringTag] = "LinkedMap";
 
 	private _map: Map<K, Item<K, V>>;
+
 	private _head: Item<K, V> | undefined;
+
 	private _tail: Item<K, V> | undefined;
+
 	private _size: number;
 
 	private _state: number;
 
 	public constructor() {
 		this._map = new Map<K, Item<K, V>>();
+
 		this._head = undefined;
+
 		this._tail = undefined;
+
 		this._size = 0;
+
 		this._state = 0;
 	}
 
 	public clear(): void {
 		this._map.clear();
+
 		this._head = undefined;
+
 		this._tail = undefined;
+
 		this._size = 0;
+
 		this._state++;
 	}
 
@@ -88,9 +102,11 @@ export class LinkedMap<K, V> implements Map<K, V> {
 		if (!item) {
 			return undefined;
 		}
+
 		if (touch !== Touch.None) {
 			this.touch(item, touch);
 		}
+
 		return item.value;
 	}
 
@@ -127,9 +143,12 @@ export class LinkedMap<K, V> implements Map<K, V> {
 
 					break;
 			}
+
 			this._map.set(key, item);
+
 			this._size++;
 		}
+
 		return this;
 	}
 
@@ -143,8 +162,11 @@ export class LinkedMap<K, V> implements Map<K, V> {
 		if (!item) {
 			return undefined;
 		}
+
 		this._map.delete(key);
+
 		this.removeItem(item);
+
 		this._size--;
 
 		return item.value;
@@ -154,12 +176,17 @@ export class LinkedMap<K, V> implements Map<K, V> {
 		if (!this._head && !this._tail) {
 			return undefined;
 		}
+
 		if (!this._head || !this._tail) {
 			throw new Error("Invalid list");
 		}
+
 		const item = this._head;
+
 		this._map.delete(item.key);
+
 		this.removeItem(item);
+
 		this._size--;
 
 		return item.value;
@@ -179,9 +206,11 @@ export class LinkedMap<K, V> implements Map<K, V> {
 			} else {
 				callbackfn(current.value, current.key, this);
 			}
+
 			if (this._state !== state) {
 				throw new Error(`LinkedMap got modified during iteration.`);
 			}
+
 			current = current.next;
 		}
 	}
@@ -199,8 +228,10 @@ export class LinkedMap<K, V> implements Map<K, V> {
 				if (this._state !== state) {
 					throw new Error(`LinkedMap got modified during iteration.`);
 				}
+
 				if (current) {
 					const result = { value: current.key, done: false };
+
 					current = current.next;
 
 					return result;
@@ -226,8 +257,10 @@ export class LinkedMap<K, V> implements Map<K, V> {
 				if (this._state !== state) {
 					throw new Error(`LinkedMap got modified during iteration.`);
 				}
+
 				if (current) {
 					const result = { value: current.value, done: false };
+
 					current = current.next;
 
 					return result;
@@ -253,11 +286,13 @@ export class LinkedMap<K, V> implements Map<K, V> {
 				if (this._state !== state) {
 					throw new Error(`LinkedMap got modified during iteration.`);
 				}
+
 				if (current) {
 					const result: IteratorResult<[K, V]> = {
 						value: [current.key, current.value],
 						done: false,
 					};
+
 					current = current.next;
 
 					return result;
@@ -278,26 +313,33 @@ export class LinkedMap<K, V> implements Map<K, V> {
 		if (newSize >= this.size) {
 			return;
 		}
+
 		if (newSize === 0) {
 			this.clear();
 
 			return;
 		}
+
 		let current = this._head;
 
 		let currentSize = this.size;
 
 		while (current && currentSize > newSize) {
 			this._map.delete(current.key);
+
 			current = current.next;
+
 			currentSize--;
 		}
+
 		this._head = current;
+
 		this._size = currentSize;
 
 		if (current) {
 			current.previous = undefined;
 		}
+
 		this._state++;
 	}
 
@@ -309,9 +351,12 @@ export class LinkedMap<K, V> implements Map<K, V> {
 			throw new Error("Invalid list");
 		} else {
 			item.next = this._head;
+
 			this._head.previous = item;
 		}
+
 		this._head = item;
+
 		this._state++;
 	}
 
@@ -323,15 +368,19 @@ export class LinkedMap<K, V> implements Map<K, V> {
 			throw new Error("Invalid list");
 		} else {
 			item.previous = this._tail;
+
 			this._tail.next = item;
 		}
+
 		this._tail = item;
+
 		this._state++;
 	}
 
 	private removeItem(item: Item<K, V>): void {
 		if (item === this._head && item === this._tail) {
 			this._head = undefined;
+
 			this._tail = undefined;
 		} else if (item === this._head) {
 			// This can only happened if size === 1 which is handle
@@ -339,7 +388,9 @@ export class LinkedMap<K, V> implements Map<K, V> {
 			if (!item.next) {
 				throw new Error("Invalid list");
 			}
+
 			item.next.previous = undefined;
+
 			this._head = item.next;
 		} else if (item === this._tail) {
 			// This can only happened if size === 1 which is handle
@@ -347,7 +398,9 @@ export class LinkedMap<K, V> implements Map<K, V> {
 			if (!item.previous) {
 				throw new Error("Invalid list");
 			}
+
 			item.previous.next = undefined;
+
 			this._tail = item.previous;
 		} else {
 			const next = item.next;
@@ -357,11 +410,16 @@ export class LinkedMap<K, V> implements Map<K, V> {
 			if (!next || !previous) {
 				throw new Error("Invalid list");
 			}
+
 			next.previous = previous;
+
 			previous.next = next;
 		}
+
 		item.next = undefined;
+
 		item.previous = undefined;
+
 		this._state++;
 	}
 
@@ -369,6 +427,7 @@ export class LinkedMap<K, V> implements Map<K, V> {
 		if (!this._head || !this._tail) {
 			throw new Error("Invalid list");
 		}
+
 		if (touch !== Touch.First && touch !== Touch.Last) {
 			return;
 		}
@@ -387,18 +446,24 @@ export class LinkedMap<K, V> implements Map<K, V> {
 				// previous must be defined since item was not head but is tail
 				// So there are more than on item in the map
 				previous!.next = undefined;
+
 				this._tail = previous;
 			} else {
 				// Both next and previous are not undefined since item was neither head nor tail.
 				next!.previous = previous;
+
 				previous!.next = next;
 			}
 
 			// Insert the node at head
 			item.previous = undefined;
+
 			item.next = this._head;
+
 			this._head.previous = item;
+
 			this._head = item;
+
 			this._state++;
 		} else if (touch === Touch.Last) {
 			if (item === this._tail) {
@@ -414,16 +479,23 @@ export class LinkedMap<K, V> implements Map<K, V> {
 				// next must be defined since item was not tail but is head
 				// So there are more than on item in the map
 				next!.previous = undefined;
+
 				this._head = next;
 			} else {
 				// Both next and previous are not undefined since item was neither head nor tail.
 				next!.previous = previous;
+
 				previous!.next = next;
 			}
+
 			item.next = undefined;
+
 			item.previous = this._tail;
+
 			this._tail.next = item;
+
 			this._tail = item;
+
 			this._state++;
 		}
 	}
@@ -449,11 +521,14 @@ export class LinkedMap<K, V> implements Map<K, V> {
 
 export class LRUCache<K, V> extends LinkedMap<K, V> {
 	private _limit: number;
+
 	private _ratio: number;
 
 	public constructor(limit: number, ratio: number = 1) {
 		super();
+
 		this._limit = limit;
+
 		this._ratio = Math.min(Math.max(0, ratio), 1);
 	}
 
@@ -463,6 +538,7 @@ export class LRUCache<K, V> extends LinkedMap<K, V> {
 
 	public set limit(limit: number) {
 		this._limit = limit;
+
 		this.checkTrim();
 	}
 
@@ -472,6 +548,7 @@ export class LRUCache<K, V> extends LinkedMap<K, V> {
 
 	public set ratio(ratio: number) {
 		this._ratio = Math.min(Math.max(0, ratio), 1);
+
 		this.checkTrim();
 	}
 
@@ -485,6 +562,7 @@ export class LRUCache<K, V> extends LinkedMap<K, V> {
 
 	public set(key: K, value: V): this {
 		super.set(key, value, Touch.Last);
+
 		this.checkTrim();
 
 		return this;

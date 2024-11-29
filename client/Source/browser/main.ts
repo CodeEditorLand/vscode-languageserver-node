@@ -32,6 +32,7 @@ export class LanguageClient extends BaseLanguageClient {
 		clientOptions: LanguageClientOptions,
 	) {
 		super(id, name, clientOptions);
+
 		this.serverOptions = serverOptions;
 	}
 

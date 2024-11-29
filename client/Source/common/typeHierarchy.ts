@@ -60,12 +60,14 @@ export type TypeHierarchyMiddleware = {
 		token: CancellationToken,
 		next: PrepareTypeHierarchySignature,
 	) => ProviderResult<VTypeHierarchyItem[]>;
+
 	provideTypeHierarchySupertypes?: (
 		this: void,
 		item: VTypeHierarchyItem,
 		token: CancellationToken,
 		next: TypeHierarchySupertypesSignature,
 	) => ProviderResult<VTypeHierarchyItem[]>;
+
 	provideTypeHierarchySubtypes?: (
 		this: void,
 		item: VTypeHierarchyItem,
@@ -108,6 +110,7 @@ class TypeHierarchyProvider implements VTypeHierarchyProvider {
 						if (token.isCancellationRequested) {
 							return null;
 						}
+
 						return client.protocol2CodeConverter.asTypeHierarchyItems(
 							result,
 							token,
@@ -161,6 +164,7 @@ class TypeHierarchyProvider implements VTypeHierarchyProvider {
 							if (token.isCancellationRequested) {
 								return null;
 							}
+
 							return client.protocol2CodeConverter.asTypeHierarchyItems(
 								result,
 								token,
@@ -209,6 +213,7 @@ class TypeHierarchyProvider implements VTypeHierarchyProvider {
 						if (token.isCancellationRequested) {
 							return null;
 						}
+
 						return client.protocol2CodeConverter.asTypeHierarchyItems(
 							result,
 							token,
@@ -250,6 +255,7 @@ export class TypeHierarchyFeature extends TextDocumentLanguageFeature<
 			ensure(capabilities, "textDocument")!,
 			"typeHierarchy",
 		)!;
+
 		capability.dynamicRegistration = true;
 	}
 
@@ -265,6 +271,7 @@ export class TypeHierarchyFeature extends TextDocumentLanguageFeature<
 		if (!id || !options) {
 			return;
 		}
+
 		this.register({ id: id, registerOptions: options });
 	}
 

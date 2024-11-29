@@ -64,7 +64,9 @@ export class TypeDefinitionFeature extends TextDocumentLanguageFeature<
 			ensure(capabilities, "textDocument")!,
 			"typeDefinition",
 		)!;
+
 		typeDefinitionSupport.dynamicRegistration = true;
+
 		typeDefinitionSupport.linkSupport = true;
 	}
 
@@ -80,6 +82,7 @@ export class TypeDefinitionFeature extends TextDocumentLanguageFeature<
 		if (!id || !options) {
 			return;
 		}
+
 		this.register({ id: id, registerOptions: options });
 	}
 
@@ -111,6 +114,7 @@ export class TypeDefinitionFeature extends TextDocumentLanguageFeature<
 								if (token.isCancellationRequested) {
 									return null;
 								}
+
 								return client.protocol2CodeConverter.asDefinitionResult(
 									result,
 									token,

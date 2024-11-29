@@ -14,6 +14,7 @@ import * as Is from "./utils/is";
  */
 export interface DiagnosticCode {
 	value: string | number;
+
 	target: string;
 }
 
@@ -32,6 +33,7 @@ export namespace DiagnosticCode {
 
 export class ProtocolDiagnostic extends vscode.Diagnostic {
 	public readonly data: LSPAny | undefined;
+
 	public hasDiagnosticCode: boolean;
 
 	constructor(
@@ -41,7 +43,9 @@ export class ProtocolDiagnostic extends vscode.Diagnostic {
 		data: LSPAny | undefined,
 	) {
 		super(range, message, severity);
+
 		this.data = data;
+
 		this.hasDiagnosticCode = false;
 	}
 }

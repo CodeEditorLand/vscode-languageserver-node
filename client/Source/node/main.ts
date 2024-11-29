@@ -52,6 +52,7 @@ export enum TransportKind {
 
 export interface SocketTransport {
 	kind: TransportKind.socket;
+
 	port: number;
 }
 
@@ -84,15 +85,21 @@ namespace Transport {
 
 export interface ExecutableOptions {
 	cwd?: string;
+
 	env?: any;
+
 	detached?: boolean;
+
 	shell?: boolean;
 }
 
 export interface Executable {
 	command: string;
+
 	transport?: Transport;
+
 	args?: string[];
+
 	options?: ExecutableOptions;
 }
 
@@ -104,16 +111,23 @@ namespace Executable {
 
 export interface ForkOptions {
 	cwd?: string;
+
 	env?: any;
+
 	encoding?: string;
+
 	execArgv?: string[];
 }
 
 export interface NodeModule {
 	module: string;
+
 	transport?: Transport;
+
 	args?: string[];
+
 	runtime?: string;
+
 	options?: ForkOptions;
 }
 
@@ -125,7 +139,9 @@ namespace NodeModule {
 
 export interface StreamInfo {
 	writer: NodeJS.WritableStream;
+
 	reader: NodeJS.ReadableStream;
+
 	detached?: boolean;
 }
 
@@ -143,6 +159,7 @@ namespace StreamInfo {
 
 export interface ChildProcessInfo {
 	process: ChildProcess;
+
 	detached: boolean;
 }
 
@@ -169,9 +186,13 @@ export type ServerOptions =
 
 export class LanguageClient extends BaseLanguageClient {
 	private readonly _serverOptions: ServerOptions;
+
 	private readonly _forceDebug: boolean;
+
 	private _serverProcess: ChildProcess | undefined;
+
 	private _isDetached: boolean | undefined;
+
 	private _isInDebugMode: boolean;
 
 	public constructor(
@@ -180,6 +201,7 @@ export class LanguageClient extends BaseLanguageClient {
 		clientOptions: LanguageClientOptions,
 		forceDebug?: boolean,
 	);
+
 	public constructor(
 		id: string,
 		name: string,
@@ -187,6 +209,7 @@ export class LanguageClient extends BaseLanguageClient {
 		clientOptions: LanguageClientOptions,
 		forceDebug?: boolean,
 	);
+
 	public constructor(
 		arg1: string,
 		arg2: ServerOptions | string,
@@ -206,25 +229,36 @@ export class LanguageClient extends BaseLanguageClient {
 
 		if (Is.string(arg2)) {
 			id = arg1;
+
 			name = arg2;
+
 			serverOptions = arg3 as ServerOptions;
+
 			clientOptions = arg4 as LanguageClientOptions;
 
 			forceDebug = !!arg5;
 		} else {
 			id = arg1.toLowerCase();
+
 			name = arg1;
+
 			serverOptions = arg2 as ServerOptions;
+
 			clientOptions = arg3 as LanguageClientOptions;
 
 			forceDebug = arg4 as boolean;
 		}
+
 		if (forceDebug === undefined) {
 			forceDebug = false;
 		}
+
 		super(id, name, clientOptions);
+
 		this._serverOptions = serverOptions;
+
 		this._forceDebug = forceDebug;
+
 		this._isInDebugMode = forceDebug;
 
 		try {
@@ -233,6 +267,7 @@ export class LanguageClient extends BaseLanguageClient {
 			if (Is.string(error.message)) {
 				this.outputChannel.appendLine(error.message);
 			}
+
 			throw error;
 		}
 	}
@@ -249,6 +284,7 @@ export class LanguageClient extends BaseLanguageClient {
 		if (codeVersion.prerelease && codeVersion.prerelease.length > 0) {
 			codeVersion.prerelease = [];
 		}
+
 		if (!semverSatisfies(codeVersion, REQUIRED_VSCODE_VERSION)) {
 			throw new Error(
 				`The language client requires VS Code version ${REQUIRED_VSCODE_VERSION} but received version ${VSCodeVersion}`,
@@ -268,6 +304,7 @@ export class LanguageClient extends BaseLanguageClient {
 		// stop on the same client instance.
 		if (this.isInDebugMode) {
 			await new Promise((resolve) => setTimeout(resolve, 1000));
+
 			await this.start();
 		} else {
 			await this.start();
@@ -281,11 +318,13 @@ export class LanguageClient extends BaseLanguageClient {
 		return super.shutdown(mode, timeout).finally(() => {
 			if (this._serverProcess) {
 				const toCheck = this._serverProcess;
+
 				this._serverProcess = undefined;
 
 				if (this._isDetached === undefined || !this._isDetached) {
 					this.checkProcessDied(toCheck);
 				}
+
 				this._isDetached = undefined;
 			}
 		});
@@ -295,11 +334,13 @@ export class LanguageClient extends BaseLanguageClient {
 		if (!childProcess || childProcess.pid === undefined) {
 			return;
 		}
+
 		setTimeout(() => {
 			// Test if the process is still alive. Throws an exception if not
 			try {
 				if (childProcess.pid !== undefined) {
 					process.kill(childProcess.pid, <any>0);
+
 					terminate(childProcess as ChildProcess & { pid: number });
 				}
 			} catch (error) {
@@ -329,18 +370,23 @@ export class LanguageClient extends BaseLanguageClient {
 			if (!env && !fork) {
 				return undefined;
 			}
+
 			const result: any = Object.create(null);
+
 			Object.keys(process.env).forEach(
 				(key) => (result[key] = process.env[key]),
 			);
 
 			if (fork) {
 				result["ELECTRON_RUN_AS_NODE"] = "1";
+
 				result["ELECTRON_NO_ASAR"] = "1";
 			}
+
 			if (env) {
 				Object.keys(env).forEach((key) => (result[key] = env[key]));
 			}
+
 			return result;
 		}
 
@@ -369,6 +415,7 @@ export class LanguageClient extends BaseLanguageClient {
 					);
 				});
 			}
+
 			return false;
 		}
 
@@ -404,11 +451,14 @@ export class LanguageClient extends BaseLanguageClient {
 
 					if (ChildProcessInfo.is(result)) {
 						cp = result.process;
+
 						this._isDetached = result.detached;
 					} else {
 						cp = result;
+
 						this._isDetached = false;
 					}
+
 					cp.stderr!.on("data", (data) =>
 						this.outputChannel.append(
 							Is.string(data) ? data : data.toString(encoding),
@@ -422,6 +472,7 @@ export class LanguageClient extends BaseLanguageClient {
 				}
 			});
 		}
+
 		let json: NodeModule | Executable;
 
 		const runDebug = <{ run: any; debug: any }>server;
@@ -429,14 +480,17 @@ export class LanguageClient extends BaseLanguageClient {
 		if (runDebug.run || runDebug.debug) {
 			if (this._forceDebug || startedInDebugMode()) {
 				json = runDebug.debug;
+
 				this._isInDebugMode = true;
 			} else {
 				json = runDebug.run;
+
 				this._isInDebugMode = false;
 			}
 		} else {
 			json = server as NodeModule | Executable;
 		}
+
 		return this._getServerWorkingDir(json.options)
 			.then((serverWorkingDir) => {
 				if (NodeModule.is(json) && json.module) {
@@ -455,14 +509,18 @@ export class LanguageClient extends BaseLanguageClient {
 								args.push(element),
 							);
 						}
+
 						args.push(node.module);
 
 						if (node.args) {
 							node.args.forEach((element) => args.push(element));
 						}
+
 						const execOptions: cp.SpawnOptionsWithoutStdio =
 							Object.create(null);
+
 						execOptions.cwd = serverWorkingDir;
+
 						execOptions.env = getEnvironment(options.env, false);
 
 						const runtime = this._getRuntimePath(
@@ -475,15 +533,18 @@ export class LanguageClient extends BaseLanguageClient {
 						if (transport === TransportKind.ipc) {
 							// exec options not correctly typed in lib
 							execOptions.stdio = <any>[null, null, null, "ipc"];
+
 							args.push("--node-ipc");
 						} else if (transport === TransportKind.stdio) {
 							args.push("--stdio");
 						} else if (transport === TransportKind.pipe) {
 							pipeName = generateRandomPipeName();
+
 							args.push(`--pipe=${pipeName}`);
 						} else if (Transport.isSocket(transport)) {
 							args.push(`--socket=${transport.port}`);
 						}
+
 						args.push(
 							`--clientProcessId=${process.pid.toString()}`,
 						);
@@ -504,7 +565,9 @@ export class LanguageClient extends BaseLanguageClient {
 									`Launching server using runtime ${runtime} failed.`,
 								);
 							}
+
 							this._serverProcess = serverProcess;
+
 							serverProcess.stderr.on("data", (data) =>
 								this.outputChannel.append(
 									Is.string(data)
@@ -551,7 +614,9 @@ export class LanguageClient extends BaseLanguageClient {
 											`Launching server using runtime ${runtime} failed.`,
 										);
 									}
+
 									this._serverProcess = process;
+
 									process.stderr.on("data", (data) =>
 										this.outputChannel.append(
 											Is.string(data)
@@ -559,6 +624,7 @@ export class LanguageClient extends BaseLanguageClient {
 												: data.toString(encoding),
 										),
 									);
+
 									process.stdout.on("data", (data) =>
 										this.outputChannel.append(
 											Is.string(data)
@@ -593,7 +659,9 @@ export class LanguageClient extends BaseLanguageClient {
 										`Launching server using runtime ${runtime} failed.`,
 									);
 								}
+
 								this._serverProcess = process;
+
 								process.stderr.on("data", (data) =>
 									this.outputChannel.append(
 										Is.string(data)
@@ -601,6 +669,7 @@ export class LanguageClient extends BaseLanguageClient {
 											: data.toString(encoding),
 									),
 								);
+
 								process.stdout.on("data", (data) =>
 									this.outputChannel.append(
 										Is.string(data)
@@ -633,19 +702,25 @@ export class LanguageClient extends BaseLanguageClient {
 									args.push("--stdio");
 								} else if (transport === TransportKind.pipe) {
 									pipeName = generateRandomPipeName();
+
 									args.push(`--pipe=${pipeName}`);
 								} else if (Transport.isSocket(transport)) {
 									args.push(`--socket=${transport.port}`);
 								}
+
 								args.push(
 									`--clientProcessId=${process.pid.toString()}`,
 								);
 
 								const options: cp.ForkOptions =
 									node.options ?? Object.create(null);
+
 								options.env = getEnvironment(options.env, true);
+
 								options.execArgv = options.execArgv || [];
+
 								options.cwd = serverWorkingDir;
+
 								options.silent = true;
 
 								if (
@@ -657,8 +732,11 @@ export class LanguageClient extends BaseLanguageClient {
 										args || [],
 										options,
 									);
+
 									assertStdio(sp);
+
 									this._serverProcess = sp;
+
 									sp.stderr.on("data", (data) =>
 										this.outputChannel.append(
 											Is.string(data)
@@ -675,6 +753,7 @@ export class LanguageClient extends BaseLanguageClient {
 													: data.toString(encoding),
 											),
 										);
+
 										resolve({
 											reader: new IPCMessageReader(
 												this._serverProcess,
@@ -701,8 +780,11 @@ export class LanguageClient extends BaseLanguageClient {
 												args || [],
 												options,
 											);
+
 											assertStdio(sp);
+
 											this._serverProcess = sp;
+
 											sp.stderr.on("data", (data) =>
 												this.outputChannel.append(
 													Is.string(data)
@@ -712,6 +794,7 @@ export class LanguageClient extends BaseLanguageClient {
 															),
 												),
 											);
+
 											sp.stdout.on("data", (data) =>
 												this.outputChannel.append(
 													Is.string(data)
@@ -721,6 +804,7 @@ export class LanguageClient extends BaseLanguageClient {
 															),
 												),
 											);
+
 											transport
 												.onConnected()
 												.then((protocol) => {
@@ -741,8 +825,11 @@ export class LanguageClient extends BaseLanguageClient {
 											args || [],
 											options,
 										);
+
 										assertStdio(sp);
+
 										this._serverProcess = sp;
+
 										sp.stderr.on("data", (data) =>
 											this.outputChannel.append(
 												Is.string(data)
@@ -750,6 +837,7 @@ export class LanguageClient extends BaseLanguageClient {
 													: data.toString(encoding),
 											),
 										);
+
 										sp.stdout.on("data", (data) =>
 											this.outputChannel.append(
 												Is.string(data)
@@ -757,6 +845,7 @@ export class LanguageClient extends BaseLanguageClient {
 													: data.toString(encoding),
 											),
 										);
+
 										transport
 											.onConnected()
 											.then((protocol) => {
@@ -784,6 +873,7 @@ export class LanguageClient extends BaseLanguageClient {
 						args.push("--stdio");
 					} else if (transport === TransportKind.pipe) {
 						pipeName = generateRandomPipeName();
+
 						args.push(`--pipe=${pipeName}`);
 					} else if (Transport.isSocket(transport)) {
 						args.push(`--socket=${transport.port}`);
@@ -792,7 +882,9 @@ export class LanguageClient extends BaseLanguageClient {
 							`Transport kind ipc is not support for command executable`,
 						);
 					}
+
 					const options = Object.assign({}, command.options);
+
 					options.cwd = options.cwd || serverWorkingDir;
 
 					if (
@@ -811,6 +903,7 @@ export class LanguageClient extends BaseLanguageClient {
 								`Launching server using command ${command.command} failed.`,
 							);
 						}
+
 						serverProcess.stderr.on("data", (data) =>
 							this.outputChannel.append(
 								Is.string(data)
@@ -818,7 +911,9 @@ export class LanguageClient extends BaseLanguageClient {
 									: data.toString(encoding),
 							),
 						);
+
 						this._serverProcess = serverProcess;
+
 						this._isDetached = !!options.detached;
 
 						return Promise.resolve({
@@ -844,8 +939,11 @@ export class LanguageClient extends BaseLanguageClient {
 										`Launching server using command ${command.command} failed.`,
 									);
 								}
+
 								this._serverProcess = serverProcess;
+
 								this._isDetached = !!options.detached;
+
 								serverProcess.stderr.on("data", (data) =>
 									this.outputChannel.append(
 										Is.string(data)
@@ -853,6 +951,7 @@ export class LanguageClient extends BaseLanguageClient {
 											: data.toString(encoding),
 									),
 								);
+
 								serverProcess.stdout.on("data", (data) =>
 									this.outputChannel.append(
 										Is.string(data)
@@ -886,8 +985,11 @@ export class LanguageClient extends BaseLanguageClient {
 										`Launching server using command ${command.command} failed.`,
 									);
 								}
+
 								this._serverProcess = serverProcess;
+
 								this._isDetached = !!options.detached;
+
 								serverProcess.stderr.on("data", (data) =>
 									this.outputChannel.append(
 										Is.string(data)
@@ -895,6 +997,7 @@ export class LanguageClient extends BaseLanguageClient {
 											: data.toString(encoding),
 									),
 								);
+
 								serverProcess.stdout.on("data", (data) =>
 									this.outputChannel.append(
 										Is.string(data)
@@ -915,6 +1018,7 @@ export class LanguageClient extends BaseLanguageClient {
 						);
 					}
 				}
+
 				return Promise.reject<MessageTransports>(
 					new Error(
 						`Unsupported server configuration ` +
@@ -938,6 +1042,7 @@ export class LanguageClient extends BaseLanguageClient {
 								false,
 							);
 						}
+
 						if (signal !== null) {
 							this.error(
 								`Server process exited with signal ${signal}.`,
@@ -957,6 +1062,7 @@ export class LanguageClient extends BaseLanguageClient {
 		if (path.isAbsolute(runtime)) {
 			return runtime;
 		}
+
 		const mainRootPath = this._mainGetRootPath();
 
 		if (mainRootPath !== undefined) {
@@ -966,6 +1072,7 @@ export class LanguageClient extends BaseLanguageClient {
 				return result;
 			}
 		}
+
 		if (serverWorkingDirectory !== undefined) {
 			const result = path.join(serverWorkingDirectory, runtime);
 
@@ -973,6 +1080,7 @@ export class LanguageClient extends BaseLanguageClient {
 				return result;
 			}
 		}
+
 		return runtime;
 	}
 
@@ -982,11 +1090,13 @@ export class LanguageClient extends BaseLanguageClient {
 		if (!folders || folders.length === 0) {
 			return undefined;
 		}
+
 		const folder = folders[0];
 
 		if (folder.uri.scheme === "file") {
 			return folder.uri.fsPath;
 		}
+
 		return undefined;
 	}
 
@@ -1000,6 +1110,7 @@ export class LanguageClient extends BaseLanguageClient {
 				? this.clientOptions.workspaceFolder.uri.fsPath
 				: this._mainGetRootPath();
 		}
+
 		if (cwd) {
 			// make sure the folder exists otherwise creating the process will fail
 			return new Promise((s) => {
@@ -1008,6 +1119,7 @@ export class LanguageClient extends BaseLanguageClient {
 				});
 			});
 		}
+
 		return Promise.resolve(undefined);
 	}
 }
@@ -1028,6 +1140,7 @@ export class SettingMonitor {
 			this,
 			this._listeners,
 		);
+
 		this.onDidChangeConfiguration();
 
 		return new Disposable(() => {

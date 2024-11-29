@@ -105,6 +105,7 @@ export interface FormattingMiddleware {
 		token: CancellationToken,
 		next: ProvideDocumentFormattingEditsSignature,
 	) => ProviderResult<VTextEdit[]>;
+
 	provideDocumentRangeFormattingEdits?: (
 		this: void,
 		document: TextDocument,
@@ -113,6 +114,7 @@ export interface FormattingMiddleware {
 		token: CancellationToken,
 		next: ProvideDocumentRangeFormattingEditsSignature,
 	) => ProviderResult<VTextEdit[]>;
+
 	provideDocumentRangesFormattingEdits?: (
 		this: void,
 		document: TextDocument,
@@ -121,6 +123,7 @@ export interface FormattingMiddleware {
 		token: CancellationToken,
 		next: ProvideDocumentRangesFormattingEditsSignature,
 	) => ProviderResult<VTextEdit[]>;
+
 	provideOnTypeFormattingEdits?: (
 		this: void,
 		document: TextDocument,
@@ -161,6 +164,7 @@ export class DocumentFormattingFeature extends TextDocumentLanguageFeature<
 		if (!options) {
 			return;
 		}
+
 		this.register({ id: UUID.generateUuid(), registerOptions: options });
 	}
 
@@ -200,6 +204,7 @@ export class DocumentFormattingFeature extends TextDocumentLanguageFeature<
 									if (token.isCancellationRequested) {
 										return null;
 									}
+
 									return client.protocol2CodeConverter.asTextEdits(
 										result,
 										token,
@@ -256,7 +261,9 @@ export class DocumentRangeFormattingFeature extends TextDocumentLanguageFeature<
 			ensure(capabilities, "textDocument")!,
 			"rangeFormatting",
 		)!;
+
 		capability.dynamicRegistration = true;
+
 		capability.rangesSupport = true;
 	}
 
@@ -272,6 +279,7 @@ export class DocumentRangeFormattingFeature extends TextDocumentLanguageFeature<
 		if (!options) {
 			return;
 		}
+
 		this.register({ id: UUID.generateUuid(), registerOptions: options });
 	}
 
@@ -317,6 +325,7 @@ export class DocumentRangeFormattingFeature extends TextDocumentLanguageFeature<
 									if (token.isCancellationRequested) {
 										return null;
 									}
+
 									return client.protocol2CodeConverter.asTextEdits(
 										result,
 										token,
@@ -391,6 +400,7 @@ export class DocumentRangeFormattingFeature extends TextDocumentLanguageFeature<
 									if (token.isCancellationRequested) {
 										return null;
 									}
+
 									return client.protocol2CodeConverter.asTextEdits(
 										result,
 										token,
@@ -425,6 +435,7 @@ export class DocumentRangeFormattingFeature extends TextDocumentLanguageFeature<
 						);
 			};
 		}
+
 		return [
 			Languages.registerDocumentRangeFormattingEditProvider(
 				this._client.protocol2CodeConverter.asDocumentSelector(
@@ -466,6 +477,7 @@ export class DocumentOnTypeFormattingFeature extends TextDocumentLanguageFeature
 		if (!options) {
 			return;
 		}
+
 		this.register({ id: UUID.generateUuid(), registerOptions: options });
 	}
 
@@ -516,6 +528,7 @@ export class DocumentOnTypeFormattingFeature extends TextDocumentLanguageFeature
 									if (token.isCancellationRequested) {
 										return null;
 									}
+
 									return client.protocol2CodeConverter.asTextEdits(
 										result,
 										token,

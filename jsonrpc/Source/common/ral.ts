@@ -39,17 +39,25 @@ type _MessageBufferEncoding = "ascii" | "utf-8";
 
 interface _ReadableStream {
 	onData(listener: (data: Uint8Array) => void): Disposable;
+
 	onClose(listener: () => void): Disposable;
+
 	onError(listener: (error: any) => void): Disposable;
+
 	onEnd(listener: () => void): Disposable;
 }
 
 interface _WritableStream {
 	onClose(listener: () => void): Disposable;
+
 	onError(listener: (error: any) => void): Disposable;
+
 	onEnd(listener: () => void): Disposable;
+
 	write(data: Uint8Array): Promise<void>;
+
 	write(data: string, encoding: _MessageBufferEncoding): Promise<void>;
+
 	end(): void;
 }
 
@@ -58,6 +66,7 @@ interface _DuplexStream extends _ReadableStream, _WritableStream {}
 interface RAL {
 	readonly applicationJson: {
 		readonly encoder: ContentTypeEncoder;
+
 		readonly decoder: ContentTypeDecoder;
 	};
 
@@ -67,8 +76,11 @@ interface RAL {
 
 	readonly console: {
 		info(message?: any, ...optionalParams: any[]): void;
+
 		log(message?: any, ...optionalParams: any[]): void;
+
 		warn(message?: any, ...optionalParams: any[]): void;
+
 		error(message?: any, ...optionalParams: any[]): void;
 	};
 
@@ -98,6 +110,7 @@ function RAL(): RAL {
 	if (_ral === undefined) {
 		throw new Error(`No runtime abstraction layer installed`);
 	}
+
 	return _ral;
 }
 
@@ -116,6 +129,7 @@ namespace RAL {
 		if (ral === undefined) {
 			throw new Error(`No runtime abstraction layer provided`);
 		}
+
 		_ral = ral;
 	}
 }

@@ -20,6 +20,7 @@ export interface DataCallback {
 
 export interface PartialMessageInfo {
 	readonly messageToken: number;
+
 	readonly waitingTime: number;
 }
 
@@ -64,19 +65,24 @@ export namespace MessageReader {
 
 export abstract class AbstractMessageReader implements MessageReader {
 	private errorEmitter: Emitter<Error>;
+
 	private closeEmitter: Emitter<void>;
 
 	private partialMessageEmitter: Emitter<PartialMessageInfo>;
 
 	constructor() {
 		this.errorEmitter = new Emitter<Error>();
+
 		this.closeEmitter = new Emitter<void>();
+
 		this.partialMessageEmitter = new Emitter<PartialMessageInfo>();
 	}
 
 	public dispose(): void {
 		this.errorEmitter.dispose();
+
 		this.closeEmitter.dispose();
+
 		this.partialMessageEmitter.dispose();
 	}
 
@@ -119,17 +125,25 @@ export abstract class AbstractMessageReader implements MessageReader {
 
 export interface MessageReaderOptions {
 	charset?: RAL.MessageBufferEncoding;
+
 	contentDecoder?: ContentDecoder;
+
 	contentDecoders?: ContentDecoder[];
+
 	contentTypeDecoder?: ContentTypeDecoder;
+
 	contentTypeDecoders?: ContentTypeDecoder[];
 }
 
 interface ResolvedMessageReaderOptions {
 	charset: RAL.MessageBufferEncoding;
+
 	contentDecoder?: ContentDecoder;
+
 	contentDecoders: Map<string, ContentDecoder>;
+
 	contentTypeDecoder: ContentTypeDecoder;
+
 	contentTypeDecoders: Map<string, ContentTypeDecoder>;
 }
 
@@ -157,33 +171,41 @@ namespace ResolvedMessageReaderOptions {
 
 			if (options.contentDecoder !== undefined) {
 				contentDecoder = options.contentDecoder;
+
 				contentDecoders.set(contentDecoder.name, contentDecoder);
 			}
+
 			if (options.contentDecoders !== undefined) {
 				for (const decoder of options.contentDecoders) {
 					contentDecoders.set(decoder.name, decoder);
 				}
 			}
+
 			if (options.contentTypeDecoder !== undefined) {
 				contentTypeDecoder = options.contentTypeDecoder;
+
 				contentTypeDecoders.set(
 					contentTypeDecoder.name,
 					contentTypeDecoder,
 				);
 			}
+
 			if (options.contentTypeDecoders !== undefined) {
 				for (const decoder of options.contentTypeDecoders) {
 					contentTypeDecoders.set(decoder.name, decoder);
 				}
 			}
 		}
+
 		if (contentTypeDecoder === undefined) {
 			contentTypeDecoder = RAL().applicationJson.decoder;
+
 			contentTypeDecoders.set(
 				contentTypeDecoder.name,
 				contentTypeDecoder,
 			);
 		}
+
 		return {
 			charset,
 			contentDecoder,
@@ -196,14 +218,21 @@ namespace ResolvedMessageReaderOptions {
 
 export class ReadableStreamMessageReader extends AbstractMessageReader {
 	private readable: RAL.ReadableStream;
+
 	private options: ResolvedMessageReaderOptions;
+
 	private callback!: DataCallback;
 
 	private nextMessageLength: number;
+
 	private messageToken: number;
+
 	private buffer: RAL.MessageBuffer;
+
 	private partialMessageTimer: Disposable | undefined;
+
 	private _partialMessageTimeout: number;
+
 	private readSemaphore: Semaphore<void>;
 
 	public constructor(
@@ -211,12 +240,19 @@ export class ReadableStreamMessageReader extends AbstractMessageReader {
 		options?: RAL.MessageBufferEncoding | MessageReaderOptions,
 	) {
 		super();
+
 		this.readable = readable;
+
 		this.options = ResolvedMessageReaderOptions.fromOptions(options);
+
 		this.buffer = RAL().messageBuffer.create(this.options.charset);
+
 		this._partialMessageTimeout = 10000;
+
 		this.nextMessageLength = -1;
+
 		this.messageToken = 0;
+
 		this.readSemaphore = new Semaphore(1);
 	}
 
@@ -230,14 +266,19 @@ export class ReadableStreamMessageReader extends AbstractMessageReader {
 
 	public listen(callback: DataCallback): Disposable {
 		this.nextMessageLength = -1;
+
 		this.messageToken = 0;
+
 		this.partialMessageTimer = undefined;
+
 		this.callback = callback;
 
 		const result = this.readable.onData((data: Uint8Array) => {
 			this.onData(data);
 		});
+
 		this.readable.onError((error: any) => this.fireError(error));
+
 		this.readable.onClose(() => this.fireClose());
 
 		return result;
@@ -254,6 +295,7 @@ export class ReadableStreamMessageReader extends AbstractMessageReader {
 					if (!headers) {
 						return;
 					}
+
 					const contentLength = headers.get("content-length");
 
 					if (!contentLength) {
@@ -265,6 +307,7 @@ export class ReadableStreamMessageReader extends AbstractMessageReader {
 
 						return;
 					}
+
 					const length = parseInt(contentLength);
 
 					if (isNaN(length)) {
@@ -276,8 +319,10 @@ export class ReadableStreamMessageReader extends AbstractMessageReader {
 
 						return;
 					}
+
 					this.nextMessageLength = length;
 				}
+
 				const body = this.buffer.tryReadBody(this.nextMessageLength);
 
 				if (body === undefined) {
@@ -286,7 +331,9 @@ export class ReadableStreamMessageReader extends AbstractMessageReader {
 
 					return;
 				}
+
 				this.clearPartialMessageTimer();
+
 				this.nextMessageLength = -1;
 				// Make sure that we convert one received message after the
 				// other. Otherwise it could happen that a decoding of a second
@@ -304,6 +351,7 @@ export class ReadableStreamMessageReader extends AbstractMessageReader {
 								bytes,
 								this.options,
 							);
+
 						this.callback(message);
 					})
 					.catch((error) => {
@@ -318,6 +366,7 @@ export class ReadableStreamMessageReader extends AbstractMessageReader {
 	private clearPartialMessageTimer(): void {
 		if (this.partialMessageTimer) {
 			this.partialMessageTimer.dispose();
+
 			this.partialMessageTimer = undefined;
 		}
 	}
@@ -328,6 +377,7 @@ export class ReadableStreamMessageReader extends AbstractMessageReader {
 		if (this._partialMessageTimeout <= 0) {
 			return;
 		}
+
 		this.partialMessageTimer = RAL().timer.setTimeout(
 			(token, timeout) => {
 				this.partialMessageTimer = undefined;
@@ -337,6 +387,7 @@ export class ReadableStreamMessageReader extends AbstractMessageReader {
 						messageToken: token,
 						waitingTime: timeout,
 					});
+
 					this.setPartialMessageTimer();
 				}
 			},

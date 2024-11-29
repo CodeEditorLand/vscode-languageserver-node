@@ -59,6 +59,7 @@ export class SelectionRangeFeature extends TextDocumentLanguageFeature<
 			ensure(capabilities, "textDocument")!,
 			"selectionRange",
 		)!;
+
 		capability.dynamicRegistration = true;
 	}
 
@@ -74,6 +75,7 @@ export class SelectionRangeFeature extends TextDocumentLanguageFeature<
 		if (!id || !options) {
 			return;
 		}
+
 		this.register({ id: id, registerOptions: options });
 	}
 
@@ -111,6 +113,7 @@ export class SelectionRangeFeature extends TextDocumentLanguageFeature<
 									if (token.isCancellationRequested) {
 										return null;
 									}
+
 									return client.protocol2CodeConverter.asSelectionRanges(
 										ranges,
 										token,

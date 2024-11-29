@@ -60,7 +60,9 @@ export class HoverFeature extends TextDocumentLanguageFeature<
 			ensure(capabilities, "textDocument")!,
 			"hover",
 		)!;
+
 		hoverCapability.dynamicRegistration = true;
+
 		hoverCapability.contentFormat = [
 			MarkupKind.Markdown,
 			MarkupKind.PlainText,
@@ -79,6 +81,7 @@ export class HoverFeature extends TextDocumentLanguageFeature<
 		if (!options) {
 			return;
 		}
+
 		this.register({
 			id: UUID.generateUuid(),
 			registerOptions: options,
@@ -113,6 +116,7 @@ export class HoverFeature extends TextDocumentLanguageFeature<
 								if (token.isCancellationRequested) {
 									return null;
 								}
+
 								return client.protocol2CodeConverter.asHover(
 									result,
 								);

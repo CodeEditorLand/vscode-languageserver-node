@@ -69,15 +69,21 @@ export class SignatureHelpFeature extends TextDocumentLanguageFeature<
 			ensure(capabilities, "textDocument")!,
 			"signatureHelp",
 		)!;
+
 		config.dynamicRegistration = true;
+
 		config.signatureInformation = {
 			documentationFormat: [MarkupKind.Markdown, MarkupKind.PlainText],
 		};
+
 		config.signatureInformation.parameterInformation = {
 			labelOffsetSupport: true,
 		};
+
 		config.signatureInformation.activeParameterSupport = true;
+
 		config.signatureInformation.noActiveParameterSupport = true;
+
 		config.contextSupport = true;
 	}
 
@@ -93,6 +99,7 @@ export class SignatureHelpFeature extends TextDocumentLanguageFeature<
 		if (!options) {
 			return;
 		}
+
 		this.register({
 			id: UUID.generateUuid(),
 			registerOptions: options,
@@ -127,6 +134,7 @@ export class SignatureHelpFeature extends TextDocumentLanguageFeature<
 								if (token.isCancellationRequested) {
 									return null;
 								}
+
 								return client.protocol2CodeConverter.asSignatureHelp(
 									result,
 									token,

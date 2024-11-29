@@ -49,6 +49,7 @@ export type InlayHintsMiddleware = {
 		token: CancellationToken,
 		next: ProvideInlayHintsSignature,
 	) => ProviderResult<VInlayHint[]>;
+
 	resolveInlayHint?: (
 		this: void,
 		item: VInlayHint,
@@ -59,6 +60,7 @@ export type InlayHintsMiddleware = {
 
 export type InlayHintsProviderShape = {
 	provider: InlayHintsProvider;
+
 	onDidChangeInlayHints: EventEmitter<void>;
 };
 
@@ -77,7 +79,9 @@ export class InlayHintsFeature extends TextDocumentLanguageFeature<
 			ensure(capabilities, "textDocument")!,
 			"inlayHint",
 		)!;
+
 		inlayHint.dynamicRegistration = true;
+
 		inlayHint.resolveSupport = {
 			properties: [
 				"tooltip",
@@ -87,6 +91,7 @@ export class InlayHintsFeature extends TextDocumentLanguageFeature<
 				"label.command",
 			],
 		};
+
 		ensure(
 			ensure(capabilities, "workspace")!,
 			"inlayHint",
@@ -111,6 +116,7 @@ export class InlayHintsFeature extends TextDocumentLanguageFeature<
 		if (!id || !options) {
 			return;
 		}
+
 		this.register({ id: id, registerOptions: options });
 	}
 
@@ -149,6 +155,7 @@ export class InlayHintsFeature extends TextDocumentLanguageFeature<
 						if (token.isCancellationRequested) {
 							return null;
 						}
+
 						return client.protocol2CodeConverter.asInlayHints(
 							values,
 							token,
@@ -175,6 +182,7 @@ export class InlayHintsFeature extends TextDocumentLanguageFeature<
 					: provideInlayHints(document, viewPort, token);
 			},
 		};
+
 		provider.resolveInlayHint =
 			options.resolveProvider === true
 				? (hint, token) => {
@@ -194,6 +202,7 @@ export class InlayHintsFeature extends TextDocumentLanguageFeature<
 									if (token.isCancellationRequested) {
 										return null;
 									}
+
 									const result =
 										client.protocol2CodeConverter.asInlayHint(
 											value,

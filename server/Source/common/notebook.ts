@@ -45,12 +45,15 @@ export interface NotebookSyncFeatureShape {
 		onDidOpenNotebookDocument(
 			handler: NotificationHandler1<DidOpenNotebookDocumentParams>,
 		): Disposable;
+
 		onDidChangeNotebookDocument(
 			handler: NotificationHandler1<DidChangeNotebookDocumentParams>,
 		): Disposable;
+
 		onDidSaveNotebookDocument(
 			handler: NotificationHandler1<DidSaveNotebookDocumentParams>,
 		): Disposable;
+
 		onDidCloseNotebookDocument(
 			handler: NotificationHandler1<DidCloseNotebookDocumentParams>,
 		): Disposable;
@@ -163,9 +166,11 @@ class CellTextDocumentConnection implements TextDocumentConnection {
 	private openHandler:
 		| NotificationHandler<DidOpenTextDocumentParams>
 		| undefined;
+
 	private changeHandler:
 		| NotificationHandler<DidChangeTextDocumentParams>
 		| undefined;
+
 	private closeHandler:
 		| NotificationHandler<DidCloseTextDocumentParams>
 		| undefined;
@@ -233,14 +238,18 @@ class CellTextDocumentConnection implements TextDocumentConnection {
 
 export class NotebookDocuments<T extends { uri: DocumentUri }> {
 	private readonly notebookDocuments: Map<URI, NotebookDocument>;
+
 	private readonly notebookCellMap: Map<
 		DocumentUri,
 		[NotebookCell, NotebookDocument]
 	>;
 
 	private readonly _onDidOpen: Emitter<NotebookDocument>;
+
 	private readonly _onDidSave: Emitter<NotebookDocument>;
+
 	private readonly _onDidChange: Emitter<NotebookDocumentChangeEvent>;
+
 	private readonly _onDidClose: Emitter<NotebookDocument>;
 
 	private _cellTextDocuments: TextDocuments<T>;
@@ -257,11 +266,17 @@ export class NotebookDocuments<T extends { uri: DocumentUri }> {
 				configurationOrTextDocuments,
 			);
 		}
+
 		this.notebookDocuments = new Map();
+
 		this.notebookCellMap = new Map();
+
 		this._onDidOpen = new Emitter();
+
 		this._onDidChange = new Emitter();
+
 		this._onDidSave = new Emitter();
+
 		this._onDidClose = new Emitter();
 	}
 
@@ -328,6 +343,7 @@ export class NotebookDocuments<T extends { uri: DocumentUri }> {
 		disposables.push(
 			this.cellTextDocuments.listen(cellTextDocumentConnection),
 		);
+
 		disposables.push(
 			connection.notebooks.synchronization.onDidOpenNotebookDocument(
 				async (params) => {
@@ -341,11 +357,14 @@ export class NotebookDocuments<T extends { uri: DocumentUri }> {
 							textDocument: cellTextDocument,
 						});
 					}
+
 					this.updateCellMap(params.notebookDocument);
+
 					this._onDidOpen.fire(params.notebookDocument);
 				},
 			),
 		);
+
 		disposables.push(
 			connection.notebooks.synchronization.onDidChangeNotebookDocument(
 				async (params) => {
@@ -356,6 +375,7 @@ export class NotebookDocuments<T extends { uri: DocumentUri }> {
 					if (notebookDocument === undefined) {
 						return;
 					}
+
 					notebookDocument.version = params.notebookDocument.version;
 
 					const oldMetadata = notebookDocument.metadata;
@@ -366,6 +386,7 @@ export class NotebookDocuments<T extends { uri: DocumentUri }> {
 
 					if (change.metadata !== undefined) {
 						metadataChanged = true;
+
 						notebookDocument.metadata = change.metadata;
 					}
 
@@ -386,6 +407,7 @@ export class NotebookDocuments<T extends { uri: DocumentUri }> {
 
 						if (changedCells.structure !== undefined) {
 							const array = changedCells.structure.array;
+
 							notebookDocument.cells.splice(
 								array.start,
 								array.deleteCount,
@@ -400,6 +422,7 @@ export class NotebookDocuments<T extends { uri: DocumentUri }> {
 									await cellTextDocumentConnection.openTextDocument(
 										{ textDocument: open },
 									);
+
 									opened.push(open.uri);
 								}
 							}
@@ -410,10 +433,12 @@ export class NotebookDocuments<T extends { uri: DocumentUri }> {
 									await cellTextDocumentConnection.closeTextDocument(
 										{ textDocument: close },
 									);
+
 									closed.push(close.uri);
 								}
 							}
 						}
+
 						if (changedCells.data !== undefined) {
 							const cellUpdates: Map<string, NotebookCell> =
 								new Map(
@@ -425,7 +450,9 @@ export class NotebookDocuments<T extends { uri: DocumentUri }> {
 
 							for (
 								let i = 0;
+
 								i <= notebookDocument.cells.length;
+
 								i++
 							) {
 								const change = cellUpdates.get(
@@ -438,7 +465,9 @@ export class NotebookDocuments<T extends { uri: DocumentUri }> {
 										1,
 										change,
 									);
+
 									data.push({ old: old[0], new: change });
+
 									cellUpdates.delete(change.document);
 
 									if (cellUpdates.size === 0) {
@@ -447,6 +476,7 @@ export class NotebookDocuments<T extends { uri: DocumentUri }> {
 								}
 							}
 						}
+
 						if (changedCells.textContent !== undefined) {
 							for (const cellTextDocument of changedCells.textContent) {
 								await cellTextDocumentConnection.changeTextDocument(
@@ -456,6 +486,7 @@ export class NotebookDocuments<T extends { uri: DocumentUri }> {
 											cellTextDocument.changes,
 									},
 								);
+
 								text.push(cellTextDocument.document.uri);
 							}
 						}
@@ -480,16 +511,19 @@ export class NotebookDocuments<T extends { uri: DocumentUri }> {
 					for (const open of opened) {
 						added.push(this.getNotebookCell(open)!);
 					}
+
 					const removed: NotebookCell[] = [];
 
 					for (const close of closed) {
 						removed.push(this.getNotebookCell(close)!);
 					}
+
 					const textContent: NotebookCell[] = [];
 
 					for (const change of text) {
 						textContent.push(this.getNotebookCell(change)!);
 					}
+
 					if (
 						added.length > 0 ||
 						removed.length > 0 ||
@@ -502,6 +536,7 @@ export class NotebookDocuments<T extends { uri: DocumentUri }> {
 							changed: { data, textContent },
 						};
 					}
+
 					if (
 						changeEvent.metadata !== undefined ||
 						changeEvent.cells !== undefined
@@ -511,6 +546,7 @@ export class NotebookDocuments<T extends { uri: DocumentUri }> {
 				},
 			),
 		);
+
 		disposables.push(
 			connection.notebooks.synchronization.onDidSaveNotebookDocument(
 				(params) => {
@@ -521,10 +557,12 @@ export class NotebookDocuments<T extends { uri: DocumentUri }> {
 					if (notebookDocument === undefined) {
 						return;
 					}
+
 					this._onDidSave.fire(notebookDocument);
 				},
 			),
 		);
+
 		disposables.push(
 			connection.notebooks.synchronization.onDidCloseNotebookDocument(
 				async (params) => {
@@ -535,6 +573,7 @@ export class NotebookDocuments<T extends { uri: DocumentUri }> {
 					if (notebookDocument === undefined) {
 						return;
 					}
+
 					this._onDidClose.fire(notebookDocument);
 
 					for (const cellTextDocument of params.cellTextDocuments) {
@@ -542,6 +581,7 @@ export class NotebookDocuments<T extends { uri: DocumentUri }> {
 							textDocument: cellTextDocument,
 						});
 					}
+
 					this.notebookDocuments.delete(params.notebookDocument.uri);
 
 					for (const cell of notebookDocument.cells) {

@@ -16,6 +16,7 @@ function ensure<T, K extends keyof T>(target: T, key: K): T[K] {
 	if (target[key] === void 0) {
 		target[key] = Object.create(null) as any;
 	}
+
 	return target[key];
 }
 
@@ -58,6 +59,7 @@ export class ProgressFeature implements StaticFeature {
 		for (const part of this.activeParts) {
 			part.done();
 		}
+
 		this.activeParts.clear();
 	}
 }

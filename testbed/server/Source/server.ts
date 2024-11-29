@@ -165,6 +165,7 @@ connection.onInitialize(
 			for (const folder of workspaceFolders) {
 				connection.console.log(`${folder.name} ${folder.uri}`);
 			}
+
 			if (workspaceFolders.length > 0) {
 				folder = params.workspaceFolders[0].uri;
 			}
@@ -257,9 +258,11 @@ connection.onInitialized((params) => {
 		DidChangeConfigurationNotification.type,
 		undefined,
 	);
+
 	connection.workspace.onDidChangeWorkspaceFolders((event) => {
 		connection.console.log("Workspace folder changed received");
 	});
+
 	void connection.workspace.getWorkspaceFolders().then((folders) => {
 		for (const folder of folders) {
 			connection.console.log(
@@ -276,6 +279,7 @@ connection.onInitialized((params) => {
 			delta: true,
 		},
 	};
+
 	void connection.client.register(
 		SemanticTokensRegistrationType.type,
 		registrationOptions,
@@ -313,6 +317,7 @@ connection.onDidChangeConfiguration((params) => {
 	// documents.all().forEach(document => {
 	// 	void connection.sendDiagnostics({ uri: document.uri, diagnostics: validate(document) });
 	// });
+
 	void connection.workspace.getConfiguration("testbed").then((value) => {
 		connection.console.log("Configuration received");
 	});
@@ -408,8 +413,10 @@ function computeDiagnostics(content: string): Diagnostic[] {
 				),
 			);
 		}
+
 		lineNumber++;
 	}
+
 	return result;
 }
 
@@ -435,6 +442,7 @@ connection.languages.diagnostics.on(async (param) => {
 			resultId: `${resultIdCounter++}`,
 		};
 	}
+
 	return {
 		kind: DocumentDiagnosticReportKind.Full,
 		items: computeDiagnostics(content),
@@ -467,9 +475,11 @@ connection.languages.diagnostics.onWorkspace(
 			if (index >= toValidate.length) {
 				index = 0;
 			}
+
 			const diagnostics = computeDiagnostics(
 				await fs.readFile(toValidate[index], { encoding: "utf8" }),
 			);
+
 			resultProgress.report({
 				items: [
 					{
@@ -486,7 +496,9 @@ connection.languages.diagnostics.onWorkspace(
 				void doValidate(++index);
 			}, 500);
 		};
+
 		void doValidate(0);
+
 		await new Promise((resolve) => {
 			setTimeout(resolve, 120000);
 		});
@@ -499,17 +511,23 @@ connection.onCompletion((params, token): CompletionList => {
 	const result: CompletionItem[] = [];
 
 	let item = CompletionItem.create("foo");
+
 	result.push(item);
 
 	item = CompletionItem.create("foo-text");
+
 	item.insertText = "foo-text";
+
 	result.push(item);
 
 	item = CompletionItem.create("foo-text-range-insert");
+
 	item.textEdit = TextEdit.insert(params.position, "foo-text-range-insert");
+
 	result.push(item);
 
 	item = CompletionItem.create("foo-text-range-replace");
+
 	item.textEdit = TextEdit.replace(
 		Range.create(
 			Position.create(
@@ -520,11 +538,15 @@ connection.onCompletion((params, token): CompletionList => {
 		),
 		"foo-text-range-replace",
 	);
+
 	item.filterText = "b";
+
 	result.push(item);
 
 	item = CompletionItem.create("bar");
+
 	item.commitCharacters = [":"];
+
 	item.textEdit = InsertReplaceEdit.create(
 		"bar",
 		Range.create(params.position, params.position),
@@ -536,16 +558,22 @@ connection.onCompletion((params, token): CompletionList => {
 			),
 		),
 	);
+
 	result.push(item);
 
 	item = CompletionItem.create("-record");
+
 	item.insertText =
 		"-record(${1:name}, {${2:field} = ${3:Value} :: ${4:Type}()}).";
+
 	item.insertTextFormat = InsertTextFormat.Snippet;
+
 	item.kind = CompletionItemKind.Field;
+
 	result.push(item);
 
 	const list = CompletionList.create(result, true);
+
 	list.itemDefaults = { data: "abc" };
 
 	return list;
@@ -553,6 +581,7 @@ connection.onCompletion((params, token): CompletionList => {
 
 connection.onCompletionResolve((item): CompletionItem => {
 	item.detail = "This is a special hello world function";
+
 	item.documentation = {
 		kind: MarkupKind.Markdown,
 		value: [
@@ -741,10 +770,13 @@ connection.onCodeAction((params) => {
 	if (document === undefined) {
 		return [];
 	}
+
 	const change: WorkspaceChange = new WorkspaceChange();
+
 	change.createFile(`${folder}/newFile.bat`, { overwrite: true });
 
 	const a = change.getTextEditChange(document);
+
 	a.insert(
 		{ line: 0, character: 0 },
 		"Code Action",
@@ -755,6 +787,7 @@ connection.onCodeAction((params) => {
 		uri: `${folder}/newFile.bat`,
 		version: null,
 	});
+
 	b.insert(
 		{ line: 0, character: 0 },
 		"The initial content",
@@ -766,6 +799,7 @@ connection.onCodeAction((params) => {
 		kind: CodeActionKind.QuickFix,
 		data: params.textDocument.uri,
 	};
+
 	codeAction.edit = change.edit;
 
 	return [codeAction];
@@ -827,6 +861,7 @@ connection.onRenameRequest((params) => {
 	// return new ResponseError(20, 'Element can\'t be renamed');
 
 	const change = new WorkspaceChange();
+
 	change
 		.getTextEditChange(params.textDocument.uri)
 		.insert(
@@ -842,6 +877,7 @@ connection.onExecuteCommand((params) => {
 	if (params.command === "testbed.helloWorld") {
 		throw new Error("Command execution failed");
 	}
+
 	return undefined;
 });
 
@@ -903,7 +939,9 @@ function getTokenBuilder(document: TextDocument): SemanticTokensBuilder {
 	if (result !== undefined) {
 		return result;
 	}
+
 	result = new SemanticTokensBuilder();
+
 	tokenBuilders.set(document.uri, result);
 
 	return result;
@@ -927,6 +965,7 @@ function buildTokens(builder: SemanticTokensBuilder, document: TextDocument) {
 		const tokenType = tokenCounter % TokenTypes._;
 
 		const tokenModifier = 1 << modifierCounter % TokenModifiers._;
+
 		builder.push(
 			position.line,
 			position.character,
@@ -934,7 +973,9 @@ function buildTokens(builder: SemanticTokensBuilder, document: TextDocument) {
 			tokenType,
 			tokenModifier,
 		);
+
 		tokenCounter++;
+
 		modifierCounter++;
 	}
 }
@@ -945,7 +986,9 @@ connection.languages.semanticTokens.on((params) => {
 	if (document === undefined) {
 		return { data: [] };
 	}
+
 	const builder = getTokenBuilder(document);
+
 	buildTokens(builder, document);
 
 	return builder.build();
@@ -957,8 +1000,11 @@ connection.languages.semanticTokens.onDelta((params) => {
 	if (document === undefined) {
 		return { edits: [] };
 	}
+
 	const builder = getTokenBuilder(document);
+
 	builder.previousResult(params.previousResultId);
+
 	buildTokens(builder, document);
 
 	return builder.buildEdits();

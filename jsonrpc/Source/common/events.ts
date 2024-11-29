@@ -34,6 +34,7 @@ export namespace Event {
 
 class CallbackList {
 	private _callbacks: Function[] | undefined;
+
 	private _contexts: any[] | undefined;
 
 	public add(
@@ -43,9 +44,12 @@ class CallbackList {
 	): void {
 		if (!this._callbacks) {
 			this._callbacks = [];
+
 			this._contexts = [];
 		}
+
 		this._callbacks.push(callback);
+
 		this._contexts!.push(context);
 
 		if (Array.isArray(bucket)) {
@@ -65,6 +69,7 @@ class CallbackList {
 				if (this._contexts![i] === context) {
 					// callback & context match => remove it
 					this._callbacks.splice(i, 1);
+
 					this._contexts!.splice(i, 1);
 
 					return;
@@ -98,6 +103,7 @@ class CallbackList {
 				RAL().console.error(e);
 			}
 		}
+
 		return ret;
 	}
 
@@ -107,12 +113,14 @@ class CallbackList {
 
 	public dispose(): void {
 		this._callbacks = undefined;
+
 		this._contexts = undefined;
 	}
 }
 
 export interface EmitterOptions {
 	onFirstListenerAdd?: Function;
+
 	onLastListenerRemove?: Function;
 }
 
@@ -120,6 +128,7 @@ export class Emitter<T> {
 	private static _noop = function () {};
 
 	private _event: Event<T> | undefined;
+
 	private _callbacks: CallbackList | undefined;
 
 	constructor(private _options?: EmitterOptions) {}
@@ -138,6 +147,7 @@ export class Emitter<T> {
 				if (!this._callbacks) {
 					this._callbacks = new CallbackList();
 				}
+
 				if (
 					this._options &&
 					this._options.onFirstListenerAdd &&
@@ -145,6 +155,7 @@ export class Emitter<T> {
 				) {
 					this._options.onFirstListenerAdd(this);
 				}
+
 				this._callbacks.add(listener, thisArgs);
 
 				const result: Disposable = {
@@ -155,6 +166,7 @@ export class Emitter<T> {
 						}
 
 						this._callbacks.remove(listener, thisArgs);
+
 						result.dispose = Emitter._noop;
 
 						if (
@@ -174,6 +186,7 @@ export class Emitter<T> {
 				return result;
 			};
 		}
+
 		return this._event;
 	}
 
@@ -190,6 +203,7 @@ export class Emitter<T> {
 	dispose() {
 		if (this._callbacks) {
 			this._callbacks.dispose();
+
 			this._callbacks = undefined;
 		}
 	}

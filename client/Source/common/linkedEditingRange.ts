@@ -49,6 +49,7 @@ export class LinkedEditingFeature extends TextDocumentLanguageFeature<
 			ensure(capabilities, "textDocument")!,
 			"linkedEditingRange",
 		)!;
+
 		linkedEditingSupport.dynamicRegistration = true;
 	}
 
@@ -64,6 +65,7 @@ export class LinkedEditingFeature extends TextDocumentLanguageFeature<
 		if (!id || !options) {
 			return;
 		}
+
 		this.register({ id: id, registerOptions: options });
 	}
 
@@ -92,6 +94,7 @@ export class LinkedEditingFeature extends TextDocumentLanguageFeature<
 									if (token.isCancellationRequested) {
 										return null;
 									}
+
 									return client.protocol2CodeConverter.asLinkedEditingRanges(
 										result,
 										token,

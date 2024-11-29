@@ -46,6 +46,7 @@ export interface WorkspaceSymbolMiddleware {
 		token: CancellationToken,
 		next: ProvideWorkspaceSymbolsSignature,
 	) => ProviderResult<VSymbolInformation[]>;
+
 	resolveWorkspaceSymbol?: (
 		this: void,
 		item: VSymbolInformation,
@@ -68,13 +69,17 @@ export class WorkspaceSymbolFeature extends WorkspaceFeature<
 			ensure(capabilities, "workspace")!,
 			"symbol",
 		)!;
+
 		symbolCapabilities.dynamicRegistration = true;
+
 		symbolCapabilities.symbolKind = {
 			valueSet: SupportedSymbolKinds,
 		};
+
 		symbolCapabilities.tagSupport = {
 			valueSet: SupportedSymbolTags,
 		};
+
 		symbolCapabilities.resolveSupport = { properties: ["location.range"] };
 	}
 
@@ -82,6 +87,7 @@ export class WorkspaceSymbolFeature extends WorkspaceFeature<
 		if (!capabilities.workspaceSymbolProvider) {
 			return;
 		}
+
 		this.register({
 			id: UUID.generateUuid(),
 			registerOptions:
@@ -111,6 +117,7 @@ export class WorkspaceSymbolFeature extends WorkspaceFeature<
 									if (token.isCancellationRequested) {
 										return null;
 									}
+
 									return client.protocol2CodeConverter.asSymbolInformations(
 										result,
 										token,
@@ -159,6 +166,7 @@ export class WorkspaceSymbolFeature extends WorkspaceFeature<
 												) {
 													return null;
 												}
+
 												return client.protocol2CodeConverter.asSymbolInformation(
 													result,
 												);

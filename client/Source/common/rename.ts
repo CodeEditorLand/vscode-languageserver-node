@@ -66,6 +66,7 @@ export interface RenameMiddleware {
 		token: CancellationToken,
 		next: ProvideRenameEditsSignature,
 	) => ProviderResult<VWorkspaceEdit>;
+
 	prepareRename?: (
 		this: void,
 		document: TextDocument,
@@ -91,10 +92,14 @@ export class RenameFeature extends TextDocumentLanguageFeature<
 
 	public fillClientCapabilities(capabilities: ClientCapabilities): void {
 		const rename = ensure(ensure(capabilities, "textDocument")!, "rename")!;
+
 		rename.dynamicRegistration = true;
+
 		rename.prepareSupport = true;
+
 		rename.prepareSupportDefaultBehavior =
 			PrepareSupportDefaultBehavior.Identifier;
+
 		rename.honorsChangeAnnotations = true;
 	}
 
@@ -110,9 +115,11 @@ export class RenameFeature extends TextDocumentLanguageFeature<
 		if (!options) {
 			return;
 		}
+
 		if (Is.boolean(capabilities.renameProvider)) {
 			options.prepareProvider = false;
 		}
+
 		this.register({ id: UUID.generateUuid(), registerOptions: options });
 	}
 
@@ -148,6 +155,7 @@ export class RenameFeature extends TextDocumentLanguageFeature<
 								if (token.isCancellationRequested) {
 									return null;
 								}
+
 								return client.protocol2CodeConverter.asWorkspaceEdit(
 									result,
 									token,
@@ -208,6 +216,7 @@ export class RenameFeature extends TextDocumentLanguageFeature<
 										if (token.isCancellationRequested) {
 											return null;
 										}
+
 										if (Range.is(result)) {
 											return client.protocol2CodeConverter.asRange(
 												result,

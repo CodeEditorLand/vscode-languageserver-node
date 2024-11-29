@@ -43,7 +43,9 @@ export interface TextDocumentContentMiddleware {
 
 export interface TextDocumentContentProviderShape {
 	scheme: string;
+
 	onDidChangeEmitter: vscode.EventEmitter<vscode.Uri>;
+
 	provider: vscode.TextDocumentContentProvider;
 }
 
@@ -51,10 +53,12 @@ export class TextDocumentContentFeature
 	implements DynamicFeature<TextDocumentContentRegistrationOptions>
 {
 	private readonly _client: FeatureClient<TextDocumentContentMiddleware>;
+
 	private readonly _registrations: Map<
 		string,
 		{
 			disposable: vscode.Disposable;
+
 			providers: TextDocumentContentProviderShape[];
 		}
 	> = new Map();
@@ -83,6 +87,7 @@ export class TextDocumentContentFeature
 		for (const registration of this._registrations.values()) {
 			result.push(...registration.providers);
 		}
+
 		return result;
 	}
 
@@ -91,11 +96,13 @@ export class TextDocumentContentFeature
 			ensure(capabilities, "workspace")!,
 			"textDocumentContent",
 		)!;
+
 		textDocumentContent.dynamicRegistration = true;
 	}
 
 	public initialize(capabilities: ServerCapabilities): void {
 		const client = this._client;
+
 		client.onRequest(
 			TextDocumentContentRefreshRequest.type,
 			async (params) => {
@@ -114,11 +121,13 @@ export class TextDocumentContentFeature
 		if (!capabilities?.workspace?.textDocumentContent) {
 			return;
 		}
+
 		const capability = capabilities.workspace.textDocumentContent;
 
 		const id = StaticRegistrationOptions.hasId(capability)
 			? capability.id
 			: UUID.generateUuid();
+
 		this.register({
 			id: id,
 			registerOptions: capability,
@@ -135,9 +144,12 @@ export class TextDocumentContentFeature
 		for (const scheme of data.registerOptions.schemes) {
 			const [disposable, registration] =
 				this.registerTextDocumentContentProvider(scheme);
+
 			registrations.push(registration);
+
 			disposables.push(disposable);
 		}
+
 		this._registrations.set(data.id, {
 			disposable: vscode.Disposable.from(...disposables),
 			providers: registrations,
@@ -172,6 +184,7 @@ export class TextDocumentContentFeature
 									if (token.isCancellationRequested) {
 										return null;
 									}
+
 									return result.text;
 								},
 								(error) => {
@@ -211,6 +224,7 @@ export class TextDocumentContentFeature
 
 		if (registration !== undefined) {
 			this._registrations.delete(id);
+
 			registration.disposable.dispose();
 		}
 	}
@@ -219,6 +233,7 @@ export class TextDocumentContentFeature
 		this._registrations.forEach((registration) => {
 			registration.disposable.dispose();
 		});
+
 		this._registrations.clear();
 	}
 }

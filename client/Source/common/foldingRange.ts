@@ -49,6 +49,7 @@ export interface FoldingRangeProviderMiddleware {
 
 export type FoldingRangeProviderShape = {
 	provider: FoldingRangeProvider;
+
 	onDidChangeFoldingRange: EventEmitter<void>;
 };
 
@@ -67,9 +68,13 @@ export class FoldingRangeFeature extends TextDocumentLanguageFeature<
 			ensure(capabilities, "textDocument")!,
 			"foldingRange",
 		)!;
+
 		capability.dynamicRegistration = true;
+
 		capability.rangeLimit = 5000;
+
 		capability.lineFoldingOnly = true;
+
 		capability.foldingRangeKind = {
 			valueSet: [
 				FoldingRangeKind.Comment,
@@ -77,7 +82,9 @@ export class FoldingRangeFeature extends TextDocumentLanguageFeature<
 				FoldingRangeKind.Region,
 			],
 		};
+
 		capability.foldingRange = { collapsedText: false };
+
 		ensure(
 			ensure(capabilities, "workspace")!,
 			"foldingRange",
@@ -102,6 +109,7 @@ export class FoldingRangeFeature extends TextDocumentLanguageFeature<
 		if (!id || !options) {
 			return;
 		}
+
 		this.register({ id: id, registerOptions: options });
 	}
 
@@ -140,6 +148,7 @@ export class FoldingRangeFeature extends TextDocumentLanguageFeature<
 								if (token.isCancellationRequested) {
 									return null;
 								}
+
 								return client.protocol2CodeConverter.asFoldingRanges(
 									result,
 									token,

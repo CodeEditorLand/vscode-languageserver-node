@@ -20,6 +20,7 @@ import type { _RemoteWorkspace, Feature } from "./server";
 
 export interface WorkspaceFolders {
 	getWorkspaceFolders(): Promise<WorkspaceFolder[] | null>;
+
 	onDidChangeWorkspaceFolders: Event<WorkspaceFoldersChangeEvent>;
 }
 
@@ -31,12 +32,17 @@ export const WorkspaceFoldersFeature: Feature<
 		private _onDidChangeWorkspaceFolders:
 			| Emitter<WorkspaceFoldersChangeEvent>
 			| undefined;
+
 		private _unregistration: Promise<Disposable> | undefined;
+
 		private _notificationIsAutoRegistered: boolean;
+
 		public constructor() {
 			super();
+
 			this._notificationIsAutoRegistered = false;
 		}
+
 		public initialize(capabilities: ClientCapabilities): void {
 			super.initialize(capabilities);
 
@@ -48,6 +54,7 @@ export const WorkspaceFoldersFeature: Feature<
 			) {
 				this._onDidChangeWorkspaceFolders =
 					new Emitter<WorkspaceFoldersChangeEvent>();
+
 				this.connection.onNotification(
 					DidChangeWorkspaceFoldersNotification.type,
 					(params) => {
@@ -56,29 +63,35 @@ export const WorkspaceFoldersFeature: Feature<
 				);
 			}
 		}
+
 		public fillServerCapabilities(capabilities: ServerCapabilities): void {
 			super.fillServerCapabilities(capabilities);
 
 			const changeNotifications =
 				capabilities.workspace?.workspaceFolders?.changeNotifications;
+
 			this._notificationIsAutoRegistered =
 				changeNotifications === true ||
 				typeof changeNotifications === "string";
 		}
+
 		getWorkspaceFolders(): Promise<WorkspaceFolder[] | null> {
 			return this.connection.sendRequest(WorkspaceFoldersRequest.type);
 		}
+
 		get onDidChangeWorkspaceFolders(): Event<WorkspaceFoldersChangeEvent> {
 			if (!this._onDidChangeWorkspaceFolders) {
 				throw new Error(
 					"Client doesn't support sending workspace folder change events.",
 				);
 			}
+
 			if (!this._notificationIsAutoRegistered && !this._unregistration) {
 				this._unregistration = this.connection.client.register(
 					DidChangeWorkspaceFoldersNotification.type,
 				);
 			}
+
 			return this._onDidChangeWorkspaceFolders.event;
 		}
 	};

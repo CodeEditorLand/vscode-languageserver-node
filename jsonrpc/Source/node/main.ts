@@ -43,10 +43,13 @@ export class IPCMessageReader extends AbstractMessageReader {
 
 	public constructor(process: NodeJS.Process | ChildProcess) {
 		super();
+
 		this.process = process;
 
 		const eventEmitter: NodeJS.EventEmitter = this.process;
+
 		eventEmitter.on("error", (error: any) => this.fireError(error));
+
 		eventEmitter.on("close", () => this.fireClose());
 	}
 
@@ -64,15 +67,20 @@ export class IPCMessageWriter
 	implements MessageWriter
 {
 	private readonly process: NodeJS.Process | ChildProcess;
+
 	private errorCount: number;
 
 	public constructor(process: NodeJS.Process | ChildProcess) {
 		super();
+
 		this.process = process;
+
 		this.errorCount = 0;
 
 		const eventEmitter: NodeJS.EventEmitter = this.process;
+
 		eventEmitter.on("error", (error: any) => this.fireError(error));
+
 		eventEmitter.on("close", () => this.fireClose);
 	}
 
@@ -86,6 +94,7 @@ export class IPCMessageWriter
 					(error: any) => {
 						if (error) {
 							this.errorCount++;
+
 							this.handleError(error, msg);
 						} else {
 							this.errorCount = 0;
@@ -93,6 +102,7 @@ export class IPCMessageWriter
 					},
 				);
 			}
+
 			return Promise.resolve();
 		} catch (error) {
 			this.handleError(error, msg);
@@ -103,6 +113,7 @@ export class IPCMessageWriter
 
 	private handleError(error: any, msg: Message): void {
 		this.errorCount++;
+
 		this.fireError(error, msg, this.errorCount);
 	}
 
@@ -117,9 +128,13 @@ export class PortMessageReader
 
 	public constructor(port: MessagePort | Worker) {
 		super();
+
 		this.onData = new Emitter<Message>();
+
 		port.on("close", () => this.fireClose);
+
 		port.on("error", (error) => this.fireError(error));
+
 		port.on("message", (message: Message) => {
 			this.onData.fire(message);
 		});
@@ -135,13 +150,18 @@ export class PortMessageWriter
 	implements MessageWriter
 {
 	private readonly port: MessagePort | Worker;
+
 	private errorCount: number;
 
 	public constructor(port: MessagePort | Worker) {
 		super();
+
 		this.port = port;
+
 		this.errorCount = 0;
+
 		port.on("close", () => this.fireClose());
+
 		port.on("error", (error) => this.fireError(error));
 	}
 
@@ -159,6 +179,7 @@ export class PortMessageWriter
 
 	private handleError(error: any, msg: Message): void {
 		this.errorCount++;
+
 		this.fireError(error, msg, this.errorCount);
 	}
 
@@ -182,11 +203,13 @@ export class SocketMessageWriter extends WriteableStreamMessageWriter {
 		options?: RAL.MessageBufferEncoding | MessageWriterOptions,
 	) {
 		super(RIL().stream.asWritableStream(socket), options);
+
 		this.socket = socket;
 	}
 
 	public dispose(): void {
 		super.dispose();
+
 		this.socket.destroy();
 	}
 }
@@ -235,6 +258,7 @@ export function generateRandomPipeName(): string {
 			randomLength,
 		);
 	}
+
 	if (randomLength < 16) {
 		throw new Error(
 			`Unable to generate a random pipe name with ${randomLength} characters.`,
@@ -267,14 +291,18 @@ export function createClientPipeTransport(
 	return new Promise<PipeTransport>((resolve, reject) => {
 		const server: Server = createServer((socket: Socket) => {
 			server.close();
+
 			connectResolve([
 				new SocketMessageReader(socket, encoding),
 				new SocketMessageWriter(socket, encoding),
 			]);
 		});
+
 		server.on("error", reject);
+
 		server.listen(pipeName, () => {
 			server.removeListener("error", reject);
+
 			resolve({
 				onConnected: () => {
 					return connected;
@@ -315,14 +343,18 @@ export function createClientSocketTransport(
 	return new Promise<SocketTransport>((resolve, reject) => {
 		const server: Server = createServer((socket: Socket) => {
 			server.close();
+
 			connectResolve([
 				new SocketMessageReader(socket, encoding),
 				new SocketMessageWriter(socket, encoding),
 			]);
 		});
+
 		server.on("error", reject);
+
 		server.listen(port, "127.0.0.1", () => {
 			server.removeListener("error", reject);
+
 			resolve({
 				onConnected: () => {
 					return connected;
@@ -379,6 +411,7 @@ export function createMessageConnection(
 	if (!logger) {
 		logger = NullLogger;
 	}
+
 	const reader = isReadableStream(input)
 		? new StreamMessageReader(input)
 		: input;

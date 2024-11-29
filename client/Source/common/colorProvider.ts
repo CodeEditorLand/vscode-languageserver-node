@@ -49,6 +49,7 @@ export interface ColorProviderMiddleware {
 		token: CancellationToken,
 		next: ProvideDocumentColorsSignature,
 	) => ProviderResult<VColorInformation[]>;
+
 	provideColorPresentations?: (
 		this: void,
 		color: VColor,
@@ -87,6 +88,7 @@ export class ColorProviderFeature extends TextDocumentLanguageFeature<
 		if (!id || !options) {
 			return;
 		}
+
 		this.register({ id: id, registerOptions: options });
 	}
 
@@ -123,6 +125,7 @@ export class ColorProviderFeature extends TextDocumentLanguageFeature<
 									if (token.isCancellationRequested) {
 										return null;
 									}
+
 									return this._client.protocol2CodeConverter.asColorPresentations(
 										result,
 										token,
@@ -175,6 +178,7 @@ export class ColorProviderFeature extends TextDocumentLanguageFeature<
 								if (token.isCancellationRequested) {
 									return null;
 								}
+
 								return this._client.protocol2CodeConverter.asColorInformations(
 									result,
 									token,

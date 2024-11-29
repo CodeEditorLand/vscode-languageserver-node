@@ -21,11 +21,13 @@ namespace SharableOptions {
 		if (options.extends === undefined) {
 			return options;
 		}
+
 		let result: SharableOptions = {};
 
 		for (const option of options.extends) {
 			result = assign(flatten(option), result);
 		}
+
 		return assign(result, options);
 	}
 
@@ -34,8 +36,11 @@ namespace SharableOptions {
 		opt2: SharableOptions,
 	): SharableOptions {
 		const result: SharableOptions = {};
+
 		result.exclude = Arrays.assign(opt1.exclude, opt2.exclude);
+
 		result.include = Arrays.assign(opt1.include, opt2.include);
+
 		result.compilerOptions = CompilerOptions.assign(
 			opt1.compilerOptions,
 			opt2.compilerOptions,
@@ -51,10 +56,15 @@ type TSProjectReference = {
 
 type TsConfigFile = {
 	extends?: string;
+
 	compilerOptions?: CompilerOptions;
+
 	include?: string[];
+
 	exclude?: string[];
+
 	files?: string[];
+
 	references?: TSProjectReference[];
 };
 
@@ -64,12 +74,16 @@ namespace TSConfigFile {
 		options: SharableOptions,
 	): TsConfigFile {
 		const result: TsConfigFile = Object.assign({}, config);
+
 		result.compilerOptions = CompilerOptions.assign(
 			result.compilerOptions,
 			options.compilerOptions,
 		);
+
 		result.include = Arrays.assign(result.include, options.include);
+
 		result.exclude = Arrays.assign(result.exclude, options.exclude);
+
 		result.files = Arrays.assign(result.files, options.files);
 
 		return result;
@@ -92,10 +106,12 @@ namespace ProjectOptions {
 		if (options.variables === undefined) {
 			return value;
 		}
+
 		return value.replace(/(\$\{([^\}]*)\})/g, (match, m1, m2) => {
 			if (m1 === undefined || m2 === undefined) {
 				return match;
 			}
+
 			const value = options.variables!.get(m2);
 
 			return value ?? match;
@@ -105,15 +121,18 @@ namespace ProjectOptions {
 
 export type GeneratorResultEntry = {
 	path: string;
+
 	tsconfig: TsConfigFile;
 };
 
 export class ProjectGenerator {
 	private readonly description: ProjectDescription;
+
 	private readonly options: Required<ProjectOptions>;
 
 	constructor(description: ProjectDescription, options: ProjectOptions) {
 		this.description = description;
+
 		this.options = Object.freeze(
 			Object.assign(
 				{},
@@ -142,10 +161,12 @@ export class ProjectGenerator {
 
 		if (singleSource) {
 			tsconfig = TSConfigFile.assign(tsconfig, options);
+
 			tsconfig.compilerOptions = CompilerOptions.assign(
 				tsconfig.compilerOptions,
 				this.options.compilerOptions,
 			);
+
 			tsconfig.compilerOptions.outDir = description.out!.dir;
 
 			if (description.out!.buildInfoFile !== undefined) {
@@ -156,6 +177,7 @@ export class ProjectGenerator {
 						this.options,
 					),
 				);
+
 				tsconfig.compilerOptions.incremental = true;
 			}
 		} else {
@@ -164,8 +186,11 @@ export class ProjectGenerator {
 				description.references !== undefined
 			) {
 				tsconfig.compilerOptions = tsconfig.compilerOptions ?? {};
+
 				tsconfig.compilerOptions.incremental = true;
+
 				tsconfig.compilerOptions.composite = true;
+
 				tsconfig.files = [];
 			}
 		}
@@ -207,9 +232,11 @@ export class ProjectGenerator {
 					) {
 						referencePath = `./${referencePath}`;
 					}
+
 					tsconfig.references.push({ path: referencePath });
 				}
 			}
+
 			if (tsconfig.files === undefined) {
 				tsconfig.files = [];
 			}
@@ -217,6 +244,7 @@ export class ProjectGenerator {
 
 		if (description.sourceFolders !== undefined) {
 			tsconfig.compilerOptions = tsconfig.compilerOptions ?? {};
+
 			tsconfig.references = tsconfig.references ?? [];
 
 			for (const sourceFolder of description.sourceFolders) {
@@ -225,9 +253,11 @@ export class ProjectGenerator {
 				if (!path.isAbsolute(sfp) && !sfp.startsWith("./")) {
 					sfp = `./${sfp}`;
 				}
+
 				tsconfig.references.push({
 					path: sfp,
 				});
+
 				sourceFolders.push(
 					new SourceFolderGenerator(
 						sourceFolder,
@@ -237,7 +267,9 @@ export class ProjectGenerator {
 				);
 			}
 		}
+
 		const result: GeneratorResultEntry[] = [];
+
 		result.push({
 			path: _p.join(root, description.path, this.options.tsconfig),
 			tsconfig,
@@ -250,7 +282,9 @@ export class ProjectGenerator {
 
 		for (const sourceFolder of sourceFolders) {
 			const sfr = sourceFolder.generate(_p.join(root, description.path));
+
 			result.push(sfr.result);
+
 			sourceFolderResults.set(
 				path.normalize(sourceFolder.description.path),
 				sfr.result,
@@ -262,6 +296,7 @@ export class ProjectGenerator {
 				}
 			}
 		}
+
 		if (compositeSourceFolders.size > 0) {
 			for (const compositeSourceFolder of compositeSourceFolders) {
 				const sourceFolder = sourceFolderResults.get(
@@ -271,10 +306,12 @@ export class ProjectGenerator {
 				if (sourceFolder !== undefined) {
 					sourceFolder.tsconfig.compilerOptions =
 						sourceFolder.tsconfig.compilerOptions ?? {};
+
 					sourceFolder.tsconfig.compilerOptions.composite = true;
 				}
 			}
 		}
+
 		return result;
 	}
 
@@ -284,18 +321,22 @@ export class ProjectGenerator {
 		if (normalized === "." || normalized === "./") {
 			return undefined;
 		}
+
 		const split = normalized.split(path.sep);
 
 		for (let i = 0; i < split.length; i++) {
 			split[i] = "..";
 		}
+
 		return split.join(path.sep);
 	}
 }
 
 class SourceFolderGenerator {
 	public readonly description: SourceFolderDescription;
+
 	private readonly projectDescription: ProjectDescription;
+
 	private readonly options: Required<ProjectOptions>;
 
 	constructor(
@@ -304,12 +345,15 @@ class SourceFolderGenerator {
 		options: Required<ProjectOptions>,
 	) {
 		this.description = description;
+
 		this.projectDescription = projectDescription;
+
 		this.options = options;
 	}
 
 	public generate(root: string): {
 		result: GeneratorResultEntry;
+
 		compositeTargets?: string[];
 	} {
 		let result: TsConfigFile = {};
@@ -317,7 +361,9 @@ class SourceFolderGenerator {
 		const description = this.description;
 
 		const options = SharableOptions.flatten(description);
+
 		result = TSConfigFile.assign(result, options);
+
 		result.compilerOptions = CompilerOptions.assign(
 			result.compilerOptions,
 			this.options.compilerOptions,
@@ -325,7 +371,9 @@ class SourceFolderGenerator {
 
 		if (description.out !== undefined) {
 			const out = description.out;
+
 			result.compilerOptions = result.compilerOptions ?? {};
+
 			result.compilerOptions.outDir = ProjectOptions.resolveVariables(
 				out.dir,
 				this.options,
@@ -337,6 +385,7 @@ class SourceFolderGenerator {
 						out.buildInfoFile,
 						this.options,
 					);
+
 				result.compilerOptions.incremental = true;
 			}
 		} else if (this.projectDescription.out !== undefined) {
@@ -361,7 +410,9 @@ class SourceFolderGenerator {
 					outDir = path.join(outDir, sourceSplit[i]);
 				}
 			}
+
 			result.compilerOptions = result.compilerOptions ?? {};
+
 			result.compilerOptions.outDir = outDir;
 
 			if (out.buildInfoFile !== undefined) {
@@ -372,9 +423,11 @@ class SourceFolderGenerator {
 						this.options,
 					),
 				);
+
 				result.compilerOptions.incremental = true;
 			}
 		}
+
 		const compositeTargets: string[] = [];
 
 		if (description.references) {
@@ -392,6 +445,7 @@ class SourceFolderGenerator {
 				}
 			}
 		}
+
 		return {
 			result: {
 				path: _p.join(root, description.path, this.options.tsconfig),

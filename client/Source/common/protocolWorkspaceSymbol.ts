@@ -8,6 +8,7 @@ import { LSPAny } from "vscode-languageserver-protocol";
 
 export default class WorkspaceSymbol extends code.SymbolInformation {
 	public data?: LSPAny;
+
 	public readonly hasRange: boolean;
 
 	constructor(
@@ -27,6 +28,7 @@ export default class WorkspaceSymbol extends code.SymbolInformation {
 				? locationOrUri
 				: new code.Location(locationOrUri, new code.Range(0, 0, 0, 0)),
 		);
+
 		this.hasRange = hasRange;
 
 		if (data !== undefined) {

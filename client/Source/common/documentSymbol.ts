@@ -93,14 +93,19 @@ export class DocumentSymbolFeature extends TextDocumentLanguageFeature<
 			ensure(capabilities, "textDocument")!,
 			"documentSymbol",
 		)!;
+
 		symbolCapabilities.dynamicRegistration = true;
+
 		symbolCapabilities.symbolKind = {
 			valueSet: SupportedSymbolKinds,
 		};
+
 		symbolCapabilities.hierarchicalDocumentSymbolSupport = true;
+
 		symbolCapabilities.tagSupport = {
 			valueSet: SupportedSymbolTags,
 		};
+
 		symbolCapabilities.labelSupport = true;
 	}
 
@@ -116,6 +121,7 @@ export class DocumentSymbolFeature extends TextDocumentLanguageFeature<
 		if (!options) {
 			return;
 		}
+
 		this.register({ id: UUID.generateUuid(), registerOptions: options });
 	}
 
@@ -146,6 +152,7 @@ export class DocumentSymbolFeature extends TextDocumentLanguageFeature<
 							) {
 								return null;
 							}
+
 							if (data.length === 0) {
 								return [];
 							} else {

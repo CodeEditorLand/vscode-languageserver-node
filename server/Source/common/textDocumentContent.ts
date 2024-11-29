@@ -24,6 +24,7 @@ import type { _RemoteWorkspace, Feature } from "./server";
 export interface TextDocumentContentFeatureShape {
 	textDocumentContent: {
 		refresh(uri: DocumentUri): Promise<void>;
+
 		on(
 			handler: RequestHandler<
 				TextDocumentContentParams,

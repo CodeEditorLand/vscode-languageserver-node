@@ -21,6 +21,7 @@ import * as Is from "./utils/is";
 
 interface InsertReplaceRange {
 	inserting: code.Range;
+
 	replacing: code.Range;
 }
 
@@ -36,7 +37,9 @@ namespace InsertReplaceRange {
 
 export interface FileFormattingOptions {
 	trimTrailingWhitespace?: boolean;
+
 	trimFinalNewlines?: boolean;
+
 	insertFinalNewline?: boolean;
 }
 
@@ -60,6 +63,7 @@ export interface Converter {
 	asChangeTextDocumentParams(
 		textDocument: code.TextDocument,
 	): proto.DidChangeTextDocumentParams;
+
 	asChangeTextDocumentParams(
 		event: code.TextDocumentChangeEvent,
 		uri: code.Uri,
@@ -74,6 +78,7 @@ export interface Converter {
 		textDocument: code.TextDocument,
 		includeContent?: boolean,
 	): proto.DidSaveTextDocumentParams;
+
 	asWillSaveTextDocumentParams(
 		event: code.TextDocumentWillSaveEvent,
 	): proto.WillSaveTextDocumentParams;
@@ -81,18 +86,23 @@ export interface Converter {
 	asDidCreateFilesParams(
 		event: code.FileCreateEvent,
 	): proto.CreateFilesParams;
+
 	asDidRenameFilesParams(
 		event: code.FileRenameEvent,
 	): proto.RenameFilesParams;
+
 	asDidDeleteFilesParams(
 		event: code.FileDeleteEvent,
 	): proto.DeleteFilesParams;
+
 	asWillCreateFilesParams(
 		event: code.FileCreateEvent,
 	): proto.CreateFilesParams;
+
 	asWillRenameFilesParams(
 		event: code.FileRenameEvent,
 	): proto.RenameFilesParams;
+
 	asWillDeleteFilesParams(
 		event: code.FileDeleteEvent,
 	): proto.DeleteFilesParams;
@@ -117,8 +127,11 @@ export interface Converter {
 	asWorkerPosition(position: code.Position): proto.Position;
 
 	asPosition(value: null): null;
+
 	asPosition(value: undefined): undefined;
+
 	asPosition(value: code.Position): proto.Position;
+
 	asPosition(
 		value: code.Position | undefined | null,
 	): proto.Position | undefined | null;
@@ -127,14 +140,18 @@ export interface Converter {
 		value: readonly code.Position[],
 		token?: code.CancellationToken,
 	): Promise<proto.Position[]>;
+
 	asPositionsSync(
 		value: readonly code.Position[],
 		token?: code.CancellationToken,
 	): proto.Position[];
 
 	asRange(value: null): null;
+
 	asRange(value: undefined): undefined;
+
 	asRange(value: code.Range): proto.Range;
+
 	asRange(
 		value: code.Range | undefined | null,
 	): proto.Range | undefined | null;
@@ -142,13 +159,17 @@ export interface Converter {
 	asRanges(values: readonly code.Range[]): proto.Range[];
 
 	asLocation(value: null): null;
+
 	asLocation(value: undefined): undefined;
+
 	asLocation(value: code.Location): proto.Location;
+
 	asLocation(
 		value: code.Location | undefined | null,
 	): proto.Location | undefined | null;
 
 	asDiagnosticSeverity(value: code.DiagnosticSeverity): number;
+
 	asDiagnosticTag(value: code.DiagnosticTag): number | undefined;
 
 	asDiagnostic(item: code.Diagnostic): proto.Diagnostic;
@@ -157,6 +178,7 @@ export interface Converter {
 		items: code.Diagnostic[],
 		token?: code.CancellationToken,
 	): Promise<proto.Diagnostic[]>;
+
 	asDiagnosticsSync(items: code.Diagnostic[]): proto.Diagnostic[];
 
 	asCompletionItem(
@@ -167,6 +189,7 @@ export interface Converter {
 	asSymbolKind(item: code.SymbolKind): proto.SymbolKind;
 
 	asSymbolTag(item: code.SymbolTag): proto.SymbolTag;
+
 	asSymbolTags(items: ReadonlyArray<code.SymbolTag>): proto.SymbolTag[];
 
 	asTextEdit(edit: code.TextEdit): proto.TextEdit;
@@ -181,12 +204,14 @@ export interface Converter {
 		item: code.CodeAction,
 		token?: code.CancellationToken,
 	): Promise<proto.CodeAction>;
+
 	asCodeActionSync(item: code.CodeAction): proto.CodeAction;
 
 	asCodeActionContext(
 		context: code.CodeActionContext,
 		token?: code.CancellationToken,
 	): Promise<proto.CodeActionContext>;
+
 	asCodeActionContextSync(
 		context: code.CodeActionContext,
 	): proto.CodeActionContext;
@@ -229,6 +254,7 @@ export interface Converter {
 		position: code.Position,
 		context: code.InlineCompletionContext,
 	): proto.InlineCompletionParams;
+
 	asInlineCompletionContext(
 		context: code.InlineCompletionContext,
 	): proto.InlineCompletionContext;
@@ -379,6 +405,7 @@ export function createConverter(uriConverter?: URIConverter): Converter {
 		if (includeContent) {
 			result.text = textDocument.getText();
 		}
+
 		return result;
 	}
 
@@ -395,6 +422,7 @@ export function createConverter(uriConverter?: URIConverter): Converter {
 			case code.TextDocumentSaveReason.FocusOut:
 				return proto.TextDocumentSaveReason.FocusOut;
 		}
+
 		return proto.TextDocumentSaveReason.Manual;
 	}
 
@@ -564,6 +592,7 @@ export function createConverter(uriConverter?: URIConverter): Converter {
 		if (value === undefined) {
 			return value;
 		}
+
 		return {
 			signatures: asSignatureInformations(value.signatures),
 			activeSignature: value.activeSignature,
@@ -610,6 +639,7 @@ export function createConverter(uriConverter?: URIConverter): Converter {
 		if (value === undefined || value === null) {
 			return value;
 		}
+
 		return {
 			line:
 				value.line > proto.uinteger.MAX_VALUE
@@ -657,6 +687,7 @@ export function createConverter(uriConverter?: URIConverter): Converter {
 		if (value === undefined || value === null) {
 			return value;
 		}
+
 		return { start: asPosition(value.start), end: asPosition(value.end) };
 	}
 
@@ -676,6 +707,7 @@ export function createConverter(uriConverter?: URIConverter): Converter {
 		if (value === undefined || value === null) {
 			return value;
 		}
+
 		return proto.Location.create(asUri(value.uri), asRange(value.range));
 	}
 
@@ -713,6 +745,7 @@ export function createConverter(uriConverter?: URIConverter): Converter {
 		if (!tags) {
 			return undefined;
 		}
+
 		const result: code.DiagnosticTag[] = [];
 
 		for (const tag of tags) {
@@ -722,6 +755,7 @@ export function createConverter(uriConverter?: URIConverter): Converter {
 				result.push(converted);
 			}
 		}
+
 		return result.length > 0 ? result : undefined;
 	}
 
@@ -766,9 +800,11 @@ export function createConverter(uriConverter?: URIConverter): Converter {
 		if (value === undefined || value === null) {
 			return undefined;
 		}
+
 		if (Is.number(value) || Is.string(value)) {
 			return value;
 		}
+
 		return { value: value.value, target: asUri(value.target) };
 	}
 
@@ -787,6 +823,7 @@ export function createConverter(uriConverter?: URIConverter): Converter {
 		) {
 			result.data = protocolDiagnostic.data;
 		}
+
 		const code = asDiagnosticCode(item.code);
 
 		if (DiagnosticCode.is(code)) {
@@ -797,25 +834,31 @@ export function createConverter(uriConverter?: URIConverter): Converter {
 				(result.code as unknown as DiagnosticCode) = code;
 			} else {
 				result.code = code.value;
+
 				result.codeDescription = { href: code.target };
 			}
 		} else {
 			result.code = code;
 		}
+
 		if (Is.number(item.severity)) {
 			result.severity = asDiagnosticSeverity(item.severity);
 		}
+
 		if (Array.isArray(item.tags)) {
 			result.tags = asDiagnosticTags(item.tags);
 		}
+
 		if (item.relatedInformation) {
 			result.relatedInformation = asRelatedInformations(
 				item.relatedInformation,
 			);
 		}
+
 		if (item.source) {
 			result.source = item.source;
 		}
+
 		return result;
 	}
 
@@ -826,6 +869,7 @@ export function createConverter(uriConverter?: URIConverter): Converter {
 		if (items === undefined || items === null) {
 			return items;
 		}
+
 		return async.map(items, asDiagnostic, token);
 	}
 
@@ -835,6 +879,7 @@ export function createConverter(uriConverter?: URIConverter): Converter {
 		if (items === undefined || items === null) {
 			return items;
 		}
+
 		return items.map(asDiagnostic);
 	}
 
@@ -867,6 +912,7 @@ export function createConverter(uriConverter?: URIConverter): Converter {
 			case code.CompletionItemTag.Deprecated:
 				return proto.CompletionItemTag.Deprecated;
 		}
+
 		return undefined;
 	}
 
@@ -876,6 +922,7 @@ export function createConverter(uriConverter?: URIConverter): Converter {
 		if (tags === undefined) {
 			return tags;
 		}
+
 		const result: proto.CompletionItemTag[] = [];
 
 		for (const tag of tags) {
@@ -885,6 +932,7 @@ export function createConverter(uriConverter?: URIConverter): Converter {
 				result.push(converted);
 			}
 		}
+
 		return result;
 	}
 
@@ -895,6 +943,7 @@ export function createConverter(uriConverter?: URIConverter): Converter {
 		if (original !== undefined) {
 			return original;
 		}
+
 		return (value + 1) as proto.CompletionItemKind;
 	}
 
@@ -922,11 +971,13 @@ export function createConverter(uriConverter?: URIConverter): Converter {
 				};
 			}
 		}
+
 		const result: proto.CompletionItem = { label: label };
 
 		if (labelDetails !== undefined) {
 			result.labelDetails = labelDetails;
 		}
+
 		const protocolItem =
 			item instanceof ProtocolCompletionItem
 				? (item as ProtocolCompletionItem)
@@ -950,9 +1001,11 @@ export function createConverter(uriConverter?: URIConverter): Converter {
 				);
 			}
 		}
+
 		if (item.filterText) {
 			result.filterText = item.filterText;
 		}
+
 		fillPrimaryInsertText(result, item as ProtocolCompletionItem);
 
 		if (Is.number(item.kind)) {
@@ -961,27 +1014,34 @@ export function createConverter(uriConverter?: URIConverter): Converter {
 				protocolItem && protocolItem.originalItemKind,
 			);
 		}
+
 		if (item.sortText) {
 			result.sortText = item.sortText;
 		}
+
 		if (item.additionalTextEdits) {
 			result.additionalTextEdits = asTextEdits(item.additionalTextEdits);
 		}
+
 		if (item.commitCharacters) {
 			result.commitCharacters = item.commitCharacters.slice();
 		}
+
 		if (item.command) {
 			result.command = asCommand(item.command);
 		}
+
 		if (item.preselect === true || item.preselect === false) {
 			result.preselect = item.preselect;
 		}
+
 		const tags = asCompletionItemTags(item.tags);
 
 		if (protocolItem) {
 			if (protocolItem.data !== undefined) {
 				result.data = protocolItem.data;
 			}
+
 			if (
 				protocolItem.deprecated === true ||
 				protocolItem.deprecated === false
@@ -999,21 +1059,26 @@ export function createConverter(uriConverter?: URIConverter): Converter {
 						tags.splice(index, 1);
 					}
 				}
+
 				result.deprecated = protocolItem.deprecated;
 			}
+
 			if (protocolItem.insertTextMode !== undefined) {
 				result.insertTextMode = protocolItem.insertTextMode;
 			}
 		}
+
 		if (tags !== undefined && tags.length > 0) {
 			result.tags = tags;
 		}
+
 		if (
 			result.insertTextMode === undefined &&
 			item.keepWhitespace === true
 		) {
 			result.insertTextMode = proto.InsertTextMode.adjustIndentation;
 		}
+
 		return result;
 	}
 
@@ -1029,13 +1094,16 @@ export function createConverter(uriConverter?: URIConverter): Converter {
 
 		if (source.textEdit) {
 			text = source.textEdit.newText;
+
 			range = source.textEdit.range;
 		} else if (source.insertText instanceof code.SnippetString) {
 			format = proto.InsertTextFormat.Snippet;
+
 			text = source.insertText.value;
 		} else {
 			text = source.insertText;
 		}
+
 		if (source.range) {
 			range = source.range;
 		}
@@ -1072,6 +1140,7 @@ export function createConverter(uriConverter?: URIConverter): Converter {
 		if (edits === undefined || edits === null) {
 			return edits;
 		}
+
 		return edits.map(asTextEdit);
 	}
 
@@ -1080,6 +1149,7 @@ export function createConverter(uriConverter?: URIConverter): Converter {
 			// Symbol kind is one based in the protocol and zero based in code.
 			return (item + 1) as proto.SymbolKind;
 		}
+
 		return proto.SymbolKind.Property;
 	}
 
@@ -1114,30 +1184,39 @@ export function createConverter(uriConverter?: URIConverter): Converter {
 		if (item instanceof ProtocolCodeAction && item.data !== undefined) {
 			result.data = item.data;
 		}
+
 		if (item.kind !== undefined) {
 			result.kind = asCodeActionKind(item.kind);
 		}
+
 		if (item.diagnostics !== undefined) {
 			result.diagnostics = await asDiagnostics(item.diagnostics, token);
 		}
+
 		if (item.edit !== undefined) {
 			throw new Error(
 				`VS Code code actions can only be converted to a protocol code action without an edit.`,
 			);
 		}
+
 		if (item.command !== undefined) {
 			result.command = asCommand(item.command);
 		}
+
 		if (item.isPreferred !== undefined) {
 			result.isPreferred = item.isPreferred;
 		}
+
 		if (item.disabled !== undefined) {
 			result.disabled = { reason: item.disabled.reason };
 		}
+
 		if (item.isAI) {
 			result.tags ??= [];
+
 			result.tags.push(proto.CodeActionTag.LLMGenerated);
 		}
+
 		return result;
 	}
 
@@ -1147,30 +1226,39 @@ export function createConverter(uriConverter?: URIConverter): Converter {
 		if (item instanceof ProtocolCodeAction && item.data !== undefined) {
 			result.data = item.data;
 		}
+
 		if (item.kind !== undefined) {
 			result.kind = asCodeActionKind(item.kind);
 		}
+
 		if (item.diagnostics !== undefined) {
 			result.diagnostics = asDiagnosticsSync(item.diagnostics);
 		}
+
 		if (item.edit !== undefined) {
 			throw new Error(
 				`VS Code code actions can only be converted to a protocol code action without an edit.`,
 			);
 		}
+
 		if (item.command !== undefined) {
 			result.command = asCommand(item.command);
 		}
+
 		if (item.isPreferred !== undefined) {
 			result.isPreferred = item.isPreferred;
 		}
+
 		if (item.disabled !== undefined) {
 			result.disabled = { reason: item.disabled.reason };
 		}
+
 		if (item.isAI) {
 			result.tags ??= [];
+
 			result.tags.push(proto.CodeActionTag.LLMGenerated);
 		}
+
 		return result;
 	}
 
@@ -1181,11 +1269,13 @@ export function createConverter(uriConverter?: URIConverter): Converter {
 		if (context === undefined || context === null) {
 			return context;
 		}
+
 		let only: proto.CodeActionKind[] | undefined;
 
 		if (context.only && Is.string(context.only.value)) {
 			only = [context.only.value];
 		}
+
 		return proto.CodeActionContext.create(
 			await asDiagnostics(context.diagnostics, token),
 			only,
@@ -1199,11 +1289,13 @@ export function createConverter(uriConverter?: URIConverter): Converter {
 		if (context === undefined || context === null) {
 			return context;
 		}
+
 		let only: proto.CodeActionKind[] | undefined;
 
 		if (context.only && Is.string(context.only.value)) {
 			only = [context.only.value];
 		}
+
 		return proto.CodeActionContext.create(
 			asDiagnosticsSync(context.diagnostics),
 			only,
@@ -1232,6 +1324,7 @@ export function createConverter(uriConverter?: URIConverter): Converter {
 		if (item === undefined || item === null) {
 			return undefined;
 		}
+
 		return item.value;
 	}
 
@@ -1285,6 +1378,7 @@ export function createConverter(uriConverter?: URIConverter): Converter {
 		if (info === undefined || info === null) {
 			return undefined;
 		}
+
 		return { range: asRange(info.range), text: info.text };
 	}
 
@@ -1294,9 +1388,11 @@ export function createConverter(uriConverter?: URIConverter): Converter {
 		if (item.tooltip) {
 			result.tooltip = item.tooltip;
 		}
+
 		if (item.arguments) {
 			result.arguments = item.arguments;
 		}
+
 		return result;
 	}
 
@@ -1306,11 +1402,13 @@ export function createConverter(uriConverter?: URIConverter): Converter {
 		if (item.command) {
 			result.command = asCommand(item.command);
 		}
+
 		if (item instanceof ProtocolCodeLens) {
 			if (item.data) {
 				result.data = item.data;
 			}
 		}
+
 		return result;
 	}
 
@@ -1326,12 +1424,15 @@ export function createConverter(uriConverter?: URIConverter): Converter {
 		if (fileOptions.trimTrailingWhitespace) {
 			result.trimTrailingWhitespace = true;
 		}
+
 		if (fileOptions.trimFinalNewlines) {
 			result.trimFinalNewlines = true;
 		}
+
 		if (fileOptions.insertFinalNewline) {
 			result.insertFinalNewline = true;
 		}
+
 		return result;
 	}
 
@@ -1357,9 +1458,11 @@ export function createConverter(uriConverter?: URIConverter): Converter {
 		if (item.target) {
 			result.target = asUri(item.target);
 		}
+
 		if (item.tooltip !== undefined) {
 			result.tooltip = item.tooltip;
 		}
+
 		const protocolItem =
 			item instanceof ProtocolDocumentLink
 				? (item as ProtocolDocumentLink)
@@ -1368,6 +1471,7 @@ export function createConverter(uriConverter?: URIConverter): Converter {
 		if (protocolItem && protocolItem.data) {
 			result.data = protocolItem.data;
 		}
+
 		return result;
 	}
 
@@ -1393,15 +1497,18 @@ export function createConverter(uriConverter?: URIConverter): Converter {
 		if (value.detail !== undefined && value.detail.length > 0) {
 			result.detail = value.detail;
 		}
+
 		if (value.tags !== undefined) {
 			result.tags = asSymbolTags(value.tags);
 		}
+
 		if (
 			value instanceof ProtocolCallHierarchyItem &&
 			value.data !== undefined
 		) {
 			result.data = value.data;
 		}
+
 		return result;
 	}
 
@@ -1419,15 +1526,18 @@ export function createConverter(uriConverter?: URIConverter): Converter {
 		if (value.detail !== undefined && value.detail.length > 0) {
 			result.detail = value.detail;
 		}
+
 		if (value.tags !== undefined) {
 			result.tags = asSymbolTags(value.tags);
 		}
+
 		if (
 			value instanceof ProtocolTypeHierarchyItem &&
 			value.data !== undefined
 		) {
 			result.data = value.data;
 		}
+
 		return result;
 	}
 
@@ -1453,9 +1563,11 @@ export function createConverter(uriConverter?: URIConverter): Converter {
 		if (item.tags !== undefined) {
 			result.tags = asSymbolTags(item.tags);
 		}
+
 		if (item.containerName !== "") {
 			result.containerName = item.containerName;
 		}
+
 		return result;
 	}
 
@@ -1470,21 +1582,27 @@ export function createConverter(uriConverter?: URIConverter): Converter {
 		if (item.kind !== undefined) {
 			result.kind = item.kind;
 		}
+
 		if (item.textEdits !== undefined) {
 			result.textEdits = asTextEdits(item.textEdits);
 		}
+
 		if (item.tooltip !== undefined) {
 			result.tooltip = asTooltip(item.tooltip);
 		}
+
 		if (item.paddingLeft !== undefined) {
 			result.paddingLeft = item.paddingLeft;
 		}
+
 		if (item.paddingRight !== undefined) {
 			result.paddingRight = item.paddingRight;
 		}
+
 		if (item instanceof ProtocolInlayHint && item.data !== undefined) {
 			result.data = item.data;
 		}
+
 		return result;
 	}
 
@@ -1496,12 +1614,15 @@ export function createConverter(uriConverter?: URIConverter): Converter {
 		if (item.location !== undefined) {
 			result.location = asLocation(item.location);
 		}
+
 		if (item.command !== undefined) {
 			result.command = asCommand(item.command);
 		}
+
 		if (item.tooltip !== undefined) {
 			result.tooltip = asTooltip(item.tooltip);
 		}
+
 		return result;
 	}
 
@@ -1511,6 +1632,7 @@ export function createConverter(uriConverter?: URIConverter): Converter {
 		if (typeof value === "string") {
 			return value;
 		}
+
 		const result: proto.MarkupContent = {
 			kind: proto.MarkupKind.Markdown,
 			value: value.value,

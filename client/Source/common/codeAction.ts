@@ -59,6 +59,7 @@ export interface CodeActionMiddleware {
 		token: CancellationToken,
 		next: ProvideCodeActionsSignature,
 	) => ProviderResult<(VCommand | VCodeAction)[]>;
+
 	resolveCodeAction?: (
 		this: void,
 		item: VCodeAction,
@@ -82,14 +83,19 @@ export class CodeActionFeature extends TextDocumentLanguageFeature<
 			ensure(capabilities, "textDocument")!,
 			"codeAction",
 		)!;
+
 		cap.dynamicRegistration = true;
+
 		cap.isPreferredSupport = true;
+
 		cap.disabledSupport = true;
+
 		cap.dataSupport = true;
 		// We can only resolve the edit property.
 		cap.resolveSupport = {
 			properties: ["edit", "command"],
 		};
+
 		cap.codeActionLiteralSupport = {
 			codeActionKind: {
 				valueSet: [
@@ -106,8 +112,11 @@ export class CodeActionFeature extends TextDocumentLanguageFeature<
 				],
 			},
 		};
+
 		cap.honorsChangeAnnotations = true;
+
 		cap.documentationSupport = true;
+
 		cap.tagSupport = {
 			valueSet: [CodeActionTag.LLMGenerated],
 		};
@@ -125,6 +134,7 @@ export class CodeActionFeature extends TextDocumentLanguageFeature<
 		if (!options) {
 			return;
 		}
+
 		this.register({ id: UUID.generateUuid(), registerOptions: options });
 	}
 
@@ -166,6 +176,7 @@ export class CodeActionFeature extends TextDocumentLanguageFeature<
 								) {
 									return null;
 								}
+
 								return client.protocol2CodeConverter.asCodeActionResult(
 									values,
 									token,
@@ -215,6 +226,7 @@ export class CodeActionFeature extends TextDocumentLanguageFeature<
 											if (token.isCancellationRequested) {
 												return item;
 											}
+
 											return client.protocol2CodeConverter.asCodeAction(
 												result,
 												token,
@@ -263,6 +275,7 @@ export class CodeActionFeature extends TextDocumentLanguageFeature<
 		) {
 			return undefined;
 		}
+
 		return {
 			providedCodeActionKinds:
 				this._client.protocol2CodeConverter.asCodeActionKinds(

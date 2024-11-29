@@ -50,6 +50,7 @@ export interface CodeLensMiddleware {
 		token: CancellationToken,
 		next: ProvideCodeLensesSignature,
 	) => ProviderResult<VCodeLens[]>;
+
 	resolveCodeLens?: (
 		this: void,
 		codeLens: VCodeLens,
@@ -60,6 +61,7 @@ export interface CodeLensMiddleware {
 
 export type CodeLensProviderShape = {
 	provider?: CodeLensProvider;
+
 	onDidChangeCodeLensEmitter: EventEmitter<void>;
 };
 
@@ -75,8 +77,11 @@ export class CodeLensFeature extends TextDocumentLanguageFeature<
 
 	public fillClientCapabilities(capabilities: ClientCapabilities): void {
 		const clc = ensure(ensure(capabilities, "textDocument")!, "codeLens")!;
+
 		clc.dynamicRegistration = true;
+
 		clc.resolveSupport = { properties: ["command"] };
+
 		ensure(ensure(capabilities, "workspace")!, "codeLens")!.refreshSupport =
 			true;
 	}
@@ -86,6 +91,7 @@ export class CodeLensFeature extends TextDocumentLanguageFeature<
 		documentSelector: DocumentSelector,
 	): void {
 		const client = this._client;
+
 		client.onRequest(CodeLensRefreshRequest.type, async () => {
 			for (const provider of this.getAllProviders()) {
 				provider.onDidChangeCodeLensEmitter.fire();
@@ -100,6 +106,7 @@ export class CodeLensFeature extends TextDocumentLanguageFeature<
 		if (!options) {
 			return;
 		}
+
 		this.register({ id: UUID.generateUuid(), registerOptions: options });
 	}
 
@@ -132,6 +139,7 @@ export class CodeLensFeature extends TextDocumentLanguageFeature<
 								if (token.isCancellationRequested) {
 									return null;
 								}
+
 								return client.protocol2CodeConverter.asCodeLenses(
 									result,
 									token,
@@ -182,6 +190,7 @@ export class CodeLensFeature extends TextDocumentLanguageFeature<
 										if (token.isCancellationRequested) {
 											return codeLens;
 										}
+
 										return client.protocol2CodeConverter.asCodeLens(
 											result,
 										);

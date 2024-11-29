@@ -49,6 +49,7 @@ export interface DocumentLinkMiddleware {
 		token: CancellationToken,
 		next: ProvideDocumentLinksSignature,
 	) => ProviderResult<VDocumentLink[]>;
+
 	resolveDocumentLink?: (
 		this: void,
 		link: VDocumentLink,
@@ -90,6 +91,7 @@ export class DocumentLinkFeature extends TextDocumentLanguageFeature<
 		if (!options) {
 			return;
 		}
+
 		this.register({ id: UUID.generateUuid(), registerOptions: options });
 	}
 
@@ -122,6 +124,7 @@ export class DocumentLinkFeature extends TextDocumentLanguageFeature<
 								if (token.isCancellationRequested) {
 									return null;
 								}
+
 								return client.protocol2CodeConverter.asDocumentLinks(
 									result,
 									token,
@@ -167,6 +170,7 @@ export class DocumentLinkFeature extends TextDocumentLanguageFeature<
 											if (token.isCancellationRequested) {
 												return link;
 											}
+
 											return client.protocol2CodeConverter.asDocumentLink(
 												result,
 											);

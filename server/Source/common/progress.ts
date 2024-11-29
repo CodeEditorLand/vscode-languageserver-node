@@ -38,7 +38,9 @@ export interface WorkDoneProgressReporter {
 	): void;
 
 	report(percentage: number): void;
+
 	report(message: string): void;
+
 	report(percentage: number, message: string): void;
 
 	done(): void;
@@ -53,6 +55,7 @@ export interface WindowProgress {
 	attachWorkDoneProgress(
 		token: ProgressToken | undefined,
 	): WorkDoneProgressReporter;
+
 	createWorkDoneProgress(): Promise<WorkDoneProgressServerReporter>;
 }
 
@@ -87,6 +90,7 @@ class WorkDoneProgressReporterImpl implements WorkDoneProgressReporter {
 			// is a uinteger according to the specification
 			param.percentage = Math.round(percentage);
 		}
+
 		this._connection.sendProgress(
 			WorkDoneProgress.type,
 			this._token,
@@ -110,6 +114,7 @@ class WorkDoneProgressReporterImpl implements WorkDoneProgressReporter {
 		} else {
 			param.message = arg0;
 		}
+
 		this._connection.sendProgress(
 			WorkDoneProgress.type,
 			this._token,
@@ -119,6 +124,7 @@ class WorkDoneProgressReporterImpl implements WorkDoneProgressReporter {
 
 	done(): void {
 		WorkDoneProgressReporterImpl.Instances.delete(this._token);
+
 		this._connection.sendProgress(WorkDoneProgress.type, this._token, {
 			kind: "end",
 		});
@@ -133,6 +139,7 @@ class WorkDoneProgressServerReporterImpl
 
 	constructor(connection: ProgressContext, token: ProgressToken) {
 		super(connection, token);
+
 		this._source = new CancellationTokenSource();
 	}
 
@@ -169,6 +176,7 @@ class NullProgressServerReporter
 
 	constructor() {
 		super();
+
 		this._source = new CancellationTokenSource();
 	}
 
@@ -194,6 +202,7 @@ export function attachWorkDone(
 	}
 
 	const token = params.workDoneToken;
+
 	delete params.workDoneToken;
 
 	return new WorkDoneProgressReporterImpl(connection, token);
@@ -204,15 +213,19 @@ export const ProgressFeature: Feature<_RemoteWindow, WindowProgress> = (
 ) => {
 	return class extends Base {
 		private _progressSupported: boolean;
+
 		public constructor() {
 			super();
+
 			this._progressSupported = false;
 		}
+
 		public initialize(capabilities: ClientCapabilities): void {
 			super.initialize(capabilities);
 
 			if (capabilities?.window?.workDoneProgress === true) {
 				this._progressSupported = true;
+
 				this.connection.onNotification(
 					WorkDoneProgressCancelNotification.type,
 					(params) => {
@@ -232,6 +245,7 @@ export const ProgressFeature: Feature<_RemoteWindow, WindowProgress> = (
 				);
 			}
 		}
+
 		public attachWorkDoneProgress(
 			token: ProgressToken | undefined,
 		): WorkDoneProgressReporter {
@@ -241,6 +255,7 @@ export const ProgressFeature: Feature<_RemoteWindow, WindowProgress> = (
 				return new WorkDoneProgressReporterImpl(this.connection, token);
 			}
 		}
+
 		public createWorkDoneProgress(): Promise<WorkDoneProgressServerReporter> {
 			if (this._progressSupported) {
 				const token: string = generateUuid();
@@ -291,6 +306,7 @@ export function attachPartialResult<R>(
 	}
 
 	const token = params.partialResultToken;
+
 	delete params.partialResultToken;
 
 	return new ResultProgressReporterImpl<R>(connection, token);

@@ -77,12 +77,17 @@ namespace MapKeyType {
 }
 type LiteralInfo = {
 	type: TypeInfo;
+
 	optional: boolean;
 
 	documentation?: string;
+
 	since?: string;
+
 	sinceTags?: string[];
+
 	proposed?: boolean;
+
 	deprecated?: string;
 };
 
@@ -91,48 +96,61 @@ type TypeInfo = {
 } & (
 	| {
 			kind: "base";
+
 			name: BaseTypeInfoKind;
 	  }
 	| {
 			kind: "reference";
+
 			name: string;
+
 			symbol: ts.Symbol;
 	  }
 	| {
 			kind: "array";
+
 			elementType: TypeInfo;
 	  }
 	| {
 			kind: "map";
+
 			key: MapKeyType;
+
 			value: TypeInfo;
 	  }
 	| {
 			kind: "union";
+
 			items: TypeInfo[];
 	  }
 	| {
 			kind: "intersection";
+
 			items: TypeInfo[];
 	  }
 	| {
 			kind: "tuple";
+
 			items: TypeInfo[];
 	  }
 	| {
 			kind: "literal";
+
 			items: Map<string, LiteralInfo>;
 	  }
 	| {
 			kind: "stringLiteral";
+
 			value: string;
 	  }
 	| {
 			kind: "integerLiteral";
+
 			value: number;
 	  }
 	| {
 			kind: "booleanLiteral";
+
 			value: boolean;
 	  }
 );
@@ -174,9 +192,11 @@ namespace TypeInfo {
 				if (baseSet.has(info.name)) {
 					return { kind: "base", name: info.name as BaseTypes };
 				}
+
 				if (info.name === "object") {
 					return { kind: "reference", name: "LSPAny" };
 				}
+
 				break;
 
 			case "reference":
@@ -222,17 +242,22 @@ namespace TypeInfo {
 					if (value.optional === true) {
 						property.optional = true;
 					}
+
 					if (value.documentation !== undefined) {
 						property.documentation = value.documentation;
 					}
+
 					if (value.since !== undefined) {
 						property.since = value.since;
 					}
+
 					if (value.proposed === true) {
 						property.proposed = true;
 					}
+
 					literal.properties.push(property);
 				}
+
 				return { kind: "literal", value: literal };
 
 			case "stringLiteral":
@@ -244,6 +269,7 @@ namespace TypeInfo {
 			case "booleanLiteral":
 				return { kind: "booleanLiteral", value: info.value };
 		}
+
 		throw new Error(
 			`Can't convert type info ${JSON.stringify(info, undefined, 0)}`,
 		);
@@ -252,14 +278,19 @@ namespace TypeInfo {
 
 type RequestTypes = {
 	param?: TypeInfo;
+
 	result: TypeInfo;
+
 	partialResult: TypeInfo;
+
 	errorData: TypeInfo;
+
 	registrationOptions: TypeInfo;
 };
 
 type NotificationTypes = {
 	param?: TypeInfo;
+
 	registrationOptions: TypeInfo;
 };
 
@@ -281,31 +312,49 @@ namespace MessageDirection {
 
 export default class Visitor {
 	private readonly program: ts.Program;
+
 	private readonly typeChecker: ts.TypeChecker;
+
 	private readonly symbols: Symbols;
 
 	#currentSourceFile: ts.SourceFile | undefined;
 
 	private readonly requests: JsonRequest[];
+
 	private readonly notifications: JsonNotification[];
+
 	private readonly structures: Structure[];
+
 	private readonly enumerations: Enumeration[];
+
 	private readonly typeAliases: TypeAlias[];
+
 	private readonly symbolQueue: Map<string, ts.Symbol>;
+
 	private readonly processedStructures: Map<string, ts.Symbol>;
+
 	private readonly filter: Map<string, (symbol: ts.Symbol) => boolean> =
 		new Map([["TraceValues", Symbols.isTypeAlias]]);
 
 	constructor(program: ts.Program) {
 		this.program = program;
+
 		this.typeChecker = this.program.getTypeChecker();
+
 		this.symbols = new Symbols(this.typeChecker);
+
 		this.requests = [];
+
 		this.notifications = [];
+
 		this.structures = [];
+
 		this.enumerations = [];
+
 		this.typeAliases = [];
+
 		this.symbolQueue = new Map();
+
 		this.processedStructures = new Map();
 	}
 
@@ -313,6 +362,7 @@ export default class Visitor {
 		if (this.#currentSourceFile === undefined) {
 			throw new Error(`Current source file not known`);
 		}
+
 		return this.#currentSourceFile;
 	}
 
@@ -346,7 +396,9 @@ export default class Visitor {
 						this.typeAliases.push(element as TypeAlias);
 					}
 				}
+
 				this.symbolQueue.delete(name);
+
 				this.processedStructures.set(name, symbol);
 			}
 		}
@@ -398,6 +450,7 @@ export default class Visitor {
 		if (visit.call(this, node)) {
 			node.forEachChild((child) => this.visit(child));
 		}
+
 		endVisit.call(this, node);
 	}
 
@@ -421,6 +474,7 @@ export default class Visitor {
 				) {
 					this.visitTypeReference(statement);
 				}
+
 				if (ts.isVariableStatement(statement)) {
 					for (const declaration of statement.declarationList
 						.declarations) {
@@ -430,6 +484,7 @@ export default class Visitor {
 						) {
 							continue;
 						}
+
 						const symbol = this.typeChecker.getSymbolAtLocation(
 							declaration.initializer,
 						);
@@ -437,11 +492,13 @@ export default class Visitor {
 						if (symbol === undefined) {
 							continue;
 						}
+
 						this.queueSymbol(symbol.getName(), symbol);
 					}
 				}
 			}
 		}
+
 		return true;
 	}
 
@@ -473,6 +530,7 @@ export default class Visitor {
 				this.notifications.push(notification);
 			}
 		}
+
 		return true;
 	}
 
@@ -482,31 +540,40 @@ export default class Visitor {
 		if (symbol === undefined) {
 			return;
 		}
+
 		const type = symbol.exports?.get("type" as ts.__String);
 
 		if (type === undefined) {
 			return;
 		}
+
 		const methodName = this.getMethodName(symbol, type);
 
 		if (methodName === undefined) {
 			return;
 		}
+
 		const requestTypes = this.getRequestTypes(type);
 
 		if (requestTypes === undefined) {
 			return;
 		}
+
 		requestTypes.param && this.queueTypeInfo(requestTypes.param);
+
 		this.queueTypeInfo(requestTypes.result);
+
 		this.queueTypeInfo(requestTypes.partialResult);
+
 		this.queueTypeInfo(requestTypes.errorData);
+
 		this.queueTypeInfo(requestTypes.registrationOptions);
 
 		const asJsonType = (info: TypeInfo) => {
 			if (TypeInfo.isNonLSPType(info)) {
 				return undefined;
 			}
+
 			return TypeInfo.asJsonType(info);
 		};
 
@@ -518,16 +585,22 @@ export default class Visitor {
 				: TypeInfo.asJsonType(requestTypes.result),
 			messageDirection: this.getMessageDirection(symbol),
 		};
+
 		result.params =
 			requestTypes.param !== undefined
 				? asJsonType(requestTypes.param)
 				: undefined;
+
 		result.partialResult = asJsonType(requestTypes.partialResult);
+
 		result.errorData = asJsonType(requestTypes.errorData);
+
 		result.registrationMethod = this.getRegistrationMethodName(symbol);
+
 		result.registrationOptions = asJsonType(
 			requestTypes.registrationOptions,
 		);
+
 		this.fillDocProperties(node, result);
 
 		return result;
@@ -541,28 +614,34 @@ export default class Visitor {
 		if (symbol === undefined) {
 			return;
 		}
+
 		const type = symbol.exports?.get("type" as ts.__String);
 
 		if (type === undefined) {
 			return;
 		}
+
 		const methodName = this.getMethodName(symbol, type);
 
 		if (methodName === undefined) {
 			return;
 		}
+
 		const notificationTypes = this.getNotificationTypes(type);
 
 		if (notificationTypes === undefined) {
 			return undefined;
 		}
+
 		notificationTypes.param && this.queueTypeInfo(notificationTypes.param);
+
 		this.queueTypeInfo(notificationTypes.registrationOptions);
 
 		const asJsonType = (info: TypeInfo) => {
 			if (TypeInfo.isNonLSPType(info)) {
 				return undefined;
 			}
+
 			return TypeInfo.asJsonType(info);
 		};
 
@@ -571,14 +650,18 @@ export default class Visitor {
 			typeName: symbol.name,
 			messageDirection: this.getMessageDirection(symbol),
 		};
+
 		result.params =
 			notificationTypes.param !== undefined
 				? asJsonType(notificationTypes.param)
 				: undefined;
+
 		result.registrationMethod = this.getRegistrationMethodName(symbol);
+
 		result.registrationOptions = asJsonType(
 			notificationTypes.registrationOptions,
 		);
+
 		this.fillDocProperties(node, result);
 
 		return result;
@@ -590,11 +673,13 @@ export default class Visitor {
 		if (!ts.isTypeReferenceNode(type)) {
 			return;
 		}
+
 		const symbol = this.typeChecker.getSymbolAtLocation(type.typeName);
 
 		if (symbol === undefined) {
 			return;
 		}
+
 		this.queueSymbol(type.typeName.getText(), symbol);
 	}
 
@@ -611,6 +696,7 @@ export default class Visitor {
 			typeInfo.items.forEach((item) => this.queueTypeInfo(item));
 		} else if (typeInfo.kind === "map") {
 			this.queueTypeInfo(typeInfo.key);
+
 			this.queueTypeInfo(typeInfo.value);
 		} else if (typeInfo.kind === "literal") {
 			typeInfo.items.forEach((item) => this.queueTypeInfo(item.type));
@@ -623,6 +709,7 @@ export default class Visitor {
 				`Different symbol names [${name}, ${symbol.getName()}]`,
 			);
 		}
+
 		const existing =
 			this.symbolQueue.get(name) ?? this.processedStructures.get(name);
 
@@ -639,6 +726,7 @@ export default class Visitor {
 					`The symbol ${symbol.getName()} has a different name than the aliased symbol ${aliased.getName()}`,
 				);
 			}
+
 			this.symbolQueue.set(name, aliased ?? symbol);
 		} else {
 			const left = Symbols.isAliasSymbol(symbol)
@@ -671,8 +759,10 @@ export default class Visitor {
 			) {
 				continue;
 			}
+
 			result.push(sourceFile);
 		}
+
 		return result;
 	}
 
@@ -690,9 +780,11 @@ export default class Visitor {
 			if (declaration === undefined) {
 				return undefined;
 			}
+
 			if (!ts.isVariableDeclaration(declaration)) {
 				return undefined;
 			}
+
 			const initializer = declaration.initializer;
 
 			if (
@@ -702,6 +794,7 @@ export default class Visitor {
 			) {
 				return undefined;
 			}
+
 			text = initializer.getText();
 		} else {
 			const declaration = this.getFirstDeclaration(type);
@@ -709,21 +802,26 @@ export default class Visitor {
 			if (declaration === undefined) {
 				return undefined;
 			}
+
 			if (!ts.isVariableDeclaration(declaration)) {
 				return undefined;
 			}
+
 			const initializer = declaration.initializer;
 
 			if (initializer === undefined || !ts.isNewExpression(initializer)) {
 				return undefined;
 			}
+
 			const args = initializer.arguments;
 
 			if (args === undefined || args.length < 1) {
 				return undefined;
 			}
+
 			text = args[0].getText();
 		}
+
 		return this.removeQuotes(text);
 	}
 
@@ -737,6 +835,7 @@ export default class Visitor {
 		if (registrationMethod === undefined) {
 			return undefined;
 		}
+
 		const declaration = this.getFirstDeclaration(registrationMethod);
 
 		if (
@@ -747,6 +846,7 @@ export default class Visitor {
 		) {
 			return undefined;
 		}
+
 		const initializerSymbol = this.typeChecker.getSymbolAtLocation(
 			declaration.initializer.name,
 		);
@@ -757,11 +857,13 @@ export default class Visitor {
 		) {
 			return undefined;
 		}
+
 		const valueDeclaration = initializerSymbol.valueDeclaration;
 
 		if (!ts.isVariableDeclaration(valueDeclaration)) {
 			return undefined;
 		}
+
 		if (
 			valueDeclaration.initializer === undefined ||
 			(!ts.isStringLiteral(valueDeclaration.initializer) &&
@@ -785,6 +887,7 @@ export default class Visitor {
 		if (messageDirection === undefined) {
 			throw new Error(errorMessage);
 		}
+
 		const declaration = this.getFirstDeclaration(messageDirection);
 
 		if (
@@ -795,6 +898,7 @@ export default class Visitor {
 		) {
 			throw new Error(errorMessage);
 		}
+
 		const initializerSymbol = this.typeChecker.getSymbolAtLocation(
 			declaration.initializer.name,
 		);
@@ -805,22 +909,26 @@ export default class Visitor {
 		) {
 			throw new Error(errorMessage);
 		}
+
 		const valueDeclaration = initializerSymbol.valueDeclaration;
 
 		if (!ts.isEnumMember(valueDeclaration)) {
 			throw new Error(errorMessage);
 		}
+
 		if (
 			valueDeclaration.initializer === undefined ||
 			!ts.isStringLiteral(valueDeclaration.initializer)
 		) {
 			throw new Error(errorMessage);
 		}
+
 		const value = this.removeQuotes(valueDeclaration.initializer.getText());
 
 		if (!MessageDirection.is(value)) {
 			throw new Error(errorMessage);
 		}
+
 		return value;
 	}
 
@@ -830,17 +938,21 @@ export default class Visitor {
 		if (declaration === undefined) {
 			return undefined;
 		}
+
 		if (!ts.isVariableDeclaration(declaration)) {
 			return;
 		}
+
 		const initializer = declaration.initializer;
 
 		if (initializer === undefined || !ts.isNewExpression(initializer)) {
 			return undefined;
 		}
+
 		if (initializer.typeArguments === undefined) {
 			return undefined;
 		}
+
 		const typeInfos: TypeInfo[] = [];
 
 		for (const typeNode of initializer.typeArguments) {
@@ -849,11 +961,14 @@ export default class Visitor {
 			if (info === undefined) {
 				return undefined;
 			}
+
 			typeInfos.push(info);
 		}
+
 		if (typeInfos.length !== initializer.typeArguments.length) {
 			return undefined;
 		}
+
 		switch (initializer.typeArguments.length) {
 			case 4:
 				return {
@@ -872,6 +987,7 @@ export default class Visitor {
 					registrationOptions: typeInfos[4],
 				};
 		}
+
 		return undefined;
 	}
 
@@ -883,17 +999,21 @@ export default class Visitor {
 		if (declaration === undefined) {
 			return undefined;
 		}
+
 		if (!ts.isVariableDeclaration(declaration)) {
 			return;
 		}
+
 		const initializer = declaration.initializer;
 
 		if (initializer === undefined || !ts.isNewExpression(initializer)) {
 			return undefined;
 		}
+
 		if (initializer.typeArguments === undefined) {
 			return undefined;
 		}
+
 		const typeInfos: TypeInfo[] = [];
 
 		for (const typeNode of initializer.typeArguments) {
@@ -902,11 +1022,14 @@ export default class Visitor {
 			if (info === undefined) {
 				return undefined;
 			}
+
 			typeInfos.push(info);
 		}
+
 		if (typeInfos.length !== initializer.typeArguments.length) {
 			return undefined;
 		}
+
 		switch (initializer.typeArguments.length) {
 			case 1:
 				return { registrationOptions: typeInfos[0] };
@@ -917,6 +1040,7 @@ export default class Visitor {
 					registrationOptions: typeInfos[1],
 				};
 		}
+
 		return undefined;
 	}
 
@@ -930,11 +1054,13 @@ export default class Visitor {
 			if (LSPBaseTypes.has(typeName)) {
 				return { kind: "base", name: typeName as BaseTypeInfoKind };
 			}
+
 			const symbol = this.typeChecker.getSymbolAtLocation(typeNode);
 
 			if (symbol === undefined) {
 				return undefined;
 			}
+
 			return { kind: "reference", name: typeName, symbol };
 		} else if (ts.isTypeReferenceNode(typeNode)) {
 			const typeName = ts.isIdentifier(typeNode.typeName)
@@ -944,6 +1070,7 @@ export default class Visitor {
 			if (LSPBaseTypes.has(typeName)) {
 				return { kind: "base", name: typeName as BaseTypeInfoKind };
 			}
+
 			const symbol = this.typeChecker.getSymbolAtLocation(
 				typeNode.typeName,
 			);
@@ -951,6 +1078,7 @@ export default class Visitor {
 			if (symbol === undefined) {
 				return undefined;
 			}
+
 			return { kind: "reference", name: typeName, symbol };
 		} else if (ts.isArrayTypeNode(typeNode)) {
 			const elementType = this.getTypeInfo(typeNode.elementType);
@@ -958,6 +1086,7 @@ export default class Visitor {
 			if (elementType === undefined) {
 				return undefined;
 			}
+
 			return { kind: "array", elementType: elementType };
 		} else if (ts.isUnionTypeNode(typeNode)) {
 			const items: TypeInfo[] = [];
@@ -977,8 +1106,10 @@ export default class Visitor {
 				) {
 					continue;
 				}
+
 				items.push(typeInfo);
 			}
+
 			return { kind: "union", items };
 		} else if (ts.isIntersectionTypeNode(typeNode)) {
 			const items: TypeInfo[] = [];
@@ -989,8 +1120,10 @@ export default class Visitor {
 				if (typeInfo === undefined) {
 					return undefined;
 				}
+
 				items.push(typeInfo);
 			}
+
 			return { kind: "intersection", items };
 		} else if (ts.isTypeLiteralNode(typeNode)) {
 			const type = this.typeChecker.getTypeAtLocation(typeNode);
@@ -1009,11 +1142,13 @@ export default class Visitor {
 				) {
 					return undefined;
 				}
+
 				const keyTypeNode = declaration.parameters[0].type;
 
 				if (keyTypeNode === undefined) {
 					return undefined;
 				}
+
 				const key = this.getTypeInfo(keyTypeNode);
 
 				const value = this.getTypeInfo(declaration.type);
@@ -1021,9 +1156,11 @@ export default class Visitor {
 				if (key === undefined || value === undefined) {
 					return undefined;
 				}
+
 				if (!MapKeyType.is(key)) {
 					return undefined;
 				}
+
 				return { kind: "map", key: key, value: value };
 			} else {
 				// We can't directly ask for the symbol since the literal has no name.
@@ -1034,17 +1171,21 @@ export default class Visitor {
 				if (symbol === undefined) {
 					return undefined;
 				}
+
 				if (symbol.members === undefined) {
 					return { kind: "literal", items: new Map() };
 				}
+
 				const items = new Map<
 					string,
 					{ type: TypeInfo; optional: boolean }
 				>();
+
 				symbol.members.forEach((member) => {
 					if (!Symbols.isProperty(member)) {
 						return;
 					}
+
 					const declaration = this.getDeclaration(
 						member,
 						ts.SyntaxKind.PropertySignature,
@@ -1059,6 +1200,7 @@ export default class Visitor {
 							`Can't parse property ${member.getName()} of structure ${symbol.getName()}`,
 						);
 					}
+
 					const propertyType = this.getTypeInfo(declaration.type);
 
 					if (propertyType === undefined) {
@@ -1066,11 +1208,14 @@ export default class Visitor {
 							`Can't parse property ${member.getName()} of structure ${symbol.getName()}`,
 						);
 					}
+
 					const literalInfo: LiteralInfo = {
 						type: propertyType,
 						optional: Symbols.isOptional(member),
 					};
+
 					this.fillDocProperties(declaration, literalInfo);
+
 					items.set(member.getName(), literalInfo);
 				});
 
@@ -1085,8 +1230,10 @@ export default class Visitor {
 				if (typeInfo === undefined) {
 					return undefined;
 				}
+
 				items.push(typeInfo);
 			}
+
 			return { kind: "tuple", items };
 		} else if (
 			ts.isTypeQueryNode(typeNode) &&
@@ -1104,6 +1251,7 @@ export default class Visitor {
 					`Can't resolve symbol for right hand side of enum declaration`,
 				);
 			}
+
 			const declaration = this.getDeclaration(
 				typeNodeSymbol,
 				ts.SyntaxKind.VariableDeclaration,
@@ -1118,6 +1266,7 @@ export default class Visitor {
 					`Can't resolve variable declaration for right hand side of enum declaration`,
 				);
 			}
+
 			if (ts.isNumericLiteral(declaration.initializer)) {
 				return {
 					kind: "integerLiteral",
@@ -1129,6 +1278,7 @@ export default class Visitor {
 					value: this.removeQuotes(declaration.initializer.getText()),
 				};
 			}
+
 			return {
 				kind: "stringLiteral",
 				value: typeNode.exprName.right.getText(),
@@ -1138,6 +1288,7 @@ export default class Visitor {
 		} else if (ts.isLiteralTypeNode(typeNode)) {
 			return this.getBaseTypeInfo(typeNode.literal);
 		}
+
 		return this.getBaseTypeInfo(typeNode);
 	}
 
@@ -1185,6 +1336,7 @@ export default class Visitor {
 			case ts.SyntaxKind.ObjectKeyword:
 				return { kind: "base", name: "object" };
 		}
+
 		return undefined;
 	}
 
@@ -1194,6 +1346,7 @@ export default class Visitor {
 		"StaticRegistrationOptions",
 		"WorkDoneProgressOptions",
 	]);
+
 	private static readonly PropertyFilters: Map<string, Set<string>> = new Map(
 		[
 			["TraceValue", new Set(["Compact"])],
@@ -1219,6 +1372,7 @@ export default class Visitor {
 			],
 		],
 	);
+
 	private static readonly PropertyRenames: Map<string, Map<string, string>> =
 		new Map([
 			[
@@ -1229,6 +1383,7 @@ export default class Visitor {
 				]),
 			],
 		]);
+
 	private processSymbol(
 		name: string,
 		symbol: ts.Symbol,
@@ -1240,14 +1395,17 @@ export default class Visitor {
 
 			return PreDefined.LSPAny;
 		}
+
 		if (name === "LSPArray") {
 			// LSP Array is never reference via a indirect reference from
 			// a request or notification.
 			return undefined;
 		}
+
 		if (name === "LSPObject") {
 			return PreDefined.LSPObject;
 		}
+
 		if (Symbols.isInterface(symbol)) {
 			const result: Structure = { name: name, properties: [] };
 
@@ -1278,25 +1436,31 @@ export default class Visitor {
 									`Can't create type info for extends clause ${type.expression.getText()}`,
 								);
 							}
+
 							if (Visitor.Mixins.has(typeInfo.name)) {
 								mixins.push(TypeInfo.asJsonType(typeInfo));
 							} else {
 								extend.push(TypeInfo.asJsonType(typeInfo));
 							}
+
 							this.queueTypeInfo(typeInfo);
 						}
 					}
 				}
+
 				if (extend.length > 0) {
 					result.extends = extend;
 				}
+
 				if (mixins.length > 0) {
 					result.mixins = mixins;
 				}
 			}
+
 			if (declaration !== undefined) {
 				this.fillDocProperties(declaration, result);
 			}
+
 			this.fillProperties(result, symbol);
 
 			return result;
@@ -1314,13 +1478,16 @@ export default class Visitor {
 					`No declaration found for type alias ${symbol.getName()}`,
 				);
 			}
+
 			if (ts.isTypeLiteralNode(declaration.type)) {
 				// We have a single type literal node. So treat it as a structure
 				const result: Structure = { name: name, properties: [] };
+
 				this.fillProperties(
 					result,
 					this.typeChecker.getTypeAtLocation(declaration.type).symbol,
 				);
+
 				this.fillDocProperties(declaration, result);
 
 				return result;
@@ -1345,19 +1512,24 @@ export default class Visitor {
 								`Can't create type info for type reference ${reference.getText()}`,
 							);
 						}
+
 						if (Visitor.Mixins.has(typeInfo.name)) {
 							mixins.push(TypeInfo.asJsonType(typeInfo));
 						} else {
 							extend.push(TypeInfo.asJsonType(typeInfo));
 						}
+
 						this.queueTypeInfo(typeInfo);
 					}
+
 					if (extend.length > 0) {
 						result.extends = extend;
 					}
+
 					if (mixins.length > 0) {
 						result.mixins = mixins;
 					}
+
 					if (split.literal !== undefined) {
 						this.fillProperties(
 							result,
@@ -1365,11 +1537,13 @@ export default class Visitor {
 								.symbol,
 						);
 					}
+
 					this.fillDocProperties(declaration, result);
 
 					return result;
 				}
 			}
+
 			const target = this.getTypeInfo(
 				declaration.type,
 				name === "LSPAny",
@@ -1380,6 +1554,7 @@ export default class Visitor {
 					`Can't resolve target type for type alias ${symbol.getName()}`,
 				);
 			}
+
 			const namespace = this.getDeclaration(
 				symbol,
 				ts.SyntaxKind.ModuleDeclaration,
@@ -1445,6 +1620,7 @@ export default class Visitor {
 
 									break;
 								}
+
 								const declaration =
 									variable.declarationList.declarations[0];
 
@@ -1453,6 +1629,7 @@ export default class Visitor {
 
 									break;
 								}
+
 								const value: number | string | undefined =
 									this.getEnumValue(declaration);
 
@@ -1461,6 +1638,7 @@ export default class Visitor {
 
 									break;
 								}
+
 								if (
 									enumValuesSet &&
 									!enumValuesSet.has(value)
@@ -1469,6 +1647,7 @@ export default class Visitor {
 
 									break;
 								}
+
 								let propertyName = declaration.name.getText();
 
 								if (
@@ -1482,6 +1661,7 @@ export default class Visitor {
 											propertyName,
 										)!;
 								}
+
 								if (
 									Visitor.PropertyFilters.has(name) &&
 									Visitor.PropertyFilters.get(name)?.has(
@@ -1490,13 +1670,17 @@ export default class Visitor {
 								) {
 									continue;
 								}
+
 								const entry: EnumerationEntry = {
 									name: propertyName,
 									value: value,
 								};
+
 								this.fillDocProperties(variable, entry);
+
 								enumerations.push(entry);
 							}
+
 							if (isEnum) {
 								const type: EnumerationType | undefined =
 									enumValues
@@ -1530,6 +1714,7 @@ export default class Visitor {
 											enumeration,
 										);
 									}
+
 									return enumeration;
 								}
 							}
@@ -1550,6 +1735,7 @@ export default class Visitor {
 					mixins: [TypeInfo.asJsonType(target)],
 					properties: [],
 				};
+
 				this.fillDocProperties(declaration, result);
 
 				return result;
@@ -1560,10 +1746,12 @@ export default class Visitor {
 				if (name === "DocumentSelector") {
 					return PreDefined.DocumentSelector;
 				}
+
 				const result: TypeAlias = {
 					name: name,
 					type: TypeInfo.asJsonType(target),
 				};
+
 				this.fillDocProperties(declaration, result);
 
 				return result;
@@ -1589,6 +1777,7 @@ export default class Visitor {
 				) {
 					continue;
 				}
+
 				let value: string | number | undefined;
 
 				if (ts.isNumericLiteral(declaration.initializer)) {
@@ -1603,11 +1792,14 @@ export default class Visitor {
 					value = this.removeQuotes(
 						declaration.initializer.getText(),
 					);
+
 					enumBaseType = "string";
 				}
+
 				if (value === undefined) {
 					continue;
 				}
+
 				const entry: EnumerationEntry = {
 					name: item.getName(),
 					value: value,
@@ -1619,9 +1811,12 @@ export default class Visitor {
 				) {
 					continue;
 				}
+
 				this.fillDocProperties(declaration, entry);
+
 				entries.push(entry);
 			}
+
 			const type: EnumerationType =
 				enumBaseType === undefined
 					? { kind: "base", name: "uinteger" }
@@ -1639,6 +1834,7 @@ export default class Visitor {
 			) {
 				result.supportsCustomValues = true;
 			}
+
 			const declaration = this.getDeclaration(
 				symbol,
 				ts.SyntaxKind.EnumDeclaration,
@@ -1647,12 +1843,15 @@ export default class Visitor {
 			if (declaration !== undefined) {
 				this.fillDocProperties(declaration, result);
 			}
+
 			return result;
 		} else {
 			const result: Structure = { name: name, properties: [] };
+
 			this.fillProperties(result, symbol);
 
 			const declaration = this.getFirstDeclaration(symbol);
+
 			declaration !== undefined &&
 				this.fillDocProperties(declaration, result);
 
@@ -1667,10 +1866,12 @@ export default class Visitor {
 		if (symbol.members === undefined) {
 			return;
 		}
+
 		symbol.members.forEach((member) => {
 			if (!Symbols.isProperty(member)) {
 				return;
 			}
+
 			const declaration = this.getDeclaration(
 				member,
 				ts.SyntaxKind.PropertySignature,
@@ -1685,6 +1886,7 @@ export default class Visitor {
 					`Can't parse property ${member.getName()} of structure ${symbol.getName()}`,
 				);
 			}
+
 			const typeInfo = this.getTypeInfo(declaration.type);
 
 			if (typeInfo === undefined) {
@@ -1716,7 +1918,9 @@ export default class Visitor {
 			if (Symbols.isOptional(member)) {
 				property.optional = true;
 			}
+
 			this.fillDocProperties(declaration, property);
+
 			result.properties.push(property);
 
 			if (!isExperimentalProperty) {
@@ -1727,7 +1931,9 @@ export default class Visitor {
 
 	private splitIntersectionType(node: ts.IntersectionTypeNode): {
 		literal: ts.TypeLiteralNode | undefined;
+
 		references: ts.TypeReferenceNode[];
+
 		rest: ts.TypeNode[];
 	} {
 		let literal: ts.TypeLiteralNode | undefined;
@@ -1749,6 +1955,7 @@ export default class Visitor {
 				rest.push(element);
 			}
 		}
+
 		return { literal, references, rest };
 	}
 
@@ -1769,11 +1976,13 @@ export default class Visitor {
 		if (declarations === undefined) {
 			return undefined;
 		}
+
 		for (const declaration of declarations) {
 			if (declaration.kind === kind) {
 				return declaration;
 			}
 		}
+
 		return undefined;
 	}
 
@@ -1781,12 +1990,15 @@ export default class Visitor {
 		if (typeInfo.kind === "stringLiteral") {
 			return [typeInfo.value];
 		}
+
 		if (typeInfo.kind === "integerLiteral") {
 			return [typeInfo.value];
 		}
+
 		if (typeInfo.kind !== "union" || typeInfo.items.length === 0) {
 			return undefined;
 		}
+
 		const first = typeInfo.items[0];
 
 		const item: [string, string] | [string, number] | undefined =
@@ -1799,9 +2011,11 @@ export default class Visitor {
 		if (item === undefined) {
 			return undefined;
 		}
+
 		const kind = item[0];
 
 		const result: (string | number)[] = [];
+
 		result.push(item[1]);
 
 		for (let i = 1; i < typeInfo.items.length; i++) {
@@ -1810,14 +2024,17 @@ export default class Visitor {
 			if (info.kind !== kind) {
 				return undefined;
 			}
+
 			if (
 				info.kind !== "integerLiteral" &&
 				info.kind !== "stringLiteral"
 			) {
 				return undefined;
 			}
+
 			result.push(info.value);
 		}
+
 		return result as string[] | number[];
 	}
 
@@ -1834,9 +2051,11 @@ export default class Visitor {
 		) {
 			enumValueNode = declaration.type.literal;
 		}
+
 		if (enumValueNode === undefined) {
 			return undefined;
 		}
+
 		if (
 			ts.isNumericLiteral(enumValueNode) ||
 			(ts.isPrefixUnaryExpression(enumValueNode) &&
@@ -1846,6 +2065,7 @@ export default class Visitor {
 		} else if (ts.isStringLiteral(enumValueNode)) {
 			return this.removeQuotes(enumValueNode.getText());
 		}
+
 		return undefined;
 	}
 
@@ -1853,16 +2073,19 @@ export default class Visitor {
 		if (values.length === 0) {
 			return undefined;
 		}
+
 		const first = values[0];
 
 		if (typeof first === "string") {
 			return { kind: "base", name: "string" };
 		}
+
 		for (const value of values as number[]) {
 			if (value < 0) {
 				return { kind: "base", name: "integer" };
 			}
 		}
+
 		return { kind: "base", name: "uinteger" };
 	}
 
@@ -1875,6 +2098,7 @@ export default class Visitor {
 		) {
 			return text;
 		}
+
 		return text.substring(1, text.length - 1);
 	}
 
@@ -1908,10 +2132,15 @@ export default class Visitor {
 			})
 				? true
 				: undefined;
+
 		value.documentation = this.getDocumentation(node);
+
 		value.since = since;
+
 		value.sinceTags = sinceTags;
+
 		value.deprecated = deprecated;
+
 		value.proposed = proposed;
 	}
 
@@ -1951,25 +2180,33 @@ export default class Visitor {
 							continue;
 						}
 					}
+
 					if (noComment.length > 0 && noComment[0] === " ") {
 						noComment = noComment.substring(1);
 					}
+
 					buffer.push(noComment);
 				}
+
 				return buffer.join("\n");
 			}
 		}
+
 		return undefined;
 	}
 
 	private getTags(tags: ReadonlyArray<ts.JSDocTag>): {
 		since?: string;
+
 		sinceTags?: string[];
+
 		deprecated?: string;
 	} {
 		const result: {
 			since?: string;
+
 			sinceTags?: string[];
+
 			deprecated?: string;
 		} = {};
 
@@ -1979,6 +2216,7 @@ export default class Visitor {
 				typeof tag.comment === "string"
 			) {
 				const value = tag.comment.replace(/\r?\n/g, "\n");
+
 				result.since = value;
 
 				if (result.sinceTags === undefined) {
@@ -1993,9 +2231,11 @@ export default class Visitor {
 				result.deprecated = tag.comment.replace(/\r?\n/g, "\n");
 			}
 		}
+
 		if (Array.isArray(result.sinceTags) && result.sinceTags.length === 1) {
 			delete result.sinceTags;
 		}
+
 		return result;
 	}
 }

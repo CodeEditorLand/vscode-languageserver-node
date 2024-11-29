@@ -49,6 +49,7 @@ export type InlineValueMiddleware = {
 
 export type InlineValueProviderShape = {
 	provider: InlineValuesProvider;
+
 	onDidChangeInlineValues: EventEmitter<void>;
 };
 
@@ -67,6 +68,7 @@ export class InlineValueFeature extends TextDocumentLanguageFeature<
 			ensure(capabilities, "textDocument")!,
 			"inlineValue",
 		)!.dynamicRegistration = true;
+
 		ensure(
 			ensure(capabilities, "workspace")!,
 			"inlineValue",
@@ -91,6 +93,7 @@ export class InlineValueFeature extends TextDocumentLanguageFeature<
 		if (!id || !options) {
 			return;
 		}
+
 		this.register({ id: id, registerOptions: options });
 	}
 
@@ -135,6 +138,7 @@ export class InlineValueFeature extends TextDocumentLanguageFeature<
 								if (token.isCancellationRequested) {
 									return null;
 								}
+
 								return client.protocol2CodeConverter.asInlineValues(
 									values,
 									token,

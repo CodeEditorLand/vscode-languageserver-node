@@ -21,6 +21,7 @@ import {
 const connection = createConnection();
 
 console.log = connection.console.log.bind(connection.console);
+
 console.error = connection.console.error.bind(connection.console);
 
 const receivedNotifications: Set<string> = new Set();
@@ -95,6 +96,7 @@ connection.onRequest(GotNotifiedRequest.type, (method: string) => {
 	if (result) {
 		receivedNotifications.delete(method);
 	}
+
 	return result;
 });
 

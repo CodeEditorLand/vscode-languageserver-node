@@ -13,28 +13,36 @@ const CRLF: string = "\r\n";
 
 export abstract class AbstractMessageBuffer implements RAL.MessageBuffer {
 	private _encoding: RAL.MessageBufferEncoding;
+
 	private _chunks: Uint8Array[];
+
 	private _totalLength: number;
 
 	constructor(encoding: RAL.MessageBufferEncoding = "utf-8") {
 		this._encoding = encoding;
+
 		this._chunks = [];
+
 		this._totalLength = 0;
 	}
 
 	protected abstract emptyBuffer(): Uint8Array;
+
 	protected abstract fromString(
 		value: string,
 		encoding: RAL.MessageBufferEncoding,
 	): Uint8Array;
+
 	protected abstract toString(
 		value: Uint8Array,
 		encoding: RAL.MessageBufferEncoding,
 	): string;
+
 	protected abstract asNative(
 		buffer: Uint8Array,
 		length?: number,
 	): Uint8Array;
+
 	protected abstract allocNative(length: number): Uint8Array;
 
 	public get encoding(): RAL.MessageBufferEncoding {
@@ -46,7 +54,9 @@ export abstract class AbstractMessageBuffer implements RAL.MessageBuffer {
 			typeof chunk === "string"
 				? this.fromString(chunk, this._encoding)
 				: chunk;
+
 		this._chunks.push(toAppend);
+
 		this._totalLength += toAppend.byteLength;
 	}
 
@@ -56,6 +66,7 @@ export abstract class AbstractMessageBuffer implements RAL.MessageBuffer {
 		if (this._chunks.length === 0) {
 			return undefined;
 		}
+
 		let state = 0;
 
 		let chunkIndex = 0;
@@ -63,8 +74,10 @@ export abstract class AbstractMessageBuffer implements RAL.MessageBuffer {
 		let offset = 0;
 
 		let chunkBytesRead: number = 0;
+
 		row: while (chunkIndex < this._chunks.length) {
 			const chunk = this._chunks[chunkIndex];
+
 			offset = 0;
 
 			while (offset < chunk.length) {
@@ -86,6 +99,7 @@ export abstract class AbstractMessageBuffer implements RAL.MessageBuffer {
 							default:
 								state = 0;
 						}
+
 						break;
 
 					case LF:
@@ -97,6 +111,7 @@ export abstract class AbstractMessageBuffer implements RAL.MessageBuffer {
 
 							case 3:
 								state = 4;
+
 								offset++;
 
 								break row;
@@ -104,16 +119,21 @@ export abstract class AbstractMessageBuffer implements RAL.MessageBuffer {
 							default:
 								state = 0;
 						}
+
 						break;
 
 					default:
 						state = 0;
 				}
+
 				offset++;
 			}
+
 			chunkBytesRead += chunk.byteLength;
+
 			chunkIndex++;
 		}
+
 		if (state !== 4) {
 			return undefined;
 		}
@@ -129,6 +149,7 @@ export abstract class AbstractMessageBuffer implements RAL.MessageBuffer {
 		if (headers.length < 2) {
 			return result;
 		}
+
 		for (let i = 0; i < headers.length - 2; i++) {
 			const header = headers[i];
 
@@ -139,11 +160,14 @@ export abstract class AbstractMessageBuffer implements RAL.MessageBuffer {
 					`Message header must separate key and value using ':'\n${header}`,
 				);
 			}
+
 			const key = header.substr(0, index);
 
 			const value = header.substr(index + 1).trim();
+
 			result.set(lowerCaseKeys ? key.toLowerCase() : key, value);
 		}
+
 		return result;
 	}
 
@@ -171,7 +195,9 @@ export abstract class AbstractMessageBuffer implements RAL.MessageBuffer {
 		if (this._chunks[0].byteLength === byteCount) {
 			// super fast path, precisely first chunk must be returned
 			const chunk = this._chunks[0];
+
 			this._chunks.shift();
+
 			this._totalLength -= byteCount;
 
 			return this.asNative(chunk);
@@ -182,7 +208,9 @@ export abstract class AbstractMessageBuffer implements RAL.MessageBuffer {
 			const chunk = this._chunks[0];
 
 			const result: Uint8Array = this.asNative(chunk, byteCount);
+
 			this._chunks[0] = chunk.slice(byteCount);
+
 			this._totalLength -= byteCount;
 
 			return result;
@@ -200,20 +228,30 @@ export abstract class AbstractMessageBuffer implements RAL.MessageBuffer {
 			if (chunk.byteLength > byteCount) {
 				// this chunk will survive
 				const chunkPart = chunk.slice(0, byteCount);
+
 				result.set(chunkPart, resultOffset);
+
 				resultOffset += byteCount;
+
 				this._chunks[chunkIndex] = chunk.slice(byteCount);
+
 				this._totalLength -= byteCount;
+
 				byteCount -= byteCount;
 			} else {
 				// this chunk will be entirely read
 				result.set(chunk, resultOffset);
+
 				resultOffset += chunk.byteLength;
+
 				this._chunks.shift();
+
 				this._totalLength -= chunk.byteLength;
+
 				byteCount -= chunk.byteLength;
 			}
 		}
+
 		return result;
 	}
 }

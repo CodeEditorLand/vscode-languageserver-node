@@ -94,6 +94,7 @@ export namespace ExecutionSummary {
 		if (success === true || success === false) {
 			result.success = success;
 		}
+
 		return result;
 	}
 
@@ -114,6 +115,7 @@ export namespace ExecutionSummary {
 		if (one === other) {
 			return true;
 		}
+
 		if (
 			one === null ||
 			one === undefined ||
@@ -122,6 +124,7 @@ export namespace ExecutionSummary {
 		) {
 			return false;
 		}
+
 		return (
 			one.executionOrder === other.executionOrder &&
 			one.success === other.success
@@ -193,18 +196,22 @@ export namespace NotebookCell {
 		if (one.document !== two.document) {
 			result.add("document");
 		}
+
 		if (one.kind !== two.kind) {
 			result.add("kind");
 		}
+
 		if (one.executionSummary !== two.executionSummary) {
 			result.add("executionSummary");
 		}
+
 		if (
 			(one.metadata !== undefined || two.metadata !== undefined) &&
 			!equalsMetadata(one.metadata, two.metadata)
 		) {
 			result.add("metadata");
 		}
+
 		if (
 			(one.executionSummary !== undefined ||
 				two.executionSummary !== undefined) &&
@@ -212,6 +219,7 @@ export namespace NotebookCell {
 		) {
 			result.add("executionSummary");
 		}
+
 		return result;
 	}
 
@@ -224,6 +232,7 @@ export namespace NotebookCell {
 		if (one === other) {
 			return true;
 		}
+
 		if (
 			one === null ||
 			one === undefined ||
@@ -232,12 +241,15 @@ export namespace NotebookCell {
 		) {
 			return false;
 		}
+
 		if (typeof one !== typeof other) {
 			return false;
 		}
+
 		if (typeof one !== "object") {
 			return false;
 		}
+
 		const oneArray = Array.isArray(one);
 
 		const otherArray = Array.isArray(other);
@@ -250,12 +262,14 @@ export namespace NotebookCell {
 			if (one.length !== other.length) {
 				return false;
 			}
+
 			for (let i = 0; i < one.length; i++) {
 				if (!equalsMetadata(one[i], other[i])) {
 					return false;
 				}
 			}
 		}
+
 		if (Is.objectLiteral(one) && Is.objectLiteral(other)) {
 			const oneKeys = Object.keys(one);
 
@@ -266,11 +280,13 @@ export namespace NotebookCell {
 			}
 
 			oneKeys.sort();
+
 			otherKeys.sort();
 
 			if (!equalsMetadata(oneKeys, otherKeys)) {
 				return false;
 			}
+
 			for (let i = 0; i < oneKeys.length; i++) {
 				const prop = oneKeys[i];
 
@@ -284,6 +300,7 @@ export namespace NotebookCell {
 				}
 			}
 		}
+
 		return true;
 	}
 }
@@ -333,6 +350,7 @@ export namespace NotebookDocument {
 	): NotebookDocument {
 		return { uri, notebookType, version, cells };
 	}
+
 	export function is(value: any): value is NotebookDocument {
 		const candidate: NotebookDocument = value;
 
@@ -549,6 +567,7 @@ export namespace NotebookCellArrayChange {
 		if (cells !== undefined) {
 			result.cells = cells;
 		}
+
 		return result;
 	}
 }
@@ -582,6 +601,7 @@ export type NotebookDocumentCellChangeStructure = {
  */
 export type NotebookDocumentCellContentChanges = {
 	document: VersionedTextDocumentIdentifier;
+
 	changes: TextDocumentContentChangeEvent[];
 };
 

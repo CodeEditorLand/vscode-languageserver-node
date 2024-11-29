@@ -5,8 +5,11 @@
 
 interface Message {
 	command: string;
+
 	success?: boolean;
+
 	args?: any;
+
 	result?: any;
 }
 
@@ -16,6 +19,7 @@ process.on("message", (message: Message) => {
 	} else if (message.command === "resolve") {
 		try {
 			const result = (<any>require).resolve(message.args);
+
 			process.send!({
 				command: "resolve",
 				success: true,

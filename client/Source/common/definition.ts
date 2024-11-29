@@ -60,7 +60,9 @@ export class DefinitionFeature extends TextDocumentLanguageFeature<
 			ensure(capabilities, "textDocument")!,
 			"definition",
 		)!;
+
 		definitionSupport.dynamicRegistration = true;
+
 		definitionSupport.linkSupport = true;
 	}
 
@@ -76,6 +78,7 @@ export class DefinitionFeature extends TextDocumentLanguageFeature<
 		if (!options) {
 			return;
 		}
+
 		this.register({ id: UUID.generateUuid(), registerOptions: options });
 	}
 
@@ -107,6 +110,7 @@ export class DefinitionFeature extends TextDocumentLanguageFeature<
 								if (token.isCancellationRequested) {
 									return null;
 								}
+
 								return client.protocol2CodeConverter.asDefinitionResult(
 									result,
 									token,

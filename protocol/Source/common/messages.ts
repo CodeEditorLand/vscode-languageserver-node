@@ -26,6 +26,7 @@ export class RegistrationType<RO> {
 	public readonly ____: [RO, _EM] | undefined;
 
 	public readonly method: string;
+
 	public constructor(method: string) {
 		this.method = method;
 	}
@@ -40,8 +41,11 @@ export class ProtocolRequestType0<R, PR, E, RO>
 	 * in TypeScript
 	 */
 	public readonly __: [PR, _EM] | undefined;
+
 	public readonly ___: [PR, RO, _EM] | undefined;
+
 	public readonly ____: [RO, _EM] | undefined;
+
 	public readonly _pr: PR | undefined;
 
 	public constructor(method: string) {
@@ -57,8 +61,11 @@ export class ProtocolRequestType<P, R, PR, E, RO>
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */
 	public readonly __: [PR, _EM] | undefined;
+
 	public readonly ___: [PR, RO, _EM] | undefined;
+
 	public readonly ____: [RO, _EM] | undefined;
+
 	public readonly _pr: PR | undefined;
 
 	public constructor(method: string) {
@@ -74,6 +81,7 @@ export class ProtocolNotificationType0<RO>
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */
 	public readonly ___: [RO, _EM] | undefined;
+
 	public readonly ____: [RO, _EM] | undefined;
 
 	public constructor(method: string) {
@@ -89,6 +97,7 @@ export class ProtocolNotificationType<P, RO>
 	 * Clients must not use this property. It is here to ensure correct typing.
 	 */
 	public readonly ___: [RO, _EM] | undefined;
+
 	public readonly ____: [RO, _EM] | undefined;
 
 	public constructor(method: string) {

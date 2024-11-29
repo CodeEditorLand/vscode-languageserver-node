@@ -69,12 +69,14 @@ export interface CallHierarchyMiddleware {
 		token: CancellationToken,
 		next: PrepareCallHierarchySignature,
 	) => ProviderResult<VCallHierarchyItem | VCallHierarchyItem[]>;
+
 	provideCallHierarchyIncomingCalls?: (
 		this: void,
 		item: VCallHierarchyItem,
 		token: CancellationToken,
 		next: CallHierarchyIncomingCallsSignature,
 	) => ProviderResult<VCallHierarchyIncomingCall[]>;
+
 	provideCallHierarchyOutgoingCalls?: (
 		this: void,
 		item: VCallHierarchyItem,
@@ -117,6 +119,7 @@ class CallHierarchyProvider implements VCallHierarchyProvider {
 						if (token.isCancellationRequested) {
 							return null;
 						}
+
 						return client.protocol2CodeConverter.asCallHierarchyItems(
 							result,
 							token,
@@ -170,6 +173,7 @@ class CallHierarchyProvider implements VCallHierarchyProvider {
 							if (token.isCancellationRequested) {
 								return null;
 							}
+
 							return client.protocol2CodeConverter.asCallHierarchyIncomingCalls(
 								result,
 								token,
@@ -222,6 +226,7 @@ class CallHierarchyProvider implements VCallHierarchyProvider {
 							if (token.isCancellationRequested) {
 								return null;
 							}
+
 							return client.protocol2CodeConverter.asCallHierarchyOutgoingCalls(
 								result,
 								token,
@@ -267,6 +272,7 @@ export class CallHierarchyFeature extends TextDocumentLanguageFeature<
 			ensure(capabilities, "textDocument")!,
 			"callHierarchy",
 		)!;
+
 		capability.dynamicRegistration = true;
 	}
 
@@ -282,6 +288,7 @@ export class CallHierarchyFeature extends TextDocumentLanguageFeature<
 		if (!id || !options) {
 			return;
 		}
+
 		this.register({ id: id, registerOptions: options });
 	}
 

@@ -87,7 +87,9 @@ export async function activate(context: ExtensionContext) {
 		serverOptions,
 		clientOptions,
 	);
+
 	client.registerProposedFeatures();
+
 	client.onTelemetry((data: any) => {
 		console.log(`Telemetry event received: ${JSON.stringify(data)}`);
 	});
@@ -101,11 +103,13 @@ export async function activate(context: ExtensionContext) {
 	} catch (error) {
 		client.error(`Start failed`, error, "force");
 	}
+
 	try {
 		await client.sendNotification(not, ["dirk", "baeumer"]);
 	} catch (error) {
 		client.error(`Sending test notification failed`, error, "force");
 	}
+
 	commands.registerCommand("testbed.myCommand.invoked", () => {
 		void commands.executeCommand("testbed.myCommand").then((value) => {
 			console.log(value);
@@ -139,11 +143,13 @@ REM or .bmp extension from c:\\source to c:\\images;;`;
 		const doc = await workspace.openTextDocument(
 			Uri.parse("test-content://file.txt"),
 		);
+
 		await window.showTextDocument(doc);
 	});
 
 	const refreshNotification: NotificationType<string> =
 		new NotificationType<string>("testbed/refreshContent");
+
 	commands.registerCommand("testbed.refreshContent", async () => {
 		await client.sendNotification(
 			refreshNotification,

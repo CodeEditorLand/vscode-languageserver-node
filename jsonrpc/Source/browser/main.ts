@@ -31,17 +31,22 @@ export class BrowserMessageReader
 	implements MessageReader
 {
 	private _onData: Emitter<Message>;
+
 	private _messageListener: (event: MessageEvent) => void;
 
 	public constructor(
 		port: MessagePort | Worker | DedicatedWorkerGlobalScope,
 	) {
 		super();
+
 		this._onData = new Emitter<Message>();
+
 		this._messageListener = (event: MessageEvent) => {
 			this._onData.fire(event.data);
 		};
+
 		port.addEventListener("error", (event) => this.fireError(event));
+
 		port.onmessage = this._messageListener;
 	}
 
@@ -60,7 +65,9 @@ export class BrowserMessageWriter
 		private port: MessagePort | Worker | DedicatedWorkerGlobalScope,
 	) {
 		super();
+
 		this.errorCount = 0;
+
 		port.addEventListener("error", (event) => this.fireError(event));
 	}
 
@@ -78,6 +85,7 @@ export class BrowserMessageWriter
 
 	private handleError(error: any, msg: Message): void {
 		this.errorCount++;
+
 		this.fireError(error, msg, this.errorCount);
 	}
 

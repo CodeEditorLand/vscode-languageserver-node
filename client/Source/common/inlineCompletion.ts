@@ -67,6 +67,7 @@ export class InlineCompletionItemFeature extends TextDocumentLanguageFeature<
 			ensure(capabilities, "textDocument")!,
 			"inlineCompletion",
 		)!;
+
 		inlineCompletion.dynamicRegistration = true;
 	}
 
@@ -124,6 +125,7 @@ export class InlineCompletionItemFeature extends TextDocumentLanguageFeature<
 									if (token.isCancellationRequested) {
 										return null;
 									}
+
 									return client.protocol2CodeConverter.asInlineCompletionResult(
 										result,
 										token,

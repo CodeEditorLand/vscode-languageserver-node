@@ -57,13 +57,18 @@ import * as UUID from "./utils/uuid";
 
 export interface TextDocumentSynchronizationMiddleware {
 	didOpen?: NextSignature<TextDocument, Promise<void>>;
+
 	didChange?: NextSignature<TextDocumentChangeEvent, Promise<void>>;
+
 	willSave?: NextSignature<TextDocumentWillSaveEvent, Promise<void>>;
+
 	willSaveWaitUntil?: NextSignature<
 		TextDocumentWillSaveEvent,
 		Thenable<VTextEdit[]>
 	>;
+
 	didSave?: NextSignature<TextDocument, Promise<void>>;
+
 	didClose?: NextSignature<TextDocument, Promise<void>>;
 }
 
@@ -93,8 +98,11 @@ export class DidOpenTextDocumentFeature
 	implements DidOpenTextDocumentFeatureShape
 {
 	private readonly _syncedDocuments: Map<string, TextDocument>;
+
 	private readonly _pendingOpenNotifications: Map<string, TextDocument>;
+
 	private readonly _delayOpen: boolean;
+
 	private _pendingOpenListeners: Disposable[] | undefined;
 
 	constructor(
@@ -116,8 +124,11 @@ export class DidOpenTextDocumentFeature
 			(data) => data,
 			TextDocumentEventFeature.textDocumentFilter,
 		);
+
 		this._syncedDocuments = syncedDocuments;
+
 		this._pendingOpenNotifications = new Map<string, TextDocument>();
+
 		this._delayOpen =
 			client.clientOptions.textSynchronization?.delayOpenNotifications ??
 			false;
@@ -130,6 +141,7 @@ export class DidOpenTextDocumentFeature
 			if (!this.matches(document)) {
 				return;
 			}
+
 			const tabsModel = this._client.tabsModel;
 
 			if (tabsModel.isVisible(document)) {
@@ -186,16 +198,19 @@ export class DidOpenTextDocumentFeature
 		if (!data.registerOptions.documentSelector) {
 			return;
 		}
+
 		const documentSelector =
 			this._client.protocol2CodeConverter.asDocumentSelector(
 				data.registerOptions.documentSelector,
 			);
+
 		Workspace.textDocuments.forEach((textDocument) => {
 			const uri: string = textDocument.uri.toString();
 
 			if (this._syncedDocuments.has(uri)) {
 				return;
 			}
+
 			if (
 				Languages.match(documentSelector, textDocument) > 0 &&
 				!this._client.hasDedicatedTextSynchronizationFeature(
@@ -224,6 +239,7 @@ export class DidOpenTextDocumentFeature
 							error,
 						);
 					});
+
 					this._syncedDocuments.set(uri, textDocument);
 				} else {
 					this._pendingOpenNotifications.set(uri, textDocument);
@@ -235,6 +251,7 @@ export class DidOpenTextDocumentFeature
 			this._pendingOpenListeners = [];
 
 			const tabsModel = this._client.tabsModel;
+
 			this._pendingOpenListeners.push(
 				tabsModel.onClose((closed) => {
 					for (const uri of closed) {
@@ -242,6 +259,7 @@ export class DidOpenTextDocumentFeature
 					}
 				}),
 			);
+
 			this._pendingOpenListeners.push(
 				tabsModel.onOpen((opened) => {
 					for (const uri of opened) {
@@ -256,6 +274,7 @@ export class DidOpenTextDocumentFeature
 									error,
 								);
 							});
+
 							this._pendingOpenNotifications.delete(
 								uri.toString(),
 							);
@@ -263,6 +282,7 @@ export class DidOpenTextDocumentFeature
 					}
 				}),
 			);
+
 			this._pendingOpenListeners.push(
 				workspace.onDidCloseTextDocument((document) => {
 					this._pendingOpenNotifications.delete(
@@ -279,6 +299,7 @@ export class DidOpenTextDocumentFeature
 		const notifications = Array.from(
 			this._pendingOpenNotifications.values(),
 		);
+
 		this._pendingOpenNotifications.clear();
 
 		for (const notification of notifications) {
@@ -288,6 +309,7 @@ export class DidOpenTextDocumentFeature
 			) {
 				continue;
 			}
+
 			await super.callback(notification);
 		}
 	}
@@ -316,8 +338,10 @@ export class DidOpenTextDocumentFeature
 			for (const listener of this._pendingOpenListeners) {
 				listener.dispose();
 			}
+
 			this._pendingOpenListeners = undefined;
 		}
+
 		super.clear();
 	}
 }
@@ -336,6 +360,7 @@ export class DidCloseTextDocumentFeature
 	implements DidCloseTextDocumentFeatureShape
 {
 	private readonly _syncedDocuments: Map<string, TextDocument>;
+
 	private readonly _pendingTextDocumentChanges: Map<string, TextDocument>;
 
 	constructor(
@@ -355,7 +380,9 @@ export class DidCloseTextDocumentFeature
 			(data) => data,
 			TextDocumentEventFeature.textDocumentFilter,
 		);
+
 		this._syncedDocuments = syncedDocuments;
+
 		this._pendingTextDocumentChanges = pendingTextDocumentChanges;
 	}
 
@@ -392,6 +419,7 @@ export class DidCloseTextDocumentFeature
 
 	protected async callback(data: TextDocument): Promise<void> {
 		await super.callback(data);
+
 		this._pendingTextDocumentChanges.delete(data.uri.toString());
 	}
 
@@ -423,6 +451,7 @@ export class DidCloseTextDocumentFeature
 		super.unregister(id);
 
 		const selectors = this._selectors.values();
+
 		this._syncedDocuments.forEach((textDocument) => {
 			if (
 				Languages.match(selector, textDocument) > 0 &&
@@ -441,6 +470,7 @@ export class DidCloseTextDocumentFeature
 						this._createParams(textDocument),
 					);
 				};
+
 				this._syncedDocuments.delete(textDocument.uri.toString());
 				(middleware.didClose
 					? middleware.didClose(textDocument, didClose)
@@ -477,12 +507,17 @@ export class DidChangeTextDocumentFeature
 	implements DidChangeTextDocumentFeatureShape
 {
 	private _listener: Disposable | undefined;
+
 	private readonly _changeData: Map<string, DidChangeTextDocumentData>;
+
 	private readonly _onNotificationSent: EventEmitter<
 		NotificationSendEvent<DidChangeTextDocumentParams>
 	>;
+
 	private readonly _onPendingChangeAdded: EventEmitter<void>;
+
 	private readonly _pendingTextDocumentChanges: Map<string, TextDocument>;
+
 	private _syncKind: TextDocumentSyncKind;
 
 	constructor(
@@ -490,10 +525,15 @@ export class DidChangeTextDocumentFeature
 		pendingTextDocumentChanges: Map<string, TextDocument>,
 	) {
 		super(client);
+
 		this._changeData = new Map<string, DidChangeTextDocumentData>();
+
 		this._onNotificationSent = new EventEmitter();
+
 		this._onPendingChangeAdded = new EventEmitter();
+
 		this._pendingTextDocumentChanges = pendingTextDocumentChanges;
+
 		this._syncKind = TextDocumentSyncKind.None;
 	}
 
@@ -553,12 +593,14 @@ export class DidChangeTextDocumentFeature
 		if (!data.registerOptions.documentSelector) {
 			return;
 		}
+
 		if (!this._listener) {
 			this._listener = Workspace.onDidChangeTextDocument(
 				this.callback,
 				this,
 			);
 		}
+
 		this._changeData.set(data.id, {
 			syncKind: data.registerOptions.syncKind,
 			documentSelector:
@@ -566,6 +608,7 @@ export class DidChangeTextDocumentFeature
 					data.registerOptions.documentSelector,
 				),
 		});
+
 		this.updateSyncKind(data.registerOptions.syncKind);
 	}
 
@@ -611,16 +654,19 @@ export class DidChangeTextDocumentFeature
 								uri,
 								version,
 							);
+
 						await this._client.sendNotification(
 							DidChangeTextDocumentNotification.type,
 							params,
 						);
+
 						this.notificationSent(
 							event.document,
 							DidChangeTextDocumentNotification.type,
 							params,
 						);
 					};
+
 					promises.push(
 						middleware.didChange
 							? middleware.didChange(event, (event) =>
@@ -633,12 +679,15 @@ export class DidChangeTextDocumentFeature
 						event: TextDocumentChangeEvent,
 					): Promise<void> => {
 						const eventUri: string = event.document.uri.toString();
+
 						this._pendingTextDocumentChanges.set(
 							eventUri,
 							event.document,
 						);
+
 						this._onPendingChangeAdded.fire();
 					};
+
 					promises.push(
 						middleware.didChange
 							? middleware.didChange(event, (event) =>
@@ -649,6 +698,7 @@ export class DidChangeTextDocumentFeature
 				}
 			}
 		}
+
 		return Promise.all(promises).then(undefined, (error) => {
 			this._client.error(
 				`Sending document notification ${DidChangeTextDocumentNotification.type.method} failed`,
@@ -676,8 +726,10 @@ export class DidChangeTextDocumentFeature
 		if (this._changeData.size === 0) {
 			if (this._listener) {
 				this._listener.dispose();
+
 				this._listener = undefined;
 			}
+
 			this._syncKind = TextDocumentSyncKind.None;
 		} else {
 			this._syncKind = TextDocumentSyncKind.None as TextDocumentSyncKind;
@@ -694,11 +746,14 @@ export class DidChangeTextDocumentFeature
 
 	public clear(): void {
 		this._pendingTextDocumentChanges.clear();
+
 		this._changeData.clear();
+
 		this._syncKind = TextDocumentSyncKind.None;
 
 		if (this._listener) {
 			this._listener.dispose();
+
 			this._listener = undefined;
 		}
 	}
@@ -707,10 +762,12 @@ export class DidChangeTextDocumentFeature
 		if (this._pendingTextDocumentChanges.size === 0) {
 			return [];
 		}
+
 		let result: TextDocument[];
 
 		if (excludes.size === 0) {
 			result = Array.from(this._pendingTextDocumentChanges.values());
+
 			this._pendingTextDocumentChanges.clear();
 		} else {
 			result = [];
@@ -718,10 +775,12 @@ export class DidChangeTextDocumentFeature
 			for (const entry of this._pendingTextDocumentChanges) {
 				if (!excludes.has(entry[0])) {
 					result.push(entry[1]);
+
 					this._pendingTextDocumentChanges.delete(entry[0]);
 				}
 			}
 		}
+
 		return result;
 	}
 
@@ -737,6 +796,7 @@ export class DidChangeTextDocumentFeature
 				};
 			}
 		}
+
 		return undefined;
 	}
 
@@ -744,6 +804,7 @@ export class DidChangeTextDocumentFeature
 		if (this._syncKind === TextDocumentSyncKind.Full) {
 			return;
 		}
+
 		switch (syncKind) {
 			case TextDocumentSyncKind.Full:
 				this._syncKind = syncKind;
@@ -754,6 +815,7 @@ export class DidChangeTextDocumentFeature
 				if (this._syncKind === TextDocumentSyncKind.None) {
 					this._syncKind = TextDocumentSyncKind.Incremental;
 				}
+
 				break;
 		}
 	}
@@ -792,6 +854,7 @@ export class WillSaveFeature extends TextDocumentEventFeature<
 			ensure(capabilities, "textDocument")!,
 			"synchronization",
 		)!;
+
 		value.willSave = true;
 	}
 
@@ -825,10 +888,12 @@ export class WillSaveWaitUntilFeature extends DynamicDocumentFeature<
 	TextDocumentSynchronizationMiddleware
 > {
 	private _listener: Disposable | undefined;
+
 	private readonly _selectors: Map<string, VDocumentSelector>;
 
 	constructor(client: FeatureClient<TextDocumentSynchronizationMiddleware>) {
 		super(client);
+
 		this._selectors = new Map<string, VDocumentSelector>();
 	}
 
@@ -845,6 +910,7 @@ export class WillSaveWaitUntilFeature extends DynamicDocumentFeature<
 			ensure(capabilities, "textDocument")!,
 			"synchronization",
 		)!;
+
 		value.willSaveWaitUntil = true;
 	}
 
@@ -874,12 +940,14 @@ export class WillSaveWaitUntilFeature extends DynamicDocumentFeature<
 		if (!data.registerOptions.documentSelector) {
 			return;
 		}
+
 		if (!this._listener) {
 			this._listener = Workspace.onWillSaveTextDocument(
 				this.callback,
 				this,
 			);
 		}
+
 		this._selectors.set(
 			data.id,
 			this._client.protocol2CodeConverter.asDocumentSelector(
@@ -917,6 +985,7 @@ export class WillSaveWaitUntilFeature extends DynamicDocumentFeature<
 						return vEdits === undefined ? [] : vEdits;
 					});
 			};
+
 			event.waitUntil(
 				middleware.willSaveWaitUntil
 					? middleware.willSaveWaitUntil(event, willSaveWaitUntil)
@@ -930,6 +999,7 @@ export class WillSaveWaitUntilFeature extends DynamicDocumentFeature<
 
 		if (this._selectors.size === 0 && this._listener) {
 			this._listener.dispose();
+
 			this._listener = undefined;
 		}
 	}
@@ -939,6 +1009,7 @@ export class WillSaveWaitUntilFeature extends DynamicDocumentFeature<
 
 		if (this._listener) {
 			this._listener.dispose();
+
 			this._listener = undefined;
 		}
 	}
@@ -973,6 +1044,7 @@ export class DidSaveTextDocumentFeature
 			(data) => data,
 			TextDocumentEventFeature.textDocumentFilter,
 		);
+
 		this._includeText = false;
 	}
 
@@ -1007,6 +1079,7 @@ export class DidSaveTextDocumentFeature
 							includeText:
 								!!textDocumentSyncOptions.save.includeText,
 						};
+
 			this.register({
 				id: UUID.generateUuid(),
 				registerOptions: Object.assign(

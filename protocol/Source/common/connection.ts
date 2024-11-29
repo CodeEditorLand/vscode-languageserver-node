@@ -50,6 +50,7 @@ export interface ProtocolConnection {
 		type: ProtocolRequestType0<R, PR, E, RO>,
 		token?: CancellationToken,
 	): Promise<R>;
+
 	sendRequest<R, E>(
 		type: RequestType0<R, E>,
 		token?: CancellationToken,
@@ -68,6 +69,7 @@ export interface ProtocolConnection {
 		params: P,
 		token?: CancellationToken,
 	): Promise<R>;
+
 	sendRequest<P, R, E>(
 		type: RequestType<P, R, E>,
 		params: P,
@@ -108,6 +110,7 @@ export interface ProtocolConnection {
 		type: ProtocolRequestType0<R, PR, E, RO>,
 		handler: RequestHandler0<R, E>,
 	): Disposable;
+
 	onRequest<R, E>(
 		type: RequestType0<R, E>,
 		handler: RequestHandler0<R, E>,
@@ -124,6 +127,7 @@ export interface ProtocolConnection {
 		type: ProtocolRequestType<P, R, PR, E, RO>,
 		handler: RequestHandler<P, R, E>,
 	): Disposable;
+
 	onRequest<P, R, E>(
 		type: RequestType<P, R, E>,
 		handler: RequestHandler<P, R, E>,
@@ -155,6 +159,7 @@ export interface ProtocolConnection {
 	 * network layer.
 	 */
 	sendNotification(type: NotificationType0): Promise<void>;
+
 	sendNotification<RO>(type: ProtocolNotificationType0<RO>): Promise<void>;
 
 	/**
@@ -169,6 +174,7 @@ export interface ProtocolConnection {
 		type: ProtocolNotificationType<P, RO>,
 		params?: P,
 	): Promise<void>;
+
 	sendNotification<P>(type: NotificationType<P>, params?: P): Promise<void>;
 
 	/**
@@ -201,6 +207,7 @@ export interface ProtocolConnection {
 		type: ProtocolNotificationType0<RO>,
 		handler: NotificationHandler0,
 	): Disposable;
+
 	onNotification(
 		type: NotificationType0,
 		handler: NotificationHandler0,
@@ -217,6 +224,7 @@ export interface ProtocolConnection {
 		type: ProtocolNotificationType<P, RO>,
 		handler: NotificationHandler<P>,
 	): Disposable;
+
 	onNotification<P>(
 		type: NotificationType<P>,
 		handler: NotificationHandler<P>,
@@ -271,6 +279,7 @@ export interface ProtocolConnection {
 		tracer: Tracer,
 		sendNotification?: boolean,
 	): Promise<void>;
+
 	trace(
 		value: Trace,
 		tracer: Tracer,
@@ -323,5 +332,6 @@ export function createProtocolConnection(
 	if (ConnectionStrategy.is(options)) {
 		options = { connectionStrategy: options } as ConnectionOptions;
 	}
+
 	return createMessageConnection(input, output, logger, options);
 }

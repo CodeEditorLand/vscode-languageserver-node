@@ -8,11 +8,13 @@ import type RAL from "./ral";
 
 export interface FunctionContentEncoder {
 	name: string;
+
 	encode(input: Uint8Array): Promise<Uint8Array>;
 }
 
 export interface StreamContentEncoder {
 	name: string;
+
 	create(): RAL.WritableStream;
 }
 
@@ -22,11 +24,13 @@ export type ContentEncoder =
 
 export interface FunctionContentDecoder {
 	name: string;
+
 	decode(buffer: Uint8Array): Promise<Uint8Array>;
 }
 
 export interface StreamContentDecoder {
 	name: string;
+
 	create(): RAL.WritableStream;
 }
 
@@ -40,6 +44,7 @@ export interface ContentTypeEncoderOptions {
 
 export interface FunctionContentTypeEncoder {
 	name: string;
+
 	encode(
 		msg: Message,
 		options: ContentTypeEncoderOptions,
@@ -48,6 +53,7 @@ export interface FunctionContentTypeEncoder {
 
 export interface StreamContentTypeEncoder {
 	name: string;
+
 	create(options: ContentTypeEncoderOptions): RAL.WritableStream;
 }
 
@@ -61,6 +67,7 @@ export interface ContentTypeDecoderOptions {
 
 export interface FunctionContentTypeDecoder {
 	name: string;
+
 	decode(
 		buffer: Uint8Array,
 		options: ContentTypeDecoderOptions,
@@ -69,6 +76,7 @@ export interface FunctionContentTypeDecoder {
 
 export interface StreamContentTypeDecoder {
 	name: string;
+
 	create(options: ContentTypeDecoderOptions): RAL.WritableStream;
 }
 
@@ -87,6 +95,7 @@ export namespace Encodings {
 		if (encodings.length === 1) {
 			return encodings[0].name;
 		}
+
 		const distribute = encodings.length - 1;
 
 		if (distribute > 1000) {
@@ -94,6 +103,7 @@ export namespace Encodings {
 				`Quality value can only have three decimal digits but trying to distribute ${encodings.length} elements.`,
 			);
 		}
+
 		const digits = Math.ceil(Math.log10(distribute));
 
 		const factor = Math.pow(10, digits);
@@ -108,8 +118,10 @@ export namespace Encodings {
 			result.push(
 				`${encoding.name};q=${q === 1 || q === 0 ? q.toFixed(0) : q.toFixed(digits)}`,
 			);
+
 			q = q - diff;
 		}
+
 		return result.join(", ");
 	}
 
@@ -124,15 +136,20 @@ export namespace Encodings {
 			if (encoding === "*") {
 				continue;
 			}
+
 			let values = map.get(q);
 
 			if (values === undefined) {
 				values = [];
+
 				map.set(q, values);
 			}
+
 			values.push(encoding);
 		}
+
 		const keys = Array.from(map.keys());
+
 		keys.sort((a, b) => b - a);
 
 		const result: string[] = [];
@@ -140,6 +157,7 @@ export namespace Encodings {
 		for (const key of keys) {
 			result.push(...map.get(key)!);
 		}
+
 		return result;
 	}
 
@@ -156,10 +174,12 @@ export namespace Encodings {
 			if (!Number.isNaN(parsed)) {
 				q = parsed;
 			}
+
 			encoding = value.substr(0, index);
 		} else {
 			encoding = value;
 		}
+
 		return [encoding, q];
 	}
 }

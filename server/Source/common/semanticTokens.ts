@@ -29,6 +29,7 @@ import type { _Languages, Feature, ServerRequestHandler } from "./server";
 export interface SemanticTokensFeatureShape {
 	semanticTokens: {
 		refresh(): Promise<void>;
+
 		on(
 			handler: ServerRequestHandler<
 				SemanticTokensParams,
@@ -37,6 +38,7 @@ export interface SemanticTokensFeatureShape {
 				void
 			>,
 		): Disposable;
+
 		onDelta(
 			handler: ServerRequestHandler<
 				SemanticTokensDeltaParams,
@@ -45,6 +47,7 @@ export interface SemanticTokensFeatureShape {
 				void
 			>,
 		): Disposable;
+
 		onRange(
 			handler: ServerRequestHandler<
 				SemanticTokensRangeParams,
@@ -133,10 +136,12 @@ export const SemanticTokensFeature: Feature<
 
 export class SemanticTokensDiff {
 	private readonly originalSequence: number[];
+
 	private readonly modifiedSequence: number[];
 
 	constructor(originalSequence: number[], modifiedSequence: number[]) {
 		this.originalSequence = originalSequence;
+
 		this.modifiedSequence = modifiedSequence;
 	}
 
@@ -155,6 +160,7 @@ export class SemanticTokensDiff {
 		) {
 			startIndex++;
 		}
+
 		if (startIndex < modifiedLength && startIndex < originalLength) {
 			let originalEndIndex = originalLength - 1;
 
@@ -167,6 +173,7 @@ export class SemanticTokensDiff {
 					this.modifiedSequence[modifiedEndIndex]
 			) {
 				originalEndIndex--;
+
 				modifiedEndIndex--;
 			}
 			// if one moved behind the start index move them forward again
@@ -175,6 +182,7 @@ export class SemanticTokensDiff {
 				modifiedEndIndex < startIndex
 			) {
 				originalEndIndex++;
+
 				modifiedEndIndex++;
 			}
 
@@ -216,26 +224,38 @@ export class SemanticTokensBuilder {
 	private _id!: number;
 
 	private _prevLine!: number;
+
 	private _prevChar!: number;
+
 	private _dataIsSortedAndDeltaEncoded!: boolean;
+
 	private _data!: number[];
+
 	private _dataNonDelta!: number[];
+
 	private _dataLen!: number;
 
 	private _prevData: number[] | undefined;
 
 	constructor() {
 		this._prevData = undefined;
+
 		this.initialize();
 	}
 
 	private initialize() {
 		this._id = Date.now();
+
 		this._prevLine = 0;
+
 		this._prevChar = 0;
+
 		this._data = [];
+
 		this._dataNonDelta = [];
+
 		this._dataLen = 0;
+
 		this._dataIsSortedAndDeltaEncoded = true;
 	}
 
@@ -274,12 +294,17 @@ export class SemanticTokensBuilder {
 			: this._dataNonDelta;
 
 		dataSource[this._dataLen++] = pushLine;
+
 		dataSource[this._dataLen++] = pushChar;
+
 		dataSource[this._dataLen++] = length;
+
 		dataSource[this._dataLen++] = tokenType;
+
 		dataSource[this._dataLen++] = tokenModifiers;
 
 		this._prevLine = line;
+
 		this._prevChar = char;
 	}
 
@@ -307,6 +332,7 @@ export class SemanticTokensBuilder {
 			if (line === 0) {
 				// on the same line as previous token
 				line = prevLine;
+
 				char += prevChar;
 			} else {
 				// on a different line than previous token
@@ -320,12 +346,17 @@ export class SemanticTokensBuilder {
 			const tokenModifiers = data[dstOffset + 4];
 
 			result[dstOffset + 0] = line;
+
 			result[dstOffset + 1] = char;
+
 			result[dstOffset + 2] = length;
+
 			result[dstOffset + 3] = tokenType;
+
 			result[dstOffset + 4] = tokenModifiers;
 
 			prevLine = line;
+
 			prevChar = char;
 		}
 
@@ -340,6 +371,7 @@ export class SemanticTokensBuilder {
 		for (let i = 0; i < tokenCount; i++) {
 			pos[i] = i;
 		}
+
 		pos.sort((a, b) => {
 			const aLine = data[5 * a];
 
@@ -352,6 +384,7 @@ export class SemanticTokensBuilder {
 
 				return aChar - bChar;
 			}
+
 			return aLine - bLine;
 		});
 
@@ -379,13 +412,19 @@ export class SemanticTokensBuilder {
 			const pushChar = pushLine === 0 ? char - prevChar : char;
 
 			const dstOffset = 5 * i;
+
 			result[dstOffset + 0] = pushLine;
+
 			result[dstOffset + 1] = pushChar;
+
 			result[dstOffset + 2] = length;
+
 			result[dstOffset + 3] = tokenType;
+
 			result[dstOffset + 4] = tokenModifiers;
 
 			prevLine = line;
+
 			prevChar = char;
 		}
 
@@ -406,6 +445,7 @@ export class SemanticTokensBuilder {
 		if (this.id === id) {
 			this._prevData = this.getFinalDataDelta();
 		}
+
 		this.initialize();
 	}
 

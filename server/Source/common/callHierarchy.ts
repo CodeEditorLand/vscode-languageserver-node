@@ -34,6 +34,7 @@ export interface CallHierarchy {
 				void
 			>,
 		): Disposable;
+
 		onIncomingCalls(
 			handler: ServerRequestHandler<
 				CallHierarchyIncomingCallsParams,
@@ -42,6 +43,7 @@ export interface CallHierarchy {
 				void
 			>,
 		): Disposable;
+
 		onOutgoingCalls(
 			handler: ServerRequestHandler<
 				CallHierarchyOutgoingCallsParams,

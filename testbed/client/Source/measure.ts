@@ -45,6 +45,7 @@ export function activate(context: vscode.ExtensionContext) {
 			// for (let i = 0; i < ranges.length; i++) {
 			// 	ranges[i] = proto.Range.create(1, 1, 1, 1,);
 			// }
+
 			const message = JSON.stringify(
 				new Array<proto.Range>(counter).fill(
 					proto.Range.create(1, 1, 1, 1),
@@ -54,6 +55,7 @@ export function activate(context: vscode.ExtensionContext) {
 			);
 
 			console.time("reviver");
+
 			JSON.parse(message, (_key, value) => {
 				if (value.start !== undefined && value.end !== undefined) {
 					const start = (value as proto.Range).start;
@@ -67,8 +69,10 @@ export function activate(context: vscode.ExtensionContext) {
 						end.character,
 					);
 				}
+
 				return value;
 			});
+
 			console.timeEnd("reviver");
 
 			console.time("without reviver");
@@ -76,6 +80,7 @@ export function activate(context: vscode.ExtensionContext) {
 			const trad: vscode.Range[] = (
 				JSON.parse(message) as proto.Range[]
 			).map((range) => converter.asRange(range));
+
 			console.timeEnd("without reviver");
 
 			// const message = JSON.stringify(diagnostics);

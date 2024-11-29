@@ -42,6 +42,7 @@ class MessageBuffer extends AbstractMessageBuffer {
 			return new TextDecoder(encoding).decode(value);
 		}
 	}
+
 	protected asNative(buffer: Uint8Array, length?: number): Buffer {
 		if (length === undefined) {
 			return buffer instanceof Buffer ? buffer : Buffer.from(buffer);
@@ -137,6 +138,7 @@ interface RIL extends RAL {
 		readonly asReadableStream: (
 			stream: NodeJS.ReadableStream,
 		) => RAL.ReadableStream;
+
 		readonly asWritableStream: (
 			stream: NodeJS.WritableStream,
 		) => RAL.WritableStream;

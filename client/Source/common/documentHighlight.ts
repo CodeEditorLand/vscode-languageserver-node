@@ -74,6 +74,7 @@ export class DocumentHighlightFeature extends TextDocumentLanguageFeature<
 		if (!options) {
 			return;
 		}
+
 		this.register({ id: UUID.generateUuid(), registerOptions: options });
 	}
 
@@ -102,6 +103,7 @@ export class DocumentHighlightFeature extends TextDocumentLanguageFeature<
 									if (token.isCancellationRequested) {
 										return null;
 									}
+
 									return client.protocol2CodeConverter.asDocumentHighlights(
 										result,
 										token,

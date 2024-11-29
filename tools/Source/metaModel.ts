@@ -37,6 +37,7 @@ export type MessageDirection = "clientToServer" | "serverToClient" | "both";
  */
 export type BaseType = {
 	kind: "base";
+
 	name: BaseTypes;
 };
 
@@ -47,6 +48,7 @@ export type BaseType = {
  */
 export type ReferenceType = {
 	kind: "reference";
+
 	name: string;
 };
 
@@ -55,6 +57,7 @@ export type ReferenceType = {
  */
 export type ArrayType = {
 	kind: "array";
+
 	element: Type;
 };
 
@@ -74,7 +77,9 @@ export type MapKeyType =
  */
 export type MapType = {
 	kind: "map";
+
 	key: MapKeyType;
+
 	value: Type;
 };
 
@@ -84,6 +89,7 @@ export type MapType = {
  */
 export type AndType = {
 	kind: "and";
+
 	items: Type[];
 };
 
@@ -93,6 +99,7 @@ export type AndType = {
  */
 export type OrType = {
 	kind: "or";
+
 	items: Type[];
 };
 
@@ -102,6 +109,7 @@ export type OrType = {
  */
 export type TupleType = {
 	kind: "tuple";
+
 	items: Type[];
 };
 
@@ -111,6 +119,7 @@ export type TupleType = {
  */
 export type StructureLiteralType = {
 	kind: "literal";
+
 	value: StructureLiteral;
 };
 
@@ -120,6 +129,7 @@ export type StructureLiteralType = {
  */
 export type StringLiteralType = {
 	kind: "stringLiteral";
+
 	value: string;
 };
 
@@ -129,6 +139,7 @@ export type IntegerLiteralType = {
 	 * (e.g. `kind: 1`).
 	 */
 	kind: "integerLiteral";
+
 	value: number;
 };
 
@@ -138,6 +149,7 @@ export type IntegerLiteralType = {
  */
 export type BooleanLiteralType = {
 	kind: "booleanLiteral";
+
 	value: boolean;
 };
 
@@ -542,6 +554,7 @@ export type EnumerationEntry = {
 
 export type EnumerationType = {
 	kind: "base";
+
 	name: "string" | "integer" | "uinteger";
 };
 

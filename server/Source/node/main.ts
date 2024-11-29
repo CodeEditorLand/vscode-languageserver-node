@@ -52,6 +52,7 @@ function endProtocolConnection(): void {
 	if (_protocolConnection === undefined) {
 		return;
 	}
+
 	try {
 		_protocolConnection.end();
 	} catch (_err) {
@@ -77,6 +78,7 @@ function setupExitTimer(): void {
 					} catch (ex) {
 						// Parent process doesn't exist anymore. Exit the server.
 						endProtocolConnection();
+
 						process.exit(_shutdownReceived ? 0 : 1);
 					}
 				}, 3000);
@@ -129,6 +131,7 @@ const watchDog: WatchDog = {
 	},
 	exit: (code: number): void => {
 		endProtocolConnection();
+
 		process.exit(code);
 	},
 };
@@ -306,17 +309,24 @@ export function createConnection(
 
 	if (arg1 !== undefined && (arg1 as Features).__brand === "features") {
 		factories = arg1;
+
 		arg1 = arg2;
+
 		arg2 = arg3;
+
 		arg3 = arg4;
 	}
+
 	if (ConnectionStrategy.is(arg1) || ConnectionOptions.is(arg1)) {
 		options = arg1;
 	} else {
 		input = arg1;
+
 		output = arg2;
+
 		options = arg3;
 	}
+
 	return _createConnection(input, output, options, factories);
 }
 
@@ -367,12 +377,15 @@ function _createConnection<
 
 			if (arg === "--node-ipc") {
 				input = new IPCMessageReader(process);
+
 				output = new IPCMessageWriter(process);
 
 				break;
 			} else if (arg === "--stdio") {
 				stdio = true;
+
 				input = process.stdin;
+
 				output = process.stdout;
 
 				break;
@@ -398,16 +411,22 @@ function _createConnection<
 				}
 			}
 		}
+
 		if (port) {
 			const transport = createServerSocketTransport(port);
+
 			input = transport[0];
+
 			output = transport[1];
 		} else if (pipeName) {
 			const transport = createServerPipeTransport(pipeName);
+
 			input = transport[0];
+
 			output = transport[1];
 		}
 	}
+
 	const commandLineMessage =
 		"Use arguments of createConnection or set command line parameters: '--node-ipc', '--stdio' or '--socket={number}'";
 
@@ -416,6 +435,7 @@ function _createConnection<
 			"Connection input stream is not set. " + commandLineMessage,
 		);
 	}
+
 	if (!output) {
 		throw new Error(
 			"Connection output stream is not set. " + commandLineMessage,
@@ -428,12 +448,16 @@ function _createConnection<
 		Is.func((input as NodeJS.ReadableStream).on)
 	) {
 		const inputStream = <NodeJS.ReadableStream>input;
+
 		inputStream.on("end", () => {
 			endProtocolConnection();
+
 			process.exit(_shutdownReceived ? 0 : 1);
 		});
+
 		inputStream.on("close", () => {
 			endProtocolConnection();
+
 			process.exit(_shutdownReceived ? 0 : 1);
 		});
 	}
@@ -449,6 +473,7 @@ function _createConnection<
 		if (stdio) {
 			patchConsole(logger);
 		}
+
 		return result;
 	};
 
@@ -468,10 +493,12 @@ function patchConsole(logger: Logger): undefined {
 		if (assertion) {
 			return;
 		}
+
 		if (args.length === 0) {
 			logger.error("Assertion failed");
 		} else {
 			const [message, ...rest] = args;
+
 			logger.error(`Assertion failed: ${message} ${serialize(rest)}`);
 		}
 	};
@@ -480,8 +507,11 @@ function patchConsole(logger: Logger): undefined {
 		const message = String(label);
 
 		let counter = counters.get(message) ?? 0;
+
 		counter += 1;
+
 		counters.set(message, counter);
+
 		logger.log(`${message}: ${message}`);
 	};
 
@@ -517,6 +547,7 @@ function patchConsole(logger: Logger): undefined {
 		if (args.length !== 0) {
 			message += `: ${serialize(args)}`;
 		}
+
 		logger.log(`${message}\n${stack}`);
 	};
 

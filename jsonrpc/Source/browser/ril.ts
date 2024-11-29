@@ -20,6 +20,7 @@ class MessageBuffer extends AbstractMessageBuffer {
 
 	constructor(encoding: RAL.MessageBufferEncoding = "utf-8") {
 		super(encoding);
+
 		this.asciiDecoder = new TextDecoder("ascii");
 	}
 
@@ -60,12 +61,15 @@ class MessageBuffer extends AbstractMessageBuffer {
 
 class ReadableStreamWrapper implements RAL.ReadableStream {
 	private _onData: Emitter<Uint8Array>;
+
 	private _messageListener: (event: MessageEvent) => void;
 
 	constructor(private socket: WebSocket) {
 		this._onData = new Emitter<Uint8Array>();
+
 		this._messageListener = (event) => {
 			const blob = event.data as Blob;
+
 			blob.arrayBuffer().then(
 				(buffer) => {
 					this._onData.fire(new Uint8Array(buffer));
@@ -77,6 +81,7 @@ class ReadableStreamWrapper implements RAL.ReadableStream {
 				},
 			);
 		};
+
 		this.socket.addEventListener("message", this._messageListener);
 	}
 
@@ -146,10 +151,12 @@ class WritableStreamWrapper implements RAL.WritableStream {
 					`In a Browser environments only utf-8 text encoding is supported. But got encoding: ${encoding}`,
 				);
 			}
+
 			this.socket.send(data);
 		} else {
 			this.socket.send(data);
 		}
+
 		return Promise.resolve();
 	}
 
@@ -161,6 +168,7 @@ class WritableStreamWrapper implements RAL.WritableStream {
 interface RIL extends RAL {
 	readonly stream: {
 		readonly asReadableStream: (stream: WebSocket) => RAL.ReadableStream;
+
 		readonly asWritableStream: (stream: WebSocket) => RAL.WritableStream;
 	};
 }
@@ -184,6 +192,7 @@ const _ril: RIL = Object.freeze<RIL>({
 						`In a Browser environments only utf-8 text encoding is supported. But got encoding: ${options.charset}`,
 					);
 				}
+
 				return Promise.resolve(
 					_textEncoder.encode(JSON.stringify(msg, undefined, 0)),
 				);
@@ -200,6 +209,7 @@ const _ril: RIL = Object.freeze<RIL>({
 						`In a Browser environments only Uint8Arrays are supported.`,
 					);
 				}
+
 				return Promise.resolve(
 					JSON.parse(new TextDecoder(options.charset).decode(buffer)),
 				);

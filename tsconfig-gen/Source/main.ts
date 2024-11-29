@@ -63,11 +63,13 @@ export function main(): number {
 	if (args.h) {
 		return 0;
 	}
+
 	if (args.v) {
 		console.log(require("../package.json").version);
 
 		return 0;
 	}
+
 	const test = args.d;
 
 	const free = args._;
@@ -107,11 +109,13 @@ export function main(): number {
 		if (variants === undefined) {
 			return true;
 		}
+
 		for (const tag of variant.tags) {
 			if (variants.has(tag)) {
 				return true;
 			}
 		}
+
 		return false;
 	}
 
@@ -124,6 +128,7 @@ export function main(): number {
 			if (!match(variant)) {
 				continue;
 			}
+
 			const generator = new ProjectGenerator(project[0], variant);
 
 			const result = generator.generate(path.dirname(file));
@@ -133,6 +138,7 @@ export function main(): number {
 			} else {
 				for (const config of result) {
 					const filename = config.path;
+
 					fs.writeFileSync(
 						filename,
 						JSON.stringify(config.tsconfig, undefined, 4),

@@ -162,9 +162,11 @@ export namespace Position {
 		if (line === Number.MAX_VALUE) {
 			line = uinteger.MAX_VALUE;
 		}
+
 		if (character === Number.MAX_VALUE) {
 			character = uinteger.MAX_VALUE;
 		}
+
 		return { line, character };
 	}
 	/**
@@ -275,6 +277,7 @@ export namespace Range {
  */
 export interface Location {
 	uri: DocumentUri;
+
 	range: Range;
 }
 
@@ -638,15 +641,19 @@ export namespace FoldingRange {
 		if (Is.defined(startCharacter)) {
 			result.startCharacter = startCharacter;
 		}
+
 		if (Is.defined(endCharacter)) {
 			result.endCharacter = endCharacter;
 		}
+
 		if (Is.defined(kind)) {
 			result.kind = kind;
 		}
+
 		if (Is.defined(collapsedText)) {
 			result.collapsedText = collapsedText;
 		}
+
 		return result;
 	}
 
@@ -877,15 +884,19 @@ export namespace Diagnostic {
 		if (Is.defined(severity)) {
 			result.severity = severity;
 		}
+
 		if (Is.defined(code)) {
 			result.code = code;
 		}
+
 		if (Is.defined(source)) {
 			result.source = source;
 		}
+
 		if (Is.defined(relatedInformation)) {
 			result.relatedInformation = relatedInformation;
 		}
+
 		return result;
 	}
 
@@ -966,6 +977,7 @@ export namespace Command {
 		if (Is.defined(args) && args.length > 0) {
 			result.arguments = args;
 		}
+
 		return result;
 	}
 	/**
@@ -1076,11 +1088,14 @@ export namespace ChangeAnnotation {
 		if (needsConfirmation !== undefined) {
 			result.needsConfirmation = needsConfirmation;
 		}
+
 		if (description !== undefined) {
 			result.description = description;
 		}
+
 		return result;
 	}
+
 	export function is(value: any): value is ChangeAnnotation {
 		const candidate = value as ChangeAnnotation;
 
@@ -1299,9 +1314,11 @@ export namespace CreateFile {
 		) {
 			result.options = options;
 		}
+
 		if (annotation !== undefined) {
 			result.annotationId = annotation;
 		}
+
 		return result;
 	}
 
@@ -1383,9 +1400,11 @@ export namespace RenameFile {
 		) {
 			result.options = options;
 		}
+
 		if (annotation !== undefined) {
 			result.annotationId = annotation;
 		}
+
 		return result;
 	}
 
@@ -1461,9 +1480,11 @@ export namespace DeleteFile {
 		) {
 			result.options = options;
 		}
+
 		if (annotation !== undefined) {
 			result.annotationId = annotation;
 		}
+
 		return result;
 	}
 
@@ -1617,6 +1638,7 @@ export interface TextEditChange {
 	 * @param annotation An optional annotation.
 	 */
 	insert(position: Position, newText: string): void;
+
 	insert(
 		position: Position,
 		newText: string,
@@ -1631,6 +1653,7 @@ export interface TextEditChange {
 	 * @param annotation An optional annotation.
 	 */
 	replace(range: Range, newText: string): void;
+
 	replace(
 		range: Range,
 		newText: string,
@@ -1644,6 +1667,7 @@ export interface TextEditChange {
 	 * @param annotation An optional annotation.
 	 */
 	delete(range: Range): void;
+
 	delete(
 		range: Range,
 		annotation?: ChangeAnnotation | ChangeAnnotationIdentifier,
@@ -1652,6 +1676,7 @@ export interface TextEditChange {
 
 class TextEditChangeImpl implements TextEditChange {
 	private edits: (TextEdit | AnnotatedTextEdit | SnippetTextEdit)[];
+
 	private changeAnnotations: ChangeAnnotations | undefined;
 
 	public constructor(
@@ -1659,15 +1684,18 @@ class TextEditChangeImpl implements TextEditChange {
 		changeAnnotations?: ChangeAnnotations,
 	) {
 		this.edits = edits;
+
 		this.changeAnnotations = changeAnnotations;
 	}
 
 	public insert(position: Position, newText: string): void;
+
 	public insert(
 		position: Position,
 		newText: string,
 		annotation: ChangeAnnotation | ChangeAnnotationIdentifier,
 	): ChangeAnnotationIdentifier;
+
 	public insert(
 		position: Position,
 		newText: string,
@@ -1681,12 +1709,16 @@ class TextEditChangeImpl implements TextEditChange {
 			edit = TextEdit.insert(position, newText);
 		} else if (ChangeAnnotationIdentifier.is(annotation)) {
 			id = annotation;
+
 			edit = AnnotatedTextEdit.insert(position, newText, annotation);
 		} else {
 			this.assertChangeAnnotations(this.changeAnnotations);
+
 			id = this.changeAnnotations.manage(annotation);
+
 			edit = AnnotatedTextEdit.insert(position, newText, id);
 		}
+
 		this.edits.push(edit);
 
 		if (id !== undefined) {
@@ -1695,11 +1727,13 @@ class TextEditChangeImpl implements TextEditChange {
 	}
 
 	public replace(range: Range, newText: string): void;
+
 	public replace(
 		range: Range,
 		newText: string,
 		annotation: ChangeAnnotation | ChangeAnnotationIdentifier,
 	): ChangeAnnotationIdentifier;
+
 	public replace(
 		range: Range,
 		newText: string,
@@ -1713,12 +1747,16 @@ class TextEditChangeImpl implements TextEditChange {
 			edit = TextEdit.replace(range, newText);
 		} else if (ChangeAnnotationIdentifier.is(annotation)) {
 			id = annotation;
+
 			edit = AnnotatedTextEdit.replace(range, newText, annotation);
 		} else {
 			this.assertChangeAnnotations(this.changeAnnotations);
+
 			id = this.changeAnnotations.manage(annotation);
+
 			edit = AnnotatedTextEdit.replace(range, newText, id);
 		}
+
 		this.edits.push(edit);
 
 		if (id !== undefined) {
@@ -1727,10 +1765,12 @@ class TextEditChangeImpl implements TextEditChange {
 	}
 
 	public delete(range: Range): void;
+
 	public delete(
 		range: Range,
 		annotation: ChangeAnnotation | ChangeAnnotationIdentifier,
 	): ChangeAnnotationIdentifier;
+
 	public delete(
 		range: Range,
 		annotation?: ChangeAnnotation | ChangeAnnotationIdentifier,
@@ -1743,12 +1783,16 @@ class TextEditChangeImpl implements TextEditChange {
 			edit = TextEdit.del(range);
 		} else if (ChangeAnnotationIdentifier.is(annotation)) {
 			id = annotation;
+
 			edit = AnnotatedTextEdit.del(range, annotation);
 		} else {
 			this.assertChangeAnnotations(this.changeAnnotations);
+
 			id = this.changeAnnotations.manage(annotation);
+
 			edit = AnnotatedTextEdit.del(range, id);
 		}
+
 		this.edits.push(edit);
 
 		if (id !== undefined) {
@@ -1824,13 +1868,17 @@ class ChangeAnnotations {
 	private _annotations: {
 		[id: ChangeAnnotationIdentifier]: ChangeAnnotation;
 	};
+
 	private _counter: number;
+
 	private _size: number;
 
 	public constructor(annotations?: { [id: string]: ChangeAnnotation }) {
 		this._annotations =
 			annotations === undefined ? Object.create(null) : annotations;
+
 		this._counter = 0;
+
 		this._size = 0;
 	}
 
@@ -1843,10 +1891,12 @@ class ChangeAnnotations {
 	}
 
 	public manage(annotation: ChangeAnnotation): ChangeAnnotationIdentifier;
+
 	public manage(
 		id: ChangeAnnotationIdentifier,
 		annotation: ChangeAnnotation,
 	): ChangeAnnotationIdentifier;
+
 	public manage(
 		idOrAnnotation: ChangeAnnotationIdentifier | ChangeAnnotation,
 		annotation?: ChangeAnnotation,
@@ -1857,15 +1907,20 @@ class ChangeAnnotations {
 			id = idOrAnnotation;
 		} else {
 			id = this.nextId();
+
 			annotation = idOrAnnotation;
 		}
+
 		if (this._annotations[id] !== undefined) {
 			throw new Error(`Id ${id} is already in use.`);
 		}
+
 		if (annotation === undefined) {
 			throw new Error(`No annotation provided for id ${id}`);
 		}
+
 		this._annotations[id] = annotation;
+
 		this._size++;
 
 		return id;
@@ -1883,7 +1938,9 @@ class ChangeAnnotations {
  */
 export class WorkspaceChange {
 	private _workspaceEdit: WorkspaceEdit;
+
 	private _textEditChanges: { [uri: DocumentUri]: TextEditChange };
+
 	private _changeAnnotations: ChangeAnnotations | undefined;
 
 	constructor(workspaceEdit?: WorkspaceEdit) {
@@ -1896,13 +1953,16 @@ export class WorkspaceChange {
 				this._changeAnnotations = new ChangeAnnotations(
 					workspaceEdit.changeAnnotations,
 				);
+
 				workspaceEdit.changeAnnotations = this._changeAnnotations.all();
+
 				workspaceEdit.documentChanges.forEach((change) => {
 					if (TextDocumentEdit.is(change)) {
 						const textEditChange = new TextEditChangeImpl(
 							change.edits,
 							this._changeAnnotations!,
 						);
+
 						this._textEditChanges[change.textDocument.uri] =
 							textEditChange;
 					}
@@ -1912,6 +1972,7 @@ export class WorkspaceChange {
 					const textEditChange = new TextEditChangeImpl(
 						workspaceEdit.changes![key],
 					);
+
 					this._textEditChanges[key] = textEditChange;
 				});
 			}
@@ -1935,6 +1996,7 @@ export class WorkspaceChange {
 					this._changeAnnotations.all();
 			}
 		}
+
 		return this._workspaceEdit;
 	}
 
@@ -1945,7 +2007,9 @@ export class WorkspaceChange {
 	public getTextEditChange(
 		textDocument: OptionalVersionedTextDocumentIdentifier,
 	): TextEditChange;
+
 	public getTextEditChange(uri: DocumentUri): TextEditChange;
+
 	public getTextEditChange(
 		key: DocumentUri | OptionalVersionedTextDocumentIdentifier,
 	): TextEditChange {
@@ -1957,6 +2021,7 @@ export class WorkspaceChange {
 					"Workspace edit is not configured for document changes.",
 				);
 			}
+
 			const textDocument: OptionalVersionedTextDocumentIdentifier = {
 				uri: key.uri,
 				version: key.version,
@@ -1972,10 +2037,14 @@ export class WorkspaceChange {
 					textDocument,
 					edits,
 				};
+
 				this._workspaceEdit.documentChanges.push(textDocumentEdit);
+
 				result = new TextEditChangeImpl(edits, this._changeAnnotations);
+
 				this._textEditChanges[textDocument.uri] = result;
 			}
+
 			return result;
 		} else {
 			this.initChanges();
@@ -1985,14 +2054,19 @@ export class WorkspaceChange {
 					"Workspace edit is not configured for normal text edit changes.",
 				);
 			}
+
 			let result: TextEditChange = this._textEditChanges[key];
 
 			if (!result) {
 				const edits: (TextEdit | AnnotatedTextEdit)[] = [];
+
 				this._workspaceEdit.changes[key] = edits;
+
 				result = new TextEditChangeImpl(edits);
+
 				this._textEditChanges[key] = result;
 			}
+
 			return result;
 		}
 	}
@@ -2003,7 +2077,9 @@ export class WorkspaceChange {
 			this._workspaceEdit.changes === undefined
 		) {
 			this._changeAnnotations = new ChangeAnnotations();
+
 			this._workspaceEdit.documentChanges = [];
+
 			this._workspaceEdit.changeAnnotations =
 				this._changeAnnotations.all();
 		}
@@ -2019,11 +2095,13 @@ export class WorkspaceChange {
 	}
 
 	public createFile(uri: DocumentUri, options?: CreateFileOptions): void;
+
 	public createFile(
 		uri: DocumentUri,
 		annotation: ChangeAnnotation | ChangeAnnotationIdentifier,
 		options?: CreateFileOptions,
 	): ChangeAnnotationIdentifier;
+
 	public createFile(
 		uri: DocumentUri,
 		optionsOrAnnotation?:
@@ -2039,6 +2117,7 @@ export class WorkspaceChange {
 				"Workspace edit is not configured for document changes.",
 			);
 		}
+
 		let annotation:
 			| ChangeAnnotation
 			| ChangeAnnotationIdentifier
@@ -2063,8 +2142,10 @@ export class WorkspaceChange {
 			id = ChangeAnnotationIdentifier.is(annotation)
 				? annotation
 				: this._changeAnnotations!.manage(annotation);
+
 			operation = CreateFile.create(uri, options, id);
 		}
+
 		this._workspaceEdit.documentChanges.push(operation);
 
 		if (id !== undefined) {
@@ -2077,12 +2158,14 @@ export class WorkspaceChange {
 		newUri: DocumentUri,
 		options?: RenameFileOptions,
 	): void;
+
 	public renameFile(
 		oldUri: DocumentUri,
 		newUri: DocumentUri,
 		annotation?: ChangeAnnotation | ChangeAnnotationIdentifier,
 		options?: RenameFileOptions,
 	): ChangeAnnotationIdentifier;
+
 	public renameFile(
 		oldUri: DocumentUri,
 		newUri: DocumentUri,
@@ -2099,6 +2182,7 @@ export class WorkspaceChange {
 				"Workspace edit is not configured for document changes.",
 			);
 		}
+
 		let annotation:
 			| ChangeAnnotation
 			| ChangeAnnotationIdentifier
@@ -2123,8 +2207,10 @@ export class WorkspaceChange {
 			id = ChangeAnnotationIdentifier.is(annotation)
 				? annotation
 				: this._changeAnnotations!.manage(annotation);
+
 			operation = RenameFile.create(oldUri, newUri, options, id);
 		}
+
 		this._workspaceEdit.documentChanges.push(operation);
 
 		if (id !== undefined) {
@@ -2133,11 +2219,13 @@ export class WorkspaceChange {
 	}
 
 	public deleteFile(uri: DocumentUri, options?: DeleteFileOptions): void;
+
 	public deleteFile(
 		uri: DocumentUri,
 		annotation: ChangeAnnotation | ChangeAnnotationIdentifier,
 		options?: DeleteFileOptions,
 	): ChangeAnnotationIdentifier;
+
 	public deleteFile(
 		uri: DocumentUri,
 		optionsOrAnnotation?:
@@ -2153,6 +2241,7 @@ export class WorkspaceChange {
 				"Workspace edit is not configured for document changes.",
 			);
 		}
+
 		let annotation:
 			| ChangeAnnotation
 			| ChangeAnnotationIdentifier
@@ -2177,8 +2266,10 @@ export class WorkspaceChange {
 			id = ChangeAnnotationIdentifier.is(annotation)
 				? annotation
 				: this._changeAnnotations!.manage(annotation);
+
 			operation = DeleteFile.create(uri, options, id);
 		}
+
 		this._workspaceEdit.documentChanges.push(operation);
 
 		if (id !== undefined) {
@@ -3066,6 +3157,7 @@ export namespace CompletionItem {
  */
 export type EditRangeWithInsertReplace = {
 	insert: Range;
+
 	replace: Range;
 };
 
@@ -3273,6 +3365,7 @@ export namespace CompletionList {
  */
 export type MarkedStringWithLanguage = {
 	language: string;
+
 	value: string;
 };
 
@@ -3452,11 +3545,13 @@ export namespace SignatureInformation {
 		if (Is.defined(documentation)) {
 			result.documentation = documentation;
 		}
+
 		if (Is.defined(parameters)) {
 			result.parameters = parameters;
 		} else {
 			result.parameters = [];
 		}
+
 		return result;
 	}
 }
@@ -3609,6 +3704,7 @@ export namespace DocumentHighlight {
 		if (Is.number(kind)) {
 			result.kind = kind;
 		}
+
 		return result;
 	}
 }
@@ -3794,6 +3890,7 @@ export namespace SymbolInformation {
 		if (containerName) {
 			result.containerName = containerName;
 		}
+
 		return result;
 	}
 }
@@ -3939,6 +4036,7 @@ export namespace DocumentSymbol {
 		if (children !== undefined) {
 			result.children = children;
 		}
+
 		return result;
 	}
 	/**
@@ -4148,9 +4246,11 @@ export namespace CodeActionContext {
 		if (only !== undefined && only !== null) {
 			result.only = only;
 		}
+
 		if (triggerKind !== undefined && triggerKind !== null) {
 			result.triggerKind = triggerKind;
 		}
+
 		return result;
 	}
 	/**
@@ -4333,17 +4433,21 @@ export namespace CodeAction {
 
 		if (typeof kindOrCommandOrEdit === "string") {
 			checkKind = false;
+
 			result.kind = kindOrCommandOrEdit;
 		} else if (Command.is(kindOrCommandOrEdit)) {
 			result.command = kindOrCommandOrEdit;
 		} else {
 			result.edit = kindOrCommandOrEdit;
 		}
+
 		if (checkKind && kind !== undefined) {
 			result.kind = kind;
 		}
+
 		return result;
 	}
+
 	export function is(value: any): value is CodeAction {
 		const candidate: CodeAction = value;
 
@@ -4405,6 +4509,7 @@ export namespace CodeLens {
 		if (Is.defined(data)) {
 			result.data = data;
 		}
+
 		return result;
 	}
 	/**
@@ -5256,6 +5361,7 @@ export namespace InlayHint {
 		if (kind !== undefined) {
 			result.kind = kind;
 		}
+
 		return result;
 	}
 
@@ -5605,6 +5711,7 @@ export namespace TextDocument {
 			if (diff === 0) {
 				return a.range.start.character - b.range.start.character;
 			}
+
 			return diff;
 		});
 
@@ -5625,8 +5732,10 @@ export namespace TextDocument {
 			} else {
 				throw new Error("Overlapping edit");
 			}
+
 			lastModifiedOffset = startOffset;
 		}
+
 		return text;
 	}
 
@@ -5635,6 +5744,7 @@ export namespace TextDocument {
 			// sorted
 			return data;
 		}
+
 		const p = (data.length / 2) | 0;
 
 		const left = data.slice(0, p);
@@ -5642,6 +5752,7 @@ export namespace TextDocument {
 		const right = data.slice(p);
 
 		mergeSort(left, compare);
+
 		mergeSort(right, compare);
 
 		let leftIdx = 0;
@@ -5661,12 +5772,15 @@ export namespace TextDocument {
 				data[i++] = right[rightIdx++];
 			}
 		}
+
 		while (leftIdx < left.length) {
 			data[i++] = left[leftIdx++];
 		}
+
 		while (rightIdx < right.length) {
 			data[i++] = right[rightIdx++];
 		}
+
 		return data;
 	}
 }
@@ -5708,9 +5822,13 @@ type TextDocumentContentChangeEvent =
  */
 class FullTextDocument implements TextDocument {
 	private _uri: DocumentUri;
+
 	private _languageId: LanguageKind;
+
 	private _version: integer;
+
 	private _content: string;
+
 	private _lineOffsets: uinteger[] | undefined;
 
 	public constructor(
@@ -5720,9 +5838,13 @@ class FullTextDocument implements TextDocument {
 		content: string,
 	) {
 		this._uri = uri;
+
 		this._languageId = languageId;
+
 		this._version = version;
+
 		this._content = content;
+
 		this._lineOffsets = undefined;
 	}
 
@@ -5746,6 +5868,7 @@ class FullTextDocument implements TextDocument {
 
 			return this._content.substring(start, end);
 		}
+
 		return this._content;
 	}
 
@@ -5754,7 +5877,9 @@ class FullTextDocument implements TextDocument {
 		version: integer,
 	): void {
 		this._content = event.text;
+
 		this._version = version;
+
 		this._lineOffsets = undefined;
 	}
 
@@ -5769,9 +5894,12 @@ class FullTextDocument implements TextDocument {
 			for (let i = 0; i < text.length; i++) {
 				if (isLineStart) {
 					lineOffsets.push(i);
+
 					isLineStart = false;
 				}
+
 				const ch = text.charAt(i);
+
 				isLineStart = ch === "\r" || ch === "\n";
 
 				if (
@@ -5782,11 +5910,14 @@ class FullTextDocument implements TextDocument {
 					i++;
 				}
 			}
+
 			if (isLineStart && text.length > 0) {
 				lineOffsets.push(text.length);
 			}
+
 			this._lineOffsets = lineOffsets;
 		}
+
 		return this._lineOffsets;
 	}
 
@@ -5801,6 +5932,7 @@ class FullTextDocument implements TextDocument {
 		if (high === 0) {
 			return Position.create(0, offset);
 		}
+
 		while (low < high) {
 			const mid = Math.floor((low + high) / 2);
 
@@ -5825,6 +5957,7 @@ class FullTextDocument implements TextDocument {
 		} else if (position.line < 0) {
 			return 0;
 		}
+
 		const lineOffset = lineOffsets[position.line];
 
 		const nextLineOffset =

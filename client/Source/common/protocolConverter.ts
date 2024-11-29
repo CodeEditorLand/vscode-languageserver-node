@@ -25,6 +25,7 @@ import * as Is from "./utils/is";
 
 interface InsertReplaceRange {
 	inserting: code.Range;
+
 	replacing: code.Range;
 }
 
@@ -34,13 +35,17 @@ export interface Converter {
 	asDocumentSelector(value: ls.DocumentSelector): code.DocumentSelector;
 
 	asPosition(value: undefined | null): undefined;
+
 	asPosition(value: ls.Position): code.Position;
+
 	asPosition(
 		value: ls.Position | undefined | null,
 	): code.Position | undefined;
 
 	asRange(value: undefined | null): undefined;
+
 	asRange(value: ls.Range): code.Range;
+
 	asRange(value: ls.Range | undefined | null): code.Range | undefined;
 
 	asRanges(
@@ -58,10 +63,13 @@ export interface Converter {
 	asDiagnosticSeverity(
 		value: number | undefined | null,
 	): code.DiagnosticSeverity;
+
 	asDiagnosticTag(tag: ls.DiagnosticTag): code.DiagnosticTag | undefined;
 
 	asHover(hover: undefined | null): undefined;
+
 	asHover(hover: ls.Hover): code.Hover;
+
 	asHover(hover: ls.Hover | undefined | null): code.Hover | undefined;
 
 	asCompletionResult(
@@ -69,16 +77,19 @@ export interface Converter {
 		allCommitCharacters?: string[],
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	asCompletionResult(
 		value: ls.CompletionList,
 		allCommitCharacters?: string[],
 		token?: code.CancellationToken,
 	): Promise<code.CompletionList>;
+
 	asCompletionResult(
 		value: ls.CompletionItem[],
 		allCommitCharacters?: string[],
 		token?: code.CancellationToken,
 	): Promise<code.CompletionItem[]>;
+
 	asCompletionResult(
 		value: ls.CompletionItem[] | ls.CompletionList | undefined | null,
 		allCommitCharacters?: string[],
@@ -91,17 +102,21 @@ export interface Converter {
 	): ProtocolCompletionItem;
 
 	asTextEdit(edit: undefined | null): undefined;
+
 	asTextEdit(edit: ls.TextEdit): code.TextEdit;
+
 	asTextEdit(edit: ls.TextEdit | undefined | null): code.TextEdit | undefined;
 
 	asTextEdits(
 		items: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	asTextEdits(
 		items: ls.TextEdit[],
 		token?: code.CancellationToken,
 	): Promise<code.TextEdit[]>;
+
 	asTextEdits(
 		items: ls.TextEdit[] | undefined | null,
 		token?: code.CancellationToken,
@@ -111,10 +126,12 @@ export interface Converter {
 		item: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	asSignatureHelp(
 		item: ls.SignatureHelp,
 		token?: code.CancellationToken,
 	): Promise<code.SignatureHelp>;
+
 	asSignatureHelp(
 		item: ls.SignatureHelp | undefined | null,
 		token?: code.CancellationToken,
@@ -140,21 +157,26 @@ export interface Converter {
 	): Promise<code.ParameterInformation[]>;
 
 	asLocation(item: ls.Location): code.Location;
+
 	asLocation(item: undefined | null): undefined;
+
 	asLocation(item: ls.Location | undefined | null): code.Location | undefined;
 
 	asDeclarationResult(
 		item: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	asDeclarationResult(
 		item: ls.Declaration,
 		token?: code.CancellationToken,
 	): Promise<code.Location | code.Location[]>;
+
 	asDeclarationResult(
 		item: ls.DeclarationLink[],
 		token?: code.CancellationToken,
 	): Promise<code.LocationLink[]>;
+
 	asDeclarationResult(
 		item: ls.Declaration | ls.DeclarationLink[] | undefined | null,
 		token?: code.CancellationToken,
@@ -164,14 +186,17 @@ export interface Converter {
 		item: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	asDefinitionResult(
 		item: ls.Definition,
 		token?: code.CancellationToken,
 	): Promise<code.Definition>;
+
 	asDefinitionResult(
 		item: ls.DefinitionLink[],
 		token?: code.CancellationToken,
 	): Promise<code.DefinitionLink[]>;
+
 	asDefinitionResult(
 		item: ls.Definition | ls.DefinitionLink[] | undefined | null,
 		token?: code.CancellationToken,
@@ -181,10 +206,12 @@ export interface Converter {
 		values: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	asReferences(
 		values: ls.Location[],
 		token?: code.CancellationToken,
 	): Promise<code.Location[]>;
+
 	asReferences(
 		values: ls.Location[] | undefined | null,
 		token?: code.CancellationToken,
@@ -198,10 +225,12 @@ export interface Converter {
 		values: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	asDocumentHighlights(
 		values: ls.DocumentHighlight[],
 		token?: code.CancellationToken,
 	): Promise<code.DocumentHighlight[]>;
+
 	asDocumentHighlights(
 		values: ls.DocumentHighlight[] | undefined | null,
 		token?: code.CancellationToken,
@@ -210,8 +239,11 @@ export interface Converter {
 	asSymbolKind(item: ls.SymbolKind): code.SymbolKind;
 
 	asSymbolTag(item: ls.SymbolTag): code.SymbolTag | undefined;
+
 	asSymbolTags(items: undefined | null): undefined;
+
 	asSymbolTags(items: ReadonlyArray<ls.SymbolTag>): code.SymbolTag[];
+
 	asSymbolTags(
 		items: ReadonlyArray<ls.SymbolTag> | undefined | null,
 	): code.SymbolTag[] | undefined;
@@ -224,10 +256,12 @@ export interface Converter {
 		values: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	asSymbolInformations(
 		values: ls.SymbolInformation[] | ls.WorkspaceSymbol[],
 		token?: code.CancellationToken,
 	): Promise<code.SymbolInformation[]>;
+
 	asSymbolInformations(
 		values:
 			| ls.SymbolInformation[]
@@ -246,10 +280,12 @@ export interface Converter {
 		value: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	asDocumentSymbols(
 		value: ls.DocumentSymbol[],
 		token?: code.CancellationToken,
 	): Promise<code.DocumentSymbol[]>;
+
 	asDocumentSymbols(
 		value: ls.DocumentSymbol[] | undefined | null,
 		token?: code.CancellationToken,
@@ -261,10 +297,12 @@ export interface Converter {
 		items: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	asCommands(
 		items: ls.Command[],
 		token?: code.CancellationToken,
 	): Promise<code.Command[]>;
+
 	asCommands(
 		items: ls.Command[] | undefined | null,
 		token?: code.CancellationToken,
@@ -274,31 +312,39 @@ export interface Converter {
 		item: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	asCodeAction(
 		item: ls.CodeAction,
 		token?: code.CancellationToken,
 	): Promise<code.CodeAction>;
+
 	asCodeAction(
 		item: ls.CodeAction | undefined | null,
 		token?: code.CancellationToken,
 	): Promise<code.CodeAction | undefined>;
 
 	asCodeActionKind(item: null | undefined): undefined;
+
 	asCodeActionKind(item: ls.CodeActionKind): code.CodeActionKind;
+
 	asCodeActionKind(
 		item: ls.CodeActionKind | null | undefined,
 	): code.CodeActionKind | undefined;
 
 	asCodeActionKinds(item: null | undefined): undefined;
+
 	asCodeActionKinds(items: ls.CodeActionKind[]): code.CodeActionKind[];
+
 	asCodeActionKinds(
 		item: ls.CodeActionKind[] | null | undefined,
 	): code.CodeActionKind[] | undefined;
 
 	asCodeActionDocumentations(items: null | undefined): undefined;
+
 	asCodeActionDocumentations(
 		items: ls.CodeActionKindDocumentation[],
 	): code.CodeActionProviderMetadata["documentation"];
+
 	asCodeActionDocumentations(
 		items: ls.CodeActionKindDocumentation[] | null | undefined,
 	): code.CodeActionProviderMetadata["documentation"] | undefined;
@@ -309,17 +355,21 @@ export interface Converter {
 	): Promise<(code.Command | code.CodeAction)[]>;
 
 	asCodeLens(item: ls.CodeLens): code.CodeLens;
+
 	asCodeLens(item: undefined | null): undefined;
+
 	asCodeLens(item: ls.CodeLens | undefined | null): code.CodeLens | undefined;
 
 	asCodeLenses(
 		items: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	asCodeLenses(
 		items: ls.CodeLens[],
 		token?: code.CancellationToken,
 	): Promise<code.CodeLens[]>;
+
 	asCodeLenses(
 		items: ls.CodeLens[] | undefined | null,
 		token?: code.CancellationToken,
@@ -329,10 +379,12 @@ export interface Converter {
 		item: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	asWorkspaceEdit(
 		item: ls.WorkspaceEdit,
 		token?: code.CancellationToken,
 	): Promise<code.WorkspaceEdit>;
+
 	asWorkspaceEdit(
 		item: ls.WorkspaceEdit | undefined | null,
 		token?: code.CancellationToken,
@@ -344,10 +396,12 @@ export interface Converter {
 		items: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	asDocumentLinks(
 		items: ls.DocumentLink[],
 		token?: code.CancellationToken,
 	): Promise<code.DocumentLink[]>;
+
 	asDocumentLinks(
 		items: ls.DocumentLink[] | undefined | null,
 		token?: code.CancellationToken,
@@ -361,10 +415,12 @@ export interface Converter {
 		colorPresentations: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	asColorInformations(
 		colorPresentations: ls.ColorInformation[],
 		token?: code.CancellationToken,
 	): Promise<code.ColorInformation[]>;
+
 	asColorInformations(
 		colorInformation: ls.ColorInformation[] | undefined | null,
 		token?: code.CancellationToken,
@@ -376,10 +432,12 @@ export interface Converter {
 		colorPresentations: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	asColorPresentations(
 		colorPresentations: ls.ColorPresentation[],
 		token?: code.CancellationToken,
 	): Promise<code.ColorPresentation[]>;
+
 	asColorPresentations(
 		colorPresentations: ls.ColorPresentation[] | undefined | null,
 		token?: code.CancellationToken,
@@ -395,10 +453,12 @@ export interface Converter {
 		foldingRanges: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	asFoldingRanges(
 		foldingRanges: ls.FoldingRange[],
 		token?: code.CancellationToken,
 	): Promise<code.FoldingRange[]>;
+
 	asFoldingRanges(
 		foldingRanges: ls.FoldingRange[] | undefined | null,
 		token?: code.CancellationToken,
@@ -410,10 +470,12 @@ export interface Converter {
 		selectionRanges: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	asSelectionRanges(
 		selectionRanges: ls.SelectionRange[],
 		token?: code.CancellationToken,
 	): Promise<code.SelectionRange[]>;
+
 	asSelectionRanges(
 		selectionRanges: ls.SelectionRange[] | undefined | null,
 		token?: code.CancellationToken,
@@ -425,10 +487,12 @@ export interface Converter {
 		values: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	asInlineValues(
 		values: ls.InlineValue[],
 		token?: code.CancellationToken,
 	): Promise<code.InlineValue[]>;
+
 	asInlineValues(
 		values: ls.InlineValue[] | undefined | null,
 		token?: code.CancellationToken,
@@ -443,10 +507,12 @@ export interface Converter {
 		values: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	asInlayHints(
 		values: ls.InlayHint[],
 		token?: code.CancellationToken,
 	): Promise<code.InlayHint[]>;
+
 	asInlayHints(
 		values: ls.InlayHint[] | undefined | null,
 		token?: code.CancellationToken,
@@ -460,10 +526,12 @@ export interface Converter {
 		value: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	asSemanticTokens(
 		value: ls.SemanticTokens,
 		token?: code.CancellationToken,
 	): Promise<code.SemanticTokens>;
+
 	asSemanticTokens(
 		value: ls.SemanticTokens | undefined | null,
 		token?: code.CancellationToken,
@@ -475,17 +543,21 @@ export interface Converter {
 		value: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	asSemanticTokensEdits(
 		value: ls.SemanticTokensDelta,
 		token?: code.CancellationToken,
 	): Promise<code.SemanticTokensEdits>;
+
 	asSemanticTokensEdits(
 		value: ls.SemanticTokensDelta | undefined | null,
 		token?: code.CancellationToken,
 	): Promise<code.SemanticTokensEdits | undefined>;
 
 	asCallHierarchyItem(item: null): undefined;
+
 	asCallHierarchyItem(item: ls.CallHierarchyItem): code.CallHierarchyItem;
+
 	asCallHierarchyItem(
 		item: ls.CallHierarchyItem | null,
 	): code.CallHierarchyItem | undefined;
@@ -494,10 +566,12 @@ export interface Converter {
 		items: null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	asCallHierarchyItems(
 		items: ls.CallHierarchyItem[],
 		token?: code.CancellationToken,
 	): Promise<code.CallHierarchyItem[]>;
+
 	asCallHierarchyItems(
 		items: ls.CallHierarchyItem[] | null,
 		token?: code.CancellationToken,
@@ -512,10 +586,12 @@ export interface Converter {
 		items: null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	asCallHierarchyIncomingCalls(
 		items: ReadonlyArray<ls.CallHierarchyIncomingCall>,
 		token?: code.CancellationToken,
 	): Promise<code.CallHierarchyIncomingCall[]>;
+
 	asCallHierarchyIncomingCalls(
 		items: ReadonlyArray<ls.CallHierarchyIncomingCall> | null,
 		token?: code.CancellationToken,
@@ -530,10 +606,12 @@ export interface Converter {
 		items: null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	asCallHierarchyOutgoingCalls(
 		items: ReadonlyArray<ls.CallHierarchyOutgoingCall>,
 		token?: code.CancellationToken,
 	): Promise<code.CallHierarchyOutgoingCall[]>;
+
 	asCallHierarchyOutgoingCalls(
 		items: ReadonlyArray<ls.CallHierarchyOutgoingCall> | null,
 		token?: code.CancellationToken,
@@ -543,17 +621,21 @@ export interface Converter {
 		value: null | undefined,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	asLinkedEditingRanges(
 		value: ls.LinkedEditingRanges,
 		token?: code.CancellationToken,
 	): Promise<code.LinkedEditingRanges>;
+
 	asLinkedEditingRanges(
 		value: ls.LinkedEditingRanges | null | undefined,
 		token?: code.CancellationToken,
 	): Promise<code.LinkedEditingRanges | undefined>;
 
 	asTypeHierarchyItem(item: null): undefined;
+
 	asTypeHierarchyItem(item: ls.TypeHierarchyItem): code.TypeHierarchyItem;
+
 	asTypeHierarchyItem(
 		item: ls.TypeHierarchyItem | null,
 	): code.TypeHierarchyItem | undefined;
@@ -562,30 +644,36 @@ export interface Converter {
 		items: null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	asTypeHierarchyItems(
 		items: ls.TypeHierarchyItem[],
 		token?: code.CancellationToken,
 	): Promise<code.TypeHierarchyItem[]>;
+
 	asTypeHierarchyItems(
 		items: ls.TypeHierarchyItem[] | null,
 		token?: code.CancellationToken,
 	): Promise<code.TypeHierarchyItem[] | undefined>;
 
 	asGlobPattern(pattern: undefined | null): undefined;
+
 	asGlobPattern(pattern: ls.GlobPattern): code.GlobPattern | undefined;
 
 	asInlineCompletionResult(
 		value: undefined | null,
 		token?: code.CancellationToken,
 	): Promise<undefined>;
+
 	asInlineCompletionResult(
 		value: ls.InlineCompletionList,
 		token?: code.CancellationToken,
 	): Promise<code.InlineCompletionList>;
+
 	asInlineCompletionResult(
 		value: ls.InlineCompletionItem[],
 		token?: code.CancellationToken,
 	): Promise<code.InlineCompletionItem[]>;
+
 	asInlineCompletionResult(
 		value:
 			| ls.InlineCompletionItem[]
@@ -608,6 +696,7 @@ export interface URIConverter {
 
 interface CodeFenceBlock {
 	language: string;
+
 	value: string;
 }
 
@@ -658,6 +747,7 @@ export function createConverter(
 					});
 				} else {
 					const notebookType = filter.notebook.notebookType ?? "*";
+
 					result.push({
 						notebookType: notebookType,
 						scheme: filter.notebook.scheme,
@@ -673,6 +763,7 @@ export function createConverter(
 				});
 			}
 		}
+
 		return result;
 	}
 
@@ -691,6 +782,7 @@ export function createConverter(
 		for (let i = 0; i < diagnostics.length; i++) {
 			result[i] = asDiagnostic(diagnostics[i]);
 		}
+
 		return result;
 	}
 
@@ -721,23 +813,28 @@ export function createConverter(
 				result.hasDiagnosticCode = true;
 
 				const diagnosticCode = diagnostic.code as DiagnosticCode;
+
 				result.code = {
 					value: diagnosticCode.value,
 					target: asUri(diagnosticCode.target),
 				};
 			}
 		}
+
 		if (diagnostic.source) {
 			result.source = diagnostic.source;
 		}
+
 		if (diagnostic.relatedInformation) {
 			result.relatedInformation = asRelatedInformation(
 				diagnostic.relatedInformation,
 			);
 		}
+
 		if (Array.isArray(diagnostic.tags)) {
 			result.tags = asDiagnosticTags(diagnostic.tags);
 		}
+
 		return result;
 	}
 
@@ -750,11 +847,13 @@ export function createConverter(
 
 		for (let i = 0; i < relatedInformation.length; i++) {
 			const info = relatedInformation[i];
+
 			result[i] = new code.DiagnosticRelatedInformation(
 				asLocation(info.location),
 				info.message,
 			);
 		}
+
 		return result;
 	}
 
@@ -772,6 +871,7 @@ export function createConverter(
 		if (!tags) {
 			return undefined;
 		}
+
 		const result: code.DiagnosticTag[] = [];
 
 		for (const tag of tags) {
@@ -781,6 +881,7 @@ export function createConverter(
 				result.push(converted);
 			}
 		}
+
 		return result.length > 0 ? result : undefined;
 	}
 
@@ -860,6 +961,7 @@ export function createConverter(
 		if (value === undefined || value === null) {
 			return code.DiagnosticSeverity.Error;
 		}
+
 		switch (value) {
 			case ls.DiagnosticSeverity.Error:
 				return code.DiagnosticSeverity.Error;
@@ -873,6 +975,7 @@ export function createConverter(
 			case ls.DiagnosticSeverity.Hint:
 				return code.DiagnosticSeverity.Hint;
 		}
+
 		return code.DiagnosticSeverity.Error;
 	}
 
@@ -896,8 +999,10 @@ export function createConverter(
 				} else {
 					item.appendMarkdown(element);
 				}
+
 				result.push(item);
 			}
+
 			return result;
 		} else {
 			return asMarkdownString(value);
@@ -939,12 +1044,14 @@ export function createConverter(
 
 				case ls.MarkupKind.PlainText:
 					result = new code.MarkdownString();
+
 					result.appendText(value.value);
 
 					break;
 
 				default:
 					result = new code.MarkdownString();
+
 					result.appendText(
 						`Unsupported Markup content received. Kind is: ${value.kind}`,
 					);
@@ -952,8 +1059,11 @@ export function createConverter(
 					break;
 			}
 		}
+
 		result.isTrusted = trustMarkdown;
+
 		result.supportHtml = supportHtml;
+
 		result.supportThemeIcons = supportThemeIcons;
 
 		return result;
@@ -973,6 +1083,7 @@ export function createConverter(
 		if (!hover) {
 			return undefined;
 		}
+
 		return new code.Hover(
 			asHoverContent(hover.contents),
 			asRange(hover.range),
@@ -1011,6 +1122,7 @@ export function createConverter(
 		if (!value) {
 			return undefined;
 		}
+
 		if (Array.isArray(value)) {
 			return async.map(
 				value,
@@ -1018,6 +1130,7 @@ export function createConverter(
 				token,
 			);
 		}
+
 		const list = <ls.CompletionList>value;
 
 		const { defaultRange, commitCharacters } = getCompletionItemDefaults(
@@ -1050,6 +1163,7 @@ export function createConverter(
 		allCommitCharacters?: string[],
 	): {
 		defaultRange: code.Range | InsertReplaceRange | undefined;
+
 		commitCharacters: string[] | undefined;
 	} {
 		const rangeDefaults = list.itemDefaults?.editRange;
@@ -1080,6 +1194,7 @@ export function createConverter(
 		) {
 			return [value - 1, undefined];
 		}
+
 		return [code.CompletionItemKind.Text, value];
 	}
 
@@ -1090,6 +1205,7 @@ export function createConverter(
 			case ls.CompletionItemTag.Deprecated:
 				return code.CompletionItemTag.Deprecated;
 		}
+
 		return undefined;
 	}
 
@@ -1099,6 +1215,7 @@ export function createConverter(
 		if (tags === undefined || tags === null) {
 			return [];
 		}
+
 		const result: code.CompletionItemTag[] = [];
 
 		for (const tag of tags) {
@@ -1108,6 +1225,7 @@ export function createConverter(
 				result.push(converted);
 			}
 		}
+
 		return result;
 	}
 
@@ -1130,15 +1248,19 @@ export function createConverter(
 		if (item.detail) {
 			result.detail = item.detail;
 		}
+
 		if (item.documentation) {
 			result.documentation = asDocumentation(item.documentation);
+
 			result.documentationFormat = Is.string(item.documentation)
 				? "$string"
 				: item.documentation.kind;
 		}
+
 		if (item.filterText) {
 			result.filterText = item.filterText;
 		}
+
 		const insertText = asCompletionInsertText(
 			item,
 			defaultRange,
@@ -1147,25 +1269,32 @@ export function createConverter(
 
 		if (insertText) {
 			result.insertText = insertText.text;
+
 			result.range = insertText.range;
+
 			result.fromEdit = insertText.fromEdit;
 		}
+
 		if (Is.number(item.kind)) {
 			const [itemKind, original] = asCompletionItemKind(item.kind);
+
 			result.kind = itemKind;
 
 			if (original) {
 				result.originalItemKind = original;
 			}
 		}
+
 		if (item.sortText) {
 			result.sortText = item.sortText;
 		}
+
 		if (item.additionalTextEdits) {
 			result.additionalTextEdits = asTextEditsSync(
 				item.additionalTextEdits,
 			);
 		}
+
 		const commitCharacters = applyCommitCharacters(
 			item,
 			defaultCommitCharacters,
@@ -1175,9 +1304,11 @@ export function createConverter(
 		if (commitCharacters) {
 			result.commitCharacters = commitCharacters.slice();
 		}
+
 		if (item.command) {
 			result.command = asCommand(item.command);
 		}
+
 		if (item.deprecated === true || item.deprecated === false) {
 			result.deprecated = item.deprecated;
 
@@ -1185,17 +1316,21 @@ export function createConverter(
 				tags.push(code.CompletionItemTag.Deprecated);
 			}
 		}
+
 		if (item.preselect === true || item.preselect === false) {
 			result.preselect = item.preselect;
 		}
+
 		const data = applyData(item, defaultData, dataApplyKind);
 
 		if (data !== undefined) {
 			result.data = data;
 		}
+
 		if (tags.length > 0) {
 			result.tags = tags;
 		}
+
 		const insertTextMode = item.insertTextMode ?? defaultInsertTextMode;
 
 		if (insertTextMode !== undefined) {
@@ -1205,6 +1340,7 @@ export function createConverter(
 				result.keepWhitespace = true;
 			}
 		}
+
 		return result;
 	}
 
@@ -1217,6 +1353,7 @@ export function createConverter(
 			if (!defaultCommitCharacters && !item.commitCharacters) {
 				return undefined;
 			}
+
 			const set = new Set<string>();
 
 			if (defaultCommitCharacters) {
@@ -1224,11 +1361,13 @@ export function createConverter(
 					set.add(char);
 				}
 			}
+
 			if (Is.stringArray(item.commitCharacters)) {
 				for (const char of item.commitCharacters) {
 					set.add(char);
 				}
 			}
+
 			return Array.from(set);
 		}
 
@@ -1284,7 +1423,9 @@ export function createConverter(
 	):
 		| {
 				text: string | code.SnippetString;
+
 				range?: code.Range | InsertReplaceRange;
+
 				fromEdit: boolean;
 		  }
 		| undefined {
@@ -1346,6 +1487,7 @@ export function createConverter(
 		if (!edit) {
 			return undefined;
 		}
+
 		return new code.TextEdit(asRange(edit.range), edit.newText);
 	}
 
@@ -1371,6 +1513,7 @@ export function createConverter(
 		if (!items) {
 			return undefined;
 		}
+
 		return async.map(items, asTextEdit, token);
 	}
 
@@ -1388,11 +1531,13 @@ export function createConverter(
 		if (!items) {
 			return undefined;
 		}
+
 		const result: code.TextEdit[] = new Array(items.length);
 
 		for (let i = 0; i < items.length; i++) {
 			result[i] = asTextEdit(items[i]);
 		}
+
 		return result;
 	}
 
@@ -1418,6 +1563,7 @@ export function createConverter(
 		if (!item) {
 			return undefined;
 		}
+
 		const result = new code.SignatureHelp();
 
 		if (Is.number(item.activeSignature)) {
@@ -1426,6 +1572,7 @@ export function createConverter(
 			// activeSignature was optional in the past
 			result.activeSignature = 0;
 		}
+
 		if (Is.number(item.activeParameter)) {
 			result.activeParameter = item.activeParameter;
 		} else if (item.activeParameter === null) {
@@ -1434,12 +1581,14 @@ export function createConverter(
 			// activeParameter was optional in the past
 			result.activeParameter = 0;
 		}
+
 		if (item.signatures) {
 			result.signatures = await asSignatureInformations(
 				item.signatures,
 				token,
 			);
 		}
+
 		return result;
 	}
 
@@ -1459,12 +1608,14 @@ export function createConverter(
 		if (item.documentation !== undefined) {
 			result.documentation = asDocumentation(item.documentation);
 		}
+
 		if (item.parameters !== undefined) {
 			result.parameters = await asParameterInformations(
 				item.parameters,
 				token,
 			);
 		}
+
 		if (item.activeParameter !== undefined) {
 			result.activeParameter = item.activeParameter ?? -1;
 		}
@@ -1488,6 +1639,7 @@ export function createConverter(
 		if (item.documentation) {
 			result.documentation = asDocumentation(item.documentation);
 		}
+
 		return result;
 	}
 
@@ -1529,6 +1681,7 @@ export function createConverter(
 		if (!item) {
 			return undefined;
 		}
+
 		return asLocationResult(item, token);
 	}
 
@@ -1554,6 +1707,7 @@ export function createConverter(
 		if (!item) {
 			return undefined;
 		}
+
 		return asLocationResult(item, token);
 	}
 
@@ -1567,6 +1721,7 @@ export function createConverter(
 		if (!item) {
 			return undefined;
 		}
+
 		const result = {
 			targetUri: _uriConverter(item.targetUri),
 			targetRange: asRange(item.targetRange), // See issue: https://github.com/Microsoft/vscode/issues/58649
@@ -1579,6 +1734,7 @@ export function createConverter(
 				`targetSelectionRange must not be undefined or null`,
 			);
 		}
+
 		return result;
 	}
 
@@ -1596,6 +1752,7 @@ export function createConverter(
 		if (!item) {
 			return undefined;
 		}
+
 		if (Is.array(item)) {
 			if (item.length === 0) {
 				return [];
@@ -1641,6 +1798,7 @@ export function createConverter(
 		if (!values) {
 			return undefined;
 		}
+
 		return async.map(
 			values,
 			asLocation as (item: ls.Location) => code.Location,
@@ -1670,6 +1828,7 @@ export function createConverter(
 		if (!values) {
 			return undefined;
 		}
+
 		return async.map(values, asDocumentHighlight, token);
 	}
 
@@ -1681,6 +1840,7 @@ export function createConverter(
 		if (Is.number(item.kind)) {
 			result.kind = asDocumentHighlightKind(item.kind);
 		}
+
 		return result;
 	}
 
@@ -1695,6 +1855,7 @@ export function createConverter(
 			case ls.DocumentHighlightKind.Write:
 				return code.DocumentHighlightKind.Write;
 		}
+
 		return code.DocumentHighlightKind.Text;
 	}
 
@@ -1720,6 +1881,7 @@ export function createConverter(
 		if (!values) {
 			return undefined;
 		}
+
 		return async.map(values, asSymbolInformation, token);
 	}
 
@@ -1728,6 +1890,7 @@ export function createConverter(
 			// Symbol kind is one based in the protocol and zero based in code.
 			return item - 1;
 		}
+
 		return code.SymbolKind.Property;
 	}
 
@@ -1755,6 +1918,7 @@ export function createConverter(
 		if (items === undefined || items === null) {
 			return undefined;
 		}
+
 		const result: code.SymbolTag[] = [];
 
 		for (const item of items) {
@@ -1764,6 +1928,7 @@ export function createConverter(
 				result.push(converted);
 			}
 		}
+
 		return result.length === 0 ? undefined : result;
 	}
 
@@ -1798,6 +1963,7 @@ export function createConverter(
 							asRange(location.range),
 						),
 					);
+
 		fillTags(result, item);
 
 		return result;
@@ -1820,6 +1986,7 @@ export function createConverter(
 		if (values === undefined || values === null) {
 			return undefined;
 		}
+
 		return async.map(values, asDocumentSymbol, token);
 	}
 
@@ -1831,6 +1998,7 @@ export function createConverter(
 			asRange(value.range),
 			asRange(value.selectionRange),
 		);
+
 		fillTags(result, value);
 
 		if (value.children !== undefined && value.children.length > 0) {
@@ -1839,8 +2007,10 @@ export function createConverter(
 			for (const child of value.children) {
 				children.push(asDocumentSymbol(child));
 			}
+
 			result.children = children;
 		}
+
 		return result;
 	}
 
@@ -1870,9 +2040,11 @@ export function createConverter(
 		if (item.tooltip) {
 			result.tooltip = item.tooltip;
 		}
+
 		if (item.arguments) {
 			result.arguments = item.arguments;
 		}
+
 		return result;
 	}
 
@@ -1898,26 +2070,35 @@ export function createConverter(
 		if (!items) {
 			return undefined;
 		}
+
 		return async.map(items, asCommand, token);
 	}
 
 	const kindMapping: Map<ls.CodeActionKind, code.CodeActionKind> = new Map();
+
 	kindMapping.set(ls.CodeActionKind.Empty, code.CodeActionKind.Empty);
+
 	kindMapping.set(ls.CodeActionKind.QuickFix, code.CodeActionKind.QuickFix);
+
 	kindMapping.set(ls.CodeActionKind.Refactor, code.CodeActionKind.Refactor);
+
 	kindMapping.set(
 		ls.CodeActionKind.RefactorExtract,
 		code.CodeActionKind.RefactorExtract,
 	);
+
 	kindMapping.set(
 		ls.CodeActionKind.RefactorInline,
 		code.CodeActionKind.RefactorInline,
 	);
+
 	kindMapping.set(
 		ls.CodeActionKind.RefactorRewrite,
 		code.CodeActionKind.RefactorRewrite,
 	);
+
 	kindMapping.set(ls.CodeActionKind.Source, code.CodeActionKind.Source);
+
 	kindMapping.set(
 		ls.CodeActionKind.SourceOrganizeImports,
 		code.CodeActionKind.SourceOrganizeImports,
@@ -1937,17 +2118,21 @@ export function createConverter(
 		if (item === undefined || item === null) {
 			return undefined;
 		}
+
 		let result: code.CodeActionKind | undefined = kindMapping.get(item);
 
 		if (result) {
 			return result;
 		}
+
 		const parts = item.split(".");
+
 		result = code.CodeActionKind.Empty;
 
 		for (const part of parts) {
 			result = result.append(part);
 		}
+
 		return result;
 	}
 
@@ -1967,6 +2152,7 @@ export function createConverter(
 		if (items === undefined || items === null) {
 			return undefined;
 		}
+
 		return items.map((kind) => asCodeActionKind(kind));
 	}
 
@@ -1986,6 +2172,7 @@ export function createConverter(
 		if (items === undefined || items === null) {
 			return undefined;
 		}
+
 		return items.map((doc) => ({
 			kind: asCodeActionKind(doc.kind),
 			command: asCommand(doc.command),
@@ -2014,26 +2201,33 @@ export function createConverter(
 		if (item === undefined || item === null) {
 			return undefined;
 		}
+
 		const result = new ProtocolCodeAction(item.title, item.data);
 
 		if (item.kind !== undefined) {
 			result.kind = asCodeActionKind(item.kind);
 		}
+
 		if (item.diagnostics !== undefined) {
 			result.diagnostics = asDiagnosticsSync(item.diagnostics);
 		}
+
 		if (item.edit !== undefined) {
 			result.edit = await asWorkspaceEdit(item.edit, token);
 		}
+
 		if (item.command !== undefined) {
 			result.command = asCommand(item.command);
 		}
+
 		if (item.isPreferred !== undefined) {
 			result.isPreferred = item.isPreferred;
 		}
+
 		if (item.disabled !== undefined) {
 			result.disabled = { reason: item.disabled.reason };
 		}
+
 		if (item.tags?.includes(ls.CodeActionTag.LLMGenerated)) {
 			result.isAI = true;
 		}
@@ -2072,6 +2266,7 @@ export function createConverter(
 		if (!item) {
 			return undefined;
 		}
+
 		const result: ProtocolCodeLens = new ProtocolCodeLens(
 			asRange(item.range),
 		);
@@ -2079,9 +2274,11 @@ export function createConverter(
 		if (item.command) {
 			result.command = asCommand(item.command);
 		}
+
 		if (item.data !== undefined && item.data !== null) {
 			result.data = item.data;
 		}
+
 		return result;
 	}
 
@@ -2107,6 +2304,7 @@ export function createConverter(
 		if (!items) {
 			return undefined;
 		}
+
 		return async.map(
 			items,
 			asCodeLens as (item: ls.CodeLens) => code.CodeLens,
@@ -2136,22 +2334,26 @@ export function createConverter(
 		if (!item) {
 			return undefined;
 		}
+
 		const sharedMetadata: Map<string, code.WorkspaceEditEntryMetadata> =
 			new Map();
 
 		if (item.changeAnnotations !== undefined) {
 			const changeAnnotations = item.changeAnnotations;
+
 			await async.forEach(
 				Object.keys(changeAnnotations),
 				(key) => {
 					const metaData = asWorkspaceEditEntryMetadata(
 						changeAnnotations[key],
 					);
+
 					sharedMetadata.set(key, metaData);
 				},
 				token,
 			);
 		}
+
 		const asMetadata = (
 			annotation: ls.ChangeAnnotationIdentifier | undefined,
 		): code.WorkspaceEditEntryMetadata | undefined => {
@@ -2166,6 +2368,7 @@ export function createConverter(
 
 		if (item.documentChanges) {
 			const documentChanges = item.documentChanges;
+
 			await async.forEach(
 				documentChanges,
 				(change) => {
@@ -2225,6 +2428,7 @@ export function createConverter(
 								]);
 							}
 						}
+
 						result.set(uri, edits);
 					} else {
 						throw new Error(
@@ -2236,6 +2440,7 @@ export function createConverter(
 			);
 		} else if (item.changes) {
 			const changes = item.changes;
+
 			await async.forEach(
 				Object.keys(changes),
 				(key) => {
@@ -2247,6 +2452,7 @@ export function createConverter(
 				token,
 			);
 		}
+
 		return result;
 	}
 
@@ -2266,6 +2472,7 @@ export function createConverter(
 		if (annotation === undefined) {
 			return undefined;
 		}
+
 		return {
 			label: annotation.label,
 			needsConfirmation: !!annotation.needsConfirmation,
@@ -2283,9 +2490,11 @@ export function createConverter(
 		if (item.tooltip !== undefined) {
 			link.tooltip = item.tooltip;
 		}
+
 		if (item.data !== undefined && item.data !== null) {
 			link.data = item.data;
 		}
+
 		return link;
 	}
 
@@ -2311,6 +2520,7 @@ export function createConverter(
 		if (!items) {
 			return undefined;
 		}
+
 		return async.map(items, asDocumentLink, token);
 	}
 
@@ -2341,6 +2551,7 @@ export function createConverter(
 		if (!colorInformation) {
 			return undefined;
 		}
+
 		return async.map(colorInformation, asColorInformation, token);
 	}
 
@@ -2348,6 +2559,7 @@ export function createConverter(
 		cp: ls.ColorPresentation,
 	): code.ColorPresentation {
 		const presentation = new code.ColorPresentation(cp.label);
+
 		presentation.additionalTextEdits = asTextEditsSync(
 			cp.additionalTextEdits,
 		);
@@ -2355,6 +2567,7 @@ export function createConverter(
 		if (cp.textEdit) {
 			presentation.textEdit = asTextEdit(cp.textEdit);
 		}
+
 		return presentation;
 	}
 
@@ -2375,6 +2588,7 @@ export function createConverter(
 		if (!colorPresentations) {
 			return undefined;
 		}
+
 		return async.map(colorPresentations, asColorPresentation, token);
 	}
 
@@ -2393,6 +2607,7 @@ export function createConverter(
 					return code.FoldingRangeKind.Region;
 			}
 		}
+
 		return undefined;
 	}
 
@@ -2426,6 +2641,7 @@ export function createConverter(
 		if (!foldingRanges) {
 			return undefined;
 		}
+
 		return async.map(foldingRanges, asFoldingRange, token);
 	}
 
@@ -2462,6 +2678,7 @@ export function createConverter(
 		if (!Array.isArray(selectionRanges)) {
 			return [];
 		}
+
 		return async.map(selectionRanges, asSelectionRange, token);
 	}
 
@@ -2507,6 +2724,7 @@ export function createConverter(
 		if (!Array.isArray(inlineValues)) {
 			return [];
 		}
+
 		return async.map(inlineValues, asInlineValue, token);
 	}
 
@@ -2524,21 +2742,27 @@ export function createConverter(
 		if (value.kind !== undefined) {
 			result.kind = value.kind;
 		}
+
 		if (value.textEdits !== undefined) {
 			result.textEdits = await asTextEdits(value.textEdits, token);
 		}
+
 		if (value.tooltip !== undefined) {
 			result.tooltip = asTooltip(value.tooltip);
 		}
+
 		if (value.paddingLeft !== undefined) {
 			result.paddingLeft = value.paddingLeft;
 		}
+
 		if (value.paddingRight !== undefined) {
 			result.paddingRight = value.paddingRight;
 		}
+
 		if (value.data !== undefined) {
 			result.data = value.data;
 		}
+
 		return result;
 	}
 
@@ -2550,12 +2774,15 @@ export function createConverter(
 		if (part.location !== undefined) {
 			result.location = asLocation(part.location);
 		}
+
 		if (part.tooltip !== undefined) {
 			result.tooltip = asTooltip(part.tooltip);
 		}
+
 		if (part.command !== undefined) {
 			result.command = asCommand(part.command);
 		}
+
 		return result;
 	}
 
@@ -2565,6 +2792,7 @@ export function createConverter(
 		if (typeof value === "string") {
 			return value;
 		}
+
 		return asMarkdownString(value);
 	}
 
@@ -2590,6 +2818,7 @@ export function createConverter(
 		if (!Array.isArray(values)) {
 			return undefined;
 		}
+
 		return async.mapAsync(values, asInlayHint, token);
 	}
 
@@ -2611,6 +2840,7 @@ export function createConverter(
 		if (item === null) {
 			return undefined;
 		}
+
 		const result = new ProtocolCallHierarchyItem(
 			asSymbolKind(item.kind),
 			item.name,
@@ -2624,6 +2854,7 @@ export function createConverter(
 		if (item.tags !== undefined) {
 			result.tags = asSymbolTags(item.tags);
 		}
+
 		return result;
 	}
 
@@ -2649,6 +2880,7 @@ export function createConverter(
 		if (items === null) {
 			return undefined;
 		}
+
 		return async.map(
 			items,
 			asCallHierarchyItem as (
@@ -2667,6 +2899,7 @@ export function createConverter(
 			await asRanges(item.fromRanges, token),
 		);
 	}
+
 	function asCallHierarchyIncomingCalls(
 		items: null,
 		token?: code.CancellationToken,
@@ -2689,6 +2922,7 @@ export function createConverter(
 		if (items === null) {
 			return undefined;
 		}
+
 		return async.mapAsync(items, asCallHierarchyIncomingCall, token);
 	}
 
@@ -2724,6 +2958,7 @@ export function createConverter(
 		if (items === null) {
 			return undefined;
 		}
+
 		return async.mapAsync(items, asCallHierarchyOutgoingCall, token);
 	}
 
@@ -2751,6 +2986,7 @@ export function createConverter(
 		if (value === undefined || value === null) {
 			return undefined;
 		}
+
 		return new code.SemanticTokens(
 			new Uint32Array(value.data),
 			value.resultId,
@@ -2789,6 +3025,7 @@ export function createConverter(
 		if (value === undefined || value === null) {
 			return undefined;
 		}
+
 		return new code.SemanticTokensEdits(
 			value.edits.map(asSemanticTokensEdit),
 			value.resultId,
@@ -2823,6 +3060,7 @@ export function createConverter(
 		if (value === null || value === undefined) {
 			return undefined;
 		}
+
 		return new code.LinkedEditingRanges(
 			await asRanges(value.ranges, token),
 			asRegularExpression(value.wordPattern),
@@ -2843,6 +3081,7 @@ export function createConverter(
 		if (value === null || value === undefined) {
 			return undefined;
 		}
+
 		return new RegExp(value);
 	}
 
@@ -2863,6 +3102,7 @@ export function createConverter(
 		if (item === null) {
 			return undefined;
 		}
+
 		const result = new ProtocolTypeHierarchyItem(
 			asSymbolKind(item.kind),
 			item.name,
@@ -2876,6 +3116,7 @@ export function createConverter(
 		if (item.tags !== undefined) {
 			result.tags = asSymbolTags(item.tags);
 		}
+
 		return result;
 	}
 
@@ -2901,6 +3142,7 @@ export function createConverter(
 		if (items === null) {
 			return undefined;
 		}
+
 		return async.map(
 			items,
 			asTypeHierarchyItem as (
@@ -2922,6 +3164,7 @@ export function createConverter(
 		if (Is.string(pattern)) {
 			return pattern;
 		}
+
 		if (ls.RelativePattern.is(pattern)) {
 			if (ls.URI.is(pattern.baseUri)) {
 				return new code.RelativePattern(
@@ -2938,6 +3181,7 @@ export function createConverter(
 					: undefined;
 			}
 		}
+
 		return undefined;
 	}
 
@@ -2980,6 +3224,7 @@ export function createConverter(
 		if (!value) {
 			return undefined;
 		}
+
 		if (Array.isArray(value)) {
 			return async.map(
 				value,
@@ -2987,6 +3232,7 @@ export function createConverter(
 				token,
 			);
 		}
+
 		const list = <ls.InlineCompletionList>value;
 
 		const converted = await async.map(

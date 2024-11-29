@@ -54,8 +54,10 @@ function computeDiagnostics(content: string): Diagnostic[] {
 				),
 			);
 		}
+
 		lineNumber++;
 	}
+
 	return result;
 }
 
@@ -89,6 +91,7 @@ connection.onInitialize(
 
 documents.onDidChangeContent((event) => {
 	const document = event.document;
+
 	void connection.sendDiagnostics({
 		uri: document.uri,
 		diagnostics: computeDiagnostics(document.getText()),
@@ -119,6 +122,7 @@ connection.onCompletion((params, token): CompletionItem[] => {
 	const result: CompletionItem[] = [];
 
 	const item = CompletionItem.create("foo");
+
 	result.push(item);
 
 	return result;

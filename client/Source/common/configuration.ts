@@ -54,11 +54,13 @@ export class ConfigurationFeature implements StaticFeature {
 
 	public fillClientCapabilities(capabilities: ClientCapabilities): void {
 		capabilities.workspace = capabilities.workspace || {};
+
 		capabilities.workspace!.configuration = true;
 	}
 
 	public initialize(): void {
 		const client = this._client;
+
 		client.onRequest(ConfigurationRequest.type, (params, token) => {
 			const configuration: ConfigurationRequest.HandlerSignature = (
 				params,
@@ -72,6 +74,7 @@ export class ConfigurationFeature implements StaticFeature {
 									item.scopeUri,
 								)
 							: undefined;
+
 					result.push(
 						this.getConfiguration(
 							resource,
@@ -79,6 +82,7 @@ export class ConfigurationFeature implements StaticFeature {
 						),
 					);
 				}
+
 				return result;
 			};
 
@@ -119,6 +123,7 @@ export class ConfigurationFeature implements StaticFeature {
 			}
 		} else {
 			const config = workspace.getConfiguration(undefined, resource);
+
 			result = {};
 
 			for (const key of Object.keys(config)) {
@@ -127,9 +132,11 @@ export class ConfigurationFeature implements StaticFeature {
 				}
 			}
 		}
+
 		if (result === undefined) {
 			result = null;
 		}
+
 		return result;
 	}
 
@@ -148,9 +155,11 @@ export function toJSONObject(obj: any): any {
 					res[key] = toJSONObject(obj[key]);
 				}
 			}
+
 			return res;
 		}
 	}
+
 	return obj;
 }
 
@@ -192,6 +201,7 @@ export type SynchronizeOptions = {
 
 export type $ConfigurationOptions = {
 	synchronize?: SynchronizeOptions;
+
 	workspaceFolder?: VWorkspaceFolder;
 };
 
@@ -199,6 +209,7 @@ export class SyncConfigurationFeature
 	implements DynamicFeature<DidChangeConfigurationRegistrationOptions>
 {
 	private isCleared: boolean;
+
 	private readonly _listeners: Map<string, Disposable>;
 
 	constructor(
@@ -208,6 +219,7 @@ export class SyncConfigurationFeature
 		>,
 	) {
 		this.isCleared = false;
+
 		this._listeners = new Map();
 	}
 
@@ -252,6 +264,7 @@ export class SyncConfigurationFeature
 		const disposable = workspace.onDidChangeConfiguration((event) => {
 			this.onDidChangeConfiguration(data.registerOptions.section, event);
 		});
+
 		this._listeners.set(data.id, disposable);
 
 		if (data.registerOptions.section !== undefined) {
@@ -267,6 +280,7 @@ export class SyncConfigurationFeature
 
 		if (disposable) {
 			this._listeners.delete(id);
+
 			disposable.dispose();
 		}
 	}
@@ -275,7 +289,9 @@ export class SyncConfigurationFeature
 		for (const disposable of this._listeners.values()) {
 			disposable.dispose();
 		}
+
 		this._listeners.clear();
+
 		this.isCleared = true;
 	}
 
@@ -286,6 +302,7 @@ export class SyncConfigurationFeature
 		if (this.isCleared) {
 			return;
 		}
+
 		let sections: string[] | undefined;
 
 		if (Is.string(configurationSection)) {
@@ -293,6 +310,7 @@ export class SyncConfigurationFeature
 		} else {
 			sections = configurationSection;
 		}
+
 		if (sections !== undefined && event !== undefined) {
 			const affected = sections.some((section) =>
 				event.affectsConfiguration(section),
@@ -302,6 +320,7 @@ export class SyncConfigurationFeature
 				return;
 			}
 		}
+
 		const didChangeConfiguration = async (
 			sections: string[] | undefined,
 		): Promise<void> => {
@@ -340,12 +359,16 @@ export class SyncConfigurationFeature
 
 				if (!obj) {
 					obj = Object.create(null);
+
 					current[path[i]] = obj;
 				}
+
 				current = obj;
 			}
+
 			return current;
 		}
+
 		const resource: Uri | undefined = this._client.clientOptions
 			.workspaceFolder
 			? this._client.clientOptions.workspaceFolder.uri
@@ -369,12 +392,15 @@ export class SyncConfigurationFeature
 					.getConfiguration(undefined, resource)
 					.get(key);
 			}
+
 			if (config) {
 				const path = keys[i].split(".");
+
 				ensurePath(result, path)[path[path.length - 1]] =
 					toJSONObject(config);
 			}
 		}
+
 		return result;
 	}
 }
