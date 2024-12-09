@@ -1,5 +1,7 @@
 {
+	"dependencies": {},
 	"description": "Types used by the Language server for node",
+	"devDependencies": {},
 	"exports": {
 		".": {
 			"browser": "./lib/esm/main.js",
@@ -9,7 +11,7 @@
 		}
 	},
 	"main": "./lib/umd/main.js",
-	"name": "vscode-languageserver-types",
+	"name": "@codeeditorland/languageserver-types",
 	"scripts": {
 		"all": "npm run clean && npm run compile && npm run lint && npm run test",
 		"all:publish": "git clean -xfd . && npm install && npm run compile:esm && npm run compile:umd && npm run lint && npm run test",

@@ -15,7 +15,7 @@
 			"types": "./lib/main.d.ts"
 		}
 	},
-	"name": "@vscode/tsconfig-gen",
+	"name": "@codeeditorland/tsconfig-gen",
 	"scripts": {
 		"all": "npm run compile && npm run lint",
 		"all:publish": "git clean -xfd . && npm install && npm run compile:publish && npm run lint",

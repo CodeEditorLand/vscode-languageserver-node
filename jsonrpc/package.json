@@ -1,4 +1,5 @@
 {
+	"dependencies": {},
 	"description": "A json rpc implementation over streams",
 	"devDependencies": {
 		"@types/msgpack-lite": "0.1.11",
@@ -18,7 +19,7 @@
 			"types": "./lib/node/main.d.ts"
 		}
 	},
-	"name": "vscode-jsonrpc",
+	"name": "@codeeditorland/jsonrpc",
 	"scripts": {
 		"all": "npm run clean && npm run compile && npm run lint && npm run test",
 		"all:publish": "git clean -xfd . && npm install && npm run compile:publish && npm run lint && npm run test",

@@ -1,7 +1,11 @@
 {
-	"activationEvents": [
-		"*"
-	],
+	"name": "testbed",
+	"description": "testbed",
+	"main": "./client/out/extension.js",
+	"scripts": {
+		"clean": "tsc -b --clean",
+		"compile": "tsc -b"
+	},
 	"contributes": {
 		"commands": [
 			{
@@ -34,12 +38,10 @@
 			"type": "object"
 		}
 	},
-	"description": "testbed",
-	"enabledApiProposals": [],
-	"main": "./client/out/extension.js",
-	"name": "testbed",
-	"scripts": {
-		"clean": "tsc -b --clean",
-		"compile": "tsc -b"
-	}
+	"activationEvents": [
+		"*"
+	],
+	"dependencies": {},
+	"devDependencies": {},
+	"enabledApiProposals": []
 }

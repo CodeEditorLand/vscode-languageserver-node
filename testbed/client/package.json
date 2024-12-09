@@ -1,4 +1,5 @@
 {
+	"dependencies": {},
 	"description": "Testbed client",
 	"devDependencies": {},
 	"name": "testbed-client",
