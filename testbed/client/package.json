@@ -1,9 +1,9 @@
 {
-	"dependencies": {},
-	"description": "Testbed client",
-	"devDependencies": {},
 	"name": "testbed-client",
+	"description": "Testbed client",
 	"scripts": {
 		"compile": "tsc -b ./tsconfig.json"
-	}
+	},
+	"dependencies": {},
+	"devDependencies": {}
 }
