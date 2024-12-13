@@ -2430,7 +2430,6 @@ export interface TextDocumentItem {
 /**
  * Predefined Language kinds
  * @since 3.18.0
- * @proposed
  */
 export namespace LanguageKind {
 	export const ABAP = "abap" as const;

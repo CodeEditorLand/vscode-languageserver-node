@@ -23,6 +23,17 @@
 		"yargs": "17.7.2"
 	},
 	"devDependencies": {
-		"@types/yargs": "17.0.33"
+		"@types/yargs": "^17.0.33"
+	},
+	"scripts": {
+		"prepublishOnly": "echo \"⛔ Can only publish from a secure pipeline ⛔\" && node ../build/npm/fail",
+		"prepack": "git clean -xfd . && npm install && npm run all",
+		"compile": "tsc -b ./tsconfig.json",
+		"clean": "rimraf lib",
+		"watch": "tsc -b ./tsconfig.watch.json -w",
+		"lint": "eslint --ext ts src",
+		"all": "npm run compile && npm run lint",
+		"compile:publish": "tsc -b ./tsconfig.publish.json",
+		"all:publish": "git clean -xfd . && npm install && npm run compile:publish && npm run lint"
 	}
 }
