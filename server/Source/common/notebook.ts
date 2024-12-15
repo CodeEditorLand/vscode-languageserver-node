@@ -450,9 +450,7 @@ export class NotebookDocuments<T extends { uri: DocumentUri }> {
 
 							for (
 								let i = 0;
-
 								i <= notebookDocument.cells.length;
-
 								i++
 							) {
 								const change = cellUpdates.get(

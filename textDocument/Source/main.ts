@@ -279,9 +279,7 @@ class FullTextDocument implements TextDocument {
 				if (endLine - startLine === addedLineOffsets.length) {
 					for (
 						let i = 0, len = addedLineOffsets.length;
-
 						i < len;
-
 						i++
 					) {
 						lineOffsets[i + startLine + 1] = addedLineOffsets[i];
@@ -310,9 +308,7 @@ class FullTextDocument implements TextDocument {
 					for (
 						let i = startLine + 1 + addedLineOffsets.length,
 							len = lineOffsets.length;
-
 						i < len;
-
 						i++
 					) {
 						lineOffsets[i] = lineOffsets[i] + diff;
