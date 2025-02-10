@@ -34,7 +34,7 @@
 	},
 	"dependencies": {
 		"minimatch": "10.0.1",
-		"semver": "7.7.0"
+		"semver": "7.7.1"
 	},
 	"devDependencies": {
 		"@types/minimatch": "5.1.2",
